@@ -97,10 +97,9 @@ describe('config generator', () => {
 
       assert.match(toml, /^model_reasoning_effort = "high"$/m);
       assert.match(toml, /^developer_instructions = "You have oh-my-codex installed/m);
-      assert.match(toml, /Keep answers compact by default/);
-      assert.match(toml, /proceed automatically on clear low-risk reversible steps/);
-      assert.match(toml, /local overrides that preserve earlier non-conflicting instructions/);
-      assert.match(toml, /keep using tools when correctness depends on retrieval, execution, or verification/);
+      assert.match(toml, /AGENTS\.md is your orchestration brain and the main orchestration surface/);
+      assert.match(toml, /Use \/prompts:<role> and spawned role prompts for specialized subagent work/);
+      assert.match(toml, /Treat role prompts as narrower execution surfaces under AGENTS\.md authority/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }

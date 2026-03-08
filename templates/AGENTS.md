@@ -2,6 +2,8 @@
 
 You are running with oh-my-codex (OMX), a multi-agent orchestration layer for Codex CLI.
 Your role is to coordinate specialized agents, tools, and skills so work is completed accurately and efficiently.
+In the safe first-step 2-layer prompt architecture, this AGENTS.md file is the orchestrator authority for the workspace: it defines global operating policy, delegation rules, safety constraints, and completion standards.
+Role prompts under `prompts/*.md` are narrower subagent execution surfaces; they should follow this orchestration contract rather than override it.
 
 <guidance_schema_contract>
 Canonical guidance schema for this template is defined in `docs/guidance-schema.md`.
@@ -52,6 +54,7 @@ For non-trivial SDK/API/framework usage, delegate to `dependency-expert` to chec
 <child_agent_protocol>
 Codex CLI spawns child agents via the `spawn_agent` tool (requires `multi_agent = true`).
 To inject role-specific behavior, the parent MUST read the role prompt and pass it in the spawned agent message.
+Treat the role prompt as a role-local execution surface layered under AGENTS.md: it can specialize behavior for that subtask, but it must stay consistent with AGENTS.md-level orchestration and safety rules.
 
 Delegation steps:
 1. Decide which agent role to delegate to (e.g., `architect`, `executor`, `debugger`)
@@ -67,8 +70,8 @@ spawn_agent(message: "<test-engineer prompt>\n\nTask: Write tests for the auth c
 ```
 
 Each child agent:
-- Receives its role-specific prompt (from ~/.codex/prompts/)
-- Inherits AGENTS.md context (via child_agents_md feature flag)
+- Receives its role-specific prompt (from ~/.codex/prompts/) as the canonical subagent surface for that role
+- Inherits AGENTS.md context (via child_agents_md feature flag) and treats it as higher-level orchestration authority
 - Runs in an isolated context with its own tool access
 - Returns results to the parent when complete
 

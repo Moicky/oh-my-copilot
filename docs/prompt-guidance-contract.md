@@ -10,7 +10,7 @@ Use it when you edit any of these surfaces:
 
 - `AGENTS.md`
 - `templates/AGENTS.md`
-- `prompts/*.md`
+- canonical XML-tagged role prompt surfaces in `prompts/*.md`
 - generated top-level `developer_instructions` text in `src/config/generator.ts`
 
 ## Scope and current source of truth
@@ -20,9 +20,11 @@ Issue [#615](https://github.com/Yeachan-Heo/oh-my-codex/issues/615) uses example
 The GPT-5.4 contract is currently distributed across:
 
 - orchestration surfaces: `AGENTS.md`, `templates/AGENTS.md`
-- role prompts: `prompts/*.md`
+- canonical XML-tagged subagent role prompt surfaces: `prompts/*.md`
 - generated top-level Codex config guidance: `src/config/generator.ts`
 - regression tests: `src/hooks/__tests__/prompt-guidance-*.test.ts`
+
+In this repository, `prompts/*.md` remain the canonical source files even when their installed runtime form is injected into TOML or other launcher-specific wrappers. Treat the XML-tagged prompt body itself as the canonical role surface.
 
 This document is the contributor-oriented index for those surfaces.
 
@@ -155,10 +157,18 @@ Keep these separate when editing docs and prompts:
 
 | Topic | Primary sources |
 |---|---|
-| GPT-5.4 prompt behavior contract | `AGENTS.md`, `templates/AGENTS.md`, `prompts/*.md`, `src/config/generator.ts`, `src/hooks/__tests__/prompt-guidance-*.test.ts` |
+| GPT-5.4 prompt behavior contract | `AGENTS.md`, `templates/AGENTS.md`, canonical XML-tagged role prompt surfaces in `prompts/*.md`, `src/config/generator.ts`, `src/hooks/__tests__/prompt-guidance-*.test.ts` |
 | role/tier/posture routing | `README.md:133-179`, `docs/shared/agent-tiers.md:7-56`, `src/agents/native-config.ts:12-40` |
 
 If a change only affects posture overlays or native agent metadata, document it in the routing docs rather than expanding this contract unnecessarily.
+
+## Canonical role prompts vs specialized behavior prompts
+
+The main role catalog is the installable specialized-agent set used by `/prompts:name` and native agent generation.
+
+- Files like `prompts/executor.md`, `prompts/planner.md`, and `prompts/architect.md` are canonical XML-tagged role prompt surfaces.
+- `prompts/sisyphus-lite.md` should be treated as a specialized worker-behavior prompt, not as a first-class main catalog role.
+- Worker/runtime overlays may compose that behavior under worker protocol constraints without promoting it to the primary public role catalog.
 
 ## Contributor checklist for prompt changes
 

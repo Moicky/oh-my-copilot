@@ -147,6 +147,19 @@ export const LEGACY_PROMPT_CONTRACTS: GuidanceSurfaceContract[] = [
   },
 ];
 
+export const SPECIALIZED_PROMPT_CONTRACTS: GuidanceSurfaceContract[] = [
+  {
+    id: 'sisyphus-lite',
+    path: 'prompts/sisyphus-lite.md',
+    requiredPatterns: [
+      rx('compact, information-dense outputs'),
+      rx('Treat newer user instructions as local overrides'),
+      rx('No evidence = not complete'),
+      rx('specialized worker behavior prompt|worker behavior prompt'),
+    ],
+  },
+];
+
 export const SKILL_CONTRACTS: GuidanceSurfaceContract[] = [
   'analyze',
   'autopilot',
