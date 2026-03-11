@@ -87,6 +87,7 @@ import {
   generateShutdownInbox,
   generateTriggerMessage,
   generateMailboxTriggerMessage,
+  generateLeaderMailboxTriggerMessage,
   writeWorkerRoleInstructionsFile,
 } from './worker-bootstrap.js';
 import { loadRolePrompt } from './role-router.js';
@@ -2573,7 +2574,7 @@ export async function sendWorkerMessage(
   const manifest = await readTeamManifestV2(sanitized, cwd);
   const dispatchPolicy = resolveDispatchPolicy(manifest?.policy, config.worker_launch_mode);
   if (toWorker === 'leader-fixed') {
-    const leaderTriggerMessage = `Team ${sanitized}: new worker message for leader from ${fromWorker}`;
+    const leaderTriggerMessage = generateLeaderMailboxTriggerMessage(sanitized, fromWorker);
     const leaderTransportPreference = dispatchPolicy.dispatch_mode === 'transport_direct'
       ? 'transport_direct'
       : 'hook_preferred_with_fallback';
