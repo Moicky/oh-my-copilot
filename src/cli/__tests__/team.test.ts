@@ -3,9 +3,16 @@ import assert from 'node:assert/strict';
 import { chmod, mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { parseTeamStartArgs, teamCommand } from '../team.js';
+import { buildLeaderMonitoringHints, parseTeamStartArgs, teamCommand } from '../team.js';
 import { DEFAULT_MAX_WORKERS } from '../../team/state.js';
-import { initTeamState, appendTeamEvent } from '../../team/state.js';
+import {
+  appendTeamEvent,
+  createTask,
+  initTeamState,
+  updateWorkerHeartbeat,
+  writeMonitorSnapshot,
+  writeWorkerStatus,
+} from '../../team/state.js';
 
 describe('parseTeamStartArgs', () => {
   it('parses default team start args without worktree', () => {
@@ -70,6 +77,13 @@ describe('teamCommand shutdown --force parsing', () => {
 });
 
 describe('teamCommand api', () => {
+  it('builds leader monitoring hints that keep team status visible while ON', () => {
+    const hints = buildLeaderMonitoringHints('My Team');
+    assert.equal(hints[0], 'leader_check: omx team status my-team');
+    assert.match(hints[1] ?? '', /while ON, keep checking state/);
+    assert.match(hints[1] ?? '', /sleep 30 && omx team status my-team/);
+  });
+
   it('prints team-specific help for omx team --help', async () => {
     const logs: string[] = [];
     const originalLog = console.log;
@@ -111,6 +125,8 @@ describe('teamCommand api', () => {
       assert.match(logs[0] ?? '', /Usage: omx team api <operation>/);
       assert.match(logs[0] ?? '', /send-message/);
       assert.match(logs[0] ?? '', /transition-task-status/);
+      assert.match(logs[0] ?? '', /read-idle-state/);
+      assert.match(logs[0] ?? '', /read-stall-state/);
     } finally {
       console.log = originalLog;
     }
@@ -225,6 +241,171 @@ describe('teamCommand api', () => {
       assert.equal(envelope.data?.events?.[0]?.source_type, 'worker_idle');
       assert.equal(envelope.data?.events?.[0]?.worker, 'worker-1');
       assert.equal(envelope.data?.events?.[0]?.task_id, '1');
+    } finally {
+      console.log = originalLog;
+      process.chdir(previousCwd);
+      await rm(wd, { recursive: true, force: true });
+    }
+  });
+
+  it('executes read-idle-state via CLI api with structured JSON results', async () => {
+    const wd = await mkdtemp(join(tmpdir(), 'omx-team-api-read-idle-state-'));
+    const previousCwd = process.cwd();
+    const logs: string[] = [];
+    const originalLog = console.log;
+    try {
+      process.chdir(wd);
+      await initTeamState('api-read-idle', 'api idle state test', 'executor', 2, wd);
+      await writeMonitorSnapshot('api-read-idle', {
+        taskStatusById: {},
+        workerAliveByName: { 'worker-1': true, 'worker-2': true },
+        workerStateByName: { 'worker-1': 'idle', 'worker-2': 'working' },
+        workerTurnCountByName: { 'worker-1': 2, 'worker-2': 4 },
+        workerTaskIdByName: { 'worker-1': '', 'worker-2': '1' },
+        mailboxNotifiedByMessageId: {},
+        completedEventTaskIds: {},
+      }, wd);
+      await appendTeamEvent('api-read-idle', {
+        type: 'worker_idle',
+        worker: 'worker-1',
+        task_id: '1',
+        prev_state: 'working',
+      }, wd);
+      console.log = (...args: unknown[]) => logs.push(args.map(String).join(' '));
+
+      await teamCommand([
+        'api',
+        'read-idle-state',
+        '--input',
+        JSON.stringify({ team_name: 'api-read-idle' }),
+        '--json',
+      ]);
+
+      assert.equal(logs.length, 1);
+      const envelope = JSON.parse(logs[0]) as {
+        command?: string;
+        ok?: boolean;
+        operation?: string;
+        data?: {
+          all_workers_idle?: boolean;
+          idle_worker_count?: number;
+          idle_workers?: string[];
+          non_idle_workers?: string[];
+          last_idle_transition_by_worker?: Record<string, { source_type?: string } | null>;
+        };
+      };
+      assert.equal(envelope.command, 'omx team api read-idle-state');
+      assert.equal(envelope.ok, true);
+      assert.equal(envelope.operation, 'read-idle-state');
+      assert.equal(envelope.data?.all_workers_idle, false);
+      assert.equal(envelope.data?.idle_worker_count, 1);
+      assert.deepEqual(envelope.data?.idle_workers, ['worker-1']);
+      assert.deepEqual(envelope.data?.non_idle_workers, ['worker-2']);
+      assert.equal(envelope.data?.last_idle_transition_by_worker?.['worker-1']?.source_type, 'worker_idle');
+    } finally {
+      console.log = originalLog;
+      process.chdir(previousCwd);
+      await rm(wd, { recursive: true, force: true });
+    }
+  });
+
+  it('executes read-stall-state via CLI api with structured JSON results', async () => {
+    const wd = await mkdtemp(join(tmpdir(), 'omx-team-api-read-stall-state-'));
+    const previousCwd = process.cwd();
+    const logs: string[] = [];
+    const originalLog = console.log;
+    try {
+      process.chdir(wd);
+      await initTeamState('api-read-stall', 'api stall state test', 'executor', 2, wd);
+      const task = await createTask('api-read-stall', {
+        subject: 'Pending work',
+        description: 'Needs leader attention',
+        status: 'pending',
+      }, wd);
+      await writeWorkerStatus('api-read-stall', 'worker-1', {
+        state: 'working',
+        current_task_id: task.id,
+        updated_at: '2026-03-10T10:00:00.000Z',
+      }, wd);
+      await writeWorkerStatus('api-read-stall', 'worker-2', {
+        state: 'idle',
+        updated_at: '2026-03-10T10:00:00.000Z',
+      }, wd);
+      await updateWorkerHeartbeat('api-read-stall', 'worker-1', {
+        alive: true,
+        pid: 201,
+        turn_count: 1,
+        last_turn_at: '2026-03-10T10:00:00.000Z',
+      }, wd);
+      await updateWorkerHeartbeat('api-read-stall', 'worker-2', {
+        alive: true,
+        pid: 202,
+        turn_count: 1,
+        last_turn_at: '2026-03-10T10:00:00.000Z',
+      }, wd);
+      console.log = (...args: unknown[]) => logs.push(args.map(String).join(' '));
+      await teamCommand([
+        'api',
+        'get-summary',
+        '--input',
+        JSON.stringify({ team_name: 'api-read-stall' }),
+        '--json',
+      ]);
+      logs.length = 0;
+
+      await updateWorkerHeartbeat('api-read-stall', 'worker-1', {
+        alive: true,
+        pid: 201,
+        turn_count: 8,
+        last_turn_at: '2026-03-10T10:05:00.000Z',
+      }, wd);
+      await writeMonitorSnapshot('api-read-stall', {
+        taskStatusById: { [task.id]: 'pending' },
+        workerAliveByName: { 'worker-1': true, 'worker-2': true },
+        workerStateByName: { 'worker-1': 'idle', 'worker-2': 'idle' },
+        workerTurnCountByName: { 'worker-1': 8, 'worker-2': 1 },
+        workerTaskIdByName: { 'worker-1': task.id, 'worker-2': '' },
+        mailboxNotifiedByMessageId: {},
+        completedEventTaskIds: {},
+      }, wd);
+      await appendTeamEvent('api-read-stall', {
+        type: 'all_workers_idle',
+        worker: 'worker-2',
+        worker_count: 2,
+      }, wd);
+      await appendTeamEvent('api-read-stall', {
+        type: 'team_leader_nudge',
+        worker: 'leader-fixed',
+        reason: 'all_workers_idle',
+      }, wd);
+
+      await teamCommand([
+        'api',
+        'read-stall-state',
+        '--input',
+        JSON.stringify({ team_name: 'api-read-stall' }),
+        '--json',
+      ]);
+
+      assert.equal(logs.length, 1);
+      const envelope = JSON.parse(logs[0]) as {
+        command?: string;
+        ok?: boolean;
+        operation?: string;
+        data?: {
+          team_stalled?: boolean;
+          leader_stale?: boolean;
+          stalled_workers?: string[];
+          reasons?: string[];
+        };
+      };
+      assert.equal(envelope.command, 'omx team api read-stall-state');
+      assert.equal(envelope.ok, true);
+      assert.equal(envelope.operation, 'read-stall-state');
+      assert.equal(envelope.data?.team_stalled, true);
+      assert.equal(envelope.data?.leader_stale, true);
+      assert.deepEqual(envelope.data?.stalled_workers, ['worker-1']);
+      assert.match((envelope.data?.reasons ?? []).join(' '), /leader_attention_pending:team_leader_nudge/);
     } finally {
       console.log = originalLog;
       process.chdir(previousCwd);

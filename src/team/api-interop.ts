@@ -44,7 +44,9 @@ import {
   teamWriteMonitorSnapshot,
   teamReadTaskApproval,
   teamWriteTaskApproval,
+  type TeamEvent,
   type TeamMonitorSnapshotState,
+  type TeamSummary,
 } from './team-ops.js';
 
 const TEAM_UPDATE_TASK_MUTABLE_FIELDS = new Set(['subject', 'description', 'blocked_by', 'requires_code_change']);
@@ -104,6 +106,8 @@ export const TEAM_API_OPERATIONS = [
   'append-event',
   'read-events',
   'await-event',
+  'read-idle-state',
+  'read-stall-state',
   'get-summary',
   'cleanup',
   'write-shutdown-request',
@@ -119,6 +123,8 @@ export type TeamApiOperation = typeof TEAM_API_OPERATIONS[number];
 export type TeamApiEnvelope =
   | { ok: true; operation: TeamApiOperation; data: Record<string, unknown> }
   | { ok: false; operation: TeamApiOperation | 'unknown'; error: { code: string; message: string } };
+
+const TEAM_STATE_EVENT_WINDOW = 50;
 
 async function markLatestMailboxDispatchDelivered(
   teamName: string,
@@ -180,6 +186,144 @@ function parseOptionalEventType(value: unknown): TeamEventType | 'worker_idle' |
     throw new Error(`type must be one of: ${TEAM_EVENT_TYPES.join(', ')}`);
   }
   return normalized as TeamEventType | 'worker_idle';
+}
+
+function selectRecentEvents(events: TeamEvent[]): TeamEvent[] {
+  return events.slice(Math.max(0, events.length - TEAM_STATE_EVENT_WINDOW));
+}
+
+function listTeamWorkerNames(summary: TeamSummary | null, snapshot: TeamMonitorSnapshotState | null): string[] {
+  const names = new Set<string>();
+  for (const worker of summary?.workers ?? []) {
+    names.add(worker.name);
+  }
+  for (const workerName of Object.keys(snapshot?.workerStateByName ?? {})) {
+    names.add(workerName);
+  }
+  return [...names].sort();
+}
+
+function findLatestEventByType(events: TeamEvent[], types: TeamEvent['type'][]): TeamEvent | null {
+  const allowed = new Set(types);
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const event = events[index];
+    if (event && allowed.has(event.type)) {
+      return event;
+    }
+  }
+  return null;
+}
+
+function findLatestWorkerIdleEvent(events: TeamEvent[], workerName: string): TeamEvent | null {
+  for (let index = events.length - 1; index >= 0; index -= 1) {
+    const event = events[index];
+    if (!event || event.worker !== workerName) continue;
+    if (event.type === 'worker_state_changed' && event.state === 'idle') {
+      return event;
+    }
+  }
+  return null;
+}
+
+function summarizeEvent(event: TeamEvent | null): Record<string, unknown> | null {
+  if (!event) return null;
+  return {
+    event_id: event.event_id,
+    type: event.type,
+    worker: event.worker,
+    task_id: event.task_id ?? null,
+    created_at: event.created_at,
+    reason: event.reason ?? null,
+    state: event.state ?? null,
+    prev_state: event.prev_state ?? null,
+    source_type: event.source_type ?? null,
+    worker_count: event.worker_count ?? null,
+  };
+}
+
+function buildIdleState(
+  teamName: string,
+  summary: TeamSummary | null,
+  snapshot: TeamMonitorSnapshotState | null,
+  recentEvents: TeamEvent[],
+): Record<string, unknown> {
+  const workerNames = listTeamWorkerNames(summary, snapshot);
+  const idleWorkers = workerNames.filter((workerName) => snapshot?.workerStateByName[workerName] === 'idle');
+  const nonIdleWorkers = workerNames.filter((workerName) => !idleWorkers.includes(workerName));
+  const lastIdleTransitionByWorker = Object.fromEntries(
+    workerNames.map((workerName) => [workerName, summarizeEvent(findLatestWorkerIdleEvent(recentEvents, workerName))]),
+  );
+  const lastAllWorkersIdleEvent = findLatestEventByType(recentEvents, ['all_workers_idle']);
+
+  return {
+    team_name: teamName,
+    worker_count: summary?.workerCount ?? workerNames.length,
+    idle_worker_count: idleWorkers.length,
+    idle_workers: idleWorkers,
+    non_idle_workers: nonIdleWorkers,
+    all_workers_idle: workerNames.length > 0 && idleWorkers.length === workerNames.length,
+    last_idle_transition_by_worker: lastIdleTransitionByWorker,
+    last_all_workers_idle_event: summarizeEvent(lastAllWorkersIdleEvent),
+    source: {
+      summary_available: summary !== null,
+      snapshot_available: snapshot !== null,
+      recent_event_count: recentEvents.length,
+    },
+  };
+}
+
+function buildStallState(
+  teamName: string,
+  summary: TeamSummary | null,
+  snapshot: TeamMonitorSnapshotState | null,
+  recentEvents: TeamEvent[],
+): Record<string, unknown> {
+  const idleState = buildIdleState(teamName, summary, snapshot, recentEvents);
+  const workerNames = listTeamWorkerNames(summary, snapshot);
+  const deadWorkers = workerNames.filter((workerName) => summary?.workers.find((worker) => worker.name === workerName)?.alive === false);
+  const stalledWorkers = [...(summary?.nonReportingWorkers ?? [])].sort();
+  const latestAllWorkersIdleEvent = findLatestEventByType(recentEvents, ['all_workers_idle']);
+  const latestLeaderNudgeEvent = findLatestEventByType(recentEvents, ['team_leader_nudge']);
+  const latestDeferredEvent = findLatestEventByType(recentEvents, ['leader_notification_deferred']);
+  const pendingTaskCount = (summary?.tasks.pending ?? 0) + (summary?.tasks.blocked ?? 0) + (summary?.tasks.in_progress ?? 0);
+  const leaderStale = pendingTaskCount > 0 && idleState.all_workers_idle === true && (
+    latestLeaderNudgeEvent !== null
+    || latestDeferredEvent !== null
+    || latestAllWorkersIdleEvent !== null
+  );
+  const teamStalled = stalledWorkers.length > 0 || leaderStale || (deadWorkers.length > 0 && pendingTaskCount > 0);
+  const reasons: string[] = [];
+
+  if (stalledWorkers.length > 0) {
+    reasons.push(`workers_non_reporting:${stalledWorkers.join(',')}`);
+  }
+  if (deadWorkers.length > 0 && pendingTaskCount > 0) {
+    reasons.push(`dead_workers_with_pending_work:${deadWorkers.join(',')}`);
+  }
+  if (leaderStale) {
+    const leaderSignal = latestLeaderNudgeEvent ?? latestDeferredEvent ?? latestAllWorkersIdleEvent;
+    reasons.push(`leader_attention_pending:${leaderSignal?.type ?? 'all_workers_idle'}`);
+  }
+
+  return {
+    team_name: teamName,
+    team_stalled: teamStalled,
+    leader_stale: leaderStale,
+    stalled_workers: stalledWorkers,
+    dead_workers: deadWorkers,
+    pending_task_count: pendingTaskCount,
+    all_workers_idle: idleState.all_workers_idle,
+    idle_workers: idleState.idle_workers,
+    reasons,
+    last_all_workers_idle_event: summarizeEvent(latestAllWorkersIdleEvent),
+    last_team_leader_nudge_event: summarizeEvent(latestLeaderNudgeEvent),
+    last_leader_notification_deferred_event: summarizeEvent(latestDeferredEvent),
+    source: {
+      summary_available: summary !== null,
+      snapshot_available: snapshot !== null,
+      recent_event_count: recentEvents.length,
+    },
+  };
 }
 
 function parseValidatedTaskIdArray(value: unknown, fieldName: string): string[] {
@@ -671,6 +815,46 @@ export async function executeTeamApiOperation(
             cursor: result.cursor,
             event: result.event ?? null,
           },
+        };
+      }
+      case 'read-idle-state': {
+        const teamName = String(args.team_name || '').trim();
+        if (!teamName) {
+          return { ok: false, operation, error: { code: 'invalid_input', message: 'team_name is required' } };
+        }
+        const [summary, snapshot, events] = await Promise.all([
+          teamGetSummary(teamName, cwd),
+          teamReadMonitorSnapshot(teamName, cwd),
+          readTeamEvents(teamName, cwd),
+        ]);
+        if (!summary) {
+          return { ok: false, operation, error: { code: 'team_not_found', message: 'team_not_found' } };
+        }
+        const recentEvents = selectRecentEvents(events);
+        return {
+          ok: true,
+          operation,
+          data: buildIdleState(teamName, summary, snapshot, recentEvents),
+        };
+      }
+      case 'read-stall-state': {
+        const teamName = String(args.team_name || '').trim();
+        if (!teamName) {
+          return { ok: false, operation, error: { code: 'invalid_input', message: 'team_name is required' } };
+        }
+        const [summary, snapshot, events] = await Promise.all([
+          teamGetSummary(teamName, cwd),
+          teamReadMonitorSnapshot(teamName, cwd),
+          readTeamEvents(teamName, cwd),
+        ]);
+        if (!summary) {
+          return { ok: false, operation, error: { code: 'team_not_found', message: 'team_not_found' } };
+        }
+        const recentEvents = selectRecentEvents(events);
+        return {
+          ok: true,
+          operation,
+          data: buildStallState(teamName, summary, snapshot, recentEvents),
         };
       }
       case 'get-summary': {

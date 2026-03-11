@@ -17,9 +17,10 @@
 import { readFile, writeFile, mkdir, rm, readdir } from 'fs/promises';
 import { dirname, join } from 'path';
 import { existsSync } from 'fs';
-import { omxNotepadPath, omxProjectMemoryPath } from '../utils/paths.js';
-import { getStateDir, listModeStateFilesWithScopePreference } from '../mcp/state-paths.js';
+import { omxNotepadPath, omxProjectMemoryPath, packageRoot } from '../utils/paths.js';
+import { getReadScopedStateDirs, getStateDir, listModeStateFilesWithScopePreference } from '../mcp/state-paths.js';
 import { generateCodebaseMap } from './codebase-map.js';
+import { SKILL_ACTIVE_STATE_FILE } from './keyword-detector.js';
 
 const START_MARKER = '<!-- OMX:RUNTIME:START -->';
 const END_MARKER = '<!-- OMX:RUNTIME:END -->';
@@ -96,6 +97,12 @@ type OverlaySection = {
   text: string;
   optional: boolean;
 };
+
+export type SessionOrchestrationMode = 'default' | 'team';
+
+export interface GenerateOverlayOptions {
+  orchestrationMode?: SessionOrchestrationMode;
+}
 
 function joinSections(sections: OverlaySection[]): string {
   return sections.map(s => s.text).join('\n\n');
@@ -230,18 +237,58 @@ function getCompactionInstructions(): string {
   ].join('\n');
 }
 
+async function readTeamOrchestratorOverlay(): Promise<string> {
+  const overlayPath = join(packageRoot(), 'prompts', 'team-orchestrator.md');
+  try {
+    return (await readFile(overlayPath, 'utf-8')).trim();
+  } catch {
+    return '';
+  }
+}
+
+export async function resolveSessionOrchestrationMode(
+  cwd: string,
+  sessionId?: string,
+  activeSkill?: string,
+): Promise<SessionOrchestrationMode> {
+  if (activeSkill === 'team') return 'team';
+  if (activeSkill) return 'default';
+
+  const scopedStateDirs = await getReadScopedStateDirs(cwd, sessionId);
+  for (const stateDir of scopedStateDirs) {
+    const statePath = join(stateDir, SKILL_ACTIVE_STATE_FILE);
+    if (!existsSync(statePath)) continue;
+
+    try {
+      const state = JSON.parse(await readFile(statePath, 'utf-8')) as { active?: boolean; skill?: string };
+      if (state.active !== true) continue;
+      return state.skill === 'team' ? 'team' : 'default';
+    } catch {
+      continue;
+    }
+  }
+
+  return 'default';
+}
+
 /**
  * Generate the overlay content to inject into AGENTS.md.
  * Total output is capped at MAX_OVERLAY_SIZE chars.
  */
-export async function generateOverlay(cwd: string, sessionId?: string): Promise<string> {
-  const [activeModes, notepadPriority, projectMemory, codebaseMap, ralphActive, planningArtifacts] = await Promise.all([
+export async function generateOverlay(
+  cwd: string,
+  sessionId?: string,
+  options: GenerateOverlayOptions = {},
+): Promise<string> {
+  const orchestrationMode = options.orchestrationMode ?? 'default';
+  const [activeModes, notepadPriority, projectMemory, codebaseMap, ralphActive, planningArtifacts, teamOverlay] = await Promise.all([
     readActiveModes(cwd, sessionId),
     readNotepadPriority(cwd),
     readProjectMemorySummary(cwd),
     generateCodebaseMap(cwd),
     isRalphActive(cwd, sessionId),
     readRalphPlanningArtifacts(cwd),
+    orchestrationMode === 'team' ? readTeamOrchestratorOverlay() : Promise.resolve(''),
   ]);
 
   // Build sections with deterministic overflow behavior.
@@ -283,6 +330,14 @@ export async function generateOverlay(cwd: string, sessionId?: string): Promise<
     sections.push({
       key: 'project_context',
       text: `**Project Context:**\n${truncate(projectMemory, 1000)}`,
+      optional: true,
+    });
+  }
+
+  if (teamOverlay) {
+    sections.push({
+      key: 'team_orchestrator',
+      text: `**Orchestration Mode:** team\n${truncate(teamOverlay, 900)}`,
       optional: true,
     });
   }

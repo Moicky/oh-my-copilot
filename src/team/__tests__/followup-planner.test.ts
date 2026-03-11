@@ -23,6 +23,20 @@ describe('followup-planner', () => {
     }
   });
 
+
+  it('includes team-executor when the prompt is available', async () => {
+    const dir = await mkdtemp(join(tmpdir(), 'omx-followup-roster-'));
+    try {
+      await writeFile(join(dir, 'executor.md'), '# Executor');
+      await writeFile(join(dir, 'team-executor.md'), '# Team Executor');
+
+      const roles = await resolveAvailableAgentTypes(process.cwd(), { promptDirs: [dir] });
+      assert.deepEqual(roles, ['executor', 'team-executor']);
+    } finally {
+      await rm(dir, { recursive: true, force: true });
+    }
+  });
+
   it('builds concrete team staffing guidance from the available roster', () => {
     const plan = buildFollowupStaffingPlan(
       'team',

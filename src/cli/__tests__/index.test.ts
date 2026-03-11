@@ -7,6 +7,7 @@ import {
   normalizeCodexLaunchArgs,
   buildTmuxShellCommand,
   buildTmuxPaneCommand,
+  buildWindowsPromptCommand,
   buildTmuxSessionName,
   resolveCliInvocation,
   resolveCodexLaunchPolicy,
@@ -294,6 +295,13 @@ describe('resolveCliInvocation', () => {
     });
   });
 
+  it('resolves session to session command', () => {
+    assert.deepEqual(resolveCliInvocation(['session', 'search', 'startup evidence']), {
+      command: 'session',
+      launchArgs: [],
+    });
+  });
+
   it('resolves hooks to hooks command', () => {
     assert.deepEqual(resolveCliInvocation(['hooks']), {
       command: 'hooks',
@@ -545,6 +553,21 @@ describe('detached tmux new-session sequencing', () => {
     );
   });
 
+  it('buildDetachedSessionBootstrapSteps starts native Windows detached sessions with powershell', () => {
+    const steps = buildDetachedSessionBootstrapSteps(
+      'omx-demo',
+      'C:/project',
+      "'codex' '--dangerously-bypass-approvals-and-sandbox'",
+      "'node' 'omx.js' 'hud' '--watch'",
+      '--model gpt-5',
+      'C:/codex-home',
+      null,
+      true,
+    );
+    assert.equal(steps[0]?.name, 'new-session');
+    assert.equal(steps[0]?.args.at(-1), 'powershell.exe');
+  });
+
   it('buildDetachedSessionFinalizeSteps keeps schedule after split-capture and before attach', () => {
     const steps = buildDetachedSessionFinalizeSteps('omx-demo', '%12', '3', true, false);
     const names = steps.map((step) => step.name);
@@ -571,6 +594,14 @@ describe('detached tmux new-session sequencing', () => {
     assert.match(schedule?.args[2] ?? '', new RegExp(`-y ${HUD_TMUX_HEIGHT_LINES}\\b`));
     assert.match((reconcile?.args ?? []).join(' '), />\/dev\/null 2>&1 \|\| true/);
     assert.match((reconcile?.args ?? []).join(' '), new RegExp(`-y ${HUD_TMUX_HEIGHT_LINES}\\b`));
+  });
+
+  it('buildDetachedSessionFinalizeSteps skips detached resize hooks on native Windows', () => {
+    const steps = buildDetachedSessionFinalizeSteps('omx-demo', '%12', '3', true, false, true);
+    assert.deepEqual(
+      steps.map((step) => step.name),
+      ['set-mouse', 'attach-session'],
+    );
   });
 
   it('buildDetachedSessionRollbackSteps unregisters hooks before killing session', () => {
@@ -636,10 +667,19 @@ describe('buildTmuxPaneCommand', () => {
   });
 });
 
+describe('buildWindowsPromptCommand', () => {
+  it('quotes detached Windows codex commands for PowerShell prompt injection', () => {
+    assert.equal(
+      buildWindowsPromptCommand('codex', ['--dangerously-bypass-approvals-and-sandbox', '-c', 'model_reasoning_effort="high"', "it's"]),
+      "& 'codex' '--dangerously-bypass-approvals-and-sandbox' '-c' 'model_reasoning_effort=\"high\"' 'it''s'",
+    );
+  });
+});
+
 describe('buildTmuxSessionName', () => {
-  it('uses omx-directory-branch-session format', () => {
+  it('uses detached fallback quietly outside git repos', () => {
     const name = buildTmuxSessionName('/tmp/My Repo', 'omx-1770992424158-abc123');
-    assert.match(name, /^omx-my-repo-[a-z0-9-]+-1770992424158-abc123$/);
+    assert.equal(name, 'omx-my-repo-detached-1770992424158-abc123');
   });
 
   it('sanitizes invalid characters', () => {

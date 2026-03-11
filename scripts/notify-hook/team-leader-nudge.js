@@ -53,6 +53,12 @@ export function resolveLeaderProgressStallThresholdMs() {
   return 120_000;
 }
 
+function buildStatusCheckReminder(teamName, { keepPolling = false } = {}) {
+  return keepPolling
+    ? `Check: omx team status ${teamName}; keep polling.`
+    : `Check: omx team status ${teamName}.`;
+}
+
 export async function checkWorkerPanesAlive(tmuxTarget, workerPaneIds = []) {
   const sessionName = tmuxTarget.split(':')[0];
   try {
@@ -543,7 +549,10 @@ export async function maybeNudgeTeamLeader({ cwd, stateDir, logsDir, preComputed
     // Stale-leader follow-up is the only periodic visible nudge path.
     // This keeps the leader pane quieter when the leader is not actually stale.
     const stalePanesNudge = paneStatus.alive && leaderStale;
-    const stalledTeamNudge = teamProgressStalled && leaderStale && (dueByTime || prevReason !== 'leader_stale_with_stalled_team');
+    const stalledTeamReason = leaderStale ? 'leader_stale_with_stalled_team' : 'stalled_team_progress';
+    const previousStalledTeamNudge =
+      prevReason === 'leader_stale_with_stalled_team' || prevReason === 'stalled_team_progress';
+    const stalledTeamNudge = teamProgressStalled && (dueByTime || !previousStalledTeamNudge);
     const staleFollowupDue = stalePanesNudge && dueByTime;
 
     if (!shouldSendAllIdleNudge && !hasNewMessage && !stalledTeamNudge && !staleFollowupDue) continue;
@@ -559,26 +568,31 @@ export async function maybeNudgeTeamLeader({ cwd, stateDir, logsDir, preComputed
       text =
         `Team ${teamName}: ${ackWithoutStartEvidence.worker} said "${ackWithoutStartEvidence.body}" `
         + `but has no work-start evidence yet (status: ${ackWithoutStartEvidence.statusState}, no owned in_progress task). `
-        + `Run: omx team status ${teamName}`;
+        + buildStatusCheckReminder(teamName);
     } else if (stalledTeamNudge) {
-      nudgeReason = 'leader_stale_with_stalled_team';
+      nudgeReason = stalledTeamReason;
       const { pending, in_progress, blocked } = progressSnapshot.taskCounts;
       const missingSignals = progressSnapshot.missingSignalWorkers > 0
         ? `; ${progressSnapshot.missingSignalWorkers} worker signal${progressSnapshot.missingSignalWorkers === 1 ? '' : 's'} missing`
         : '';
+      const stallPrefix = leaderStale ? 'leader stale, ' : 'worker panes stalled, ';
       text =
-        `Team ${teamName}: leader stale, no team progress for ${formatDurationMs(stalledForMs)} `
-        + `(pending:${pending} in_progress:${in_progress} blocked:${blocked}${missingSignals}). `
-        + `Run: omx team status ${teamName}`;
+        `Team ${teamName}: ${stallPrefix}no team progress for ${formatDurationMs(stalledForMs)}. `
+        + `${buildStatusCheckReminder(teamName, { keepPolling: true })} `
+        + `(pending:${pending} in_progress:${in_progress} blocked:${blocked}${missingSignals})`;
     } else if (stalePanesNudge && hasNewMessage) {
       nudgeReason = 'stale_leader_with_messages';
-      text = `Team ${teamName}: leader stale, ${paneStatus.paneCount} pane(s) active, ${messages.length} msg(s) pending. Run: omx team status ${teamName}`;
+      text =
+        `Team ${teamName}: leader stale, ${paneStatus.paneCount} pane(s) active, ${messages.length} msg(s) pending. `
+        + buildStatusCheckReminder(teamName, { keepPolling: true });
     } else if (staleFollowupDue) {
       nudgeReason = 'stale_leader_panes_alive';
-      text = `Team ${teamName}: leader stale, ${paneStatus.paneCount} worker pane(s) still active. Run: omx team status ${teamName}`;
+      text =
+        `Team ${teamName}: leader stale, ${paneStatus.paneCount} worker pane(s) still active. `
+        + buildStatusCheckReminder(teamName, { keepPolling: true });
     } else if (hasNewMessage) {
       nudgeReason = 'new_mailbox_message';
-      text = `Team ${teamName}: ${messages.length} msg(s) for leader. Run: omx team status ${teamName}`;
+      text = `Team ${teamName}: ${messages.length} msg(s) for leader. ${buildStatusCheckReminder(teamName)}`;
     } else {
       continue;
     }

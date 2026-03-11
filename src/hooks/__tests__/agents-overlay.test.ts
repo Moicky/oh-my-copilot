@@ -16,6 +16,7 @@ import {
   applyOverlay,
   stripOverlay,
   hasOverlay,
+  resolveSessionOrchestrationMode,
   writeSessionModelInstructionsFile,
   removeSessionModelInstructionsFile,
   sessionModelInstructionsPath,
@@ -43,6 +44,15 @@ describe('generateOverlay', () => {
     assert.ok(overlay.includes('<!-- OMX:RUNTIME:END -->'));
     assert.ok(overlay.includes('test-session-1'));
     assert.ok(overlay.includes('Compaction Protocol'));
+  });
+
+  it('includes the team orchestrator overlay only when orchestration mode is team', async () => {
+    const overlay = await generateOverlay(tempDir, 'team-session', { orchestrationMode: 'team' });
+    assert.match(overlay, /\*\*Orchestration Mode:\*\* team/);
+    assert.match(overlay, /supervised, high-overhead coordination surface/i);
+
+    const defaultOverlay = await generateOverlay(tempDir, 'default-session', { orchestrationMode: 'default' });
+    assert.doesNotMatch(defaultOverlay, /\*\*Orchestration Mode:\*\* team/);
   });
 
   it('generates overlay with active modes', async () => {
@@ -188,6 +198,44 @@ describe('generateOverlay', () => {
     const overlay = await generateOverlay(tempDir, sessionId);
     assert.match(overlay, /\*\*Ralph Ralplan-First Gate:\*\* UNLOCKED/);
     assert.match(overlay, /Planning artifacts present: PRD \+ test spec/);
+  });
+});
+
+describe('resolveSessionOrchestrationMode', () => {
+  let tempDir: string;
+
+  before(async () => { tempDir = await makeTempDir(); });
+  after(async () => { await rm(tempDir, { recursive: true, force: true }); });
+
+  it('uses explicit activeSkill when provided', async () => {
+    const mode = await resolveSessionOrchestrationMode(tempDir, 'sess-explicit', 'team');
+    assert.equal(mode, 'team');
+  });
+
+  it('reads persisted team skill state from the current session scope', async () => {
+    const sessionId = 'sess-team';
+    const sessionDir = join(tempDir, '.omx', 'state', 'sessions', sessionId);
+    await mkdir(sessionDir, { recursive: true });
+    await writeFile(
+      join(sessionDir, 'skill-active-state.json'),
+      JSON.stringify({ active: true, skill: 'team' }),
+    );
+
+    const mode = await resolveSessionOrchestrationMode(tempDir, sessionId);
+    assert.equal(mode, 'team');
+  });
+
+  it('falls back to default mode for non-team skill state', async () => {
+    const sessionId = 'sess-autopilot';
+    const sessionDir = join(tempDir, '.omx', 'state', 'sessions', sessionId);
+    await mkdir(sessionDir, { recursive: true });
+    await writeFile(
+      join(sessionDir, 'skill-active-state.json'),
+      JSON.stringify({ active: true, skill: 'autopilot' }),
+    );
+
+    const mode = await resolveSessionOrchestrationMode(tempDir, sessionId);
+    assert.equal(mode, 'default');
   });
 });
 

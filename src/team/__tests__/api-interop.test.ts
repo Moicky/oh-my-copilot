@@ -18,6 +18,9 @@ import {
   enqueueDispatchRequest,
   readDispatchRequest,
   appendTeamEvent,
+  updateWorkerHeartbeat,
+  writeMonitorSnapshot,
+  writeWorkerStatus,
 } from '../state.js';
 
 async function setupTeam(name: string): Promise<{ cwd: string; cleanup: () => Promise<void> }> {
@@ -53,7 +56,7 @@ describe('resolveTeamApiOperation', () => {
     assert.equal(resolveTeamApiOperation('  SEND_MESSAGE  '), 'send-message');
   });
 
-  it('resolves all 30 operations from the operation list', () => {
+  it('resolves all 32 operations from the operation list', () => {
     for (const op of TEAM_API_OPERATIONS) {
       assert.equal(resolveTeamApiOperation(op), op);
     }
@@ -95,8 +98,8 @@ describe('LEGACY_TEAM_MCP_TOOLS', () => {
 });
 
 describe('TEAM_API_OPERATIONS', () => {
-  it('contains 30 operations', () => {
-    assert.equal(TEAM_API_OPERATIONS.length, 30);
+  it('contains 32 operations', () => {
+    assert.equal(TEAM_API_OPERATIONS.length, 32);
   });
 
   it('all use kebab-case', () => {
@@ -1009,6 +1012,150 @@ describe('executeTeamApiOperation: await-event', () => {
     assert.equal(result.ok, false);
     if (!result.ok) {
       assert.match(result.error.message, /timeout_ms must be a non-negative integer/);
+    }
+  });
+});
+
+// ─── read-idle-state ────────────────────────────────────────────────────────
+
+describe('executeTeamApiOperation: read-idle-state', () => {
+  it('returns structured idle state from summary, snapshot, and recent events', async () => {
+    const { cwd, cleanup } = await setupTeam('idle-state-team');
+    try {
+      await writeMonitorSnapshot('idle-state-team', {
+        taskStatusById: { '1': 'pending' },
+        workerAliveByName: { 'worker-1': true, 'worker-2': true },
+        workerStateByName: { 'worker-1': 'idle', 'worker-2': 'working' },
+        workerTurnCountByName: { 'worker-1': 3, 'worker-2': 5 },
+        workerTaskIdByName: { 'worker-1': '1', 'worker-2': '1' },
+        mailboxNotifiedByMessageId: {},
+        completedEventTaskIds: {},
+      }, cwd);
+      await appendTeamEvent('idle-state-team', {
+        type: 'worker_idle',
+        worker: 'worker-1',
+        task_id: '1',
+        prev_state: 'working',
+      }, cwd);
+      const allIdleEvent = await appendTeamEvent('idle-state-team', {
+        type: 'all_workers_idle',
+        worker: 'worker-1',
+        worker_count: 2,
+      }, cwd);
+
+      const result = await executeTeamApiOperation('read-idle-state', {
+        team_name: 'idle-state-team',
+      }, cwd);
+
+      assert.equal(result.ok, true);
+      if (result.ok) {
+        assert.equal(result.data.team_name, 'idle-state-team');
+        assert.equal(result.data.worker_count, 2);
+        assert.equal(result.data.idle_worker_count, 1);
+        assert.deepEqual(result.data.idle_workers, ['worker-1']);
+        assert.deepEqual(result.data.non_idle_workers, ['worker-2']);
+        assert.equal(result.data.all_workers_idle, false);
+        const byWorker = result.data.last_idle_transition_by_worker as Record<string, { event_id?: string; source_type?: string } | null>;
+        assert.equal(byWorker['worker-1']?.source_type, 'worker_idle');
+        assert.equal(byWorker['worker-2'], null);
+        const lastAllIdle = result.data.last_all_workers_idle_event as { event_id?: string; type?: string; worker_count?: number } | null;
+        assert.equal(lastAllIdle?.event_id, allIdleEvent.event_id);
+        assert.equal(lastAllIdle?.type, 'all_workers_idle');
+        assert.equal(lastAllIdle?.worker_count, 2);
+      }
+    } finally {
+      await cleanup();
+    }
+  });
+});
+
+// ─── read-stall-state ───────────────────────────────────────────────────────
+
+describe('executeTeamApiOperation: read-stall-state', () => {
+  it('returns structured stall state from summary, snapshot, and recent events', async () => {
+    const { cwd, cleanup } = await setupTeam('stall-state-team');
+    try {
+      const task = await createTask('stall-state-team', {
+        subject: 'Pending work',
+        description: 'Needs attention',
+        status: 'pending',
+      }, cwd);
+
+      await writeWorkerStatus('stall-state-team', 'worker-1', {
+        state: 'working',
+        current_task_id: task.id,
+        updated_at: '2026-03-10T10:00:00.000Z',
+      }, cwd);
+      await writeWorkerStatus('stall-state-team', 'worker-2', {
+        state: 'idle',
+        updated_at: '2026-03-10T10:00:00.000Z',
+      }, cwd);
+      await updateWorkerHeartbeat('stall-state-team', 'worker-1', {
+        alive: true,
+        pid: 101,
+        turn_count: 1,
+        last_turn_at: '2026-03-10T10:00:00.000Z',
+      }, cwd);
+      await updateWorkerHeartbeat('stall-state-team', 'worker-2', {
+        alive: true,
+        pid: 102,
+        turn_count: 1,
+        last_turn_at: '2026-03-10T10:00:00.000Z',
+      }, cwd);
+      const primed = await executeTeamApiOperation('get-summary', {
+        team_name: 'stall-state-team',
+      }, cwd);
+      assert.equal(primed.ok, true);
+
+      await updateWorkerHeartbeat('stall-state-team', 'worker-1', {
+        alive: true,
+        pid: 101,
+        turn_count: 8,
+        last_turn_at: '2026-03-10T10:05:00.000Z',
+      }, cwd);
+      await writeMonitorSnapshot('stall-state-team', {
+        taskStatusById: { [task.id]: 'pending' },
+        workerAliveByName: { 'worker-1': true, 'worker-2': true },
+        workerStateByName: { 'worker-1': 'idle', 'worker-2': 'idle' },
+        workerTurnCountByName: { 'worker-1': 8, 'worker-2': 1 },
+        workerTaskIdByName: { 'worker-1': task.id, 'worker-2': '' },
+        mailboxNotifiedByMessageId: {},
+        completedEventTaskIds: {},
+      }, cwd);
+      const idleEvent = await appendTeamEvent('stall-state-team', {
+        type: 'all_workers_idle',
+        worker: 'worker-2',
+        worker_count: 2,
+      }, cwd);
+      const nudgeEvent = await appendTeamEvent('stall-state-team', {
+        type: 'team_leader_nudge',
+        worker: 'leader-fixed',
+        reason: 'all_workers_idle',
+      }, cwd);
+
+      const result = await executeTeamApiOperation('read-stall-state', {
+        team_name: 'stall-state-team',
+      }, cwd);
+
+      assert.equal(result.ok, true);
+      if (result.ok) {
+        assert.equal(result.data.team_name, 'stall-state-team');
+        assert.equal(result.data.team_stalled, true);
+        assert.equal(result.data.leader_stale, true);
+        assert.deepEqual(result.data.stalled_workers, ['worker-1']);
+        assert.deepEqual(result.data.dead_workers, []);
+        assert.equal(result.data.pending_task_count, 1);
+        assert.equal(result.data.all_workers_idle, true);
+        assert.match((result.data.reasons as string[]).join(' '), /workers_non_reporting:worker-1/);
+        assert.match((result.data.reasons as string[]).join(' '), /leader_attention_pending:team_leader_nudge/);
+        const lastAllIdle = result.data.last_all_workers_idle_event as { event_id?: string } | null;
+        const lastNudge = result.data.last_team_leader_nudge_event as { event_id?: string; reason?: string } | null;
+        assert.equal(lastAllIdle?.event_id, idleEvent.event_id);
+        assert.equal(lastNudge?.event_id, nudgeEvent.event_id);
+        assert.equal(lastNudge?.reason, 'all_workers_idle');
+      }
+    } finally {
+      await cleanup();
     }
   });
 });

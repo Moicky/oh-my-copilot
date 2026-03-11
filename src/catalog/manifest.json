@@ -266,6 +266,11 @@
       "status": "active"
     },
     {
+      "name": "team-executor",
+      "category": "build",
+      "status": "internal"
+    },
+    {
       "name": "verifier",
       "category": "build",
       "status": "active"
