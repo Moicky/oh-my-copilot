@@ -92,6 +92,7 @@ const TEAM_API_OPERATION_REQUIRED_FIELDS: Record<TeamApiOperation, string[]> = {
   'read-stall-state': ['team_name'],
   'get-summary': ['team_name'],
   'cleanup': ['team_name'],
+  'orphan-cleanup': ['team_name'],
   'write-shutdown-request': ['team_name', 'worker', 'requested_by'],
   'read-shutdown-ack': ['team_name', 'worker'],
   'read-monitor-snapshot': ['team_name'],
@@ -104,6 +105,7 @@ const TEAM_API_OPERATION_OPTIONAL_FIELDS: Partial<Record<TeamApiOperation, strin
   'create-task': ['owner', 'blocked_by', 'requires_code_change'],
   'update-task': ['subject', 'description', 'blocked_by', 'requires_code_change'],
   'claim-task': ['expected_version'],
+  'cleanup': ['force', 'ralph'],
   'read-shutdown-ack': ['min_updated_at'],
   'write-worker-identity': [
     'assigned_tasks', 'pid', 'pane_id', 'working_dir',
@@ -119,6 +121,8 @@ const TEAM_API_OPERATION_NOTES: Partial<Record<TeamApiOperation, string>> = {
   'update-task': 'Only non-lifecycle task metadata can be updated.',
   'release-task-claim': 'Use this only for rollback/requeue to pending (not for completion).',
   'transition-task-status': 'Lifecycle flow is claim-safe and typically transitions in_progress -> completed|failed.',
+  'cleanup': 'Uses the runtime shutdown contract; use orphan-cleanup only for known orphan recovery.',
+  'orphan-cleanup': 'Destructive escape hatch for known orphan recovery. Bypasses shutdown orchestration.',
   'read-events': 'Events are returned in canonical form; worker_idle log entries normalize to type worker_state_changed with source_type worker_idle. wakeable_only defaults to false; set wakeable_only=true to mirror omx team await semantics.',
   'await-event': 'Waits for the next matching event and returns status=timeout when no matching event arrives before timeout_ms. wakeable_only defaults to false; set wakeable_only=true to mirror omx team await semantics.',
   'read-idle-state': 'Builds a structured idle summary from the existing monitor snapshot, team summary, and recent events.',
@@ -593,6 +597,12 @@ async function ensureTeamModeState(
   }
 }
 
+function isLinkedRalphProfile(
+  config: { lifecycle_profile?: unknown } | null | undefined,
+): boolean {
+  return config?.lifecycle_profile === 'linked_ralph';
+}
+
 async function ensureLinkedRalphModeState(parsed: ParsedTeamArgs): Promise<void> {
   const existing = await readModeState('ralph').catch(() => null);
   const nextPhase = existing?.active === true
@@ -837,9 +847,12 @@ export async function teamCommand(args: string[], options: TeamCliOptions = {}):
       return;
     }
     const existingState = await readModeState('team').catch(() => null);
-    const preservedRalph = existingState?.active === true
+    const persistedRalph = isLinkedRalphProfile(runtime.config);
+    const preservedRalph = persistedRalph || (
+      existingState?.active === true
       && existingState?.team_name === runtime.teamName
-      && existingState?.linked_ralph === true;
+      && existingState?.linked_ralph === true
+    );
     await ensureTeamModeState({
       task: runtime.config.task,
       workerCount: runtime.config.worker_count,
@@ -863,11 +876,15 @@ export async function teamCommand(args: string[], options: TeamCliOptions = {}):
     if (!name) throw new Error('Usage: omx team shutdown <team-name> [--force] [--ralph]');
     const force = teamArgs.includes('--force');
     const ralphFlag = teamArgs.includes('--ralph');
+    const persistedConfig = await readTeamConfig(name, cwd).catch(() => null);
     const ralphFromState = !ralphFlag
-      ? await readModeState('team').then(
+      ? (
+        isLinkedRalphProfile(persistedConfig)
+        || await readModeState('team').then(
           (s) => s?.active === true && s?.linked_ralph === true && s?.team_name === name,
           () => false,
         )
+      )
       : false;
     await shutdownTeam(name, cwd, { force, ralph: ralphFlag || ralphFromState });
     await updateModeState('team', {

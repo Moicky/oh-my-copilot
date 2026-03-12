@@ -65,6 +65,7 @@ export interface TeamConfig {
   task: string;
   agent_type: string;
   worker_launch_mode: 'interactive' | 'prompt';
+  lifecycle_profile: 'default' | 'linked_ralph';
   worker_count: number;
   max_workers: number; // default 20, configurable up to 20
   workers: WorkerInfo[];
@@ -223,6 +224,7 @@ export interface TeamManifestV2 {
   leader: TeamLeader;
   policy: TeamPolicy;
   governance: TeamGovernance;
+  lifecycle_profile: 'default' | 'linked_ralph';
   permissions_snapshot: PermissionsSnapshot;
   tmux_session: string;
   worker_count: number;
@@ -702,6 +704,7 @@ export async function initTeamState(
   maxWorkers: number = DEFAULT_MAX_WORKERS,
   env: NodeJS.ProcessEnv = process.env,
   workspace: TeamWorkspaceMetadata = {},
+  lifecycleProfile: 'default' | 'linked_ralph' = 'default',
 ): Promise<TeamConfig> {
   validateTeamName(teamName);
 
@@ -750,6 +753,7 @@ export async function initTeamState(
     task,
     agent_type: agentType,
     worker_launch_mode: workerLaunchMode,
+    lifecycle_profile: lifecycleProfile,
     worker_count: workerCount,
     max_workers: maxWorkers,
     workers,
@@ -790,6 +794,7 @@ export async function initTeamState(
       },
       policy: defaultPolicy(displayMode, workerLaunchMode),
       governance: defaultGovernance(),
+      lifecycle_profile: lifecycleProfile,
       permissions_snapshot: permissionsSnapshot,
       tmux_session: config.tmux_session,
       worker_count: workerCount,
@@ -824,6 +829,7 @@ async function writeConfig(cfg: TeamConfig, cwd: string): Promise<void> {
       tmux_session: normalized.tmux_session,
       worker_count: normalized.worker_count,
       workers: normalized.workers,
+      lifecycle_profile: normalized.lifecycle_profile,
       next_task_id: normalizeNextTaskId(normalized.next_task_id),
       leader_cwd: normalized.leader_cwd,
       team_state_root: normalized.team_state_root,
@@ -849,6 +855,7 @@ function teamConfigFromManifest(manifest: TeamManifestV2): TeamConfig {
     task: manifest.task,
     agent_type: manifest.workers[0]?.role ?? 'executor',
     worker_launch_mode: workerLaunchMode,
+    lifecycle_profile: manifest.lifecycle_profile,
     worker_count: manifest.worker_count,
     max_workers: DEFAULT_MAX_WORKERS,
     workers: manifest.workers,
@@ -870,6 +877,7 @@ function normalizeTeamConfig(config: TeamConfig): TeamConfig {
   const workerLaunchMode = config.worker_launch_mode === 'prompt' ? 'prompt' : 'interactive';
   return {
     ...config,
+    lifecycle_profile: config.lifecycle_profile === 'linked_ralph' ? 'linked_ralph' : 'default',
     leader_pane_id: config.leader_pane_id ?? null,
     hud_pane_id: config.hud_pane_id ?? null,
     resize_hook_name: config.resize_hook_name ?? null,
@@ -896,6 +904,7 @@ function teamManifestFromConfig(config: TeamConfig): TeamManifestV2 {
     leader: defaultLeader(),
     policy,
     governance: defaultGovernance(),
+    lifecycle_profile: normalized.lifecycle_profile,
     permissions_snapshot: defaultPermissionsSnapshot(),
     tmux_session: normalized.tmux_session,
     worker_count: normalized.worker_count,
@@ -930,6 +939,7 @@ export async function writeTeamManifestV2(manifest: TeamManifestV2, cwd: string)
         ...manifest,
         policy: normalizedPolicy,
         governance: normalizedGovernance,
+        lifecycle_profile: manifest.lifecycle_profile === 'linked_ralph' ? 'linked_ralph' : 'default',
       },
       null,
       2,
@@ -955,6 +965,7 @@ export async function readTeamManifestV2(teamName: string, cwd: string): Promise
         worker_launch_mode: parsedManifest.policy?.worker_launch_mode === 'prompt' ? 'prompt' : 'interactive',
       }),
       governance: normalizeTeamGovernance(parsedManifest.governance, parsedManifest.policy),
+      lifecycle_profile: parsedManifest.lifecycle_profile === 'linked_ralph' ? 'linked_ralph' : 'default',
     };
   } catch {
     return null;

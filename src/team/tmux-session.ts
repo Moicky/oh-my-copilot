@@ -10,6 +10,7 @@ import {
   MODEL_FLAG,
 } from '../cli/constants.js';
 import {
+  buildCapturePaneArgv as sharedBuildCapturePaneArgv,
   normalizeTmuxCapture as sharedNormalizeTmuxCapture,
   paneHasActiveTask as sharedPaneHasActiveTask,
   paneIsBootstrapping as sharedPaneIsBootstrapping,
@@ -213,7 +214,7 @@ async function sendKeyAsync(target: string, key: string): Promise<void> {
 }
 
 async function capturePaneAsync(target: string): Promise<string> {
-  const result = await runTmuxAsync(['capture-pane', '-t', target, '-p', '-S', '-80']);
+  const result = await runTmuxAsync(sharedBuildCapturePaneArgv(target, 80));
   if (!result.ok) return '';
   return result.stdout;
 }

@@ -56,7 +56,7 @@ describe('resolveTeamApiOperation', () => {
     assert.equal(resolveTeamApiOperation('  SEND_MESSAGE  '), 'send-message');
   });
 
-  it('resolves all 32 operations from the operation list', () => {
+  it('resolves all 33 operations from the operation list', () => {
     for (const op of TEAM_API_OPERATIONS) {
       assert.equal(resolveTeamApiOperation(op), op);
     }
@@ -86,8 +86,8 @@ describe('buildLegacyTeamDeprecationHint', () => {
 // ─── constants ────────────────────────────────────────────────────────────
 
 describe('LEGACY_TEAM_MCP_TOOLS', () => {
-  it('contains 28 legacy tool names', () => {
-    assert.equal(LEGACY_TEAM_MCP_TOOLS.length, 28);
+  it('contains 29 legacy tool names', () => {
+    assert.equal(LEGACY_TEAM_MCP_TOOLS.length, 29);
   });
 
   it('all start with team_', () => {
@@ -98,8 +98,8 @@ describe('LEGACY_TEAM_MCP_TOOLS', () => {
 });
 
 describe('TEAM_API_OPERATIONS', () => {
-  it('contains 32 operations', () => {
-    assert.equal(TEAM_API_OPERATIONS.length, 32);
+  it('contains 33 operations', () => {
+    assert.equal(TEAM_API_OPERATIONS.length, 33);
   });
 
   it('all use kebab-case', () => {
@@ -1197,14 +1197,35 @@ describe('executeTeamApiOperation: get-summary', () => {
 // ─── cleanup ──────────────────────────────────────────────────────────────
 
 describe('executeTeamApiOperation: cleanup', () => {
-  it('cleans up team state', async () => {
+  it('routes normal cleanup through shutdownTeam', async () => {
     const { cwd, cleanup } = await setupTeam('cleanup-team');
     try {
       const result = await executeTeamApiOperation('cleanup', {
         team_name: 'cleanup-team',
       }, cwd);
       assert.equal(result.ok, true);
-      if (result.ok) assert.equal(result.data.team_name, 'cleanup-team');
+      if (result.ok) {
+        assert.equal(result.data.team_name, 'cleanup-team');
+        assert.equal(result.data.cleanup_mode, 'shutdown');
+      }
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it('does not bypass shutdown gate for pending work', async () => {
+    const { cwd, cleanup } = await setupTeam('cleanup-gated');
+    try {
+      await createTask('cleanup-gated', {
+        subject: 'pending task',
+        description: 'should block normal cleanup',
+        status: 'pending',
+      }, cwd);
+      const result = await executeTeamApiOperation('cleanup', {
+        team_name: 'cleanup-gated',
+      }, cwd);
+      assert.equal(result.ok, false);
+      if (!result.ok) assert.match(result.error.message, /shutdown_gate_blocked/);
     } finally {
       await cleanup();
     }
@@ -1212,6 +1233,25 @@ describe('executeTeamApiOperation: cleanup', () => {
 
   it('returns error when team_name missing', async () => {
     const result = await executeTeamApiOperation('cleanup', {}, '/tmp');
+    assert.equal(result.ok, false);
+  });
+});
+
+describe('executeTeamApiOperation: orphan-cleanup', () => {
+  it('uses destructive orphan cleanup explicitly', async () => {
+    const { cwd } = await setupTeam('cleanup-orphan');
+    const result = await executeTeamApiOperation('orphan-cleanup', {
+      team_name: 'cleanup-orphan',
+    }, cwd);
+    assert.equal(result.ok, true);
+    if (result.ok) {
+      assert.equal(result.data.team_name, 'cleanup-orphan');
+      assert.equal(result.data.cleanup_mode, 'orphan_cleanup');
+    }
+  });
+
+  it('returns error when team_name missing', async () => {
+    const result = await executeTeamApiOperation('orphan-cleanup', {}, '/tmp');
     assert.equal(result.ok, false);
   });
 });

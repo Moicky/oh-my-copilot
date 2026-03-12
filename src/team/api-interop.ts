@@ -12,6 +12,7 @@ import {
   type TeamTaskApprovalStatus,
 } from './contracts.js';
 import { readTeamEvents, waitForTeamEvent } from './state/events.js';
+import { shutdownTeam } from './runtime.js';
 import {
   teamSendMessage as sendDirectMessage,
   teamBroadcast as broadcastMessage,
@@ -75,6 +76,7 @@ export const LEGACY_TEAM_MCP_TOOLS = [
   'team_append_event',
   'team_get_summary',
   'team_cleanup',
+  'team_orphan_cleanup',
   'team_write_shutdown_request',
   'team_read_shutdown_ack',
   'team_read_monitor_snapshot',
@@ -110,6 +112,7 @@ export const TEAM_API_OPERATIONS = [
   'read-stall-state',
   'get-summary',
   'cleanup',
+  'orphan-cleanup',
   'write-shutdown-request',
   'read-shutdown-ack',
   'read-monitor-snapshot',
@@ -868,8 +871,16 @@ export async function executeTeamApiOperation(
       case 'cleanup': {
         const teamName = String(args.team_name || '').trim();
         if (!teamName) return { ok: false, operation, error: { code: 'invalid_input', message: 'team_name is required' } };
+        const force = args.force === true;
+        const ralph = args.ralph === true;
+        await shutdownTeam(teamName, cwd, { force, ralph });
+        return { ok: true, operation, data: { team_name: teamName, cleanup_mode: 'shutdown' } };
+      }
+      case 'orphan-cleanup': {
+        const teamName = String(args.team_name || '').trim();
+        if (!teamName) return { ok: false, operation, error: { code: 'invalid_input', message: 'team_name is required' } };
         await teamCleanup(teamName, cwd);
-        return { ok: true, operation, data: { team_name: teamName } };
+        return { ok: true, operation, data: { team_name: teamName, cleanup_mode: 'orphan_cleanup' } };
       }
       case 'write-shutdown-request': {
         const teamName = String(args.team_name || '').trim();

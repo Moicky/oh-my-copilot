@@ -760,9 +760,17 @@ process.on('SIGTERM', () => process.exit(0));
 
       const teamState = JSON.parse(await readFile(join(wd, '.omx', 'state', 'team-state.json'), 'utf-8')) as Record<string, unknown>;
       const ralphState = JSON.parse(await readFile(join(wd, '.omx', 'state', 'ralph-state.json'), 'utf-8')) as Record<string, unknown>;
+      const teamConfig = JSON.parse(
+        await readFile(join(wd, '.omx', 'state', 'team', teamName, 'config.json'), 'utf-8'),
+      ) as Record<string, unknown>;
+      const teamManifest = JSON.parse(
+        await readFile(join(wd, '.omx', 'state', 'team', teamName, 'manifest.v2.json'), 'utf-8'),
+      ) as Record<string, unknown>;
 
       assert.equal(teamState.linked_ralph, true);
       assert.equal(teamState.team_name, teamName);
+      assert.equal(teamConfig.lifecycle_profile, 'linked_ralph');
+      assert.equal(teamManifest.lifecycle_profile, 'linked_ralph');
       assert.equal(ralphState.active, true);
       assert.equal(ralphState.current_phase, 'executing');
       assert.equal(ralphState.linked_team, true);

@@ -77,6 +77,7 @@ describe('team state', () => {
       assert.equal(diskCfg.worker_count, 2);
       assert.equal(diskCfg.max_workers, DEFAULT_MAX_WORKERS);
       assert.equal(diskCfg.tmux_session, 'omx-team-team-1');
+      assert.equal(diskCfg.lifecycle_profile, 'default');
       assert.equal(diskCfg.leader_pane_id, null);
       assert.equal(diskCfg.hud_pane_id, null);
       assert.equal(diskCfg.resize_hook_name, null);
@@ -84,6 +85,31 @@ describe('team state', () => {
       assert.equal(typeof diskCfg.next_task_id, 'number');
       assert.ok(Array.isArray(diskCfg.workers));
       assert.equal(diskCfg.workers.length, 2);
+    } finally {
+      await rm(cwd, { recursive: true, force: true });
+    }
+  });
+
+  it('initTeamState persists linked_ralph lifecycle profile when requested', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'omx-team-lifecycle-profile-'));
+    try {
+      const cfg = await initTeamState(
+        'team-linked',
+        'do stuff',
+        'executor',
+        1,
+        cwd,
+        DEFAULT_MAX_WORKERS,
+        process.env,
+        {},
+        'linked_ralph',
+      );
+
+      assert.equal(cfg.lifecycle_profile, 'linked_ralph');
+      const readCfg = await readTeamConfig('team-linked', cwd);
+      const manifest = await readTeamManifestV2('team-linked', cwd);
+      assert.equal(readCfg?.lifecycle_profile, 'linked_ralph');
+      assert.equal(manifest?.lifecycle_profile, 'linked_ralph');
     } finally {
       await rm(cwd, { recursive: true, force: true });
     }
@@ -102,6 +128,7 @@ describe('team state', () => {
       assert.ok(m1);
       const onDisk1 = await readTeamManifestV2('team-mig', cwd);
       assert.ok(onDisk1);
+      assert.equal(onDisk1?.lifecycle_profile, 'default');
 
       const m2 = await migrateV1ToV2('team-mig', cwd);
       assert.deepEqual(m2, onDisk1);
@@ -269,6 +296,7 @@ describe('team state', () => {
       assert.equal(manifest?.leader_cwd, '/tmp/leader');
       assert.equal(manifest?.team_state_root, '/tmp/leader/.omx/state');
       assert.equal(manifest?.workspace_mode, 'worktree');
+      assert.equal(manifest?.lifecycle_profile, 'default');
       assert.equal(manifest?.leader_pane_id, null);
       assert.equal(manifest?.hud_pane_id, null);
       assert.equal(manifest?.resize_hook_name, null);
