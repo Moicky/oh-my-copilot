@@ -14,6 +14,8 @@ describe('explore + sparkshell guidance contract', () => {
     const patterns = [
       /USE_OMX_EXPLORE_CMD/i,
       /prefer `omx explore`/i,
+      /--prompt/i,
+      /shell-only, allowlisted, read-only path/i,
       /gracefully fall back to the normal path/i,
       /omx sparkshell --tmux-pane/i,
       /explicit opt-?in/i,
@@ -33,6 +35,7 @@ describe('explore + sparkshell guidance contract', () => {
 
     expectPatterns('prompts/explore-harness.md', [
       /simple read-only repository lookup tasks/i,
+      /Prefer `omx explore --prompt/i,
       /fall back to the richer normal path/i,
     ]);
   });

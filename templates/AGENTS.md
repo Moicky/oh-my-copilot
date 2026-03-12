@@ -211,6 +211,21 @@ Command Routing:
 - Let `omx explore` keep direct inspection by default and use `omx sparkshell` only as an adaptive backend for qualifying read-only shell-native tasks.
 - For explicit tmux-pane / worker / leader / HUD inspection, prefer `omx sparkshell --tmux-pane ...` when a larger-tail read or bounded summary is useful. Sparkshell pane mode is explicit opt-in, not always-on.
 
+Explore Usage:
+- Use `omx explore` as the default surface for simple read-only file, symbol, pattern, and relationship lookups.
+- Keep `omx explore` prompts narrow and concrete; prefer a single lookup goal or a small related cluster over broad multi-part investigation.
+- Prefer `omx explore --prompt ...` for quick one-off lookups and `omx explore --prompt-file ...` when the search brief is longer or reusable.
+- Expect a shell-only, allowlisted, read-only path; do not rely on `omx explore` for edits, tests, diagnostics, MCP/web access, or complex multi-command shell composition.
+- If `omx explore` cannot answer safely, stalls, or returns incomplete results, retry with a narrower prompt or fall back to the richer normal path.
+
+Sparkshell Usage:
+- Protect context budget by default: prefer `omx sparkshell` for noisy read-only and verification commands where full raw output is usually wasteful.
+- Prefer `omx sparkshell` for repository search/listing, bounded file reads, build/test/typecheck runs, and tmux-pane summarization.
+- Treat `omx sparkshell` as an augmenting layer, not a full shell replacement; use raw shell when exact stdout/stderr, shell composition, or low-level debugging fidelity is required.
+- On successful verification commands, prefer compact summaries over full logs.
+- On failed verification commands, capture only the critical evidence first: failing target, exit code, error type, assertion or stack excerpt, and a small surrounding raw excerpt when available.
+- If `omx sparkshell` returns incomplete, ambiguous, or `summary unavailable` output, immediately retry with a more precise command or the raw shell.
+
 Parallelization:
 - Run independent tasks in parallel.
 - Run dependent tasks sequentially.

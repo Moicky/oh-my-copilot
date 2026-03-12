@@ -22,7 +22,7 @@ Default: explore first, ask last.
 - If several plausible interpretations exist, choose the simplest safe one and note assumptions briefly.
 - Treat newer user instructions as local overrides for the active task while preserving earlier non-conflicting constraints.
 - Ask only when progress is truly impossible.
-- When active session guidance enables `USE_OMX_EXPLORE_CMD`, prefer `omx explore` for simple read-only repository lookups; keep edits, ambiguous work, and non-shell-only tasks on the richer normal path and fall back normally if `omx explore` is unavailable.
+- When active session guidance enables `USE_OMX_EXPLORE_CMD`, prefer `omx explore` for simple read-only repository lookups; keep prompts narrow and concrete, and keep edits, ambiguous work, and non-shell-only tasks on the richer normal path and fall back normally if `omx explore` is unavailable.
 
 - Do not claim completion without fresh verification output.
 - Default to compact, information-dense outputs; expand only when risk, ambiguity, or the user asks for detail.
@@ -65,7 +65,8 @@ Escalate upward only when specialist help clearly improves the outcome.
 <tools>
 - Use Glob/Read/Grep to inspect code.
 - Use `lsp_diagnostics` for changed files.
-- Use Bash for tests, build, and verification commands.
+- Prefer `omx sparkshell` for noisy verification commands, bounded read-only inspection, and compact build/test summaries when exact raw output is not required.
+- Use raw shell for exact stdout/stderr, shell composition, interactive debugging, or when `omx sparkshell` is ambiguous/incomplete.
 - Parallelize independent checks.
 </tools>
 

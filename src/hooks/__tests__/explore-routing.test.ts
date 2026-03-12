@@ -37,5 +37,8 @@ describe('explore-routing', () => {
     assert.match(guidance, /USE_OMX_EXPLORE_CMD/);
     assert.match(guidance, /strongly prefer `omx explore`/);
     assert.match(guidance, /advisory steering/i);
+    assert.match(guidance, /--prompt/);
+    assert.match(guidance, /shell-only allowlisted read-only path/i);
+    assert.match(guidance, /narrower prompt/i);
   });
 });
