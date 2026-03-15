@@ -57,14 +57,17 @@ You are a team worker in team "${teamName}". Your identity and assigned tasks ar
    - State/MCP APIs use task_id: "<id>" (example: "1"), never "task-1"
 7. Request a claim via CLI interop (\`omx team api claim-task --json\`); do not directly set lifecycle fields in the task file
 8. Do the work using your tools
-9. On completion/failure, use lifecycle transition APIs:
+9. After completing work, commit your changes before reporting completion:
+   \`git add -A && git commit -m "task: <task-subject>"\`
+   This ensures your changes are available for incremental integration into the leader branch.
+10. On completion/failure, use lifecycle transition APIs:
    - \`omx team api transition-task-status --json\` with from \`"in_progress"\` to \`"completed"\` or \`"failed"\`
    - Include \`result\` (for completed) or \`error\` (for failed) in the transition patch
-10. Use \`omx team api release-task-claim --json\` only for rollback/requeue to \`pending\` (not for completion)
-11. Update your status: write {"state": "idle", "updated_at": "<current ISO timestamp>"} to <team_state_root>/team/${teamName}/workers/{your-name}/status.json
-12. Wait for new instructions (the lead will send them via your terminal)
-13. Check your mailbox for messages at <team_state_root>/team/${teamName}/mailbox/{your-name}.json
-14. For legacy team_* MCP tools (hard-deprecated), switch to \`omx team api\` CLI interop; do not pass workingDirectory unless the lead explicitly tells you to
+11. Use \`omx team api release-task-claim --json\` only for rollback/requeue to \`pending\` (not for completion)
+12. Update your status: write {"state": "idle", "updated_at": "<current ISO timestamp>"} to <team_state_root>/team/${teamName}/workers/{your-name}/status.json
+13. Wait for new instructions (the lead will send them via your terminal)
+14. Check your mailbox for messages at <team_state_root>/team/${teamName}/mailbox/{your-name}.json
+15. For legacy team_* MCP tools (hard-deprecated), switch to \`omx team api\` CLI interop; do not pass workingDirectory unless the lead explicitly tells you to
 
 ## Message Protocol
 When calling \`omx team api send-message\`, you MUST always include:
@@ -365,11 +368,14 @@ ${taskList}
    - State/MCP APIs use \`task_id: "<id>"\` (example: \`"1"\`), not \`"task-1"\`.
 7. Request a claim via CLI interop (\`omx team api claim-task --json\`) to claim it
 8. Complete the work described in the task
-9. Complete/fail it via lifecycle transition API (\`omx team api transition-task-status --json\`) from \`"in_progress"\` to \`"completed"\` or \`"failed"\` (include \`result\`/\`error\`)
-10. Use \`omx team api release-task-claim --json\` only for rollback to \`pending\`
-11. Write \`{"state": "idle", "updated_at": "<current ISO timestamp>"}\` to \`${teamStateRoot}/team/${teamName}/workers/${workerName}/status.json\`
-12. Wait for the next instruction from the lead
-13. For legacy team_* MCP tools (hard-deprecated), use \`omx team api\`; do not pass \`workingDirectory\` unless the lead explicitly asks (if resolution fails, use leader cwd: \`${leaderCwd}\`)
+9. After completing work, commit your changes before reporting completion:
+   \`git add -A && git commit -m "task: <task-subject>"\`
+   This ensures your changes are available for incremental integration into the leader branch.
+10. Complete/fail it via lifecycle transition API (\`omx team api transition-task-status --json\`) from \`"in_progress"\` to \`"completed"\` or \`"failed"\` (include \`result\`/\`error\`)
+11. Use \`omx team api release-task-claim --json\` only for rollback to \`pending\`
+12. Write \`{"state": "idle", "updated_at": "<current ISO timestamp>"}\` to \`${teamStateRoot}/team/${teamName}/workers/${workerName}/status.json\`
+13. Wait for the next instruction from the lead
+14. For legacy team_* MCP tools (hard-deprecated), use \`omx team api\`; do not pass \`workingDirectory\` unless the lead explicitly asks (if resolution fails, use leader cwd: \`${leaderCwd}\`)
 
 ## Mailbox Delivery Protocol (Required)
 When you are notified about mailbox messages, always follow this exact flow:
@@ -424,9 +430,12 @@ ${taskDescription}
    - State/MCP APIs use \`task_id: "${taskId}"\` (not \`"task-${taskId}"\`).
 3. Request a claim via CLI interop (\`omx team api claim-task --json\`)
 4. Complete the work
-5. Complete/fail via lifecycle transition API (\`omx team api transition-task-status --json\`) from \`"in_progress"\` to \`"completed"\` or \`"failed"\` (include \`result\`/\`error\`)
-6. Use \`omx team api release-task-claim --json\` only for rollback to \`pending\`
-7. Write \`{"state": "idle", "updated_at": "<current ISO timestamp>"}\` to your status file
+5. After completing work, commit your changes before reporting completion:
+   \`git add -A && git commit -m "task: <task-subject>"\`
+   This ensures your changes are available for incremental integration into the leader branch.
+6. Complete/fail via lifecycle transition API (\`omx team api transition-task-status --json\`) from \`"in_progress"\` to \`"completed"\` or \`"failed"\` (include \`result\`/\`error\`)
+7. Use \`omx team api release-task-claim --json\` only for rollback to \`pending\`
+8. Write \`{"state": "idle", "updated_at": "<current ISO timestamp>"}\` to your status file
 
 ${buildVerificationSection(taskDescription)}
 `;

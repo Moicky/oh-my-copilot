@@ -1,5 +1,5 @@
-import { join, resolve } from 'path';
-import { existsSync } from 'fs';
+import { join, resolve, dirname } from 'path';
+import { existsSync, appendFileSync, mkdirSync } from 'fs';
 import { mkdir, readdir, readFile, writeFile } from 'fs/promises';
 import { performance } from 'perf_hooks';
 import { spawn, spawnSync, type ChildProcessByStdio } from 'child_process';
@@ -369,7 +369,7 @@ function listConflictFiles(repoRoot: string, cwd: string): string[] {
 
 async function appendIntegrationEvent(
   teamName: string,
-  type: 'worker_cherry_pick_detected' | 'worker_cherry_pick_applied' | 'worker_cherry_pick_conflict' | 'worker_rebase_applied' | 'worker_rebase_conflict',
+  type: 'worker_cherry_pick_detected' | 'worker_cherry_pick_applied' | 'worker_cherry_pick_conflict' | 'worker_rebase_applied' | 'worker_rebase_conflict' | 'worker_auto_commit' | 'worker_merge_applied' | 'worker_merge_conflict' | 'worker_cross_rebase_applied' | 'worker_cross_rebase_conflict' | 'worker_cross_rebase_skipped',
   worker: WorkerInfo,
   metadata: Record<string, unknown>,
   cwd: string,
@@ -401,6 +401,48 @@ async function sendRebaseConflictMessageToWorker(
   await sendWorkerMessage(teamName, 'leader-fixed', worker.name, body, cwd).catch(() => {});
 }
 
+function autoCommitDirtyWorktree(
+  worker: WorkerInfo,
+): { committed: boolean; commitHash: string | null } {
+  const worktreePath = resolve(worker.worktree_path!);
+  const repoRoot = resolve(worker.worktree_repo_root!);
+  const status = runGitCommand(repoRoot, ['status', '--porcelain'], worktreePath);
+  if (!status.ok || !status.stdout.trim()) return { committed: false, commitHash: null };
+
+  const taskId = worker.assigned_tasks[0] || 'unknown';
+  const addResult = runGitCommand(repoRoot, ['add', '-A'], worktreePath);
+  if (!addResult.ok) return { committed: false, commitHash: null };
+
+  const msg = `omx(team): auto-checkpoint ${worker.name} [${taskId}]`;
+  const commitResult = runGitCommand(repoRoot, ['commit', '--no-verify', '-m', msg], worktreePath);
+  if (!commitResult.ok) return { committed: false, commitHash: null };
+
+  const head = runGitCommand(repoRoot, ['rev-parse', 'HEAD'], worktreePath);
+  return { committed: true, commitHash: head.ok ? head.stdout : null };
+}
+
+function appendIntegrationReport(
+  teamName: string,
+  entry: {
+    workerName: string;
+    operation: 'merge' | 'cherry-pick' | 'rebase';
+    strategy: '-X theirs' | '-X ours';
+    files: string[];
+    detail: string;
+  },
+  cwd: string,
+): void {
+  const teamStateRoot = resolveCanonicalTeamStateRoot(cwd);
+  const reportPath = join(teamStateRoot, 'team', teamName, 'integration-report.md');
+  const dir = dirname(reportPath);
+  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+
+  const timestamp = new Date().toISOString();
+  const line = `- [${timestamp}] ${entry.workerName}: ${entry.operation} conflict auto-resolved (${entry.strategy}) on files: ${entry.files.join(', ') || 'unknown'}. ${entry.detail}\n`;
+
+  appendFileSync(reportPath, existsSync(reportPath) ? line : `# Integration Report\n\n${line}`);
+}
+
 async function integrateWorkerCommitsIntoLeader(params: {
   teamName: string;
   config: TeamConfig;
@@ -409,7 +451,24 @@ async function integrateWorkerCommitsIntoLeader(params: {
 }): Promise<Record<string, TeamWorkerIntegrationState>> {
   const { teamName, config, previous, cwd } = params;
   const next: Record<string, TeamWorkerIntegrationState> = { ...(previous?.integrationByWorker ?? {}) };
+  const leaderHeadAtCycleStart = resolveLeaderHead(resolve(config.workers[0]?.worktree_repo_root ?? cwd), cwd);
+  const integratedWorkerNames = new Set<string>();
 
+  // ── Phase A: Auto-commit dirty worktrees ──
+  for (const worker of config.workers) {
+    if (!worker.worktree_repo_root || !worker.worktree_path || !existsSync(worker.worktree_path)) continue;
+    const { committed, commitHash } = autoCommitDirtyWorktree(worker);
+    if (committed) {
+      await appendIntegrationEvent(teamName, 'worker_auto_commit', worker, {
+        worker_name: worker.name,
+        commit_hash: commitHash,
+        worktree_path: resolve(worker.worktree_path),
+        summary: `auto-committed dirty worktree for ${worker.name}`,
+      }, cwd);
+    }
+  }
+
+  // ── Phase B: Integrate worker commits to leader (hybrid strategy) ──
   for (const worker of config.workers) {
     if (!worker.worktree_repo_root || !worker.worktree_path || !existsSync(worker.worktree_path)) continue;
     const repoRoot = resolve(worker.worktree_repo_root);
@@ -433,102 +492,213 @@ async function integrateWorkerCommitsIntoLeader(params: {
       continue;
     }
 
-    const baseline = state.last_integrated_head && runGitCommand(repoRoot, ['rev-parse', '--verify', state.last_integrated_head], worktreePath).ok
-      ? state.last_integrated_head
-      : leaderHead;
-    const commits = listCommitRange(repoRoot, baseline, workerHead, worktreePath);
-    if (commits.length === 0) {
-      next[worker.name] = state;
-      continue;
-    }
+    // Determine if worker is cleanly ahead of leader (merge) or diverged (cherry-pick)
+    const workerIsAheadOfLeader = runGitCommand(repoRoot, ['merge-base', '--is-ancestor', leaderHead, workerHead], cwd).ok;
 
-    for (const commit of commits) {
-      await appendIntegrationEvent(teamName, 'worker_cherry_pick_detected', worker, {
-        worker_name: worker.name,
-        worker_head: workerHead,
-        commit,
-        leader_head: resolveLeaderHead(repoRoot, cwd),
-        worktree_path: worktreePath,
-        summary: `detected worker commit ${commit.slice(0, 12)}`,
-      }, cwd);
+    if (workerIsAheadOfLeader) {
+      // Worker is cleanly ahead → merge --no-ff -X theirs
+      const workerBranch = runGitCommand(repoRoot, ['rev-parse', '--abbrev-ref', 'HEAD'], worktreePath);
+      const branchRef = workerBranch.ok && workerBranch.stdout ? workerBranch.stdout : workerHead;
+      const merge = runGitCommand(repoRoot, ['merge', '--no-ff', '-X', 'theirs', '-m', `omx(team): merge ${worker.name}`, branchRef], cwd);
 
-      const pick = runGitCommand(repoRoot, ['cherry-pick', '--allow-empty', commit], cwd);
-      if (!pick.ok) {
+      if (merge.ok) {
+        const newLeaderHead = resolveLeaderHead(repoRoot, cwd) ?? leaderHead;
+        state.last_integrated_head = workerHead;
+        state.last_leader_head = newLeaderHead;
+        state.status = 'integrated';
+        state.conflict_commit = undefined;
+        state.conflict_files = undefined;
+        state.updated_at = new Date().toISOString();
+        integratedWorkerNames.add(worker.name);
+        await appendIntegrationEvent(teamName, 'worker_merge_applied', worker, {
+          worker_name: worker.name,
+          worker_head: workerHead,
+          leader_head_before: leaderHead,
+          leader_head_after: newLeaderHead,
+          worktree_path: worktreePath,
+          summary: `merged ${worker.name} into leader via --no-ff -X theirs`,
+        }, cwd);
+        await sendIntegrationMessageToLeader(teamName, worker, `INTEGRATED: merged ${worker.name} (${workerHead.slice(0, 12)}) into leader HEAD ${newLeaderHead.slice(0, 12)} via merge --no-ff.`, cwd);
+      } else {
+        // Merge failed even with -X theirs (e.g. binary conflict) — abort and log
         const conflictFiles = listConflictFiles(repoRoot, cwd);
-        runGitCommand(repoRoot, ['cherry-pick', '--abort'], cwd);
+        runGitCommand(repoRoot, ['merge', '--abort'], cwd);
         state.status = 'cherry_pick_conflict';
-        state.conflict_commit = commit;
+        state.conflict_commit = workerHead;
         state.conflict_files = conflictFiles;
         state.updated_at = new Date().toISOString();
-        await appendIntegrationEvent(teamName, 'worker_cherry_pick_conflict', worker, {
+        await appendIntegrationEvent(teamName, 'worker_merge_conflict', worker, {
           worker_name: worker.name,
-          commit,
+          worker_head: workerHead,
           leader_head: leaderHead,
           worktree_path: worktreePath,
           conflict_files: conflictFiles,
-          stderr: pick.stderr || pick.stdout,
-          summary: `cherry-pick conflict for ${worker.name} at ${commit.slice(0, 12)}`,
+          stderr: merge.stderr || merge.stdout,
+          summary: `merge conflict for ${worker.name} (auto-resolve failed)`,
         }, cwd);
-        await sendIntegrationMessageToLeader(teamName, worker, `CONFLICT: ${worker.name} cherry-pick ${commit.slice(0, 12)} conflicted. Resolve in leader repo. Files: ${conflictFiles.join(', ') || 'unknown'}.` , cwd);
+        appendIntegrationReport(teamName, {
+          workerName: worker.name,
+          operation: 'merge',
+          strategy: '-X theirs',
+          files: conflictFiles,
+          detail: `merge --no-ff -X theirs failed; aborted. stderr: ${(merge.stderr || '').slice(0, 200)}`,
+        }, cwd);
+        await sendIntegrationMessageToLeader(teamName, worker, `CONFLICT AUTO-RESOLVED FAILED: ${worker.name}'s merge resolved with -X theirs failed on files: ${conflictFiles.join(', ') || 'unknown'}. Consider steering ${worker.name} to review these areas.`, cwd);
+      }
+    } else {
+      // Diverged → cherry-pick individual commits with -X theirs
+      const baseline = state.last_integrated_head && runGitCommand(repoRoot, ['rev-parse', '--verify', state.last_integrated_head], worktreePath).ok
+        ? state.last_integrated_head
+        : leaderHead;
+      const commits = listCommitRange(repoRoot, baseline, workerHead, worktreePath);
+      if (commits.length === 0) {
         next[worker.name] = state;
-        break;
+        continue;
       }
 
-      const newLeaderHead = resolveLeaderHead(repoRoot, cwd) ?? leaderHead;
-      state.last_integrated_head = commit;
-      state.last_leader_head = newLeaderHead;
-      state.status = 'integrated';
-      state.conflict_commit = undefined;
-      state.conflict_files = undefined;
-      state.updated_at = new Date().toISOString();
-      await appendIntegrationEvent(teamName, 'worker_cherry_pick_applied', worker, {
-        worker_name: worker.name,
-        commit,
-        leader_head_before: leaderHead,
-        leader_head_after: newLeaderHead,
-        worktree_path: worktreePath,
-        summary: `cherry-picked ${commit.slice(0, 12)} from ${worker.name}`,
-      }, cwd);
-      await sendIntegrationMessageToLeader(teamName, worker, `INTEGRATED: cherry-picked ${commit.slice(0, 12)} from ${worker.name} into leader HEAD ${newLeaderHead.slice(0, 12)}.`, cwd);
+      let allPicked = true;
+      for (const commit of commits) {
+        await appendIntegrationEvent(teamName, 'worker_cherry_pick_detected', worker, {
+          worker_name: worker.name,
+          worker_head: workerHead,
+          commit,
+          leader_head: resolveLeaderHead(repoRoot, cwd),
+          worktree_path: worktreePath,
+          summary: `detected worker commit ${commit.slice(0, 12)}`,
+        }, cwd);
 
-      const rebase = runGitCommand(repoRoot, ['rebase', newLeaderHead], worktreePath);
-      if (!rebase.ok) {
-        const conflictFiles = listConflictFiles(repoRoot, worktreePath);
-        state.status = 'rebase_conflict';
-        state.last_rebased_leader_head = newLeaderHead;
-        state.conflict_commit = commit;
-        state.conflict_files = conflictFiles;
+        const pick = runGitCommand(repoRoot, ['cherry-pick', '--allow-empty', '-X', 'theirs', commit], cwd);
+        if (!pick.ok) {
+          // Even -X theirs failed (binary conflict etc.) — abort this commit, log, continue
+          const conflictFiles = listConflictFiles(repoRoot, cwd);
+          runGitCommand(repoRoot, ['cherry-pick', '--abort'], cwd);
+          state.status = 'cherry_pick_conflict';
+          state.conflict_commit = commit;
+          state.conflict_files = conflictFiles;
+          state.updated_at = new Date().toISOString();
+          await appendIntegrationEvent(teamName, 'worker_cherry_pick_conflict', worker, {
+            worker_name: worker.name,
+            commit,
+            leader_head: leaderHead,
+            worktree_path: worktreePath,
+            conflict_files: conflictFiles,
+            stderr: pick.stderr || pick.stdout,
+            summary: `cherry-pick conflict for ${worker.name} at ${commit.slice(0, 12)} (auto-resolve failed)`,
+          }, cwd);
+          appendIntegrationReport(teamName, {
+            workerName: worker.name,
+            operation: 'cherry-pick',
+            strategy: '-X theirs',
+            files: conflictFiles,
+            detail: `cherry-pick -X theirs ${commit.slice(0, 12)} failed; aborted. stderr: ${(pick.stderr || '').slice(0, 200)}`,
+          }, cwd);
+          await sendIntegrationMessageToLeader(teamName, worker, `CONFLICT AUTO-RESOLVED FAILED: ${worker.name}'s cherry-pick ${commit.slice(0, 12)} with -X theirs failed on files: ${conflictFiles.join(', ') || 'unknown'}. Consider steering ${worker.name} to review these areas.`, cwd);
+          allPicked = false;
+          break;
+        }
+
+        const newLeaderHead = resolveLeaderHead(repoRoot, cwd) ?? leaderHead;
+        state.last_integrated_head = commit;
+        state.last_leader_head = newLeaderHead;
+        state.status = 'integrated';
+        state.conflict_commit = undefined;
+        state.conflict_files = undefined;
         state.updated_at = new Date().toISOString();
-        await appendIntegrationEvent(teamName, 'worker_rebase_conflict', worker, {
+        await appendIntegrationEvent(teamName, 'worker_cherry_pick_applied', worker, {
           worker_name: worker.name,
           commit,
+          leader_head_before: leaderHead,
+          leader_head_after: newLeaderHead,
+          worktree_path: worktreePath,
+          summary: `cherry-picked ${commit.slice(0, 12)} from ${worker.name} with -X theirs`,
+        }, cwd);
+        await sendIntegrationMessageToLeader(teamName, worker, `INTEGRATED: cherry-picked ${commit.slice(0, 12)} from ${worker.name} into leader HEAD ${newLeaderHead.slice(0, 12)} (-X theirs).`, cwd);
+      }
+
+      if (allPicked) {
+        integratedWorkerNames.add(worker.name);
+      }
+    }
+
+    next[worker.name] = state;
+  }
+
+  // ── Phase C: Cross-worker rebase (idle/done/failed workers onto new leader) ──
+  const newLeaderHead = resolveLeaderHead(resolve(config.workers[0]?.worktree_repo_root ?? cwd), cwd);
+  if (newLeaderHead && leaderHeadAtCycleStart && newLeaderHead !== leaderHeadAtCycleStart) {
+    for (const worker of config.workers) {
+      if (!worker.worktree_repo_root || !worker.worktree_path || !existsSync(worker.worktree_path)) continue;
+      // Note: do NOT skip integratedWorkerNames here — cherry-picked workers need
+      // rebase to pick up other workers' changes that landed on leader in the same cycle.
+
+      const repoRoot = resolve(worker.worktree_repo_root);
+      const worktreePath = resolve(worker.worktree_path);
+
+      // Only rebase idle/done/failed workers to avoid race conditions
+      const workerStatus = await readWorkerStatus(teamName, worker.name, cwd);
+      const rebaseEligibleStates = new Set(['idle', 'done', 'failed']);
+      if (!rebaseEligibleStates.has(workerStatus.state)) {
+        await appendIntegrationEvent(teamName, 'worker_cross_rebase_skipped', worker, {
+          worker_name: worker.name,
+          worker_state: workerStatus.state,
+          leader_head: newLeaderHead,
+          worktree_path: worktreePath,
+          summary: `skipped cross-rebase for ${worker.name} (state: ${workerStatus.state})`,
+        }, cwd);
+        continue;
+      }
+
+      // Skip if worktree is dirty (will auto-commit next cycle, then rebase)
+      const statusCheck = runGitCommand(repoRoot, ['status', '--porcelain'], worktreePath);
+      if (statusCheck.ok && statusCheck.stdout.trim()) {
+        await appendIntegrationEvent(teamName, 'worker_cross_rebase_skipped', worker, {
+          worker_name: worker.name,
+          reason: 'dirty_worktree',
+          leader_head: newLeaderHead,
+          worktree_path: worktreePath,
+          summary: `skipped cross-rebase for ${worker.name} (dirty worktree)`,
+        }, cwd);
+        continue;
+      }
+
+      // Rebase with -X ours (in rebase context, "ours" = upstream = leader wins)
+      const rebase = runGitCommand(repoRoot, ['rebase', '-X', 'ours', newLeaderHead], worktreePath);
+      if (rebase.ok) {
+        const state = next[worker.name] ?? {};
+        state.last_rebased_leader_head = newLeaderHead;
+        state.status = 'idle';
+        state.conflict_commit = undefined;
+        state.conflict_files = undefined;
+        state.updated_at = new Date().toISOString();
+        next[worker.name] = state;
+        await appendIntegrationEvent(teamName, 'worker_cross_rebase_applied', worker, {
+          worker_name: worker.name,
+          leader_head: newLeaderHead,
+          worktree_path: worktreePath,
+          summary: `cross-rebased ${worker.name} onto ${newLeaderHead.slice(0, 12)} (-X ours)`,
+        }, cwd);
+      } else {
+        // Rebase failed — abort to restore worktree, log for retry next cycle
+        const conflictFiles = listConflictFiles(repoRoot, worktreePath);
+        runGitCommand(repoRoot, ['rebase', '--abort'], worktreePath);
+        await appendIntegrationEvent(teamName, 'worker_cross_rebase_conflict', worker, {
+          worker_name: worker.name,
           leader_head: newLeaderHead,
           worktree_path: worktreePath,
           conflict_files: conflictFiles,
           stderr: rebase.stderr || rebase.stdout,
-          summary: `rebase conflict for ${worker.name} onto ${newLeaderHead.slice(0, 12)}`,
+          summary: `cross-rebase conflict for ${worker.name} onto ${newLeaderHead.slice(0, 12)} (aborted, will retry)`,
         }, cwd);
-        await sendIntegrationMessageToLeader(teamName, worker, `CONFLICT: ${worker.name} rebase onto ${newLeaderHead.slice(0, 12)} conflicted. Files: ${conflictFiles.join(', ') || 'unknown'}.`, cwd);
-        await sendRebaseConflictMessageToWorker(teamName, worker, `REBASE CONFLICT: rebase your worktree onto ${newLeaderHead}. Resolve files: ${conflictFiles.join(', ') || 'unknown'}, then continue rebase in your worktree.`, cwd);
-        next[worker.name] = state;
-        break;
+        appendIntegrationReport(teamName, {
+          workerName: worker.name,
+          operation: 'rebase',
+          strategy: '-X ours',
+          files: conflictFiles,
+          detail: `rebase -X ours onto ${newLeaderHead.slice(0, 12)} failed; aborted. Will retry next cycle.`,
+        }, cwd);
+        await sendIntegrationMessageToLeader(teamName, worker, `CONFLICT AUTO-RESOLVED FAILED: ${worker.name}'s rebase onto ${newLeaderHead.slice(0, 12)} with -X ours failed on files: ${conflictFiles.join(', ') || 'unknown'}. Consider steering ${worker.name} to review these areas.`, cwd);
       }
-
-      state.status = 'idle';
-      state.last_rebased_leader_head = newLeaderHead;
-      state.conflict_commit = undefined;
-      state.conflict_files = undefined;
-      state.updated_at = new Date().toISOString();
-      await appendIntegrationEvent(teamName, 'worker_rebase_applied', worker, {
-        worker_name: worker.name,
-        commit,
-        leader_head: newLeaderHead,
-        worktree_path: worktreePath,
-        summary: `rebased ${worker.name} worktree onto ${newLeaderHead.slice(0, 12)}`,
-      }, cwd);
     }
-
-    next[worker.name] = state;
   }
 
   return next;
