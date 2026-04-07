@@ -608,9 +608,9 @@ sleep 5
       await shutdownTeam(runtime.teamName, cwd, { force: true });
       runtime = null;
     } finally {
-      const activeRuntime = runtime;
+      const activeRuntime: TeamRuntime | null = runtime;
       if (activeRuntime) {
-        await shutdownTeam(activeRuntime.teamName, cwd, { force: true }).catch(() => {});
+        await shutdownTeam((activeRuntime as TeamRuntime).teamName, cwd, { force: true }).catch(() => {});
       }
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
       else delete process.env.PATH;
@@ -805,6 +805,127 @@ esac
     }
   });
 
+  it('startTeam captures interactive worker pid from the resolved pane id', async () => {
+    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-pane-pid-'));
+    const prevTmux = process.env.TMUX;
+    const prevTmuxPane = process.env.TMUX_PANE;
+    const prevLaunchMode = process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
+    const prevWorkerCli = process.env.OMX_TEAM_WORKER_CLI;
+    const prevSkipReadyWait = process.env.OMX_TEAM_SKIP_READY_WAIT;
+    let runtime: TeamRuntime | null = null;
+
+    try {
+      await withMockTmuxFixture(
+        {
+          dirPrefix: 'omx-runtime-pane-pid-bin-',
+          tmuxScript: (tmuxLogPath) => `#!/bin/sh
+set -eu
+printf '%s\n' "$*" >> "${tmuxLogPath}"
+case "\${1:-}" in
+  -V)
+    echo "tmux 3.4"
+    exit 0
+    ;;
+  display-message)
+    case "$*" in
+      *"#{window_width}"*)
+        echo "120"
+        ;;
+      *)
+        echo "leader:0 %1"
+        ;;
+    esac
+    exit 0
+    ;;
+  list-panes)
+    case "$*" in
+      *"pane_current_command"*)
+        printf "%%1\tnode\t'codex'\n"
+        ;;
+      *"#{pane_dead} #{pane_pid}"*)
+        echo "1 999999"
+        ;;
+      *"-t %2"*"#{pane_pid}"*)
+        echo "2222"
+        ;;
+      *"-t %3"*"#{pane_pid}"*)
+        echo "3333"
+        ;;
+      *"#{pane_pid}"*)
+        echo "1111"
+        ;;
+      *)
+        exit 0
+        ;;
+    esac
+    exit 0
+    ;;
+  split-window)
+    case "$*" in
+      *" -h "*)
+        echo "%2"
+        ;;
+      *)
+        echo "%3"
+        ;;
+    esac
+    exit 0
+    ;;
+  set-hook|run-shell|select-layout|set-window-option|select-pane|send-keys|kill-pane|kill-session)
+    exit 0
+    ;;
+  *)
+    exit 0
+    ;;
+esac
+`,
+          binaries: [{ name: 'codex', content: '#!/bin/sh\nexit 0\n' }],
+        },
+        async () => {
+          delete process.env.TMUX;
+          process.env.TMUX_PANE = '%1';
+          process.env.OMX_TEAM_WORKER_LAUNCH_MODE = 'interactive';
+          process.env.OMX_TEAM_WORKER_CLI = 'codex';
+          process.env.OMX_TEAM_SKIP_READY_WAIT = '1';
+
+          runtime = await withoutTeamWorkerEnv(() =>
+            startTeam(
+              'team-pane-pid',
+              'interactive pane pid capture',
+              'executor',
+              1,
+              [{ subject: 's', description: 'd', owner: 'worker-1' }],
+              cwd,
+            ));
+
+          assert.equal(runtime.config.workers[0]?.pane_id, '%2');
+          assert.equal(runtime.config.workers[0]?.pid, 2222);
+
+          const identityPath = join(cwd, '.omx', 'state', 'team', runtime.teamName, 'workers', 'worker-1', 'identity.json');
+          const identity = JSON.parse(await readFile(identityPath, 'utf-8')) as { pid?: number; pane_id?: string };
+          assert.equal(identity.pane_id, '%2');
+          assert.equal(identity.pid, 2222);
+        },
+      );
+    } finally {
+      const activeRuntime: TeamRuntime | null = runtime;
+      if (activeRuntime) {
+        await shutdownTeam((activeRuntime as TeamRuntime).teamName, cwd, { force: true }).catch(() => {});
+      }
+      if (typeof prevTmux === 'string') process.env.TMUX = prevTmux;
+      else delete process.env.TMUX;
+      if (typeof prevTmuxPane === 'string') process.env.TMUX_PANE = prevTmuxPane;
+      else delete process.env.TMUX_PANE;
+      if (typeof prevLaunchMode === 'string') process.env.OMX_TEAM_WORKER_LAUNCH_MODE = prevLaunchMode;
+      else delete process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
+      if (typeof prevWorkerCli === 'string') process.env.OMX_TEAM_WORKER_CLI = prevWorkerCli;
+      else delete process.env.OMX_TEAM_WORKER_CLI;
+      if (typeof prevSkipReadyWait === 'string') process.env.OMX_TEAM_SKIP_READY_WAIT = prevSkipReadyWait;
+      else delete process.env.OMX_TEAM_SKIP_READY_WAIT;
+      await rm(cwd, { recursive: true, force: true });
+    }
+  });
+
   it('startTeam saves interactive pane ids before readiness waits in source order', async () => {
     const source = await readFile(join(process.cwd(), 'src', 'team', 'runtime.ts'), 'utf-8');
     const applyIndex = source.indexOf('applyCreatedInteractiveSessionToConfig(config, createdSession, workerPaneIds);');
@@ -919,8 +1040,9 @@ sleep 5
       await shutdownTeam(runtime.teamName, cwd, { force: true });
       runtime = null;
     } finally {
-      if (runtime) {
-        await shutdownTeam(runtime.teamName, cwd, { force: true }).catch(() => {});
+      const activeRuntime: TeamRuntime | null = runtime;
+      if (activeRuntime) {
+        await shutdownTeam((activeRuntime as TeamRuntime).teamName, cwd, { force: true }).catch(() => {});
       }
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
       else delete process.env.PATH;
@@ -1005,8 +1127,9 @@ process.on('SIGTERM', () => process.exit(0));
       await shutdownTeam(runtime.teamName, cwd, { force: true });
       runtime = null;
     } finally {
-      if (runtime) {
-        await shutdownTeam(runtime.teamName, cwd, { force: true }).catch(() => {});
+      const activeRuntime: TeamRuntime | null = runtime;
+      if (activeRuntime) {
+        await shutdownTeam((activeRuntime as TeamRuntime).teamName, cwd, { force: true }).catch(() => {});
       }
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
       else delete process.env.PATH;
@@ -1128,8 +1251,9 @@ process.on('SIGTERM', () => process.exit(0));
       await shutdownTeam(runtime.teamName, cwd, { force: true });
       runtime = null;
     } finally {
-      if (runtime) {
-        await shutdownTeam(runtime.teamName, cwd, { force: true }).catch(() => {});
+      const activeRuntime: TeamRuntime | null = runtime;
+      if (activeRuntime) {
+        await shutdownTeam((activeRuntime as TeamRuntime).teamName, cwd, { force: true }).catch(() => {});
       }
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
       else delete process.env.PATH;
@@ -1222,8 +1346,9 @@ process.on('SIGTERM', () => process.exit(0));
       await shutdownTeam(runtime.teamName, cwd, { force: true });
       runtime = null;
     } finally {
-      if (runtime) {
-        await shutdownTeam(runtime.teamName, cwd, { force: true }).catch(() => {});
+      const activeRuntime: TeamRuntime | null = runtime;
+      if (activeRuntime) {
+        await shutdownTeam((activeRuntime as TeamRuntime).teamName, cwd, { force: true }).catch(() => {});
       }
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
       else delete process.env.PATH;
@@ -1285,8 +1410,9 @@ process.on('SIGTERM', () => process.exit(0));
       await shutdownTeam(runtime.teamName, cwd, { force: true });
       runtime = null;
     } finally {
-      if (runtime) {
-        await shutdownTeam(runtime.teamName, cwd, { force: true }).catch(() => {});
+      const activeRuntime: TeamRuntime | null = runtime;
+      if (activeRuntime) {
+        await shutdownTeam((activeRuntime as TeamRuntime).teamName, cwd, { force: true }).catch(() => {});
       }
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
       else delete process.env.PATH;
@@ -1420,7 +1546,7 @@ exit 0
         },
       );
     } finally {
-      const activeRuntime = runtime;
+      const activeRuntime: TeamRuntime | null = runtime;
       if (activeRuntime) {
         await shutdownTeam((activeRuntime as TeamRuntime).teamName, cwd, { force: true }).catch(() => {});
       }
@@ -1786,8 +1912,9 @@ process.on('SIGTERM', () => {
       }
       assert.equal(alive, false, `worker pid ${workerPid} should be terminated after shutdown`);
     } finally {
-      if (runtime) {
-        await shutdownTeam(runtime.teamName, cwd, { force: true }).catch(() => {});
+      const activeRuntime: TeamRuntime | null = runtime;
+      if (activeRuntime) {
+        await shutdownTeam((activeRuntime as TeamRuntime).teamName, cwd, { force: true }).catch(() => {});
       }
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
       else delete process.env.PATH;
@@ -1869,8 +1996,9 @@ process.on('SIGTERM', () => process.exit(0));
       }
       assert.equal(alive, false, `detached helper pid ${helperPid} should be terminated after shutdown`);
     } finally {
-      if (runtime) {
-        await shutdownTeam(runtime.teamName, cwd, { force: true }).catch(() => {});
+      const activeRuntime: TeamRuntime | null = runtime;
+      if (activeRuntime) {
+        await shutdownTeam((activeRuntime as TeamRuntime).teamName, cwd, { force: true }).catch(() => {});
       }
       if (helperPid > 0) {
         try {

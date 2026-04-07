@@ -2020,13 +2020,14 @@ export async function startTeam(
 
       // Get pane PID and store it (interactive mode) or process PID (prompt mode)
       if (workerLaunchMode === 'interactive') {
-        const panePid = getWorkerPanePid(sessionName, i);
+        const panePid = getWorkerPanePid(sessionName, i, paneId);
         if (panePid) identity.pid = panePid;
       } else if (config.workers[i - 1]?.pid) {
         identity.pid = config.workers[i - 1].pid;
       }
       if (paneId) identity.pane_id = paneId;
       if (config.workers[i - 1]) {
+        config.workers[i - 1].pid = identity.pid;
         config.workers[i - 1].pane_id = paneId;
         config.workers[i - 1].role = workerRole;
         config.workers[i - 1].worker_cli = workerCliPlan[i - 1];
