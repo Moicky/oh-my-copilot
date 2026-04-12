@@ -120,6 +120,7 @@ import { inferPhaseTargetFromTaskCounts, reconcilePhaseStateForMonitor } from '.
 import { getTeamTmuxSessions } from '../notifications/tmux.js';
 import { hasStructuredVerificationEvidence } from '../verification/verifier.js';
 import { buildRebalanceDecisions } from './rebalance-policy.js';
+import { getStatePath } from '../mcp/state-paths.js';
 import { readModeState, updateModeState } from '../modes/base.js';
 import {
   appendTeamCommitHygieneEntries,
@@ -206,6 +207,54 @@ async function syncRootTeamModeStateOnTerminalPhase(
     await updateModeState('team', updates, cwd);
   } catch {
     // Best-effort compatibility sync only.
+  }
+}
+
+function matchesTeamModeStateForShutdown(
+  state: Record<string, unknown> | null,
+  teamName: string,
+): boolean {
+  const stateTeamName = typeof state?.team_name === 'string' ? state.team_name.trim() : '';
+  return !stateTeamName || stateTeamName === teamName;
+}
+
+async function syncExactTeamModeStateOnShutdown(
+  teamName: string,
+  cwd: string,
+  sessionId?: string,
+): Promise<void> {
+  const path = getStatePath('team', cwd, sessionId);
+  if (!existsSync(path)) return;
+
+  try {
+    const parsed = JSON.parse(await readFile(path, 'utf-8')) as Record<string, unknown>;
+    if (!matchesTeamModeStateForShutdown(parsed, teamName)) return;
+
+    const next = {
+      ...parsed,
+      active: false,
+      current_phase: 'cancelled',
+      completed_at:
+        typeof parsed.completed_at === 'string' && parsed.completed_at.trim().length > 0
+          ? parsed.completed_at
+          : new Date().toISOString(),
+      team_name: teamName,
+    };
+    await writeFile(path, JSON.stringify(next, null, 2));
+  } catch {
+    // Best-effort compatibility sync only.
+  }
+}
+
+async function syncTeamModeStateOnShutdown(
+  teamName: string,
+  cwd: string,
+  leaderSessionId?: string,
+): Promise<void> {
+  await syncExactTeamModeStateOnShutdown(teamName, cwd);
+  const normalizedLeaderSessionId = typeof leaderSessionId === 'string' ? leaderSessionId.trim() : '';
+  if (normalizedLeaderSessionId) {
+    await syncExactTeamModeStateOnShutdown(teamName, cwd, normalizedLeaderSessionId);
   }
 }
 
@@ -2853,10 +2902,14 @@ export async function shutdownTeam(teamName: string, cwd: string, options: Shutd
       process.stderr.write(`[team/runtime] operation failed: ${err}\n`);
     }
     await cleanupTeamState(sanitized, cwd);
+    await syncTeamModeStateOnShutdown(sanitized, cwd);
     restoreTeamModelInstructionsFile(sanitized);
     return { commitHygieneArtifacts: null };
   }
   const manifest = await readTeamManifestV2(sanitized, cwd);
+  const leaderSessionId = typeof manifest?.leader?.session_id === 'string'
+    ? manifest.leader.session_id.trim()
+    : '';
   const governance = resolveGovernancePolicy(
     manifest?.governance,
     manifest?.policy as Partial<TeamGovernance> | undefined,
@@ -3168,10 +3221,15 @@ export async function shutdownTeam(teamName: string, cwd: string, options: Shutd
   }
 
   // 7. Cleanup state
+  let teamStateCleaned = false;
   try {
     await cleanupTeamState(sanitized, cwd);
+    teamStateCleaned = true;
   } catch (err) {
     cleanupErrors.push(`cleanupTeamState: ${String(err)}`);
+  }
+  if (teamStateCleaned) {
+    await syncTeamModeStateOnShutdown(sanitized, cwd, leaderSessionId);
   }
 
   if (cleanupErrors.length > 0) {

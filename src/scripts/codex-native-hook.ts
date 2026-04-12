@@ -682,6 +682,12 @@ async function buildTeamStopOutput(cwd: string, sessionId?: string): Promise<Rec
   const teamState = await readTeamModeStateForStop(cwd, sessionId);
   if (teamState?.active !== true) return null;
   const teamName = safeString(teamState.team_name).trim();
+  if (teamName) {
+    const canonicalTeamDir = join(resolveCanonicalTeamStateRoot(cwd), "team", teamName);
+    if (!existsSync(canonicalTeamDir)) {
+      return null;
+    }
+  }
   const coarsePhase = teamState.current_phase;
   const canonicalPhase = teamName ? (await readTeamPhase(teamName, cwd))?.current_phase ?? coarsePhase : coarsePhase;
   if (!isNonTerminalPhase(canonicalPhase)) return null;

@@ -1859,6 +1859,60 @@ describe('executeTeamApiOperation: cleanup', () => {
     }
   });
 
+  it('deactivates lingering team mode state after cleanup removes canonical team state', async () => {
+    const { cwd, cleanup } = await setupTeam('cleanup-mode-sync');
+    try {
+      const stateDir = join(cwd, '.omx', 'state');
+      const sessionId = 'sess-cleanup-mode-sync';
+      await mkdir(join(stateDir, 'sessions', sessionId), { recursive: true });
+      await writeFile(join(stateDir, 'session.json'), JSON.stringify({ session_id: sessionId }, null, 2));
+
+      const manifest = await readTeamManifestV2('cleanup-mode-sync', cwd);
+      assert.ok(manifest);
+      if (!manifest) throw new Error('manifest missing');
+      await writeTeamManifestV2({
+        ...manifest,
+        leader: {
+          ...(manifest.leader ?? {}),
+          session_id: sessionId,
+        },
+      }, cwd);
+
+      const activeState = {
+        active: true,
+        current_phase: 'starting',
+        team_name: 'cleanup-mode-sync',
+        session_id: sessionId,
+      };
+      await writeFile(join(stateDir, 'team-state.json'), JSON.stringify(activeState, null, 2));
+      await writeFile(
+        join(stateDir, 'sessions', sessionId, 'team-state.json'),
+        JSON.stringify(activeState, null, 2),
+      );
+
+      const result = await executeTeamApiOperation('cleanup', {
+        team_name: 'cleanup-mode-sync',
+      }, cwd);
+      assert.equal(result.ok, true);
+
+      const rootState = JSON.parse(
+        await readFile(join(stateDir, 'team-state.json'), 'utf-8'),
+      ) as Record<string, unknown>;
+      assert.equal(rootState.active, false);
+      assert.equal(rootState.current_phase, 'cancelled');
+      assert.ok(typeof rootState.completed_at === 'string' && rootState.completed_at.length > 0);
+
+      const scopedState = JSON.parse(
+        await readFile(join(stateDir, 'sessions', sessionId, 'team-state.json'), 'utf-8'),
+      ) as Record<string, unknown>;
+      assert.equal(scopedState.active, false);
+      assert.equal(scopedState.current_phase, 'cancelled');
+      assert.ok(typeof scopedState.completed_at === 'string' && scopedState.completed_at.length > 0);
+    } finally {
+      await cleanup();
+    }
+  });
+
   it('does not bypass shutdown gate for pending work', async () => {
     const { cwd, cleanup } = await setupTeam('cleanup-gated');
     try {
