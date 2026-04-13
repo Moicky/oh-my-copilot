@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { readSessionState } from '../hooks/session.js';
+import { isSessionStateUsable, readSessionState, readUsableSessionState } from '../hooks/session.js';
 import { getSkillActiveStatePaths, listActiveSkills, readSkillActiveState } from '../state/skill-active.js';
 import {
   readSubagentSessionSummary,
@@ -33,6 +33,7 @@ export interface SessionStatusDeps {
   existsSyncImpl?: typeof existsSync;
   readFileSyncImpl?: typeof readFileSync;
   readSessionStateImpl?: typeof readSessionState;
+  readUsableSessionStateImpl?: typeof readUsableSessionState;
   readSubagentSessionSummaryImpl?: typeof readSubagentSessionSummary;
   getSkillActiveStatePathsImpl?: typeof getSkillActiveStatePaths;
   readSkillActiveStateImpl?: typeof readSkillActiveState;
@@ -200,9 +201,21 @@ export async function buildDiscordSessionStatusReply(
     return STATUS_DATA_UNAVAILABLE_MESSAGE;
   }
 
-  const readSessionStateImpl = deps.readSessionStateImpl ?? readSessionState;
+  const readCurrentSessionState = async (projectPath: string) => {
+    if (deps.readUsableSessionStateImpl) {
+      return deps.readUsableSessionStateImpl(projectPath);
+    }
+
+    if (!deps.readSessionStateImpl) {
+      return readUsableSessionState(projectPath);
+    }
+
+    const state = await deps.readSessionStateImpl(projectPath);
+    if (!state) return null;
+    return isSessionStateUsable(state, projectPath) ? state : null;
+  };
   const readSubagentSessionSummaryImpl = deps.readSubagentSessionSummaryImpl ?? readSubagentSessionSummary;
-  const currentSession = await readSessionStateImpl(mapping.projectPath);
+  const currentSession = await readCurrentSessionState(mapping.projectPath);
   const currentSessionMatches = currentSession?.session_id === mapping.sessionId ? currentSession : null;
   const historyEntry = readLatestHistoryEntry(mapping.projectPath, mapping.sessionId, deps);
   const skillState = await readRelevantSkillState(mapping.projectPath, mapping.sessionId, deps);

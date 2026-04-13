@@ -8,6 +8,7 @@ import {
   recordSubagentTurn,
   writeSubagentTrackingState,
 } from '../../subagents/tracker.js';
+import { writeSessionStart } from '../../hooks/session.js';
 import type { SessionMapping } from '../session-registry.js';
 import {
   STATUS_DATA_UNAVAILABLE_MESSAGE,
@@ -44,13 +45,7 @@ describe('session-status helper', () => {
   it('renders a bounded running summary with active subagent details', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-session-status-'));
     try {
-      await writeJson(join(wd, '.omx', 'state', 'session.json'), {
-        session_id: 'sess-1',
-        native_session_id: 'native-1',
-        started_at: '2026-03-20T00:00:00.000Z',
-        cwd: wd,
-        pid: 1234,
-      });
+      await writeSessionStart(wd, 'sess-1', { nativeSessionId: 'native-1' });
       await writeJson(join(wd, '.omx', 'state', 'sessions', 'sess-1', 'skill-active-state.json'), {
         active: true,
         skill: 'ralph',
@@ -120,6 +115,59 @@ describe('session-status helper', () => {
       assert.match(status, /Updated: 2026-03-20T00:01:00.000Z/);
       assert.match(status, /Freshness: May be stale \(last updated 2026-03-20T00:01:00.000Z\)/);
       assert.match(status, /Subagents: unknown/);
+    } finally {
+      await rm(wd, { recursive: true, force: true });
+    }
+  });
+
+  it('does not report a stale tracked session as running when only raw session.json remains', async () => {
+    const wd = await mkdtemp(join(tmpdir(), 'omx-session-status-orphaned-'));
+    try {
+      await writeJson(join(wd, '.omx', 'state', 'session.json'), {
+        session_id: 'sess-orphaned',
+        native_session_id: 'native-orphaned',
+        started_at: '2026-03-20T00:00:00.000Z',
+        cwd: wd,
+        pid: 4242,
+        pid_start_ticks: 11,
+        pid_cmdline: 'node omx',
+      });
+      await mkdir(join(wd, '.omx', 'logs'), { recursive: true });
+      await writeFile(
+        join(wd, '.omx', 'logs', 'session-history.jsonl'),
+        `${JSON.stringify({
+          session_id: 'sess-orphaned',
+          native_session_id: 'native-orphaned',
+          started_at: '2026-03-20T00:00:00.000Z',
+          ended_at: '2026-03-20T00:01:00.000Z',
+        })}\n`,
+        'utf-8',
+      );
+
+      const status = await buildDiscordSessionStatusReply(createMapping(wd, 'sess-orphaned'), {
+        now: '2026-03-20T00:10:00.000Z',
+        readSessionStateImpl: async (projectPath) => {
+          assert.equal(projectPath, wd);
+          return {
+            session_id: 'sess-orphaned',
+            native_session_id: 'native-orphaned',
+            started_at: '2026-03-20T00:00:00.000Z',
+            cwd: wd,
+            pid: 4242,
+            pid_start_ticks: 11,
+            pid_cmdline: 'node omx',
+          };
+        },
+        readUsableSessionStateImpl: async (projectPath) => {
+          assert.equal(projectPath, wd);
+          return null;
+        },
+      });
+
+      assert.doesNotMatch(status, /State: running/);
+      assert.match(status, /State: ended/);
+      assert.match(status, /Native: native-orphaned/);
+      assert.match(status, /Freshness: May be stale \(last updated 2026-03-20T00:01:00.000Z\)/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
