@@ -685,6 +685,7 @@ describe("reapStaleNotifyFallbackWatcher", () => {
       const killed: Array<{ pid: number; signal?: NodeJS.Signals }> = [];
 
       await reapStaleNotifyFallbackWatcher(pidPath, {
+        isWatcherProcess: () => true,
         tryKillPid(pid, signal) {
           killed.push({ pid, signal });
           return true;
@@ -737,6 +738,7 @@ describe("reapStaleNotifyFallbackWatcher", () => {
       const warned: Array<{ message: unknown; meta: unknown }> = [];
       await reapStaleNotifyFallbackWatcher(pidPath, {
         readFile: async (path, encoding) => readFile(path, encoding),
+        isWatcherProcess: () => true,
         tryKillPid() {
           throw new Error("permission denied");
         },
@@ -1936,7 +1938,37 @@ exit 0
     ]);
   });
 
-  it("buildDetachedSessionFinalizeSteps keeps schedule after split-capture and before attach", () => {
+  it("reapStaleNotifyFallbackWatcher skips kill when process identity does not match a watcher", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "omx-reap-pid-identity-"));
+    const pidPath = join(cwd, "watcher.pid");
+    await writeFile(pidPath, JSON.stringify({ pid: 99999, started_at: new Date().toISOString() }));
+
+    const killed: number[] = [];
+    await reapStaleNotifyFallbackWatcher(pidPath, {
+      isWatcherProcess: () => false,
+      tryKillPid: (pid) => { killed.push(pid); return true; },
+    });
+
+    assert.equal(killed.length, 0, "should not kill a process that is not a watcher");
+    await rm(cwd, { recursive: true, force: true });
+  });
+
+  it("reapStaleNotifyFallbackWatcher sends SIGTERM only after confirming watcher identity", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "omx-reap-pid-confirmed-"));
+    const pidPath = join(cwd, "watcher.pid");
+    await writeFile(pidPath, JSON.stringify({ pid: 12345, started_at: new Date().toISOString() }));
+
+    const killed: number[] = [];
+    await reapStaleNotifyFallbackWatcher(pidPath, {
+      isWatcherProcess: () => true,
+      tryKillPid: (pid) => { killed.push(pid); return true; },
+    });
+
+    assert.deepEqual(killed, [12345], "should SIGTERM the verified watcher process");
+    await rm(cwd, { recursive: true, force: true });
+  });
+
+    it("buildDetachedSessionFinalizeSteps keeps schedule after split-capture and before attach", () => {
     const steps = buildDetachedSessionFinalizeSteps(
       "omx-demo",
       "%12",

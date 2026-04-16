@@ -3044,6 +3044,48 @@ function parseWatcherPidFile(content: string): number | null {
   }
 }
 
+interface WatcherPidRecord {
+  pid: number;
+  startedAt: string | null;
+}
+
+function parseWatcherPidRecord(content: string): WatcherPidRecord | null {
+  const trimmed = content.trim();
+  if (!trimmed) return null;
+  try {
+    const parsed = JSON.parse(trimmed) as { pid?: unknown; started_at?: unknown };
+    if (
+      typeof parsed.pid !== "number" ||
+      !Number.isFinite(parsed.pid) ||
+      parsed.pid <= 0
+    ) {
+      return null;
+    }
+    return {
+      pid: parsed.pid,
+      startedAt: typeof parsed.started_at === "string" ? parsed.started_at : null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function isLikelyOmxWatcherProcess(
+  pid: number,
+  execFileSyncFn: typeof execFileSync = execFileSync,
+): boolean {
+  try {
+    const cmd = execFileSyncFn("ps", ["-p", String(pid), "-o", "command="], {
+      encoding: "utf-8",
+      timeout: 2000,
+      windowsHide: true,
+    }) as string;
+    return cmd.includes("notify-fallback-watcher") || cmd.includes("hook-derived-watcher");
+  } catch {
+    return false;
+  }
+}
+
 export async function reapStaleNotifyFallbackWatcher(
   pidPath: string,
   deps: {
@@ -3052,6 +3094,7 @@ export async function reapStaleNotifyFallbackWatcher(
     tryKillPid?: (pid: number, signal?: NodeJS.Signals) => boolean;
     hasErrnoCode?: (error: unknown, code: string) => boolean;
     warn?: (message?: unknown, ...optionalParams: unknown[]) => void;
+    isWatcherProcess?: (pid: number) => boolean;
   } = {},
 ): Promise<void> {
   const exists = deps.exists ?? existsSync;
@@ -3062,11 +3105,12 @@ export async function reapStaleNotifyFallbackWatcher(
   const tryKillPidImpl = deps.tryKillPid ?? tryKillPid;
   const hasErrnoCodeImpl = deps.hasErrnoCode ?? hasErrnoCode;
   const warn = deps.warn ?? console.warn;
+  const isWatcherProcessImpl = deps.isWatcherProcess ?? isLikelyOmxWatcherProcess;
 
   try {
-    const prevPid = parseWatcherPidFile(await readFileImpl(pidPath, "utf-8"));
-    if (prevPid) {
-      tryKillPidImpl(prevPid, "SIGTERM");
+    const record = parseWatcherPidRecord(await readFileImpl(pidPath, "utf-8"));
+    if (record && isWatcherProcessImpl(record.pid)) {
+      tryKillPidImpl(record.pid, "SIGTERM");
     }
   } catch (error: unknown) {
     if (!hasErrnoCodeImpl(error, "ESRCH")) {
