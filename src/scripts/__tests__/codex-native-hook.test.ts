@@ -464,6 +464,33 @@ describe("codex native hook dispatch", () => {
     }
   });
 
+  it("does not activate Ralph workflow state from a plain conversational mention", async () => {
+    const cwd = await mkdtemp(join(tmpdir(), "omx-native-hook-ralph-plain-text-"));
+    try {
+      await mkdir(join(cwd, ".omx", "state"), { recursive: true });
+      const result = await dispatchCodexNativeHook(
+        {
+          hook_event_name: "UserPromptSubmit",
+          cwd,
+          session_id: "sess-ralph-plain-text",
+          thread_id: "thread-ralph-plain-text",
+          turn_id: "turn-ralph-plain-text",
+          prompt: "why does ralph keep blocking stop?",
+        },
+        { cwd },
+      );
+
+      assert.equal(result.omxEventName, "keyword-detector");
+      assert.equal(result.skillState, null);
+      assert.equal(result.outputJson, null);
+      assert.equal(existsSync(join(cwd, ".omx", "state", "skill-active-state.json")), false);
+      assert.equal(existsSync(join(cwd, ".omx", "state", "sessions", "sess-ralph-plain-text", "skill-active-state.json")), false);
+      assert.equal(existsSync(join(cwd, ".omx", "state", "sessions", "sess-ralph-plain-text", "ralph-state.json")), false);
+    } finally {
+      await rm(cwd, { recursive: true, force: true });
+    }
+  });
+
   it("clarifies that prompt-side $ralph activation does not invoke the PRD-gated CLI path", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omx-native-hook-ralph-routing-"));
     try {
