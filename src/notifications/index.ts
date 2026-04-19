@@ -294,8 +294,7 @@ export async function notifyLifecycle(
       if (openClawAllowed) {
         try {
           const { wakeOpenClaw } = await import("../openclaw/index.js");
-          // Non-blocking: do not await to avoid delaying notification return
-          void wakeOpenClaw(openClawEvent, {
+          const openClawContext = {
             sessionId: payload.sessionId,
             projectPath: payload.projectPath,
             tmuxSession: payload.tmuxSession,
@@ -305,7 +304,15 @@ export async function notifyLifecycle(
             tmuxTail: payload.tmuxTail,
             // Reply context env vars are read inside wakeOpenClaw;
             // callers do not need to pass them explicitly.
-          });
+          };
+          if (openClawEvent === "ask-user-question") {
+            // ask-user-question must launch through the current foreground hook path
+            // so downstream answer routing stays attached to the live session.
+            await wakeOpenClaw(openClawEvent, openClawContext);
+          } else {
+            // Other lifecycle hooks remain fire-and-forget to avoid delaying notification return.
+            void wakeOpenClaw(openClawEvent, openClawContext);
+          }
         } catch {
           // OpenClaw failures must never affect notification dispatch
         }
