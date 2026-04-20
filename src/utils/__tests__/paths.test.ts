@@ -55,7 +55,7 @@ describe("copilotHome", () => {
     assert.equal(copilotHome(), "/tmp/custom-codex");
   });
 
-  it("defaults to ~/.codex when COPILOT_HOME is not set", () => {
+  it("defaults to ~/.copilot when COPILOT_HOME is not set", () => {
     delete process.env.COPILOT_HOME;
     assert.equal(copilotHome(), join(homedir(), ".copilot"));
   });

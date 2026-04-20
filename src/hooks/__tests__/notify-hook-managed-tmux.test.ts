@@ -234,11 +234,11 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%42" ]]; then
@@ -259,7 +259,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%42\\t0\\tcodex\\tcodex\\n%%55\\t1\\tcodex\\tcodex\\n"
+    printf "%%42\\t0\\tcopilot\\tcopilot\\n%%55\\t1\\tcopilot\\tcopilot\\n"
     exit 0
   fi
   echo "unexpected list-panes target: $target" >&2
@@ -350,7 +350,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%42\\t0\\tnode\\tbash\\n%%55\\t1\\tcodex\\tcodex\\n"
+    printf "%%42\\t0\\tnode\\tbash\\n%%55\\t1\\tcopilot\\tcopilot\\n"
     exit 0
   fi
   echo "unexpected list-panes target: $target" >&2
@@ -590,7 +590,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%42" ]]; then
@@ -611,7 +611,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%42\\t0\\tbash\\tcodex --model gpt-5\\n%%55\\t1\\tnode\\tbash\\n"
+    printf "%%42\\t0\\tbash\\tcopilot --model gpt-5\\n%%55\\t1\\tnode\\tbash\\n"
     exit 0
   fi
   echo "unexpected list-panes target: $target" >&2
@@ -681,7 +681,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%42" ]]; then
@@ -702,7 +702,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%42\\t0\\tbash\\tcodex --model gpt-5\\n%%55\\t1\\tcodex\\tcodex\\n"
+    printf "%%42\\t0\\tbash\\tcopilot --model gpt-5\\n%%55\\t1\\tcopilot\\tcopilot\\n"
     exit 0
   fi
   echo "unexpected list-panes target: $target" >&2
@@ -772,7 +772,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%42" ]]; then
@@ -793,7 +793,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%42\\t1\\tzsh\\tcodex --model gpt-5\\n%%55\\t0\\tcodex\\tcodex\\n"
+    printf "%%42\\t1\\tzsh\\tcopilot --model gpt-5\\n%%55\\t0\\tcopilot\\tcopilot\\n"
     exit 0
   fi
   echo "unexpected list-panes target: $target" >&2
@@ -864,7 +864,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%42" ]]; then
@@ -895,7 +895,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%42\\t1\\tbash\\tcodex --model gpt-5\\n%%55\\t0\\tcodex\\tcodex\\n"
+    printf "%%42\\t1\\tbash\\tcopilot --model gpt-5\\n%%55\\t0\\tcopilot\\tcopilot\\n"
     exit 0
   fi
   echo "unexpected list-panes target: $target" >&2
@@ -965,7 +965,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%42" ]]; then
@@ -986,7 +986,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%42\\t1\\tbash\\tcodex --model gpt-5\\n%%55\\t0\\tbash\\tbash\\n"
+    printf "%%42\\t1\\tbash\\tcopilot --model gpt-5\\n%%55\\t0\\tbash\\tbash\\n"
     exit 0
   fi
   echo "unexpected list-panes target: $target" >&2
@@ -1073,7 +1073,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%42\\t0\\tcodex\\tcodex\\n%%55\\t1\\tcodex\\tcodex\\n"
+    printf "%%42\\t0\\tcopilot\\tcopilot\\n%%55\\t1\\tcopilot\\tcopilot\\n"
     exit 0
   fi
   echo "unexpected list-panes target: $target" >&2

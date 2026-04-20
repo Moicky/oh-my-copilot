@@ -979,7 +979,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%93" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   exit 0
@@ -1378,7 +1378,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%73" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   exit 0
@@ -1475,7 +1475,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%74" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   exit 0
@@ -1571,7 +1571,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%75" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   exit 0
@@ -1678,7 +1678,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%72" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   exit 0

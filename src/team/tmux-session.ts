@@ -575,7 +575,7 @@ function normalizeTeamWorkerCliMode(raw: string | undefined, sourceEnv: string =
   const normalized = String(raw ?? 'auto').trim().toLowerCase();
   if (normalized === '' || normalized === 'auto') return 'auto';
   if (normalized === 'copilot' || normalized === 'claude' || normalized === 'gemini') return normalized;
-  throw new Error(`Invalid ${sourceEnv} value "${raw}". Expected: auto, codex, claude, gemini`);
+  throw new Error(`Invalid ${sourceEnv} value "${raw}". Expected: auto, copilot, claude, gemini`);
 }
 
 export function resolveTeamWorkerLaunchMode(
@@ -645,7 +645,7 @@ export function resolveTeamWorkerCliPlan(
   if (entries.length === 0 || entries.every((part) => part.length === 0)) {
     throw new Error(
       `Invalid ${OMCP_TEAM_WORKER_CLI_MAP_ENV} value "${env[OMCP_TEAM_WORKER_CLI_MAP_ENV]}". `
-        + `Expected comma-separated values: auto|codex|claude|gemini.`,
+        + `Expected comma-separated values: auto|copilot|claude|gemini.`,
     );
   }
   if (entries.some((part) => part.length === 0)) {
@@ -740,7 +740,7 @@ export function assertTeamWorkerCliBinaryAvailable(
   if (existsImpl(workerCli)) return;
   throw new Error(
     `Selected team worker CLI "${workerCli}" is not available on PATH. `
-      + `Install "${workerCli}" or set ${OMCP_TEAM_WORKER_CLI_ENV}=codex|claude|gemini.`,
+      + `Install "${workerCli}" or set ${OMCP_TEAM_WORKER_CLI_ENV}=copilot|claude|gemini.`,
   );
 }
 

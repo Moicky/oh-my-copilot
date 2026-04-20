@@ -18,7 +18,7 @@ describe('reconcileHudForPromptSubmit', () => {
     const result = await reconcileHudForPromptSubmit('/repo', {
       env: { TMUX: '1', TMUX_PANE: '%1' },
       listCurrentWindowPanes: () => [
-        { paneId: '%1', currentCommand: 'codex', startCommand: 'codex' },
+        { paneId: '%1', currentCommand: 'copilot', startCommand: 'copilot' },
       ],
       createHudWatchPane: (cwd, cmd, options) => {
         created.push({ cwd, cmd, options });
@@ -47,7 +47,7 @@ describe('reconcileHudForPromptSubmit', () => {
       env: { TMUX: '1', TMUX_PANE: '%1', OMCP_SESSION_ID: 'sess-stale' },
       sessionId: 'sess-canonical',
       listCurrentWindowPanes: () => [
-        { paneId: '%1', currentCommand: 'codex', startCommand: 'codex' },
+        { paneId: '%1', currentCommand: 'copilot', startCommand: 'copilot' },
       ],
       createHudWatchPane: (_cwd, cmd) => {
         created.push({ cmd });
@@ -69,10 +69,10 @@ describe('reconcileHudForPromptSubmit', () => {
     const result = await reconcileHudForPromptSubmit('/repo', {
       env: { TMUX: '1', TMUX_PANE: '%1' },
       listCurrentWindowPanes: () => [
-        { paneId: '%1', currentCommand: 'codex', startCommand: 'codex' },
+        { paneId: '%1', currentCommand: 'copilot', startCommand: 'copilot' },
         { paneId: '%2', currentCommand: 'node', startCommand: 'node omcp hud --watch' },
         { paneId: '%3', currentCommand: 'node', startCommand: 'node omcp hud --watch' },
-        { paneId: '%4', currentCommand: 'codex', startCommand: 'codex' },
+        { paneId: '%4', currentCommand: 'copilot', startCommand: 'copilot' },
       ],
       killTmuxPane: (paneId) => {
         killed.push(paneId);
@@ -96,7 +96,7 @@ describe('reconcileHudForPromptSubmit', () => {
     const result = await reconcileHudForPromptSubmit('/repo', {
       env: { TMUX: '1', TMUX_PANE: '%1' },
       listCurrentWindowPanes: () => [
-        { paneId: '%1', currentCommand: 'codex', startCommand: 'codex' },
+        { paneId: '%1', currentCommand: 'copilot', startCommand: 'copilot' },
         { paneId: '%2', currentCommand: 'node', startCommand: 'node omcp hud --watch' },
       ],
       resizeTmuxPane: (paneId, heightLines) => {

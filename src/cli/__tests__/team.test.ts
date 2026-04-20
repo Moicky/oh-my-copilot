@@ -510,7 +510,7 @@ case "$1" in
         exit 1
         ;;
       *"-t leader:0 -F #{pane_id}"*"#{pane_current_command}"*)
-        printf "%%11\\tzsh\\tzsh\\n%%12\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%13\\tcodex\\tcodex\\n%%14\\tcodex\\tcodex\\n"
+        printf "%%11\\tzsh\\tzsh\\n%%12\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%13\\tcopilot\\tcopilot\\n%%14\\tcopilot\\tcopilot\\n"
         exit 0
         ;;
       *"-t leader:0 -F #{pane_id}"*)

@@ -303,8 +303,8 @@ describe('omcp setup skills overwrite behavior', () => {
       await setup({ scope: 'user' });
 
       const output = logs.join('\n');
-      assert.match(output, /Migration hint: Detected 1 overlapping skill names between canonical .*\.codex\/skills and legacy .*\.agents\/skills\./);
-      assert.match(output, /Remove or archive ~\/\.agents\/skills after confirming .*\.codex\/skills is the version you want Codex to load\./);
+      assert.match(output, /Migration hint: Detected 1 overlapping skill names between canonical .*\.copilot\/skills and legacy .*\.agents\/skills\./);
+      assert.match(output, /Remove or archive ~\/\.agents\/skills after confirming .*\.copilot\/skills is the version you want Codex to load\./);
     } finally {
       console.log = originalLog;
       process.chdir(previousCwd);

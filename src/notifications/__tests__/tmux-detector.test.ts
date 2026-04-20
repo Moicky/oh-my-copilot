@@ -12,7 +12,7 @@ describe('analyzePaneContent', () => {
     assert.equal(result.confidence, 0);
   });
 
-  it('detects "codex" keyword', () => {
+  it('detects "copilot" keyword', () => {
     const result = analyzePaneContent('Running Codex agent...');
     assert.equal(result.hasCodex, true);
     assert.ok(result.confidence >= 0.5);

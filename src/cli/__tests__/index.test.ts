@@ -307,7 +307,7 @@ describe("resolveNotifyTempContract", () => {
 describe("cleanupLaunchOrphanedMcpProcesses", () => {
   it("reaps only detached OMCP MCP processes without a live Codex ancestor", async () => {
     const processes: ProcessEntry[] = [
-      { pid: 700, ppid: 500, command: "codex" },
+      { pid: 700, ppid: 500, command: "copilot" },
       { pid: 701, ppid: 700, command: "node /repo/bin/omcp.js" },
       {
         pid: 710,
@@ -327,7 +327,7 @@ describe("cleanupLaunchOrphanedMcpProcesses", () => {
       {
         pid: 820,
         ppid: 50,
-        command: "codex --model gpt-5",
+        command: "copilot --model gpt-5",
       },
       {
         pid: 821,
@@ -1365,7 +1365,7 @@ describe("tmux HUD pane helpers", () => {
         "%1\tzsh\tzsh",
         "%2\tnode\tnode /tmp/bin/omcp.js hud --watch",
         "%3\tnode\tnode /tmp/bin/omcp.js hud --watch",
-        "%4\tcodex\tcodex --model gpt-5",
+        "%4\tcopilot\tcopilot --model gpt-5",
       ].join("\n"),
     );
     assert.deepEqual(findHudWatchPaneIds(panes, "%2"), ["%3"]);
@@ -1401,7 +1401,7 @@ describe("detached tmux new-session sequencing", () => {
     const steps = buildDetachedSessionBootstrapSteps(
       "omcp-demo",
       "/tmp/project",
-      "'codex' '--model' 'gpt-5'",
+      "'copilot' '--model' 'gpt-5'",
       "'node' '/tmp/omcp.js' 'hud' '--watch'",
       "--model gpt-5",
       "/tmp/codex-home",
@@ -1426,7 +1426,7 @@ describe("detached tmux new-session sequencing", () => {
     const steps = buildDetachedSessionBootstrapSteps(
       "omcp-demo",
       "/tmp/project",
-      "'codex' '--model' 'gpt-5'",
+      "'copilot' '--model' 'gpt-5'",
       "'node' '/tmp/omcp.js' 'hud' '--watch'",
       null,
       undefined,
@@ -1447,7 +1447,7 @@ describe("detached tmux new-session sequencing", () => {
     const steps = buildDetachedSessionBootstrapSteps(
       "omcp-demo",
       "/tmp/project",
-      "'env' 'OMCP_SESSION_ID=sess-detached-managed' 'codex' '--model' 'gpt-5'",
+      "'env' 'OMCP_SESSION_ID=sess-detached-managed' 'copilot' '--model' 'gpt-5'",
       "'node' '/tmp/omcp.js' 'hud' '--watch'",
       null,
       undefined,
@@ -1481,7 +1481,7 @@ describe("detached tmux new-session sequencing", () => {
     const steps = buildDetachedSessionBootstrapSteps(
       "omcp-demo",
       "C:/project",
-      "'codex' '--allow-all-tools'",
+      "'copilot' '--allow-all-tools'",
       hudCmd,
       "--model gpt-5",
       "C:/codex-home",
@@ -1510,7 +1510,7 @@ describe("detached tmux new-session sequencing", () => {
     const steps = buildDetachedSessionBootstrapSteps(
       "omcp-demo",
       "/tmp/project",
-      "'codex' '--model' 'gpt-5'",
+      "'copilot' '--model' 'gpt-5'",
       "'node' '/tmp/omcp.js' 'hud' '--watch'",
       null,
     );
@@ -1541,7 +1541,7 @@ describe("detached tmux new-session sequencing", () => {
     try {
       await mkdir(fakeBin, { recursive: true });
       await writeFile(
-        join(fakeBin, "codex"),
+        join(fakeBin, "copilot"),
         `#!/bin/sh
 if IFS= read -r line; then
   printf 'stdin:%s\n' "$line" > "${stdinLogPath}"
@@ -1550,7 +1550,7 @@ else
 fi
 `,
       );
-      await chmod(join(fakeBin, "codex"), 0o755);
+      await chmod(join(fakeBin, "copilot"), 0o755);
       await writeFile(
         join(fakeBin, "tmux"),
         `#!/bin/sh
@@ -1576,7 +1576,7 @@ exit 0
       const steps = buildDetachedSessionBootstrapSteps(
         "omcp-demo",
         cwd,
-        buildTmuxPaneCommand("codex", [], "/bin/sh"),
+        buildTmuxPaneCommand("copilot", [], "/bin/sh"),
         "'node' '/tmp/omcp.js' 'hud' '--watch'",
         null,
       );
@@ -1610,14 +1610,14 @@ exit 0
     try {
       await mkdir(fakeBin, { recursive: true });
       await writeFile(
-        join(fakeBin, "codex"),
+        join(fakeBin, "copilot"),
         `#!/bin/sh
 printf 'codex:%s\\n' "$*" >> "${logPath}"
 printf 'codex-pwd:%s\\n' "$(pwd)" >> "${logPath}"
 exit 0
 `,
       );
-      await chmod(join(fakeBin, "codex"), 0o755);
+      await chmod(join(fakeBin, "copilot"), 0o755);
       await writeFile(join(cwd, ".profile"), "cd ..\n");
       await writeFile(
         join(fakeBin, "tmux"),
@@ -1646,7 +1646,7 @@ exit 0
         "omcp-demo",
         cwd,
         buildTmuxPaneCommand(
-          "codex",
+          "copilot",
           ["--allow-all-tools"],
           "/bin/sh",
         ),
@@ -1667,7 +1667,7 @@ exit 0
       });
 
       const log = await readFile(logPath, "utf-8");
-      assert.match(log, /codex:--dangerously-bypass-approvals-and-sandbox/);
+      assert.match(log, /codex:--allow-all-tools/);
       assert.match(
         log,
         new RegExp(`codex-pwd:${cwd.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`),
@@ -1690,13 +1690,13 @@ exit 0
     try {
       await mkdir(fakeBin, { recursive: true });
       await writeFile(
-        join(fakeBin, "codex"),
+        join(fakeBin, "copilot"),
         `#!/bin/sh
 printf 'codex:%s\\n' "$*" >> "${logPath}"
 exit 143
 `,
       );
-      await chmod(join(fakeBin, "codex"), 0o755);
+      await chmod(join(fakeBin, "copilot"), 0o755);
       await writeFile(
         join(fakeBin, "tmux"),
         `#!/bin/sh
@@ -1724,7 +1724,7 @@ exit 0
         "omcp-demo",
         cwd,
         buildTmuxPaneCommand(
-          "codex",
+          "copilot",
           ["--allow-all-tools"],
           "/bin/sh",
         ),
@@ -1746,7 +1746,7 @@ exit 0
 
       assert.equal(result.status, 143);
       const log = await readFile(logPath, "utf-8");
-      assert.match(log, /codex:--dangerously-bypass-approvals-and-sandbox/);
+      assert.match(log, /codex:--allow-all-tools/);
       assert.match(log, /tmux:display-message -p #\{socket_path\}/);
       assert.match(log, /tmux:show-options -sv extended-keys/);
       assert.match(log, /tmux:set-option -sq extended-keys always/);
@@ -1764,14 +1764,14 @@ exit 0
     try {
       await mkdir(fakeBin, { recursive: true });
       await writeFile(
-        join(fakeBin, "codex"),
+        join(fakeBin, "copilot"),
         `#!/bin/sh
 echo $$ > "${pidFile}"
 trap '' HUP
 while true; do sleep 1; done
 `,
       );
-      await chmod(join(fakeBin, "codex"), 0o755);
+      await chmod(join(fakeBin, "copilot"), 0o755);
       await writeFile(
         join(fakeBin, "tmux"),
         `#!/bin/sh
@@ -1794,7 +1794,7 @@ exit 0
       const steps = buildDetachedSessionBootstrapSteps(
         "omcp-demo",
         cwd,
-        buildTmuxPaneCommand("codex", [], "/bin/sh"),
+        buildTmuxPaneCommand("copilot", [], "/bin/sh"),
         "'node' '/tmp/omcp.js' 'hud' '--watch'",
         null,
       );
@@ -2206,12 +2206,12 @@ exit 0
 describe("buildTmuxShellCommand", () => {
   it("preserves quoted config values for tmux shell-command execution", () => {
     assert.equal(
-      buildTmuxShellCommand("codex", [
+      buildTmuxShellCommand("copilot", [
         "--allow-all-tools",
         "-c",
         'model_reasoning_effort="xhigh"',
       ]),
-      `'codex' '--allow-all-tools' '-c' 'model_reasoning_effort="xhigh"'`,
+      `'copilot' '--allow-all-tools' '-c' 'model_reasoning_effort="xhigh"'`,
     );
   });
 });
@@ -2219,7 +2219,7 @@ describe("buildTmuxShellCommand", () => {
 describe("buildTmuxPaneCommand", () => {
   it("wraps command with zsh profile sourcing while preserving tmux cwd", () => {
     const result = buildTmuxPaneCommand(
-      "codex",
+      "copilot",
       ["--model", "gpt-5"],
       "/usr/bin/zsh",
     );
@@ -2234,7 +2234,7 @@ describe("buildTmuxPaneCommand", () => {
 
   it("keeps Homebrew zsh instead of downgrading to /bin/sh", () => {
     const result = buildTmuxPaneCommand(
-      "codex",
+      "copilot",
       ["--model", "gpt-5"],
       "/opt/homebrew/bin/zsh",
     );
@@ -2250,7 +2250,7 @@ describe("buildTmuxPaneCommand", () => {
   });
 
   it("wraps command with bash profile sourcing while preserving tmux cwd", () => {
-    const result = buildTmuxPaneCommand("codex", [], "/bin/bash");
+    const result = buildTmuxPaneCommand("copilot", [], "/bin/bash");
     assert.ok(
       result.startsWith("'/bin/bash' -c "),
       "should start with bash non-login shell to preserve tmux cwd",
@@ -2261,7 +2261,7 @@ describe("buildTmuxPaneCommand", () => {
   });
 
   it("skips rc sourcing for unknown shells without using a login shell", () => {
-    const result = buildTmuxPaneCommand("codex", [], "/bin/fish");
+    const result = buildTmuxPaneCommand("copilot", [], "/bin/fish");
     assert.ok(
       result.startsWith("'/bin/fish' -c "),
       "should start with fish non-login shell",
@@ -2272,7 +2272,7 @@ describe("buildTmuxPaneCommand", () => {
   });
 
   it("falls back to /bin/sh without using a login shell when shell path is empty", () => {
-    const result = buildTmuxPaneCommand("codex", [], "");
+    const result = buildTmuxPaneCommand("copilot", [], "");
     assert.ok(
       result.startsWith("'/bin/sh' -c "),
       "should fall back to /bin/sh",
@@ -2283,7 +2283,7 @@ describe("buildTmuxPaneCommand", () => {
 
 describe("buildWindowsPromptCommand", () => {
   it("encodes detached Windows commands for safe PowerShell prompt injection", () => {
-    const result = buildWindowsPromptCommand("codex", [
+    const result = buildWindowsPromptCommand("copilot", [
       "--allow-all-tools",
       "-c",
       'model_reasoning_effort="high"',
@@ -2295,7 +2295,7 @@ describe("buildWindowsPromptCommand", () => {
     const decoded = Buffer.from(payload, "base64").toString("utf16le");
     assert.equal(
       decoded,
-      "$ErrorActionPreference = 'Stop'; & { & 'codex' '--allow-all-tools' '-c' 'model_reasoning_effort=\"high\"' 'it''s' }",
+      "$ErrorActionPreference = 'Stop'; & { & 'copilot' '--allow-all-tools' '-c' 'model_reasoning_effort=\"high\"' 'it''s' }",
     );
   });
 });
@@ -2467,7 +2467,7 @@ describe("team worker launch arg inheritance helpers", () => {
   it("resolveTeamWorkerLaunchArgsEnv merges and normalizes with de-dupe + last reasoning/model wins", () => {
     assert.equal(
       resolveTeamWorkerLaunchArgsEnv(
-        '--dangerously-bypass-approvals-and-sandbox -c model_reasoning_effort="high" --model old-a --no-alt-screen --model=old-b',
+        '--allow-all-tools -c model_reasoning_effort="high" --model old-a --no-alt-screen --model=old-b',
         [
           "-c",
           'model_reasoning_effort="xhigh"',
@@ -2477,7 +2477,7 @@ describe("team worker launch arg inheritance helpers", () => {
         ],
         true,
       ),
-      '--no-alt-screen --dangerously-bypass-approvals-and-sandbox -c model_reasoning_effort="xhigh" --model old-b',
+      '--no-alt-screen --allow-all-tools -c model_reasoning_effort="xhigh" --model old-b',
     );
   });
 
@@ -2515,7 +2515,7 @@ describe("team worker launch arg inheritance helpers", () => {
         true,
         DEFAULT_FRONTIER_MODEL,
       ),
-      `--no-alt-screen --dangerously-bypass-approvals-and-sandbox --model ${DEFAULT_FRONTIER_MODEL}`,
+      `--no-alt-screen --allow-all-tools --model ${DEFAULT_FRONTIER_MODEL}`,
     );
   });
 

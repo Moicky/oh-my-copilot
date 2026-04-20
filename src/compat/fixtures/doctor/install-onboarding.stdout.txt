@@ -6,14 +6,14 @@ Resolved setup scope: user
   [CODEX_CLI_STATUS]
   [OK] Node.js: <NODE_VERSION>
   [EXPLORE_HARNESS_STATUS]
-  [OK] Codex home: <CODEX_HOME>
+  [OK] Copilot home: <COPILOT_HOME>
   [!!] Config: config.toml exists but no OMCP entries yet (expected before first setup; run "omcp setup --force" once)
   [OK] Native hooks: hooks.json not found yet (expected before first setup)
   [OK] Explore routing: enabled by default
   [!!] Prompts: prompts directory not found
   [!!] Skills: skills directory not found
   [OK] Legacy skill roots: no ~/.agents/skills overlap detected
-  [!!] AGENTS.md: not found in <CODEX_HOME>/AGENTS.md (run omcp setup --scope user)
+  [!!] AGENTS.md: not found in <COPILOT_HOME>/AGENTS.md (run omcp setup --scope user)
   [!!] State dir: <REPO_STATE_DIR> (not created yet)
   [!!] MCP Servers: 1 servers but no OMCP servers yet (expected before first setup; run "omcp setup --force" once)
   [OK] Prompt triage: config: enabled (default)

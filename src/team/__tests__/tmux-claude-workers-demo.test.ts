@@ -18,7 +18,7 @@ describe('tmux claude workers demo', () => {
       const entries: string[] = [];
       for (let i = 1; i <= workerCount; i++) {
         if (i <= pivot) {
-          entries.push('codex');
+          entries.push('copilot');
         } else {
           entries.push('claude');
         }
@@ -42,7 +42,7 @@ describe('tmux claude workers demo', () => {
 
       const entries: string[] = [];
       for (let i = 1; i <= workerCount; i++) {
-        entries.push(i <= pivot ? 'codex' : 'claude');
+        entries.push(i <= pivot ? 'copilot' : 'claude');
       }
 
       assert.deepEqual(entries, ['copilot', 'copilot', 'copilot', 'claude', 'claude']);
@@ -61,7 +61,7 @@ describe('tmux claude workers demo', () => {
 
       const entries: string[] = [];
       for (let i = 1; i <= workerCount; i++) {
-        entries.push(i <= pivot ? 'codex' : 'claude');
+        entries.push(i <= pivot ? 'copilot' : 'claude');
       }
 
       assert.deepEqual(entries, ['copilot', 'copilot', 'copilot', 'claude', 'claude', 'claude']);
@@ -167,7 +167,7 @@ describe('tmux claude workers demo', () => {
       // Build CLI map like demo script does
       const pivot = Math.floor((workerCount + 1) / 2);
       const cliMap = Array.from({ length: workerCount }, (_, i) =>
-        i + 1 <= pivot ? 'codex' : 'claude',
+        i + 1 <= pivot ? 'copilot' : 'claude',
       ).join(',');
 
       const plan = resolveTeamWorkerCliPlan(workerCount, launchArgs, {
@@ -222,11 +222,11 @@ describe('tmux claude workers demo', () => {
     });
 
     it('handles auto-resolved codex from launch args', () => {
-      // When launch args contain 'codex' in model name and no CLI_MAP is set
+      // When launch args contain 'copilot' in model name and no CLI_MAP is set
       const plan = resolveTeamWorkerCliPlan(2, ['--model', 'gpt-5.3-codex'], {});
 
-      // Both should resolve to codex because model name contains 'codex' but not 'claude'
-      assert.deepEqual(plan, ['codex', 'codex']);
+      // Both should resolve to codex because model name contains 'copilot' but not 'claude'
+      assert.deepEqual(plan, ['copilot', 'copilot']);
     });
   });
 
@@ -248,7 +248,7 @@ describe('tmux claude workers demo', () => {
         OMCP_TEAM_WORKER_CLI_MAP: 'copilot',
       });
 
-      assert.deepEqual(plan, ['codex']);
+      assert.deepEqual(plan, ['copilot']);
     });
 
     it('handles single worker with gemini', () => {
@@ -264,14 +264,14 @@ describe('tmux claude workers demo', () => {
 
     it('rejects invalid CLI map with empty entries', () => {
       assert.throws(
-        () => resolveTeamWorkerCliPlan(3, [], { OMCP_TEAM_WORKER_CLI_MAP: 'codex,,claude' }),
+        () => resolveTeamWorkerCliPlan(3, [], { OMCP_TEAM_WORKER_CLI_MAP: 'copilot,,claude' }),
         /Empty entries are not allowed/,
       );
     });
 
     it('rejects CLI map with wrong length', () => {
       assert.throws(
-        () => resolveTeamWorkerCliPlan(3, [], { OMCP_TEAM_WORKER_CLI_MAP: 'codex,claude' }),
+        () => resolveTeamWorkerCliPlan(3, [], { OMCP_TEAM_WORKER_CLI_MAP: 'copilot,claude' }),
         /expected 1 or 3/,
       );
     });

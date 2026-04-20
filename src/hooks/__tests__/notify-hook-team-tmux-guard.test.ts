@@ -154,7 +154,7 @@ shift || true
 if [[ "$cmd" == "display-message" ]]; then
   format="\${@: -1}"
   if [[ "$format" == "#{pane_current_command}" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" ]]; then
@@ -208,7 +208,7 @@ shift || true
 if [[ "$cmd" == "display-message" ]]; then
   format="\${@: -1}"
   if [[ "$format" == "#{pane_current_command}" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" ]]; then

@@ -143,10 +143,10 @@ describe("omcp setup scope behavior", () => {
       assert.match(
         res.stdout,
         new RegExp(
-          `Codex home: (?:/private)?${wd.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/\\.codex`,
+          `Copilot home: (?:/private)?${wd.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/\\.copilot`,
         ),
       );
-      assert.doesNotMatch(res.stdout, /Codex home: .*\/home\/\.copilot/);
+      assert.doesNotMatch(res.stdout, /Copilot home: .*\/home\/\.copilot/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -225,7 +225,7 @@ describe("omcp setup scope behavior", () => {
       assert.ok(hooksJson.hooks?.Stop, "hooks.json should register Stop");
       const agentsMd = await readFile(agentsMdPath, "utf-8");
       assert.match(agentsMd, /prompts\/\*\.md/);
-      assert.match(agentsMd, /\.\/\.codex\/skills/);
+      assert.match(agentsMd, /\.\/\.copilot\/skills/);
       const persistedScope = JSON.parse(await readFile(scopeFile, "utf-8")) as {
         scope: string;
       };
@@ -304,7 +304,7 @@ describe("omcp setup scope behavior", () => {
       assert.match(JSON.stringify(sessionStartHooks), /echo keep-me/);
       assert.doesNotMatch(
         JSON.stringify(hooksJson),
-        /\/old\/dist\/scripts\/codex-native-hook\.js/,
+        /\/old\/dist\/scripts\.copilot-native-hook\.js/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -341,7 +341,7 @@ describe("omcp setup scope behavior", () => {
         join(home, ".copilot", "AGENTS.md"),
         "utf-8",
       );
-      assert.match(agentsMd, /~\/\.codex\/skills/);
+      assert.match(agentsMd, /~\/\.copilot\/skills/);
       assert.equal(
         await readFile(join(wd, "AGENTS.md"), "utf-8"),
         existingAgents,
@@ -391,7 +391,7 @@ describe("omcp setup scope behavior", () => {
       );
       assert.match(
         res.stdout,
-        /\[OK\] AGENTS\.md: found in .*home\/\.codex\/AGENTS\.md/,
+        /\[OK\] AGENTS\.md: found in .*home\/\.copilot\/AGENTS\.md/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });

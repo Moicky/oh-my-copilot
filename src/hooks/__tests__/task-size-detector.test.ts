@@ -387,7 +387,7 @@ describe('task-size-detector', () => {
     });
 
     it('returns false for codex', () => {
-      assert.equal(isHeavyMode('codex'), false);
+      assert.equal(isHeavyMode('copilot'), false);
     });
 
     it('returns false for gemini', () => {

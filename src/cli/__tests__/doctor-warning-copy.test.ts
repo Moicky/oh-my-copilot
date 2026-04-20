@@ -253,7 +253,7 @@ USE_OMX_EXPLORE_CMD = "off"
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Legacy skill roots: 1 overlapping skill names between .*\.codex[\\/]+skills and .*\.agents[\\/]+skills; 1 differ in SKILL\.md content; Codex Enable\/Disable Skills may show duplicates until ~\/\.agents\/skills is cleaned up/,
+        /Legacy skill roots: 1 overlapping skill names between .*\.copilot[\\/]+skills and .*\.agents[\\/]+skills; 1 differ in SKILL\.md content; Codex Enable\/Disable Skills may show duplicates until ~\/\.agents\/skills is cleaned up/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -381,7 +381,7 @@ command = "node"
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Legacy skill roots: ~\/\.agents\/skills links to canonical .*\.codex[\\/]+skills; treating both paths as one shared skill root/,
+        /Legacy skill roots: ~\/\.agents\/skills links to canonical .*\.copilot[\\/]+skills; treating both paths as one shared skill root/,
       );
       assert.doesNotMatch(res.stdout, /\[!!\] Legacy skill roots:/);
     } finally {

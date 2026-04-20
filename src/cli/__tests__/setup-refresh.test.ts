@@ -134,13 +134,13 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
       const gitignore = await readFile(join(wd, ".gitignore"), "utf-8");
       assert.equal(gitignore, `node_modules/\n${EXPECTED_PROJECT_GITIGNORE}`);
       assert.equal(gitignore.match(/^\.omcp\/$/gm)?.length ?? 0, 1);
-      assert.equal(gitignore.match(/^\.codex\/\*$/gm)?.length ?? 0, 1);
+      assert.equal(gitignore.match(/^\.copilot\/\*$/gm)?.length ?? 0, 1);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
-  it("ignores project-local config while keeping .codex agents, skills, and prompts trackable", async () => {
+  it("ignores project-local config while keeping .copilot agents, skills, and prompts trackable", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     try {
       const initResult = spawnSync("git", ["init", "-q"], { cwd: wd });
@@ -170,11 +170,11 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
         { cwd: wd, encoding: "utf-8" },
       );
       assert.equal(status.status, 0);
-      assert.match(status.stdout, /^!! \.codex\/config\.toml$/m);
-      assert.match(status.stdout, /^\?\? \.codex\/agents\/local\.toml$/m);
-      assert.match(status.stdout, /^\?\? \.codex\/prompts\/local\.md$/m);
-      assert.match(status.stdout, /^\?\? \.codex\/skills\/help\/SKILL\.md$/m);
-      assert.match(status.stdout, /^!! \.codex\/skills\/\.system\/cache\.json$/m);
+      assert.match(status.stdout, /^!! \.copilot\/config\.toml$/m);
+      assert.match(status.stdout, /^\?\? \.copilot\/agents\/local\.toml$/m);
+      assert.match(status.stdout, /^\?\? \.copilot\/prompts\/local\.md$/m);
+      assert.match(status.stdout, /^\?\? \.copilot\/skills\/help\/SKILL\.md$/m);
+      assert.match(status.stdout, /^!! \.copilot\/skills\/\.system\/cache\.json$/m);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -189,7 +189,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
 
       const gitignore = await readFile(join(wd, ".gitignore"), "utf-8");
       assert.equal(gitignore, EXPECTED_PROJECT_GITIGNORE);
-      assert.equal(gitignore.match(/^\.codex\/$/gm)?.length ?? 0, 0);
+      assert.equal(gitignore.match(/^\.copilot\/$/gm)?.length ?? 0, 0);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }

@@ -88,7 +88,7 @@ describe('omcp setup AGENTS refresh behavior', () => {
         scope: 'user',
       });
 
-      assert.match(output, /Generated AGENTS\.md in .*home\/\.codex\./);
+      assert.match(output, /Generated AGENTS\.md in .*home\/\.copilot\./);
       assert.match(output, /User scope leaves project AGENTS\.md unchanged\./);
       assert.match(output, /agents_md: updated=1, unchanged=0, backed_up=0, skipped=0, removed=0/);
       assert.equal(await readFile(join(wd, 'AGENTS.md'), 'utf-8'), existing);

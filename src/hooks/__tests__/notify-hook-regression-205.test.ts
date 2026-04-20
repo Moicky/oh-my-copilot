@@ -66,7 +66,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%99" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#S" ]]; then
@@ -84,7 +84,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ -n "$target" ]]; then
-    printf "%%99	node	codex --model gpt-5
+    printf "%%99	node	copilot --model gpt-5
 "
     exit 0
   fi

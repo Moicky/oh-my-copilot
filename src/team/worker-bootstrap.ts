@@ -84,7 +84,7 @@ This file is generated for a live OMCP team worker run and is disposable.
 ## Protocol
 1. Read your inbox at \`${options.teamStateRoot}/team/${options.teamName}/workers/${options.workerName}/inbox.md\`.
 2. Load the worker skill from the first existing path:
-   - \`${"${COPILOT_HOME:-~/.codex}"}/skills/worker/SKILL.md\`
+   - \`${"${COPILOT_HOME:-~/.copilot}"}/skills/worker/SKILL.md\`
    - \`${options.leaderCwd}/.copilot/skills/worker/SKILL.md\`
    - \`${options.leaderCwd}/skills/worker/SKILL.md\`
 3. Send startup ACK before task work:
@@ -299,7 +299,7 @@ You are a team worker in team "${teamName}". Your identity and assigned tasks ar
 ## Protocol
 1. Read your inbox file at the path provided in your first instruction
 2. Load the worker skill instructions from the first path that exists:
-   - \`${"${COPILOT_HOME:-~/.codex}"}/skills/worker/SKILL.md\`
+   - \`${"${COPILOT_HOME:-~/.copilot}"}/skills/worker/SKILL.md\`
    - \`<leader_cwd>/.copilot/skills/worker/SKILL.md\`
    - \`<leader_cwd>/skills/worker/SKILL.md\` (repo fallback)
 3. Send an ACK to the lead using CLI interop \`omcp team api send-message --json\` (to_worker="leader-fixed") once initialized
@@ -685,7 +685,7 @@ ${taskList}
 ## Instructions
 
 1. Load and follow the worker skill from the first existing path:
-   - \`${"${COPILOT_HOME:-~/.codex}"}/skills/worker/SKILL.md\`
+   - \`${"${COPILOT_HOME:-~/.copilot}"}/skills/worker/SKILL.md\`
    - \`${leaderCwd}/.copilot/skills/worker/SKILL.md\`
    - \`${leaderCwd}/skills/worker/SKILL.md\` (repo fallback)
 2. Send startup ACK to the lead mailbox BEFORE any task work (run this exact command):

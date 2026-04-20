@@ -495,7 +495,7 @@ describe('omcp uninstall', () => {
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Warning: 1 overlapping skill names remain between .*\.codex[\\/]+skills and .*\.agents[\\/]+skills; 1 differ in SKILL\.md content\. omcp uninstall only removes the active canonical skill root; archive or remove ~\/\.agents\/skills if Codex still shows duplicates/,
+        /Warning: 1 overlapping skill names remain between .*\.copilot[\\/]+skills and .*\.agents[\\/]+skills; 1 differ in SKILL\.md content\. omcp uninstall only removes the active canonical skill root; archive or remove ~\/\.agents\/skills if Codex still shows duplicates/,
       );
       assert.equal(existsSync(canonicalHelp), false, 'canonical OMCP skill should be removed');
       assert.equal(existsSync(join(home, '.agents', 'skills')), true, 'legacy skill root should remain for manual cleanup');

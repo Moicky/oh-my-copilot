@@ -47,6 +47,7 @@ export function analyzePaneContent(content: string): PaneAnalysis {
   const lower = content.toLowerCase();
 
   const hasCodex =
+    lower.includes('copilot') ||
     lower.includes('codex') ||
     lower.includes('omcp') ||
     lower.includes('oh-my-copilot') ||

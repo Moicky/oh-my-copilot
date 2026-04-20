@@ -228,7 +228,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$fmt" == "#{pane_current_command}" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$fmt" == "#S" ]]; then
@@ -261,7 +261,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     shift || true
   done
   if [[ -n "$target" ]]; then
-    printf "%%42\tcodex\tcodex\n"
+    printf "%%42\tcopilot\tcopilot\n"
     exit 0
   fi
   echo "%42 1"
@@ -285,20 +285,20 @@ function buildManagedRalphTmux(
   const { cwd, managedSessionName, anchorPane, livePane, codexPanes, missingAnchor = false } = options;
   const panes = (codexPanes && codexPanes.length > 0)
     ? codexPanes
-    : [{ paneId: livePane, active: true, currentCommand: 'codex', startCommand: 'codex' }];
+    : [{ paneId: livePane, active: true, currentCommand: 'copilot', startCommand: 'copilot' }];
   const listPaneOutput = panes
     .map((pane) => {
       const paneId = pane.paneId;
       const active = pane.active ? '1' : '0';
-      const currentCommand = pane.currentCommand || 'codex';
-      const startCommand = pane.startCommand || 'codex';
+      const currentCommand = pane.currentCommand || 'copilot';
+      const startCommand = pane.startCommand || 'copilot';
       return `${paneId}\t${active}\t${currentCommand}\t${startCommand}`;
     })
     .join('\n');
   const paneCommandBranches = panes
     .map((pane) => {
-      const currentCommand = (pane.currentCommand || 'codex').replace(/"/g, '\\"');
-      const startCommand = (pane.startCommand || 'codex').replace(/"/g, '\\"');
+      const currentCommand = (pane.currentCommand || 'copilot').replace(/"/g, '\\"');
+      const startCommand = (pane.startCommand || 'copilot').replace(/"/g, '\\"');
       return `  if [[ "$format" == "#{pane_current_command}" && "$target" == "${pane.paneId}" ]]; then
     echo "${currentCommand}"
     exit 0
@@ -1331,7 +1331,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$fmt" == "#{pane_current_command}" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$fmt" == "#S" ]]; then
@@ -2393,8 +2393,8 @@ exit 0
         livePane,
         codexPanes: [
           { paneId: anchorPane, active: false, currentCommand: 'sh', startCommand: 'bash' },
-          { paneId: '%41', active: false, currentCommand: 'codex', startCommand: 'codex' },
-          { paneId: livePane, active: true, currentCommand: 'codex', startCommand: 'codex' },
+          { paneId: '%41', active: false, currentCommand: 'copilot', startCommand: 'copilot' },
+          { paneId: livePane, active: true, currentCommand: 'copilot', startCommand: 'copilot' },
         ],
       }));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
@@ -2518,7 +2518,7 @@ if [[ "$cmd" == "list-panes" ]]; then
   "tmux_pane_id": "%99"
 }
 JSON
-    printf "%%99\t0\tsh\tbash\n%%42\t1\tcodex\tcodex\n"
+    printf "%%99\t0\tsh\tbash\n%%42\t1\tcopilot\tcopilot\n"
     exit 0
   fi
   echo "can't find session" >&2
@@ -2597,8 +2597,8 @@ exit 0
         anchorPane,
         livePane,
         codexPanes: [
-          { paneId: anchorPane, active: false, currentCommand: 'codex', startCommand: 'codex' },
-          { paneId: livePane, active: true, currentCommand: 'codex', startCommand: 'codex' },
+          { paneId: anchorPane, active: false, currentCommand: 'copilot', startCommand: 'copilot' },
+          { paneId: livePane, active: true, currentCommand: 'copilot', startCommand: 'copilot' },
         ],
       }));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
@@ -2668,8 +2668,8 @@ exit 0
         anchorPane,
         livePane,
         codexPanes: [
-          { paneId: anchorPane, active: true, currentCommand: 'bash', startCommand: 'codex --model gpt-5' },
-          { paneId: livePane, active: false, currentCommand: 'codex', startCommand: 'codex' },
+          { paneId: anchorPane, active: true, currentCommand: 'bash', startCommand: 'copilot --model gpt-5' },
+          { paneId: livePane, active: false, currentCommand: 'copilot', startCommand: 'copilot' },
         ],
       }));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
@@ -2739,8 +2739,8 @@ exit 0
         anchorPane,
         livePane,
         codexPanes: [
-          { paneId: '%41', active: false, currentCommand: 'codex', startCommand: 'codex' },
-          { paneId: livePane, active: true, currentCommand: 'codex', startCommand: 'codex' },
+          { paneId: '%41', active: false, currentCommand: 'copilot', startCommand: 'copilot' },
+          { paneId: livePane, active: true, currentCommand: 'copilot', startCommand: 'copilot' },
         ],
         missingAnchor: true,
       }));

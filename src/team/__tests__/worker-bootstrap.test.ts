@@ -47,7 +47,7 @@ describe("worker bootstrap", () => {
     assert.match(workerSkill, /omcp team api release-task-claim/);
     assert.match(
       workerSkill,
-      /\$\{COPILOT_HOME:-~\/\.codex\}\/skills\/worker\/SKILL\.md/,
+      /\$\{COPILOT_HOME:-~\/\.copilot\}\/skills\/worker\/SKILL\.md/,
     );
     assert.doesNotMatch(workerSkill, /Write completion to the task file/i);
     assert.doesNotMatch(
@@ -72,9 +72,9 @@ describe("worker bootstrap", () => {
     assert.match(overlay, /team "my-team"/);
     assert.match(
       overlay,
-      /\$\{COPILOT_HOME:-~\/\.codex\}\/skills\/worker\/SKILL\.md/,
+      /\$\{COPILOT_HOME:-~\/\.copilot\}\/skills\/worker\/SKILL\.md/,
     );
-    assert.match(overlay, /<leader_cwd>\/\.codex\/skills\/worker\/SKILL\.md/);
+    assert.match(overlay, /<leader_cwd>\/\.copilot\/skills\/worker\/SKILL\.md/);
     assert.match(overlay, /Resolve canonical team state root/i);
     assert.match(overlay, /<team_state_root>\/team\/my-team\/tasks/);
     assert.match(overlay, /tasks\/task-<id>\.json/);
@@ -260,9 +260,9 @@ describe("worker bootstrap", () => {
     assert.match(inbox, /omcp team api release-task-claim/);
     assert.match(
       inbox,
-      /\$\{COPILOT_HOME:-~\/\.codex\}\/skills\/worker\/SKILL\.md/,
+      /\$\{COPILOT_HOME:-~\/\.copilot\}\/skills\/worker\/SKILL\.md/,
     );
-    assert.match(inbox, /\/\.codex\/skills\/worker\/SKILL\.md/);
+    assert.match(inbox, /\/\.copilot\/skills\/worker\/SKILL\.md/);
     assert.match(inbox, /ACK: worker-1 initialized/);
     assert.match(inbox, /Mailbox Delivery Protocol \(Required\)/);
     assert.match(inbox, /mailbox-mark-delivered/);

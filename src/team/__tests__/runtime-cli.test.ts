@@ -24,8 +24,8 @@ describe('runtime-cli helpers', () => {
       ['gemini'],
     );
     assert.throws(
-      () => runtimeCli.normalizeAgentTypes(['codex', 'invalid'], 2),
-      /Expected codex\\|claude\\|gemini/,
+      () => runtimeCli.normalizeAgentTypes(['copilot', 'invalid'], 2),
+      /Expected copilot\\|claude\\|gemini/,
     );
   });
 

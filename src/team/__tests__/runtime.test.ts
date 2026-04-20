@@ -523,7 +523,7 @@ describe('runtime', () => {
     try {
       const args = resolveWorkerLaunchArgsFromEnv(
         {
-          OMCP_TEAM_WORKER_CLI_MAP: 'codex,claude',
+          OMCP_TEAM_WORKER_CLI_MAP: 'copilot,claude',
           OMCP_TEAM_WORKER_LAUNCH_ARGS: '-c model_reasoning_effort="high" --model claude-3-7-sonnet',
         },
         'executor',
@@ -763,7 +763,7 @@ esac
 `,
           binaries: [
             {
-              name: 'codex',
+              name: 'copilot',
               content: '#!/bin/sh\nsleep 30\n',
             },
           ],
@@ -1062,7 +1062,7 @@ case "\${1:-}" in
     exit 0
     ;;
   list-panes)
-    printf "%%1\\tnode\\t'codex'\\n"
+    printf "%%1\\tnode\\t'copilot'\\n"
     exit 0
     ;;
   split-window)
@@ -1214,7 +1214,7 @@ case "\${1:-}" in
   list-panes)
     case "$*" in
       *"pane_current_command"*)
-        printf "%%1\tnode\t'codex'\n"
+        printf "%%1\tnode\t'copilot'\n"
         ;;
       *"#{pane_dead} #{pane_pid}"*)
         echo "1 999999"
@@ -1261,7 +1261,7 @@ EOF
     ;;
 esac
 `,
-          binaries: [{ name: 'codex', content: '#!/bin/sh\nexit 0\n' }],
+          binaries: [{ name: 'copilot', content: '#!/bin/sh\nexit 0\n' }],
         },
         async () => {
           delete process.env.TMUX;
@@ -1370,7 +1370,7 @@ case "$1" in
         echo "0 4242"
         ;;
       *"pane_current_command"*)
-        printf "%%1\\tnode\\t'codex'\\n"
+        printf "%%1\\tnode\\t'copilot'\\n"
         ;;
       *"#{pane_pid}"*)
         echo "4242"
@@ -1405,7 +1405,7 @@ esac
 `,
           binaries: [
             {
-              name: 'codex',
+              name: 'copilot',
               content: `#!/usr/bin/env node
 process.stdin.resume();
 setTimeout(() => process.exit(0), 30000);
@@ -1500,7 +1500,7 @@ case "$1" in
   list-panes)
     case "$*" in
       *"pane_current_command"*)
-        printf "%%1\\tnode\\t'codex'\\n"
+        printf "%%1\\tnode\\t'copilot'\\n"
         ;;
       *"#{pane_dead} #{pane_pid}"*)
         echo "1 4242"
@@ -1532,7 +1532,7 @@ case "$1" in
     ;;
 esac
 `,
-          binaries: [{ name: 'codex', content: '#!/usr/bin/env node\nprocess.stdin.resume();\n' }],
+          binaries: [{ name: 'copilot', content: '#!/usr/bin/env node\nprocess.stdin.resume();\n' }],
         },
         async () => {
           delete process.env.TMUX;
@@ -1611,7 +1611,7 @@ case "$1" in
         echo "0 4242"
         ;;
       *"pane_current_command"*)
-        printf "%%1\\tnode\\t'codex'\\n"
+        printf "%%1\\tnode\\t'copilot'\\n"
         ;;
       *"-t %2"*"#{pane_pid}"*)
         echo "4242"
@@ -1660,7 +1660,7 @@ esac
 `,
           binaries: [
             {
-              name: 'codex',
+              name: 'copilot',
               content: `#!/usr/bin/env node
 process.stdin.resume();
 setTimeout(() => process.exit(0), 30000);
@@ -2223,7 +2223,7 @@ case "\${1:-}" in
   list-panes)
     case "$*" in
       *"pane_current_command"* )
-        printf "%%1\\tnode\\t'codex'\\n"
+        printf "%%1\\tnode\\t'copilot'\\n"
         ;;
       *"#{pane_dead} #{pane_pid}"*)
         echo "1 999999"
@@ -4214,7 +4214,7 @@ case "$1" in
         exit 0
         ;;
       *"-t leader:0 -F #{pane_id}"*"#{pane_current_command}"*)
-        printf "%%11\\tzsh\\tzsh\\n%%12\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%13\\tcodex\\tcodex\\n%%14\\tcodex\\tcodex\\n"
+        printf "%%11\\tzsh\\tzsh\\n%%12\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%13\\tcopilot\\tcopilot\\n%%14\\tcopilot\\tcopilot\\n"
         if [ -f "$restored_marker" ]; then
           printf "%%44\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n"
         fi
@@ -4295,7 +4295,7 @@ case "$1" in
         exit 1
         ;;
       *"-t leader:0 -F #{pane_id}"*"#{pane_current_command}"*)
-        printf "%%11\\tpwsh\\tpwsh\\n%%12\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%13\\tcodex\\tcodex\\n%%14\\tcodex\\tcodex\\n"
+        printf "%%11\\tpwsh\\tpwsh\\n%%12\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%13\\tcopilot\\tcopilot\\n%%14\\tcopilot\\tcopilot\\n"
         exit 0
         ;;
       *)
@@ -4375,7 +4375,7 @@ case "$1" in
         exit 1
         ;;
       *"-t leader:0 -F #{pane_id}"*"#{pane_current_command}"*)
-        printf "%%21\\tpwsh\\tpwsh\\n%%22\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%23\\tcodex\\tcodex\\n%%24\\tcodex\\tcodex\\n"
+        printf "%%21\\tpwsh\\tpwsh\\n%%22\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%23\\tcopilot\\tcopilot\\n%%24\\tcopilot\\tcopilot\\n"
         exit 0
         ;;
       *)
@@ -4450,7 +4450,7 @@ case "$1" in
         exit 1
         ;;
       *"-t leader:0 -F #{pane_id}"*"#{pane_current_command}"*)
-        printf "%%11\\tzsh\\tzsh\\n%%12\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%13\\tcodex\\tcodex\\n%%14\\tcodex\\tcodex\\n"
+        printf "%%11\\tzsh\\tzsh\\n%%12\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%13\\tcopilot\\tcopilot\\n%%14\\tcopilot\\tcopilot\\n"
         exit 0
         ;;
       *)

@@ -258,7 +258,7 @@ describe('isPaneRunningShell', () => {
 
   it('returns false for agent processes', () => {
     assert.equal(isPaneRunningShell('node'), false);
-    assert.equal(isPaneRunningShell('codex'), false);
+    assert.equal(isPaneRunningShell('copilot'), false);
     assert.equal(isPaneRunningShell('claude'), false);
     assert.equal(isPaneRunningShell('python'), false);
   });
@@ -435,7 +435,7 @@ if [[ "$cmd" == "display-message" ]]; then
   exit 1
 fi
 if [[ "$cmd" == "list-panes" ]]; then
-  printf "%%2\tnode\tnode /pkg/dist/cli/omcp.js hud --watch\n%%42\tnode\tcodex --model gpt-5\n"
+  printf "%%2\tnode\tnode /pkg/dist/cli/omcp.js hud --watch\n%%42\tnode\tcopilot --model gpt-5\n"
   exit 0
 fi
 echo "unsupported" >&2

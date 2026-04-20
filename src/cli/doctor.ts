@@ -135,8 +135,8 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
   // Check 2.5: Explore harness readiness
   checks.push(checkExploreHarness());
 
-  // Check 3: Codex home directory
-  checks.push(checkDirectory('Codex home', paths.copilotHomeDir));
+  // Check 3: Copilot home directory
+  checks.push(checkDirectory('Copilot home', paths.copilotHomeDir));
 
   // Check 4: Config file
   checks.push(await checkConfig(paths.configPath));
@@ -462,7 +462,7 @@ function checkCodexCli(): Check {
     };
   }
   if (result.status === 0) {
-    const version = (result.stdout || '').trim();
+    const version = (result.stdout || '').split('\n')[0]?.trim() || '';
     return { name: 'Copilot CLI', status: 'pass', message: `installed (${version})` };
   }
   const stderr = (result.stderr || '').trim();

@@ -266,14 +266,14 @@ async function readManagedPaneCommandState(paneTarget: string): Promise<{ curren
 
 function paneLooksLikeManagedAgent({ currentCommand, startCommand }: { currentCommand: string; startCommand: string }): boolean {
   if (/\bomcp\b.*\bhud\b.*--watch/i.test(startCommand)) return false;
-  if (startCommand.includes('codex')) return true;
+  if (startCommand.includes('copilot')) return true;
   return currentCommand === 'copilot' || currentCommand === 'node' || currentCommand === 'npx';
 }
 
 function paneLooksLikeRetainableManagedAnchor({ currentCommand, startCommand }: { currentCommand: string; startCommand: string }): boolean {
   if (/\bomcp\b.*\bhud\b.*--watch/i.test(startCommand)) return false;
   if (currentCommand === 'copilot') return true;
-  if ((currentCommand === 'node' || currentCommand === 'npx') && startCommand.includes('codex')) return true;
+  if ((currentCommand === 'node' || currentCommand === 'npx') && startCommand.includes('copilot')) return true;
   return false;
 }
 

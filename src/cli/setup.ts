@@ -150,7 +150,7 @@ function applyScopePathRewritesToAgentsTemplate(
   scope: SetupScope,
 ): string {
   if (scope !== "project") return content;
-  return content.replaceAll("~/.codex", "./.codex");
+  return content.replaceAll("~/.copilot", "./.copilot");
 }
 
 interface PersistedSetupScope {
@@ -477,9 +477,9 @@ async function promptForSetupScope(
   try {
     console.log("Select setup scope:");
     console.log(
-      `  1) user (default) — installs to ~/.codex (skills default to ~/.copilot/skills)`,
+      `  1) user (default) — installs to ~/.copilot (skills default to ~/.copilot/skills)`,
     );
-    console.log("  2) project — installs to ./.codex (local to project)");
+    console.log("  2) project — installs to ./.copilot (local to project)");
     const answer = (await rl.question("Scope [1-2] (default: 1): "))
       .trim()
       .toLowerCase();
@@ -732,11 +732,11 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     );
     if (gitignoreResult === "created") {
       console.log(
-        "  Created .gitignore with OMCP project ignore rules so local runtime state stays out of source control while .codex agents, skills, and prompts remain trackable.\n",
+        "  Created .gitignore with OMCP project ignore rules so local runtime state stays out of source control while .copilot agents, skills, and prompts remain trackable.\n",
       );
     } else if (gitignoreResult === "updated") {
       console.log(
-        "  Updated .gitignore with OMCP project ignore rules so local runtime state stays out of source control while .codex agents, skills, and prompts remain trackable.\n",
+        "  Updated .gitignore with OMCP project ignore rules so local runtime state stays out of source control while .copilot agents, skills, and prompts remain trackable.\n",
       );
     }
   }

@@ -106,7 +106,7 @@ function wrapManagedContent(body: string, manualBody: string): string {
 export function applyProjectScopePathRewritesToAgentsTemplate(
   content: string,
 ): string {
-  return content.replaceAll("~/.codex", "./.codex");
+  return content.replaceAll("~/.copilot", "./.copilot");
 }
 
 async function readProjectRootTemplate(): Promise<string> {

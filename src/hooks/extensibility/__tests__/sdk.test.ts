@@ -228,7 +228,7 @@ cmd="$1"
 shift || true
 if [[ "$cmd" == "list-panes" ]]; then
   printf "%%2	1	node /pkg/dist/cli/omcp.js hud --watch
-%%42	0	codex --model gpt-5
+%%42	0	copilot --model gpt-5
 "
   exit 0
 fi

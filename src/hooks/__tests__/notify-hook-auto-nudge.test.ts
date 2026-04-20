@@ -108,7 +108,7 @@ if [[ "\$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "\$format" == "#{pane_start_command}" && "\$target" == "%99" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "\$format" == "#S" ]]; then
@@ -126,7 +126,7 @@ if [[ "\$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ -n "\$target" && "\$target" == "${'${OMCP_TEST_TMUX_SESSION_NAME:-devsess}'}" ]]; then
-    printf '%%99\t1\tnode\tcodex --model gpt-5\n'
+    printf '%%99\t1\tnode\tcopilot --model gpt-5\n'
     exit 0
   fi
   echo "%1 12345"
@@ -646,7 +646,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%100" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" && "$target" == "%100" ]]; then
@@ -668,7 +668,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t0\tsh\tbash\n%%100\t1\tnode\tcodex --model gpt-5\n"
+    printf "%%99\t0\tsh\tbash\n%%100\t1\tnode\tcopilot --model gpt-5\n"
     exit 0
   fi
   echo "%1 12345"
@@ -741,11 +741,11 @@ if [[ "$cmd" == "display-message" ]]; then
     esac
   done
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%99" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%99" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" && "$target" == "%99" ]]; then
@@ -767,7 +767,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t0\tcodex\tcodex\\n%%100\t1\tcodex\tcodex\\n"
+    printf "%%99\t0\tcopilot\tcopilot\\n%%100\t1\tcopilot\tcopilot\\n"
     exit 0
   fi
   echo "%1 12345"
@@ -867,7 +867,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t0\tnode\tbash\\n%%100\t1\tnode\tcodex --model gpt-5\\n"
+    printf "%%99\t0\tnode\tbash\\n%%100\t1\tnode\tcopilot --model gpt-5\\n"
     exit 0
   fi
   echo "%1 12345"
@@ -945,7 +945,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%99" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" && "$target" == "%100" ]]; then
@@ -967,7 +967,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t1\tbash\tcodex --model gpt-5\\n%%100\t0\tnode\tcodex --model gpt-5\\n"
+    printf "%%99\t1\tbash\tcopilot --model gpt-5\\n%%100\t0\tnode\tcopilot --model gpt-5\\n"
     exit 0
   fi
   echo "%1 12345"
@@ -1045,7 +1045,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%99" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%99" ]]; then
@@ -1063,7 +1063,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t1\tbash\tcodex --model gpt-5\\n%%100\t0\tbash\tbash\\n"
+    printf "%%99\t1\tbash\tcopilot --model gpt-5\\n%%100\t0\tbash\tbash\\n"
     exit 0
   fi
   echo "%1 12345"
@@ -1172,7 +1172,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%99" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" && "$target" == "%99" ]]; then
@@ -1390,7 +1390,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t1\tsh\tbash\\n%%100\t0\tnode\tcodex --model gpt-5\\n"
+    printf "%%99\t1\tsh\tbash\\n%%100\t0\tnode\tcopilot --model gpt-5\\n"
     exit 0
   fi
   echo "%1 12345"

@@ -184,14 +184,15 @@ Usage:
   omcp reasoning Show or set model reasoning effort (low|medium|high|xhigh)
 
 Options:
-  --yolo        Launch Codex in yolo mode (shorthand for: omcp launch --yolo)
-  --high        Launch Codex with high reasoning effort
+  --yolo        Launch Copilot in yolo mode (shorthand for: omcp launch --yolo)
+  --high        Launch Copilot with high reasoning effort
                 (shorthand for: -c model_reasoning_effort="high")
-  --xhigh       Launch Codex with xhigh reasoning effort
+  --xhigh       Launch Copilot with xhigh reasoning effort
                 (shorthand for: -c model_reasoning_effort="xhigh")
-  --madmax      DANGEROUS: bypass Codex approvals and sandbox
-                (alias for --dangerously-bypass-approvals-and-sandbox)
-  --spark       Use the Codex spark model (~1.3x faster) for team workers only
+  --madmax      DANGEROUS: bypass Copilot approvals and sandbox
+                (alias for --allow-all-tools)
+  --spark       Use the Copilot spark model (~1.3x faster) for team workers only
+                Workers get the configured low-complexity team model; leader model unchanged
                 Workers get the configured low-complexity team model; leader model unchanged
   --madmax-spark  spark model for workers + bypass approvals for leader and workers
                 (shorthand for: --spark --madmax)
