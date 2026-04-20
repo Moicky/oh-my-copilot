@@ -722,7 +722,7 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
       return {
         name: 'Native hooks',
         status: 'fail',
-        message: 'invalid hooks.json; Codex may skip OMCP hook coverage until "omcp setup --force" repairs it',
+        message: 'invalid hooks.json; Copilot may skip OMCP hook coverage until "omcp setup --force" repairs it',
       };
     }
 
@@ -790,7 +790,7 @@ async function checkLegacySkillRootOverlap(): Promise<Check> {
       name: 'Legacy skill roots',
       status: 'warn',
       message:
-        `legacy ~/.agents/skills still exists (${overlap.legacySkillCount} skills) alongside canonical ${overlap.canonicalDir}; remove or archive it if Codex shows duplicate entries`,
+        `legacy ~/.agents/skills still exists (${overlap.legacySkillCount} skills) alongside canonical ${overlap.canonicalDir}; remove or archive it if Copilot shows duplicate entries`,
     };
   }
 
@@ -801,7 +801,7 @@ async function checkLegacySkillRootOverlap(): Promise<Check> {
     name: 'Legacy skill roots',
     status: 'warn',
     message:
-      `${overlap.overlappingSkillNames.length} overlapping skill names between ${overlap.canonicalDir} and ${overlap.legacyDir}${mismatchMessage}; Codex Enable/Disable Skills may show duplicates until ~/.agents/skills is cleaned up`,
+      `${overlap.overlappingSkillNames.length} overlapping skill names between ${overlap.canonicalDir} and ${overlap.legacyDir}${mismatchMessage}; Copilot Enable/Disable Skills may show duplicates until ~/.agents/skills is cleaned up`,
   };
 }
 
