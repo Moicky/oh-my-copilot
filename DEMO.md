@@ -1,12 +1,12 @@
 # oh-my-copilot Demo Guide
 
-> **NOTE:** This demo describes the upstream Codex-CLI workflow. The runtime port to Copilot CLI is in progress; the steps below will not work yet on this fork. See README for status.
+> **NOTE:** This demo describes the OMCP workflow on top of GitHub Copilot CLI.
 
 ## Prerequisites
 
 - Node.js >= 20
-- [Codex CLI](https://github.com/openai/codex) installed (`npm install -g @openai/codex`)
-- OpenAI API key configured
+- [Copilot CLI](https://github.com/github/copilot-cli) installed (`brew install --cask github-copilot-cli`)
+- GitHub Copilot subscription with `copilot` CLI signed in
 
 ## Setup (< 2 minutes)
 
@@ -18,7 +18,7 @@ npm install
 npm run build
 npm link
 
-# Run setup (installs prompts, skills, configures Codex CLI)
+# Run setup (installs prompts, skills, configures Copilot CLI)
 omcp setup
 ```
 
@@ -67,9 +67,9 @@ omcp doctor
 oh-my-copilot doctor
 ==================
 
-  [OK] Codex CLI: installed
+  [OK] Copilot CLI: installed
   [OK] Node.js: v20+
-  [OK] Codex home: ~/.codex
+  [OK] Copilot home: ~/.copilot
   [OK] Config: config.toml has OMCP entries
   [OK] Prompts: 30 agent prompts installed
   [OK] Skills: 40 skills installed
@@ -82,7 +82,7 @@ Results: 9 passed, 0 warnings, 0 failed
 
 ## Demo 1: Agent/Skill Keywords
 
-Start Codex CLI in any project directory:
+Start Copilot CLI in any project directory:
 
 ```bash
 omcp
@@ -119,7 +119,7 @@ The generated `AGENTS.md` in your project root acts as the orchestration brain. 
 - Team compositions for common workflows
 - Verification protocols
 
-Codex CLI loads this automatically at session start.
+Copilot CLI loads this automatically at session start.
 
 ## Demo 3: CLI Status Commands
 
@@ -146,9 +146,9 @@ Platform: linux x64
 No active modes.
 ```
 
-## Demo 4: Skills in Codex CLI
+## Demo 4: Skills in Copilot CLI
 
-Skills are automatically discovered by Codex CLI. In a Codex session:
+Skills are automatically discovered by Copilot CLI. In a Copilot session:
 
 ```
 > $autopilot "build a REST API for task management"
@@ -174,9 +174,9 @@ The MCP servers are configured in `config.toml` and provide state/memory tools t
 
 **Expected:** Agent accesses `.omcp/state/` and `.omcp/project-memory.json` through MCP tool calls.
 
-## Demo 6: E2E Team CLI (5+ Parallel Workers, Mixed Codex/Claude)
+## Demo 6: E2E Team CLI (5+ Parallel Workers, Mixed Copilot/Claude)
 
-This demo showcases the **tmux-based multi-agent orchestration** system that spawns parallel workers across different AI CLI tools (Codex + Claude) in a single tmux session.
+This demo showcases the **tmux-based multi-agent orchestration** system that spawns parallel workers across different AI CLI tools (Copilot + Claude) in a single tmux session.
 
 ### Architecture Overview
 
@@ -185,7 +185,7 @@ This demo showcases the **tmux-based multi-agent orchestration** system that spa
 │                    tmux Session "omcp-team"                   │
 │  ┌──────────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐ │
 │  │   Leader     │  │ Worker 1 │  │ Worker 2 │  │ Worker N │ │
-│  │  (main pane) │  │ (codex)  │  │ (codex)  │  │ (claude) │ │
+│  │  (main pane) │  │ (copilot)  │  │ (copilot)  │  │ (claude) │ │
 │  └──────────────┘  └──────────┘  └──────────┘  └──────────┘ │
 │         │               │              │              │     │
 │         └───────────────┴──────────────┴──────────────┘     │
@@ -198,7 +198,7 @@ This demo showcases the **tmux-based multi-agent orchestration** system that spa
 ```
 
 **Key Features:**
-- **Mixed CLI Workers**: Combines OpenAI Codex and Anthropic Claude agents in one team
+- **Mixed CLI Workers**: Combines GitHub Copilot and Anthropic Claude agents in one team
 - **Durable State**: Task assignments persist across session interruptions
 - **Claim-Safe Lifecycle**: Prevents race conditions with versioned task claims
 - **Mailbox Communication**: Structured message passing between workers
@@ -211,9 +211,9 @@ Use a deterministic task slug so the team name is predictable:
 export TEAM_TASK="e2e team demo"
 export TEAM_NAME="e2e-team-demo"   # slugified from TEAM_TASK
 
-# Mixed worker CLIs (5+ workers, codex + claude)
+# Mixed worker CLIs (5+ workers, copilot + claude)
 export OMCP_TEAM_WORKER_CLI=auto
-export OMCP_TEAM_WORKER_CLI_MAP=codex,codex,codex,claude,claude,claude
+export OMCP_TEAM_WORKER_CLI_MAP=copilot,copilot,copilot,claude,claude,claude
 export OMCP_TEAM_WORKER_LAUNCH_ARGS='-c model_reasoning_effort="low"'
 
 # 5-worker baseline
@@ -234,7 +234,7 @@ omcp team shutdown "$TEAM_NAME"
 
 **Expected:**
 - Team starts with 5+ workers and prints `Team started: <team-name>` plus worker counts.
-- Mixed CLI map runs Codex workers and Claude workers in one team.
+- Mixed CLI map runs Copilot workers and Claude workers in one team.
 - `status` shows task distribution and worker health.
 - `shutdown` cleans up workers and team state.
 
@@ -334,10 +334,10 @@ set -euo pipefail
 export TEAM_TASK="e2e team demo"
 export TEAM_NAME="e2e-team-demo"
 export OMCP_TEAM_WORKER_CLI=auto
-export OMCP_TEAM_WORKER_CLI_MAP=codex,codex,codex,claude,claude,claude
+export OMCP_TEAM_WORKER_CLI_MAP=copilot,copilot,copilot,claude,claude,claude
 export OMCP_TEAM_WORKER_LAUNCH_ARGS='-c model_reasoning_effort="low"'
 
-echo "[1/8] start team (6 workers mixed codex/claude)"
+echo "[1/8] start team (6 workers mixed copilot/claude)"
 omcp team 6:executor "$TEAM_TASK"
 
 echo "[2/8] lifecycle status"
@@ -381,19 +381,19 @@ Expected:
 
 | Component | Count | Location |
 |-----------|-------|----------|
-| Agent prompts | 30 | `~/.codex/prompts/*.md` |
-| Skills | 40 | `~/.codex/skills/*/SKILL.md` |
-| MCP servers | 4 | Configured in `~/.codex/config.toml` |
+| Agent prompts | 30 | `~/.copilot/prompts/*.md` |
+| Skills | 40 | `~/.copilot/skills/*/SKILL.md` |
+| MCP servers | 4 | Configured in `~/.copilot/config.toml` |
 | CLI commands | 11+ | `omcp (launch), setup, doctor, team, version, tmux-hook, hud, status, cancel, reasoning, help` |
 | AGENTS.md | 1 | Project root (generated) |
 
 ## Troubleshooting
 
-**Codex CLI not found:** Install with `npm install -g @openai/codex`
+**Copilot CLI not found:** Install with `brew install --cask github-copilot-cli`
 
 **Slash commands not appearing:** Run `omcp setup --force` to reinstall prompts
 
-**MCP servers not connecting:** Check `~/.codex/config.toml` for `[mcp_servers.omcp_state]`, `[mcp_servers.omcp_memory]`, `[mcp_servers.omcp_code_intel]`, and `[mcp_servers.omcp_trace]` entries
+**MCP servers not connecting:** Check `~/.copilot/config.toml` for `[mcp_servers.omcp_state]`, `[mcp_servers.omcp_memory]`, `[mcp_servers.omcp_code_intel]`, and `[mcp_servers.omcp_trace]` entries
 
 **Doctor shows warnings:** Run `omcp setup` to install missing components
 
@@ -428,7 +428,7 @@ The bundled E2E demo script provides a complete, automated test of the tmux clau
 
 | Feature | Description |
 |---------|-------------|
-| **Mixed CLI Workers** | Automatically distributes workers across Codex and Claude CLIs |
+| **Mixed CLI Workers** | Automatically distributes workers across Copilot and Claude CLIs |
 | **Claim-Safe Lifecycle** | Demonstrates proper task claim → transition → completion flow |
 | **Mailbox Communication** | Tests message sending and mailbox operations |
 | **Envelope Validation** | Validates JSON response schemas from all API calls |
@@ -472,6 +472,6 @@ The bundled E2E demo script provides a complete, automated test of the tmux clau
 # Run with 8 workers and custom task
 WORKER_COUNT=8 \
 TEAM_TASK="load test $(date +%s)" \
-OMCP_TEAM_WORKER_CLI_MAP=codex,codex,codex,codex,claude,claude,claude,claude \
+OMCP_TEAM_WORKER_CLI_MAP=copilot,copilot,copilot,copilot,claude,claude,claude,claude \
 ./scripts/demo-team-e2e.sh
 ```

@@ -51,15 +51,15 @@ unset OMCP_TEAM_WORKER OMCP_TEAM_STATE_ROOT OMCP_TEAM_LEADER_CWD OMCP_TEAM_WORKE
 ## Project structure
 
 - `src/` -- TypeScript source (CLI, config, agents, MCP servers, hooks, modes, team, verification)
-- `prompts/` -- 30 agent prompt markdown files (installed to `~/.codex/prompts/`)
-- `skills/` -- 39 skill directories with `SKILL.md` (installed to `~/.codex/skills/`)
+- `prompts/` -- 30 agent prompt markdown files (installed to `~/.copilot/prompts/`)
+- `skills/` -- 39 skill directories with `SKILL.md` (installed to `~/.copilot/skills/`)
 - `templates/` -- `AGENTS.md` orchestration brain template
 
 ### Adding a new agent prompt
 
 1. Create `prompts/my-agent.md` with the agent's system prompt
-2. Run `omcp setup --force` to install it to `~/.codex/prompts/`
-3. Use `/prompts:my-agent` in Codex CLI
+2. Run `omcp setup --force` to install it to `~/.copilot/prompts/`
+3. Use `/prompts:my-agent` in Copilot CLI
 
 ### Prompt guidance contract
 
@@ -70,8 +70,8 @@ That document defines the GPT-5.4 behavior contract contributors should preserve
 ### Adding a new skill
 
 1. Create `skills/my-skill/SKILL.md` with the skill workflow
-2. Run `omcp setup --force` to install it to `~/.codex/skills/`
-3. Use `$my-skill` in Codex CLI
+2. Run `omcp setup --force` to install it to `~/.copilot/skills/`
+3. Use `$my-skill` in Copilot CLI
 
 ## Workflow
 
@@ -92,7 +92,7 @@ Use concise, intent-first commit messages. Existing history uses prefixes like:
 Example:
 
 ```text
-docs: clarify setup steps for Codex CLI users
+docs: clarify setup steps for Copilot CLI users
 ```
 
 ## Pull request checklist
