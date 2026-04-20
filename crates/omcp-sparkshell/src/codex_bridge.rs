@@ -180,10 +180,10 @@ fn run_codex_exec(
     let _ = stdin_writer.join();
     let stdout_bytes = stdout_reader
         .join()
-        .map_err(|_| SparkshellError::SummaryBridge("failed reading codex stdout".to_string()))?;
+        .map_err(|_| SparkshellError::SummaryBridge("failed reading copilot stdout".to_string()))?;
     let stderr_bytes = stderr_reader
         .join()
-        .map_err(|_| SparkshellError::SummaryBridge("failed reading codex stderr".to_string()))?;
+        .map_err(|_| SparkshellError::SummaryBridge("failed reading copilot stderr".to_string()))?;
 
     Ok((
         String::from_utf8_lossy(&stdout_bytes).into_owned(),

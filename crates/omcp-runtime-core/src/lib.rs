@@ -45,6 +45,7 @@ pub const RUNTIME_EVENT_NAMES: &[&str] = &[
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub enum WorkerCli {
     Codex,
+    Copilot,
     Claude,
     Other(String),
 }
@@ -54,6 +55,7 @@ impl WorkerCli {
         match label.as_ref().trim().to_lowercase().as_str() {
             "claude" => Self::Claude,
             "codex" => Self::Codex,
+            "copilot" => Self::Copilot,
             other => Self::Other(other.to_string()),
         }
     }
@@ -62,7 +64,7 @@ impl WorkerCli {
 pub fn submit_presses_for_worker_cli(worker_cli: &WorkerCli) -> u8 {
     match worker_cli {
         WorkerCli::Claude => 1,
-        WorkerCli::Codex | WorkerCli::Other(_) => 2,
+        WorkerCli::Codex | WorkerCli::Copilot | WorkerCli::Other(_) => 2,
     }
 }
 

@@ -15,7 +15,7 @@ impl fmt::Display for SparkshellError {
             SparkshellError::InvalidArgs(message) => write!(f, "{message}"),
             SparkshellError::Io(error) => write!(f, "{error}"),
             SparkshellError::SummaryTimeout(timeout_ms) => {
-                write!(f, "codex summary timed out after {timeout_ms}ms")
+                write!(f, "copilot summary timed out after {timeout_ms}ms")
             }
             SparkshellError::SummaryBridge(message) => write!(f, "{message}"),
         }

@@ -1,41 +1,31 @@
 # oh-my-copilot (OMCP)
 
-> **Status:** 🚧 Early fork — runtime is being ported from OpenAI Codex CLI to GitHub Copilot CLI. **Most commands do not work yet.** See `docs/superpowers/specs/` for the porting roadmap.
-
-> Forked from [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) by Yeachan Heo. Re-targeted at GitHub Copilot CLI.
+> Forked from [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) by Yeachan Heo. Re-targeted at [GitHub Copilot CLI](https://github.com/github/copilot-cli).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 
 ## What this is
 
-A workflow layer that aims to add prompts, skills, and runtime helpers on top of [GitHub Copilot CLI](https://github.com/github/copilot-cli). The original project (`oh-my-codex`, OMX) wrapped OpenAI's Codex CLI; this fork (`oh-my-copilot`, OMCP) is in the process of being re-targeted at Copilot CLI.
+A workflow layer that adds prompts, skills, and runtime helpers on top of [GitHub Copilot CLI](https://github.com/github/copilot-cli). It installs an opinionated set of skills, prompts and instruction files into `~/.copilot`, runs Copilot via `copilot -p`, and orchestrates multi-agent tmux teams across `copilot` and `claude` workers.
 
 ## Current state
 
-This `0.1.0` release is a **rebrand only**:
+The Copilot CLI port is functionally complete:
 
-- Project, package, binary, crates, and docs renamed to the OMCP / `oh-my-copilot` identity.
-- All references to the external `codex` CLI runtime are still in place — they will be migrated in subsequent releases.
-- **Building works; runtime commands targeting Copilot CLI do not work yet.**
+- ✅ Rebrand & packaging foundation
+- ✅ Runtime invocation layer (`copilot -p` everywhere `codex exec` used to be)
+- ✅ Config & instruction surface (`~/.copilot/`, `AGENTS.md`, `copilot-instructions.md`)
+- ✅ Hook system (writes `~/.copilot/hooks.json`; entries are no-ops until Copilot CLI exposes a hook surface upstream)
+- ✅ Skills & prompts catalog scrubbed and re-targeted at Copilot
+- ✅ Team mode (tmux-based orchestration) drives `copilot` workers
+- ✅ Auxiliary Rust crates (`omcp-explore`, `omcp-sparkshell`) spawn `copilot`
 
-## Roadmap
-
-The full Codex-to-Copilot port is decomposed into sequential sub-projects:
-
-1. ✅ Rebrand & packaging foundation (this release)
-2. ⏳ Runtime invocation layer (`codex exec` → Copilot CLI equivalents)
-3. ⏳ Config & instruction surface (`.codex/` → `~/.copilot/`, `AGENTS.md`)
-4. ⏳ Hook system redesign
-5. ⏳ Skills & prompts catalog migration to Copilot CLI plugin format
-6. ⏳ Team mode rebuilt around Copilot's `/fleet` and `/delegate`
-7. ⏳ Auxiliary subsystems (Rust crates, wiki MCP, OpenClaw, HUD)
-
-Specs live under `docs/superpowers/specs/`.
+Internal symbol names in the source tree (e.g. `codex_bridge.rs`, `codexConfigFile`, `paneShowsCodexViewport`) have been **intentionally preserved** so this fork can still cleanly merge updates from upstream `oh-my-codex`. They operate on `~/.copilot/` paths and shell out to `copilot`.
 
 ## Building from source
 
-Requirements: Node.js 20+, Rust stable, `cargo`.
+Requirements: Node.js 20+, Rust stable, `cargo`, `copilot` v1.0+ on `PATH`.
 
 ```bash
 npm install
@@ -43,7 +33,13 @@ npm run build
 cargo build --workspace
 ```
 
-The compiled CLI is at `dist/cli/omcp.js`. It will currently fail at runtime against Copilot CLI; that's expected pre-sub-project-2.
+The compiled CLI is at `dist/cli/omcp.js` (also exposed as `omcp` once installed).
+
+Quick smoke test:
+
+```bash
+node dist/cli/omcp.js doctor
+```
 
 ## License
 

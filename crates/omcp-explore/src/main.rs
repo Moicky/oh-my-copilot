@@ -8,7 +8,7 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-const CODEX_BIN_ENV: &str = "OMCP_EXPLORE_CODEX_BIN";
+const CODEX_BIN_ENV: &str = "OMCP_EXPLORE_COPILOT_BIN";
 const HARNESS_ROOT_ENV: &str = "OMCP_EXPLORE_ROOT";
 const INTERNAL_DIRECT_WRAPPER_FLAG: &str = "--internal-allowlist-direct";
 const INTERNAL_SHELL_WRAPPER_FLAG: &str = "--internal-allowlist-shell";
@@ -269,9 +269,9 @@ fn resolve_codex_binary() -> String {
         return value;
     }
 
-    resolve_host_command("codex")
+    resolve_host_command("copilot")
         .map(|path| path.display().to_string())
-        .unwrap_or_else(|| "codex".to_string())
+        .unwrap_or_else(|| "copilot".to_string())
 }
 
 fn codex_launch_for_binary(codex_binary: &str) -> Option<CodexLaunch> {

@@ -843,7 +843,7 @@ describe('exploreCommand', () => {
         const testPath = await createExploreTestPath(wd);
 
         const result = runOmcp(wd, ['explore', '--prompt', 'find buildTmuxPaneCommand'], {
-          OMCP_EXPLORE_CODEX_BIN: codexStub,
+          OMCP_EXPLORE_COPILOT_BIN: codexStub,
           PATH: testPath,
         });
         if (shouldSkipForSpawnPermissions(result.error)) return;
@@ -873,7 +873,7 @@ describe('exploreCommand', () => {
         const testPath = await createExploreTestPath(wd);
 
         const result = runOmcp(wd, ['explore', '--prompt', 'find buildTmuxPaneCommand'], {
-          OMCP_EXPLORE_CODEX_BIN: codexShim,
+          OMCP_EXPLORE_COPILOT_BIN: codexShim,
           PATH: testPath,
         });
         if (shouldSkipForSpawnPermissions(result.error)) return;
@@ -902,7 +902,7 @@ describe('exploreCommand', () => {
         await writeFile(promptPath, 'find prompt-file support\n');
 
         const result = runOmcp(wd, ['explore', '--prompt-file', promptPath], {
-          OMCP_EXPLORE_CODEX_BIN: codexStub,
+          OMCP_EXPLORE_COPILOT_BIN: codexStub,
           PATH: testPath,
         });
         if (shouldSkipForSpawnPermissions(result.error)) return;
