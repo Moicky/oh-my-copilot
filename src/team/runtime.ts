@@ -1297,7 +1297,7 @@ function assertPromptModeWorkerCliSupported(workerCliPlan: readonly TeamWorkerCl
     && process.env[PROMPT_MODE_CODEX_TEST_ALLOW_ENV] !== '1'
   ) {
     throw new Error(
-      `${PROMPT_MODE_CODEX_UNSUPPORTED_REASON}: Codex prompt workers require a terminal; use interactive team mode or set OMCP_TEAM_WORKER_CLI=claude/gemini for prompt-mode teammates.`,
+      `${PROMPT_MODE_CODEX_UNSUPPORTED_REASON}: Copilot prompt workers require a terminal; use interactive team mode or set OMCP_TEAM_WORKER_CLI=claude/gemini for prompt-mode teammates.`,
     );
   }
 }
@@ -2322,7 +2322,7 @@ export async function startTeam(
       }
 
       // Queue inbox via MCP/state then notify worker via tmux transport.
-      // Retry dispatch up to 3 times to handle Codex trust prompts that may
+      // Retry dispatch up to 3 times to handle Copilot trust prompts that may
       // block the worker pane during startup (fixes #393).
       const maxStartupDispatchRetries = 3;
       const startupRetryDelayS = 3;
@@ -3041,7 +3041,7 @@ export async function shutdownTeam(teamName: string, cwd: string, options: Shutd
         : isWorkerAlive(sessionName, w.index, w.pane_id)
     ));
     if (anyAliveAfterWait && !force) {
-      // Workers may have accepted shutdown but not exited (Codex TUI requires explicit exit).
+      // Workers may have accepted shutdown but not exited (Copilot TUI requires explicit exit).
       // In this case, proceed to force kill panes (next step) rather than failing and leaving state around.
     }
   }
