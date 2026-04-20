@@ -13,7 +13,7 @@ through a uniform `PipelineStage` interface, with state persistence and resume s
 The canonical OMCP pipeline sequences:
 
 ```
-RALPLAN (consensus planning) -> team-exec (Codex CLI workers) -> ralph-verify (architect verification)
+RALPLAN (consensus planning) -> team-exec (Copilot CLI workers) -> ralph-verify (architect verification)
 ```
 
 ## Configuration
@@ -23,7 +23,7 @@ Pipeline parameters are configurable per run:
 | Parameter | Default | Description |
 |-----------|---------|-------------|
 | `maxRalphIterations` | 10 | Ralph verification iteration ceiling |
-| `workerCount` | 2 | Number of Codex CLI team workers |
+| `workerCount` | 2 | Number of Copilot CLI team workers |
 | `agentType` | `executor` | Agent type for team workers |
 
 ## Stage Interface
@@ -44,7 +44,7 @@ return a `StageResult` with status, artifacts, and duration.
 ## Built-in Stages
 
 - **ralplan**: Consensus planning (planner + architect + critic). Skips only when both `prd-*.md` and `test-spec-*.md` planning artifacts already exist, and carries any `deep-interview-*.md` spec paths forward for traceability.
-- **team-exec**: Team execution via Codex CLI workers. Always the OMCP execution backend.
+- **team-exec**: Team execution via Copilot CLI workers. Always the OMCP execution backend.
 - **ralph-verify**: Ralph verification loop with configurable iteration count.
 
 ## State Management
@@ -81,6 +81,6 @@ const result = await runPipeline(config);
 ## Relationship to Other Modes
 
 - **autopilot**: Autopilot can use pipeline as its execution engine (v0.8+)
-- **team**: Pipeline delegates execution to team mode (Codex CLI workers)
+- **team**: Pipeline delegates execution to team mode (Copilot CLI workers)
 - **ralph**: Pipeline delegates verification to ralph (configurable iterations)
 - **ralplan**: Pipeline's first stage runs RALPLAN consensus planning

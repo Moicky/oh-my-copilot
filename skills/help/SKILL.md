@@ -87,7 +87,7 @@ Analyze your oh-my-copilot usage and get tailored recommendations to improve you
 # Check for token tracking data
 TOKEN_FILE="$HOME/.omcp/state/token-tracking.jsonl"
 SESSION_FILE=".omcp/state/session-history.json"
-CONFIG_FILE="$HOME/.codex/.omcp-config.json"
+CONFIG_FILE="$HOME/.copilot/.omcp-config.json"
 
 echo "Analyzing OMCP Usage..."
 echo ""

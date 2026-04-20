@@ -42,10 +42,10 @@ Supported setup flags (current implementation):
 - Local project orchestration file is `./AGENTS.md` (project root).
 - If `AGENTS.md` exists and `--force` is not used, interactive TTY runs ask whether to overwrite. Non-interactive runs preserve the file.
 - Scope targets:
-  - `user`: user directories (`~/.codex`, `~/.codex/skills`, `~/.omcp/agents`)
-  - `project`: local directories (`./.codex`, `./.codex/skills`, `./.omcp/agents`)
-- Migration hint: in `user` scope, if historical `~/.agents/skills` still exists alongside `${CODEX_HOME:-~/.codex}/skills`, current setup prints a cleanup hint. **Why the paths differ**: `${CODEX_HOME:-~/.codex}/skills/` is the path current Codex CLI natively loads as its skill root; `~/.agents/skills/` was the skill root in an older Codex CLI release before `~/.codex` became the standard home directory. OMCP writes only to the canonical `${CODEX_HOME:-~/.codex}/skills/` path. When both directories exist simultaneously, Codex discovers skills from both trees and may show duplicate entries in Enable/Disable Skills. Archive or remove `~/.agents/skills/` to resolve this.
-- If persisted scope is `project`, `omcp` launch automatically uses `CODEX_HOME=./.codex` unless user explicitly overrides `CODEX_HOME`.
+  - `user`: user directories (`~/.copilot`, `~/.copilot/skills`, `~/.omcp/agents`)
+  - `project`: local directories (`./.copilot`, `./.copilot/skills`, `./.omcp/agents`)
+- Migration hint: in `user` scope, if historical `~/.agents/skills` still exists alongside `${CODEX_HOME:-~/.copilot}/skills`, current setup prints a cleanup hint. **Why the paths differ**: `${CODEX_HOME:-~/.copilot}/skills/` is the path current Copilot CLI natively loads as its skill root; `~/.agents/skills/` was the skill root in an older Copilot CLI release before `~/.copilot` became the standard home directory. OMCP writes only to the canonical `${CODEX_HOME:-~/.copilot}/skills/` path. When both directories exist simultaneously, Copilot discovers skills from both trees and may show duplicate entries in Enable/Disable Skills. Archive or remove `~/.agents/skills/` to resolve this.
+- If persisted scope is `project`, `omcp` launch automatically uses `CODEX_HOME=./.copilot` unless user explicitly overrides `CODEX_HOME`.
 - With `--force`, AGENTS overwrite may still be skipped if an active OMCP session is detected (safety guard).
 - Legacy persisted scope values (`project-local`) are automatically migrated to `project` with a one-time warning.
 
@@ -63,7 +63,7 @@ omcp setup --force --verbose
 omcp doctor
 ```
 
-3. Start Codex with OMCP in the target project directory.
+3. Start Copilot with OMCP in the target project directory.
 
 ## Expected verification indicators
 
@@ -72,7 +72,7 @@ From `omcp doctor`, expect:
 - Skills installed (scope-dependent: user or project)
 - AGENTS.md found in project root
 - `.omcp/state` exists
-- OMCP MCP servers configured in scope target `config.toml` (`~/.codex/config.toml` or `./.codex/config.toml`)
+- OMCP MCP servers configured in scope target `config.toml` (`~/.copilot/config.toml` or `./.copilot/config.toml`)
 
 ## Troubleshooting
 
