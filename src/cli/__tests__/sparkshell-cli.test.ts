@@ -296,8 +296,8 @@ describe('runSparkShellBinary', () => {
   });
 
   it('merges .omcp-config.json env overrides behind explicit shell env', async () => {
-    const codexHome = await mkdtemp(join(tmpdir(), 'omcp-sparkshell-config-env-'));
-    await writeFile(join(codexHome, '.omcp-config.json'), JSON.stringify({
+    const copilotHome = await mkdtemp(join(tmpdir(), 'omcp-sparkshell-config-env-'));
+    await writeFile(join(copilotHome, '.omcp-config.json'), JSON.stringify({
       env: {
         OMCP_DEFAULT_FRONTIER_MODEL: 'frontier-local',
         OMCP_DEFAULT_SPARK_MODEL: 'spark-local',
@@ -307,9 +307,9 @@ describe('runSparkShellBinary', () => {
     try {
       let invokedEnv: NodeJS.ProcessEnv | undefined;
       runSparkShellBinary('/fake/omcp-sparkshell', ['git', 'status'], {
-        cwd: codexHome,
+        cwd: copilotHome,
         env: {
-          CODEX_HOME: codexHome,
+          COPILOT_HOME: copilotHome,
           OMCP_DEFAULT_FRONTIER_MODEL: 'frontier-shell',
         },
         spawnImpl: ((_: string, __: string[], options: { env?: NodeJS.ProcessEnv }) => {
@@ -328,7 +328,7 @@ describe('runSparkShellBinary', () => {
       assert.equal(invokedEnv?.OMCP_DEFAULT_FRONTIER_MODEL, 'frontier-shell');
       assert.equal(invokedEnv?.OMCP_DEFAULT_SPARK_MODEL, 'spark-local');
     } finally {
-      await rm(codexHome, { recursive: true, force: true });
+      await rm(copilotHome, { recursive: true, force: true });
     }
   });
 });

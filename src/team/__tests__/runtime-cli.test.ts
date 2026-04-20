@@ -16,8 +16,8 @@ describe('runtime-cli helpers', () => {
     const runtimeCli = await loadRuntimeCliModule();
 
     assert.deepEqual(
-      runtimeCli.normalizeAgentTypes(['codex', 'gemini'], 2),
-      ['codex', 'gemini'],
+      runtimeCli.normalizeAgentTypes(['copilot', 'gemini'], 2),
+      ['copilot', 'gemini'],
     );
     assert.deepEqual(
       runtimeCli.normalizeAgentTypes(['gemini'], 3),

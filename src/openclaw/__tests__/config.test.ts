@@ -19,7 +19,7 @@ describe("getOpenClawConfig", () => {
 		originalEnv = { ...process.env };
 		tmpDir = join(tmpdir(), `omcp-openclaw-test-${Date.now()}`);
 		mkdirSync(tmpDir, { recursive: true });
-		process.env.CODEX_HOME = join(tmpDir, ".codex");
+		process.env.COPILOT_HOME = join(tmpDir, ".copilot");
 	});
 
 	afterEach(() => {
@@ -229,7 +229,7 @@ describe("getOpenClawConfig generic alias normalization", () => {
 		mkdirSync(tmpDir, { recursive: true });
 		process.env.OMCP_OPENCLAW = "1";
 		process.env.HOME = tmpDir;
-		process.env.CODEX_HOME = join(tmpDir, ".codex");
+		process.env.COPILOT_HOME = join(tmpDir, ".copilot");
 		delete process.env.OMCP_OPENCLAW_CONFIG;
 	});
 
@@ -248,8 +248,8 @@ describe("getOpenClawConfig generic alias normalization", () => {
 	});
 
 	it("normalizes custom_webhook_command alias to openclaw runtime config", async () => {
-		const omcpConfigPath = join(tmpDir, ".codex", ".omcp-config.json");
-		mkdirSync(join(tmpDir, ".codex"), { recursive: true });
+		const omcpConfigPath = join(tmpDir, ".copilot", ".omcp-config.json");
+		mkdirSync(join(tmpDir, ".copilot"), { recursive: true });
 		writeFileSync(
 			omcpConfigPath,
 			JSON.stringify({
@@ -277,8 +277,8 @@ describe("getOpenClawConfig generic alias normalization", () => {
 	});
 
 	it("explicit notifications.openclaw wins over generic aliases", async () => {
-		const omcpConfigPath = join(tmpDir, ".codex", ".omcp-config.json");
-		mkdirSync(join(tmpDir, ".codex"), { recursive: true });
+		const omcpConfigPath = join(tmpDir, ".copilot", ".omcp-config.json");
+		mkdirSync(join(tmpDir, ".copilot"), { recursive: true });
 		writeFileSync(
 			omcpConfigPath,
 			JSON.stringify({
@@ -330,7 +330,7 @@ describe("inspectOpenClawConfig", () => {
 		tmpDir = join(tmpdir(), `omcp-openclaw-inspect-test-${Date.now()}`);
 		mkdirSync(tmpDir, { recursive: true });
 		process.env.HOME = tmpDir;
-		process.env.CODEX_HOME = join(tmpDir, ".codex");
+		process.env.COPILOT_HOME = join(tmpDir, ".copilot");
 		delete process.env.OMCP_OPENCLAW_CONFIG;
 		delete process.env.OMCP_OPENCLAW_COMMAND;
 	});
@@ -359,8 +359,8 @@ describe("inspectOpenClawConfig", () => {
 
 	it("reports explicit config overriding aliases", async () => {
 		process.env.OMCP_OPENCLAW = "1";
-		const omcpConfigPath = join(tmpDir, ".codex", ".omcp-config.json");
-		mkdirSync(join(tmpDir, ".codex"), { recursive: true });
+		const omcpConfigPath = join(tmpDir, ".copilot", ".omcp-config.json");
+		mkdirSync(join(tmpDir, ".copilot"), { recursive: true });
 		writeFileSync(
 			omcpConfigPath,
 			JSON.stringify({

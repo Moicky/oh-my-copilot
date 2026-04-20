@@ -45,7 +45,7 @@ describe('omcp launch fallback when tmux is unavailable', () => {
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
 
       await mkdir(home, { recursive: true });
@@ -88,7 +88,7 @@ describe('omcp launcher when tmux is available', () => {
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
       const fakeTmuxPath = join(fakeBin, 'tmux');
       const tmuxLogPath = join(wd, 'tmux.log');
@@ -170,7 +170,7 @@ exit 0
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
       const fakeTmuxPath = join(fakeBin, 'tmux');
       const tmuxLogPath = join(wd, 'tmux.log');
@@ -267,7 +267,7 @@ exit 0
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
       const fakeTmuxPath = join(fakeBin, 'tmux');
       const tmuxLogPath = join(wd, 'tmux.log');

@@ -408,7 +408,7 @@ describe('task-size-detector', () => {
     });
 
     it('does not contain lightweight modes', () => {
-      const lightweight = ['cancel', 'plan', 'tdd', 'ultrathink', 'deepsearch', 'analyze', 'codex', 'gemini'];
+      const lightweight = ['cancel', 'plan', 'tdd', 'ultrathink', 'deepsearch', 'analyze', 'copilot', 'gemini'];
       for (const mode of lightweight) {
         assert.ok(!HEAVY_MODE_KEYWORDS.has(mode), `Expected HEAVY_MODE_KEYWORDS NOT to contain "${mode}"`);
       }

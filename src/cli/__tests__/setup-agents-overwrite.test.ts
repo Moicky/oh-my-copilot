@@ -25,14 +25,14 @@ function setMockTty(value: boolean): () => void {
 
 function setMockHome(home: string): () => void {
   const previousHome = process.env.HOME;
-  const previousCodexHome = process.env.CODEX_HOME;
+  const previousCodexHome = process.env.COPILOT_HOME;
   process.env.HOME = home;
-  process.env.CODEX_HOME = join(home, '.codex');
+  process.env.COPILOT_HOME = join(home, '.copilot');
   return () => {
     if (typeof previousHome === 'string') process.env.HOME = previousHome;
     else delete process.env.HOME;
-    if (typeof previousCodexHome === 'string') process.env.CODEX_HOME = previousCodexHome;
-    else delete process.env.CODEX_HOME;
+    if (typeof previousCodexHome === 'string') process.env.COPILOT_HOME = previousCodexHome;
+    else delete process.env.COPILOT_HOME;
   };
 }
 
@@ -92,7 +92,7 @@ describe('omcp setup AGENTS refresh behavior', () => {
       assert.match(output, /User scope leaves project AGENTS\.md unchanged\./);
       assert.match(output, /agents_md: updated=1, unchanged=0, backed_up=0, skipped=0, removed=0/);
       assert.equal(await readFile(join(wd, 'AGENTS.md'), 'utf-8'), existing);
-      assert.equal(existsSync(join(home, '.codex', 'AGENTS.md')), true);
+      assert.equal(existsSync(join(home, '.copilot', 'AGENTS.md')), true);
       assert.equal(existsSync(join(wd, '.omcp', 'backups', 'setup')), false);
     } finally {
       restoreHome();
@@ -160,8 +160,8 @@ describe('omcp setup AGENTS refresh behavior', () => {
 
       const agentsContent = await readFile(join(wd, 'AGENTS.md'), 'utf-8');
       const expectedContext = resolveAgentsModelTableContext(
-        await readFile(join(wd, '.codex', 'config.toml'), 'utf-8'),
-        { codexHomeOverride: join(wd, '.codex') },
+        await readFile(join(wd, '.copilot', 'config.toml'), 'utf-8'),
+        { copilotHomeOverride: join(wd, '.copilot') },
       );
 
       assert.match(output, /Refreshed AGENTS\.md model capability table in project root\./);
@@ -217,8 +217,8 @@ describe('omcp setup AGENTS refresh behavior', () => {
 
       const agentsContent = await readFile(join(wd, 'AGENTS.md'), 'utf-8');
       const expectedContext = resolveAgentsModelTableContext(
-        await readFile(join(wd, '.codex', 'config.toml'), 'utf-8'),
-        { codexHomeOverride: join(wd, '.codex') },
+        await readFile(join(wd, '.copilot', 'config.toml'), 'utf-8'),
+        { copilotHomeOverride: join(wd, '.copilot') },
       );
 
       assert.match(output, /Refreshed AGENTS\.md model capability table in project root\./);

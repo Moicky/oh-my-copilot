@@ -18,10 +18,10 @@ import { spawnSync } from "child_process";
 import { createInterface } from "readline/promises";
 import { homedir } from "os";
 import {
-  codexHome,
-  codexConfigPath,
-  codexPromptsDir,
-  codexAgentsDir,
+  copilotHome,
+  copilotConfigPath,
+  copilotPromptsDir,
+  copilotAgentsDir,
   userSkillsDir,
   omcpStateDir,
   detectLegacySkillRootOverlap,
@@ -87,7 +87,7 @@ export type SetupScope = (typeof SETUP_SCOPES)[number];
 
 export interface ScopeDirectories {
   codexConfigFile: string;
-  codexHomeDir: string;
+  copilotHomeDir: string;
   codexHooksFile: string;
   nativeAgentsDir: string;
   promptsDir: string;
@@ -133,16 +133,16 @@ export interface SkillFrontmatterMetadata {
 
 const PROJECT_GITIGNORE_ENTRIES = [
   ".omcp/",
-  ".codex/*",
-  "!.codex/agents/",
-  "!.codex/agents/**",
-  "!.codex/skills/",
-  "!.codex/skills/**",
-  ".codex/skills/.system/**",
-  "!.codex/prompts/",
-  "!.codex/prompts/**",
+  ".copilot/*",
+  "!.copilot/agents/",
+  "!.copilot/agents/**",
+  "!.copilot/skills/",
+  "!.copilot/skills/**",
+  ".copilot/skills/.system/**",
+  "!.copilot/prompts/",
+  "!.copilot/prompts/**",
 ] as const;
-const LEGACY_PROJECT_GITIGNORE_ENTRIES = [".codex/"] as const;
+const LEGACY_PROJECT_GITIGNORE_ENTRIES = [".copilot/"] as const;
 const SETUP_ONLY_INSTALLABLE_SKILLS = new Set(["wiki"]);
 
 function applyScopePathRewritesToAgentsTemplate(
@@ -413,22 +413,22 @@ export function resolveScopeDirectories(
   projectRoot: string,
 ): ScopeDirectories {
   if (scope === "project") {
-    const codexHomeDir = join(projectRoot, ".codex");
+    const copilotHomeDir = join(projectRoot, ".copilot");
     return {
-      codexConfigFile: join(codexHomeDir, "config.toml"),
-      codexHomeDir,
-      codexHooksFile: join(codexHomeDir, "hooks.json"),
-      nativeAgentsDir: join(codexHomeDir, "agents"),
-      promptsDir: join(codexHomeDir, "prompts"),
-      skillsDir: join(codexHomeDir, "skills"),
+      codexConfigFile: join(copilotHomeDir, "config.toml"),
+      copilotHomeDir,
+      codexHooksFile: join(copilotHomeDir, "hooks.json"),
+      nativeAgentsDir: join(copilotHomeDir, "agents"),
+      promptsDir: join(copilotHomeDir, "prompts"),
+      skillsDir: join(copilotHomeDir, "skills"),
     };
   }
   return {
-    codexConfigFile: codexConfigPath(),
-    codexHomeDir: codexHome(),
-    codexHooksFile: join(codexHome(), "hooks.json"),
-    nativeAgentsDir: codexAgentsDir(),
-    promptsDir: codexPromptsDir(),
+    codexConfigFile: copilotConfigPath(),
+    copilotHomeDir: copilotHome(),
+    codexHooksFile: join(copilotHome(), "hooks.json"),
+    nativeAgentsDir: copilotAgentsDir(),
+    promptsDir: copilotPromptsDir(),
     skillsDir: userSkillsDir(),
   };
 }
@@ -477,7 +477,7 @@ async function promptForSetupScope(
   try {
     console.log("Select setup scope:");
     console.log(
-      `  1) user (default) — installs to ~/.codex (skills default to ~/.codex/skills)`,
+      `  1) user (default) — installs to ~/.codex (skills default to ~/.copilot/skills)`,
     );
     console.log("  2) project — installs to ./.codex (local to project)");
     const answer = (await rl.question("Scope [1-2] (default: 1): "))
@@ -531,7 +531,7 @@ function semverGte(
 }
 
 function probeInstalledCodexVersion(): string | null {
-  const { result } = spawnPlatformCommandSync("codex", ["--version"], {
+  const { result } = spawnPlatformCommandSync("copilot", ["--version"], {
     encoding: "utf-8",
     stdio: ["pipe", "pipe", "pipe"],
   });
@@ -650,7 +650,7 @@ async function ensureProjectGitignore(
 
   if (options.verbose) {
     const changedDetails = [
-      normalized.removed ? "removed legacy .codex/" : "",
+      normalized.removed ? "removed legacy .copilot/" : "",
       missingEntries.length > 0 ? missingEntries.join(", ") : "",
     ]
       .filter(Boolean)
@@ -704,7 +704,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   // Step 1: Ensure directories exist
   console.log("[1/8] Creating directories...");
   const dirs = [
-    scopeDirs.codexHomeDir,
+    scopeDirs.copilotHomeDir,
     scopeDirs.promptsDir,
     scopeDirs.skillsDir,
     scopeDirs.nativeAgentsDir,
@@ -907,7 +907,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   const agentsMdDst =
     resolvedScope.scope === "project"
       ? join(projectRoot, "AGENTS.md")
-      : join(scopeDirs.codexHomeDir, "AGENTS.md");
+      : join(scopeDirs.copilotHomeDir, "AGENTS.md");
   const agentsMdExists = existsSync(agentsMdDst);
 
   // Guard: refuse to overwrite project-root AGENTS.md during active session
@@ -920,7 +920,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   if (existsSync(agentsMdSrc)) {
     const content = await readFile(agentsMdSrc, "utf-8");
     const modelTableContext = resolveAgentsModelTableContext(resolvedConfig, {
-      codexHomeOverride: scopeDirs.codexHomeDir,
+      copilotHomeOverride: scopeDirs.copilotHomeDir,
     });
     const rewritten = upsertAgentsModelTable(
       addGeneratedAgentsMarker(
@@ -971,7 +971,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
       console.log(
         resolvedScope.scope === "project"
           ? "  Refreshed AGENTS.md model capability table in project root."
-          : `  Refreshed AGENTS.md model capability table in ${scopeDirs.codexHomeDir}.`,
+          : `  Refreshed AGENTS.md model capability table in ${scopeDirs.copilotHomeDir}.`,
       );
     } else {
       const result = await syncManagedAgentsContent(
@@ -991,13 +991,13 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
         console.log(
           resolvedScope.scope === "project"
             ? "  Generated AGENTS.md in project root."
-            : `  Generated AGENTS.md in ${scopeDirs.codexHomeDir}.`,
+            : `  Generated AGENTS.md in ${scopeDirs.copilotHomeDir}.`,
         );
       } else if (result === "unchanged") {
         console.log(
           resolvedScope.scope === "project"
             ? "  AGENTS.md already up to date in project root."
-            : `  AGENTS.md already up to date in ${scopeDirs.codexHomeDir}.`,
+            : `  AGENTS.md already up to date in ${scopeDirs.copilotHomeDir}.`,
         );
       } else if (agentsMdExists) {
         console.log(
@@ -1035,7 +1035,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   if (managedConfig.omcpManagesTui) {
     console.log("  StatusLine configured in config.toml via [tui] section.");
   } else {
-    console.log("  Codex CLI >= 0.107.0 manages [tui]; OMCP left that section untouched.");
+    console.log("  Copilot CLI >= 0.107.0 manages [tui]; OMCP left that section untouched.");
   }
   console.log();
 
@@ -1062,14 +1062,14 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
 
   console.log('Setup complete! Run "omcp doctor" to verify installation.');
   console.log("\nNext steps:");
-  console.log("  1. Start Codex CLI in your project directory");
+  console.log("  1. Start Copilot CLI in your project directory");
   console.log(
     "  2. Use role/workflow keywords like $architect, $executor, and $plan in Codex",
   );
   console.log("  3. Browse skills with /skills; AGENTS keyword routing can also activate them implicitly");
   console.log("  4. The AGENTS.md orchestration brain is loaded automatically");
   console.log(
-    "  5. Native agent defaults configured in config.toml [agents] and TOML files written to .codex/agents/",
+    "  5. Native agent defaults configured in config.toml [agents] and TOML files written to .copilot/agents/",
   );
   console.log(
     '  6. "omcp explore" and "omcp sparkshell" can hydrate native release binaries on first use; source installs still allow repo-local fallbacks and OMCP_EXPLORE_BIN / OMCP_SPARKSHELL_BIN overrides',
@@ -1388,7 +1388,7 @@ async function refreshNativeAgentConfigs(
 
     const promptContent = await readFile(promptPath, "utf-8");
     const toml = generateAgentToml(agent, promptContent, {
-      codexHomeOverride: join(agentsDir, ".."),
+      copilotHomeOverride: join(agentsDir, ".."),
     });
     const dst = join(agentsDir, `${name}.toml`);
     await syncManagedContent(

@@ -25,14 +25,14 @@ describe('tmux claude workers demo', () => {
       }
 
       // For 6 workers: first 3 codex, last 3 claude
-      assert.deepEqual(entries, ['codex', 'codex', 'codex', 'claude', 'claude', 'claude']);
+      assert.deepEqual(entries, ['copilot', 'copilot', 'copilot', 'claude', 'claude', 'claude']);
 
       // Verify via resolveTeamWorkerCliPlan
       const plan = resolveTeamWorkerCliPlan(workerCount, [], {
         OMCP_TEAM_WORKER_CLI_MAP: entries.join(','),
       });
 
-      assert.deepEqual(plan, ['codex', 'codex', 'codex', 'claude', 'claude', 'claude']);
+      assert.deepEqual(plan, ['copilot', 'copilot', 'copilot', 'claude', 'claude', 'claude']);
     });
 
     it('handles odd worker count correctly (5 workers)', () => {
@@ -45,13 +45,13 @@ describe('tmux claude workers demo', () => {
         entries.push(i <= pivot ? 'codex' : 'claude');
       }
 
-      assert.deepEqual(entries, ['codex', 'codex', 'codex', 'claude', 'claude']);
+      assert.deepEqual(entries, ['copilot', 'copilot', 'copilot', 'claude', 'claude']);
 
       const plan = resolveTeamWorkerCliPlan(workerCount, [], {
         OMCP_TEAM_WORKER_CLI_MAP: entries.join(','),
       });
 
-      assert.deepEqual(plan, ['codex', 'codex', 'codex', 'claude', 'claude']);
+      assert.deepEqual(plan, ['copilot', 'copilot', 'copilot', 'claude', 'claude']);
     });
 
     it('handles even worker count correctly (6 workers)', () => {
@@ -64,7 +64,7 @@ describe('tmux claude workers demo', () => {
         entries.push(i <= pivot ? 'codex' : 'claude');
       }
 
-      assert.deepEqual(entries, ['codex', 'codex', 'codex', 'claude', 'claude', 'claude']);
+      assert.deepEqual(entries, ['copilot', 'copilot', 'copilot', 'claude', 'claude', 'claude']);
     });
   });
 
@@ -123,10 +123,10 @@ describe('tmux claude workers demo', () => {
         launchArgs,
         '/tmp/workspace',
         {},
-        'codex',
+        'copilot',
       );
 
-      assert.equal(spec.workerCli, 'codex');
+      assert.equal(spec.workerCli, 'copilot');
       assert.ok(spec.args.includes('--model'));
       assert.ok(spec.args.includes('gpt-5.3-codex'));
       assert.ok(spec.args.includes('--json'));
@@ -136,7 +136,7 @@ describe('tmux claude workers demo', () => {
   describe('translateWorkerLaunchArgsForCli', () => {
     it('returns codex args unchanged', () => {
       const args = ['--model', 'gpt-5.3-codex', '--json'];
-      const result = translateWorkerLaunchArgsForCli('codex', args);
+      const result = translateWorkerLaunchArgsForCli('copilot', args);
       assert.deepEqual(result, args);
     });
 
@@ -176,7 +176,7 @@ describe('tmux claude workers demo', () => {
 
       // Verify plan matches expected distribution
       // For 6 workers with bash pivot=$((7/2))=3: first 3 codex, last 3 claude
-      assert.deepEqual(plan, ['codex', 'codex', 'codex', 'claude', 'claude', 'claude']);
+      assert.deepEqual(plan, ['copilot', 'copilot', 'copilot', 'claude', 'claude', 'claude']);
 
       // Verify each worker gets correct launch spec
       for (let i = 1; i <= workerCount; i++) {
@@ -245,7 +245,7 @@ describe('tmux claude workers demo', () => {
 
     it('handles single worker with codex', () => {
       const plan = resolveTeamWorkerCliPlan(1, [], {
-        OMCP_TEAM_WORKER_CLI_MAP: 'codex',
+        OMCP_TEAM_WORKER_CLI_MAP: 'copilot',
       });
 
       assert.deepEqual(plan, ['codex']);

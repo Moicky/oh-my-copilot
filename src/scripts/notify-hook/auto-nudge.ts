@@ -494,7 +494,7 @@ export function resolveEffectiveAutoNudgeResponse(response) {
 }
 
 export async function loadAutoNudgeConfig() {
-  const codexHomePath = process.env.CODEX_HOME || join(homedir(), '.codex');
+  const codexHomePath = process.env.COPILOT_HOME || join(homedir(), '.copilot');
   const configPath = join(codexHomePath, '.omcp-config.json');
   const raw = await readJsonIfExists(configPath, null);
   if (!raw || typeof raw !== 'object') return normalizeAutoNudgeConfig(null);

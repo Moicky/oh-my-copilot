@@ -4,7 +4,7 @@
 
 import { existsSync, readFileSync, statSync } from 'fs';
 import { join } from 'path';
-import { codexHome, omcpProjectMemoryPath } from '../utils/paths.js';
+import { copilotHome, omcpProjectMemoryPath } from '../utils/paths.js';
 import {
   appendLogUnsafe,
   getWikiDir,
@@ -19,7 +19,7 @@ import {
 import { DEFAULT_WIKI_CONFIG, type WikiConfig, WIKI_SCHEMA_VERSION } from './types.js';
 
 function loadWikiConfig(root: string): WikiConfig {
-  const candidates = [join(root, '.omcp-config.json'), join(codexHome(), '.omcp-config.json')];
+  const candidates = [join(root, '.omcp-config.json'), join(copilotHome(), '.omcp-config.json')];
 
   for (const path of candidates) {
     try {

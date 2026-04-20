@@ -2,7 +2,7 @@ import { createReadStream, existsSync } from 'node:fs';
 import { readdir, stat } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 import { createInterface } from 'node:readline';
-import { codexHome } from '../utils/paths.js';
+import { copilotHome } from '../utils/paths.js';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -16,7 +16,7 @@ export interface SessionSearchOptions {
   caseSensitive?: boolean;
   cwd?: string;
   now?: number;
-  codexHomeDir?: string;
+  copilotHomeDir?: string;
 }
 
 export interface SessionSearchResult {
@@ -262,7 +262,7 @@ async function searchRolloutFile(
     sinceCutoff: number | null;
     projectFilter?: string;
     cwd: string;
-    codexHomeDir: string;
+    copilotHomeDir: string;
   },
 ): Promise<{ meta: SessionMeta | null; results: SessionSearchResult[] }> {
   const stream = createReadStream(filePath, 'utf-8');
@@ -305,7 +305,7 @@ async function searchRolloutFile(
           timestamp: meta.timestamp,
           cwd: meta.cwd,
           transcript_path: filePath,
-          transcript_path_relative: relative(options.codexHomeDir, filePath),
+          transcript_path_relative: relative(options.copilotHomeDir, filePath),
           record_type: candidate.recordType,
           line_number: lineNumber,
           snippet,
@@ -330,13 +330,13 @@ export async function searchSessionHistory(options: SessionSearchOptions): Promi
   }
 
   const cwd = options.cwd ?? process.cwd();
-  const codexHomeDir = options.codexHomeDir ?? codexHome();
+  const copilotHomeDir = options.copilotHomeDir ?? copilotHome();
   const limit = clampInteger(options.limit ?? DEFAULT_LIMIT, DEFAULT_LIMIT, MAX_LIMIT) || DEFAULT_LIMIT;
   const context = clampInteger(options.context ?? DEFAULT_CONTEXT, DEFAULT_CONTEXT, MAX_CONTEXT) || DEFAULT_CONTEXT;
   const caseSensitive = options.caseSensitive === true;
   const sinceCutoff = parseSinceSpec(options.since, options.now ?? Date.now());
   const projectFilter = normalizeProjectFilter(options.project, cwd);
-  const rolloutRoot = join(codexHomeDir, 'sessions');
+  const rolloutRoot = join(copilotHomeDir, 'sessions');
   const files = await listRolloutFiles(rolloutRoot);
 
   const results: SessionSearchResult[] = [];
@@ -362,7 +362,7 @@ export async function searchSessionHistory(options: SessionSearchOptions): Promi
       sinceCutoff,
       projectFilter,
       cwd,
-      codexHomeDir,
+      copilotHomeDir,
     });
 
     for (const result of fileSearch.results) {

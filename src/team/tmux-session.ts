@@ -3,7 +3,7 @@ import { promisify } from 'util';
 import { existsSync, readFileSync } from 'fs';
 import { isAbsolute, join, resolve } from 'path';
 import {
-  CODEX_BYPASS_FLAG,
+  COPILOT_BYPASS_FLAG,
   CLAUDE_SKIP_PERMISSIONS_FLAG,
   MADMAX_FLAG,
   CONFIG_FLAG,
@@ -81,7 +81,7 @@ const TMUX_COPY_MODE_STYLE_OPTIONS = [
   'copy-mode-selection-style',
 ] as const;
 
-export type TeamWorkerCli = 'codex' | 'claude' | 'gemini';
+export type TeamWorkerCli = 'copilot' | 'claude' | 'gemini';
 type TeamWorkerCliMode = 'auto' | TeamWorkerCli;
 export type TeamWorkerLaunchMode = 'interactive' | 'prompt';
 
@@ -574,7 +574,7 @@ function hasModelInstructionsOverride(args: string[]): boolean {
 function normalizeTeamWorkerCliMode(raw: string | undefined, sourceEnv: string = OMCP_TEAM_WORKER_CLI_ENV): TeamWorkerCliMode {
   const normalized = String(raw ?? 'auto').trim().toLowerCase();
   if (normalized === '' || normalized === 'auto') return 'auto';
-  if (normalized === 'codex' || normalized === 'claude' || normalized === 'gemini') return normalized;
+  if (normalized === 'copilot' || normalized === 'claude' || normalized === 'gemini') return normalized;
   throw new Error(`Invalid ${sourceEnv} value "${raw}". Expected: auto, codex, claude, gemini`);
 }
 
@@ -617,7 +617,7 @@ function resolveTeamWorkerCliFromLaunchArgs(launchArgs: string[] = []): TeamWork
   const model = extractModelOverride(launchArgs);
   if (model && /claude/i.test(model)) return 'claude';
   if (model && /gemini/i.test(model)) return 'gemini';
-  return 'codex';
+  return 'copilot';
 }
 
 export function resolveTeamWorkerCliPlan(
@@ -682,7 +682,7 @@ export function translateWorkerLaunchArgsForCli(
   initialPrompt?: string,
   workerRole?: string,
 ): string[] {
-  if (workerCli === 'codex') return [...args];
+  if (workerCli === 'copilot') return [...args];
   if (workerCli === 'gemini') {
     const model = extractModelOverride(args);
     const geminiModel = model && /gemini/i.test(model) ? model : null;
@@ -765,9 +765,9 @@ function readTmuxWorkerAmbientEnv(env: NodeJS.ProcessEnv = process.env): Record<
 
 function resolveWorkerLaunchArgs(extraArgs: string[] = [], cwd: string = process.cwd(), env: NodeJS.ProcessEnv = process.env): string[] {
   const merged = [...extraArgs];
-  const wantsBypass = process.argv.includes(CODEX_BYPASS_FLAG) || process.argv.includes(MADMAX_FLAG);
-  if (wantsBypass && !merged.includes(CODEX_BYPASS_FLAG)) {
-    merged.push(CODEX_BYPASS_FLAG);
+  const wantsBypass = process.argv.includes(COPILOT_BYPASS_FLAG) || process.argv.includes(MADMAX_FLAG);
+  if (wantsBypass && !merged.includes(COPILOT_BYPASS_FLAG)) {
+    merged.push(COPILOT_BYPASS_FLAG);
   }
   if (shouldBypassDefaultSystemPrompt(env) && !hasModelInstructionsOverride(merged)) {
     merged.push(CONFIG_FLAG, buildModelInstructionsOverride(cwd, env));
@@ -848,13 +848,13 @@ export function buildWorkerProcessLaunchSpec(
   const fullLaunchArgs = resolveWorkerLaunchArgs(launchArgs, cwd, effectiveEnv);
   const workerCli = workerCliOverride ?? resolveTeamWorkerCli(fullLaunchArgs, effectiveEnv);
   const cliLaunchArgs = translateWorkerLaunchArgsForCli(workerCli, fullLaunchArgs, initialPrompt, workerRole);
-  const effectiveCliLaunchArgs = workerCli === 'codex'
+  const effectiveCliLaunchArgs = workerCli === 'copilot'
     && shouldGrantExecutionBypassForRole(workerRole)
-    && !cliLaunchArgs.includes(CODEX_BYPASS_FLAG)
-    ? [...cliLaunchArgs, CODEX_BYPASS_FLAG]
+    && !cliLaunchArgs.includes(COPILOT_BYPASS_FLAG)
+    ? [...cliLaunchArgs, COPILOT_BYPASS_FLAG]
     : cliLaunchArgs;
-  const workerCodexHomeOverride = typeof effectiveEnv.CODEX_HOME === 'string'
-    ? effectiveEnv.CODEX_HOME.trim()
+  const workerCodexHomeOverride = typeof effectiveEnv.COPILOT_HOME === 'string'
+    ? effectiveEnv.COPILOT_HOME.trim()
     : undefined;
   const providerLookupCodexHome = workerCodexHomeOverride
     ? (isAbsolute(workerCodexHomeOverride) ? workerCodexHomeOverride : resolve(cwd, workerCodexHomeOverride))
@@ -869,7 +869,7 @@ export function buildWorkerProcessLaunchSpec(
     OMCP_TEAM_WORKER: `${teamName}/worker-${workerIndex}`,
     [OMCP_LEADER_NODE_PATH_ENV]: resolveLeaderNodePath(),
     [OMCP_LEADER_CLI_PATH_ENV]: resolvedLauncherPath,
-    ...(workerCli === 'codex'
+    ...(workerCli === 'copilot'
       ? readActiveProviderEnvOverrides(
           effectiveEnv,
           providerLookupCodexHome,
@@ -1131,7 +1131,7 @@ export function createTeamSession(
 
     // Enable mouse scrolling so agent output panes can be scrolled with the
     // mouse wheel without conflicting with keyboard up/down arrow-key input
-    // history navigation in the Codex CLI input field. (issue #103)
+    // history navigation in the Copilot CLI input field. (issue #103)
     // Opt-out: set OMCP_TEAM_MOUSE=0 in the environment.
     if (process.env.OMCP_TEAM_MOUSE !== '0') {
       enableMouseScrolling(sessionName);
@@ -1338,10 +1338,10 @@ export function buildWorkerSubmitPlan(
   const queueRequested = strategy === 'queue' || (strategy === 'auto' && paneBusyAtStart);
   return {
     shouldInterrupt: strategy === 'interrupt',
-    queueFirstRound: workerCli === 'codex' && queueRequested,
+    queueFirstRound: workerCli === 'copilot' && queueRequested,
     rounds: 6,
     submitKeyPressesPerRound: workerCli === 'claude' ? 1 : 2,
-    allowAdaptiveRetry: workerCli === 'codex' && allowAdaptiveRetry,
+    allowAdaptiveRetry: workerCli === 'copilot' && allowAdaptiveRetry,
   };
 }
 

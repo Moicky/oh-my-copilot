@@ -36,7 +36,7 @@ describe('omcp resume', () => {
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
 
       await mkdir(home, { recursive: true });
@@ -66,7 +66,7 @@ describe('omcp resume', () => {
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
 
       await mkdir(home, { recursive: true });

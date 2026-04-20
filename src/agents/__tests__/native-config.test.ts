@@ -121,17 +121,17 @@ describe("agents/native-config", () => {
 
   it("keeps standard agents off a custom gpt-5.2 root model", async () => {
     const root = await mkdtemp(join(tmpdir(), "omcp-native-config-root-model-"));
-    const codexHome = join(root, ".codex");
+    const copilotHome = join(root, ".copilot");
     const promptsDir = join(root, "prompts");
-    const outDir = join(codexHome, "agents");
-    const previousCodexHome = process.env.CODEX_HOME;
+    const outDir = join(copilotHome, "agents");
+    const previousCodexHome = process.env.COPILOT_HOME;
 
     try {
       delete process.env.OMCP_DEFAULT_STANDARD_MODEL;
-      process.env.CODEX_HOME = codexHome;
+      process.env.COPILOT_HOME = copilotHome;
       await mkdir(promptsDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
-      await writeFile(join(codexHome, "config.toml"), 'model = "gpt-5.2"\n');
+      await mkdir(copilotHome, { recursive: true });
+      await writeFile(join(copilotHome, "config.toml"), 'model = "gpt-5.2"\n');
       await writeFile(join(promptsDir, "debugger.md"), "debugger prompt");
 
       await installNativeAgentConfigs(root, { agentsDir: outDir });
@@ -139,8 +139,8 @@ describe("agents/native-config", () => {
       assert.match(debuggerToml, /model = "gpt-5\.4-mini"/);
       assert.doesNotMatch(debuggerToml, /model = "gpt-5\.2"/);
     } finally {
-      if (typeof previousCodexHome === "string") process.env.CODEX_HOME = previousCodexHome;
-      else delete process.env.CODEX_HOME;
+      if (typeof previousCodexHome === "string") process.env.COPILOT_HOME = previousCodexHome;
+      else delete process.env.COPILOT_HOME;
       process.env.OMCP_DEFAULT_STANDARD_MODEL = "gpt-5.4-mini";
       await rm(root, { recursive: true, force: true });
     }
@@ -148,25 +148,25 @@ describe("agents/native-config", () => {
 
   it("keeps executor on the frontier lane so an explicit gpt-5.2 root model still applies there", async () => {
     const root = await mkdtemp(join(tmpdir(), "omcp-native-config-executor-model-"));
-    const codexHome = join(root, ".codex");
+    const copilotHome = join(root, ".copilot");
     const promptsDir = join(root, "prompts");
-    const outDir = join(codexHome, "agents");
-    const previousCodexHome = process.env.CODEX_HOME;
+    const outDir = join(copilotHome, "agents");
+    const previousCodexHome = process.env.COPILOT_HOME;
 
     try {
       delete process.env.OMCP_DEFAULT_STANDARD_MODEL;
-      process.env.CODEX_HOME = codexHome;
+      process.env.COPILOT_HOME = copilotHome;
       await mkdir(promptsDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
-      await writeFile(join(codexHome, "config.toml"), 'model = "gpt-5.2"\n');
+      await mkdir(copilotHome, { recursive: true });
+      await writeFile(join(copilotHome, "config.toml"), 'model = "gpt-5.2"\n');
       await writeFile(join(promptsDir, "executor.md"), "executor prompt");
 
       await installNativeAgentConfigs(root, { agentsDir: outDir });
       const executorToml = await readFile(join(outDir, "executor.toml"), "utf8");
       assert.match(executorToml, /model = "gpt-5\.2"/);
     } finally {
-      if (typeof previousCodexHome === "string") process.env.CODEX_HOME = previousCodexHome;
-      else delete process.env.CODEX_HOME;
+      if (typeof previousCodexHome === "string") process.env.COPILOT_HOME = previousCodexHome;
+      else delete process.env.COPILOT_HOME;
       process.env.OMCP_DEFAULT_STANDARD_MODEL = "gpt-5.4-mini";
       await rm(root, { recursive: true, force: true });
     }

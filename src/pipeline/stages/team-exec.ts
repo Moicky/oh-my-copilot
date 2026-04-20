@@ -1,7 +1,7 @@
 /**
  * Team execution stage adapter for pipeline orchestrator.
  *
- * Wraps the existing team mode (tmux-based Codex CLI workers) into a
+ * Wraps the existing team mode (tmux-based Copilot CLI workers) into a
  * PipelineStage. The execution backend is always teams — this is the
  * canonical OMCP execution surface.
  */
@@ -13,7 +13,7 @@ import {
 } from '../../team/followup-planner.js';
 
 export interface TeamExecStageOptions {
-  /** Number of Codex CLI workers to launch. Defaults to 2. */
+  /** Number of Copilot CLI workers to launch. Defaults to 2. */
   workerCount?: number;
 
   /** Agent type/role for workers. Defaults to 'executor'. */
@@ -30,7 +30,7 @@ export interface TeamExecStageOptions {
  * Create a team-exec pipeline stage.
  *
  * This stage delegates to the existing `omcp team` infrastructure, which
- * starts real Codex CLI workers in tmux panes. The stage collects the
+ * starts real Copilot CLI workers in tmux panes. The stage collects the
  * plan artifacts from the previous RALPLAN stage and passes them as
  * the team task description.
  */

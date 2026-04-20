@@ -169,10 +169,10 @@ printf '# Answer\nHarness completed\n' > "$output_path"
 }
 
 async function writePosixPackageManagerCodexShim(wd: string, capturePath: string): Promise<string> {
-  const packageRoot = join(wd, 'node_modules', '@openai', 'codex');
+  const packageRoot = join(wd, 'node_modules', '@openai', 'copilot');
   const binDir = join(wd, 'node_modules', '.bin');
   const entrypointPath = join(packageRoot, 'bin', 'codex.js');
-  const shimPath = join(binDir, 'codex');
+  const shimPath = join(binDir, 'copilot');
   await mkdir(join(packageRoot, 'bin'), { recursive: true });
   await mkdir(binDir, { recursive: true });
   await writeFile(

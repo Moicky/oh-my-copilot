@@ -18,13 +18,13 @@ describe('team model contract', () => {
   it('collects inheritable bypass, reasoning, and model overrides', () => {
     assert.deepEqual(
       collectInheritableTeamWorkerArgs([
-        '--dangerously-bypass-approvals-and-sandbox',
+        '--allow-all-tools',
         '-c',
         'model_reasoning_effort="xhigh"',
         '--model=gpt-5.3',
       ]),
       [
-        '--dangerously-bypass-approvals-and-sandbox',
+        '--allow-all-tools',
         '-c',
         'model_reasoning_effort="xhigh"',
         '--model',
@@ -58,10 +58,10 @@ describe('team model contract', () => {
     assert.deepEqual(
       resolveTeamWorkerLaunchArgs({
         existingRaw: '--no-alt-screen',
-        inheritedArgs: ['--dangerously-bypass-approvals-and-sandbox'],
+        inheritedArgs: ['--allow-all-tools'],
         fallbackModel: expectedLowComplexityModel(),
       }),
-      ['--no-alt-screen', '--dangerously-bypass-approvals-and-sandbox', '--model', expectedLowComplexityModel()],
+      ['--no-alt-screen', '--allow-all-tools', '--model', expectedLowComplexityModel()],
     );
   });
 

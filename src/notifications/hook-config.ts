@@ -2,13 +2,13 @@
  * Hook Notification Config Reader
  *
  * Reads hookTemplates from .omcp-config.json for user-customizable message templates.
- * Config is stored under the notifications.hookTemplates key in codexHome()/.omcp-config.json.
+ * Config is stored under the notifications.hookTemplates key in copilotHome()/.omcp-config.json.
  * Env var OMCP_HOOK_CONFIG overrides to a separate file path.
  */
 
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { codexHome } from "../utils/paths.js";
+import { copilotHome } from "../utils/paths.js";
 import type { HookNotificationConfig } from "./hook-config-types.js";
 import type {
   FullNotificationConfig,
@@ -22,7 +22,7 @@ let cachedConfig: HookNotificationConfig | null | undefined;
 /**
  * Read and cache the hook notification config.
  *
- * Primary source: notifications.hookTemplates key in codexHome()/.omcp-config.json
+ * Primary source: notifications.hookTemplates key in copilotHome()/.omcp-config.json
  * Env var override: OMCP_HOOK_CONFIG points to a separate file containing the
  *   HookNotificationConfig JSON directly (used for testing and advanced overrides).
  *
@@ -56,7 +56,7 @@ export function getHookConfig(): HookNotificationConfig | null {
   }
 
   // Primary: read from notifications.hookTemplates in .omcp-config.json
-  const OMCP_CONFIG_PATH = join(codexHome(), ".omcp-config.json");
+  const OMCP_CONFIG_PATH = join(copilotHome(), ".omcp-config.json");
   if (!existsSync(OMCP_CONFIG_PATH)) {
     cachedConfig = null;
     return null;

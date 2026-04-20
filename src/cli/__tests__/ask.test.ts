@@ -254,8 +254,8 @@ describe('omcp ask', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-ask-agent-prompt-'));
     try {
       const fakeBin = join(wd, 'bin');
-      const codexHome = join(wd, '.codex-home');
-      const promptsDir = join(codexHome, 'prompts');
+      const copilotHome = join(wd, '.codex-home');
+      const promptsDir = join(copilotHome, 'prompts');
       await mkdir(fakeBin, { recursive: true });
       await mkdir(promptsDir, { recursive: true });
 
@@ -273,7 +273,7 @@ describe('omcp ask', () => {
       const res = runOmcp(
         wd,
         ['ask', 'claude', '--agent-prompt', 'executor', 'ship', 'feature'],
-        { PATH: `${fakeBin}:${process.env.PATH || ''}`, CODEX_HOME: codexHome },
+        { PATH: `${fakeBin}:${process.env.PATH || ''}`, COPILOT_HOME: copilotHome },
       );
       if (shouldSkipForSpawnPermissions(res.error)) return;
 
@@ -294,8 +294,8 @@ describe('omcp ask', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-ask-agent-prompt-missing-'));
     try {
       const fakeBin = join(wd, 'bin');
-      const codexHome = join(wd, '.codex-home');
-      const promptsDir = join(codexHome, 'prompts');
+      const copilotHome = join(wd, '.codex-home');
+      const promptsDir = join(copilotHome, 'prompts');
       await mkdir(fakeBin, { recursive: true });
       await mkdir(promptsDir, { recursive: true });
 
@@ -308,7 +308,7 @@ describe('omcp ask', () => {
       const res = runOmcp(
         wd,
         ['ask', 'gemini', '--agent-prompt=planner', '--prompt', 'do', 'planning'],
-        { PATH: `${fakeBin}:${process.env.PATH || ''}`, CODEX_HOME: codexHome },
+        { PATH: `${fakeBin}:${process.env.PATH || ''}`, COPILOT_HOME: copilotHome },
       );
       if (shouldSkipForSpawnPermissions(res.error)) return;
 

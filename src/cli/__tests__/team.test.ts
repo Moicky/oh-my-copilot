@@ -1228,7 +1228,7 @@ describe('teamCommand status', () => {
           completed_at: '2026-03-11T00:06:00.000Z',
         }, null, 2)}\n`,
       );
-      config.workers[0]!.worker_cli = 'codex';
+      config.workers[0]!.worker_cli = 'copilot';
       config.workers[1]!.worker_cli = 'gemini';
       config.workers[0]!.pid = 101;
       config.workers[1]!.pid = 102;
@@ -1932,7 +1932,7 @@ describe('teamCommand await', () => {
   it('returns a dead-worker event for the prompt-launch smoke path instead of timing out', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-team-await-prompt-dead-'));
     const binDir = join(wd, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     const previousCwd = process.cwd();
     const previousPath = process.env.PATH;
     const previousTmux = process.env.TMUX;
@@ -1961,7 +1961,7 @@ process.on('SIGTERM', () => process.exit(0));
       process.env.PATH = `${binDir}:${previousPath ?? ''}`;
       delete process.env.TMUX;
       process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-      process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+      process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
       console.log = (...args: unknown[]) => logs.push(args.map(String).join(' '));
       process.stderr.write = ((chunk: string | Uint8Array) => {
         stderr.push(String(chunk));
@@ -2008,7 +2008,7 @@ process.on('SIGTERM', () => process.exit(0));
   it('initializes and rehydrates active team mode state on start and resume', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-team-mode-state-'));
     const binDir = join(wd, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     const previousCwd = process.cwd();
     const previousPath = process.env.PATH;
     const previousTmux = process.env.TMUX;
@@ -2033,7 +2033,7 @@ process.on('SIGTERM', () => process.exit(0));
       process.env.PATH = `${binDir}:${previousPath ?? ''}`;
       delete process.env.TMUX;
       process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-      process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+      process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
 
       await withMockPromptModeCodexAllowed(() =>
         withoutTeamTestWorkerEnv(() => teamCommand(['1:executor', teamTask])));
@@ -2069,7 +2069,7 @@ process.on('SIGTERM', () => process.exit(0));
   it('does not resurrect active team mode state when canonical team phase is terminal on resume', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-team-mode-terminal-'));
     const binDir = join(wd, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     const previousCwd = process.cwd();
     const previousPath = process.env.PATH;
     const previousTmux = process.env.TMUX;
@@ -2094,7 +2094,7 @@ process.on('SIGTERM', () => process.exit(0));
       process.env.PATH = `${binDir}:${previousPath ?? ''}`;
       delete process.env.TMUX;
       process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-      process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+      process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
 
       await withMockPromptModeCodexAllowed(() =>
         withoutTeamTestWorkerEnv(() => teamCommand(['1:executor', teamTask])));

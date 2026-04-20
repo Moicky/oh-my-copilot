@@ -22,7 +22,7 @@
 import { parse as parseToml } from '@iarna/toml';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
-import { codexConfigPath, codexHome } from '../utils/paths.js';
+import { copilotConfigPath, copilotHome } from '../utils/paths.js';
 
 export interface ModelsConfig {
   [mode: string]: string | undefined;
@@ -47,8 +47,8 @@ export const OMCP_DEFAULT_STANDARD_MODEL_ENV = 'OMCP_DEFAULT_STANDARD_MODEL';
 export const OMCP_DEFAULT_SPARK_MODEL_ENV = 'OMCP_DEFAULT_SPARK_MODEL';
 export const OMCP_SPARK_MODEL_ENV = 'OMCP_SPARK_MODEL';
 
-function readOmcpConfigFile(codexHomeOverride?: string): OmcpConfigFile | null {
-  const configPath = join(codexHomeOverride || codexHome(), '.omcp-config.json');
+function readOmcpConfigFile(copilotHomeOverride?: string): OmcpConfigFile | null {
+  const configPath = join(copilotHomeOverride || copilotHome(), '.omcp-config.json');
   if (!existsSync(configPath)) return null;
   try {
     const raw = JSON.parse(readFileSync(configPath, 'utf-8'));
@@ -59,10 +59,10 @@ function readOmcpConfigFile(codexHomeOverride?: string): OmcpConfigFile | null {
   }
 }
 
-function readCodexConfigFile(codexHomeOverride?: string): CodexConfigFile | null {
-  const configPath = codexHomeOverride
-    ? join(codexHomeOverride, 'config.toml')
-    : codexConfigPath();
+function readCodexConfigFile(copilotHomeOverride?: string): CodexConfigFile | null {
+  const configPath = copilotHomeOverride
+    ? join(copilotHomeOverride, 'config.toml')
+    : copilotConfigPath();
   if (!existsSync(configPath)) return null;
   try {
     const raw = parseToml(readFileSync(configPath, 'utf-8'));
@@ -73,8 +73,8 @@ function readCodexConfigFile(codexHomeOverride?: string): CodexConfigFile | null
   }
 }
 
-function readModelsBlock(codexHomeOverride?: string): ModelsConfig | null {
-  const config = readOmcpConfigFile(codexHomeOverride);
+function readModelsBlock(copilotHomeOverride?: string): ModelsConfig | null {
+  const config = readOmcpConfigFile(copilotHomeOverride);
   if (!config) return null;
   if (config.models && typeof config.models === 'object' && !Array.isArray(config.models)) {
     return config.models;
@@ -92,16 +92,16 @@ function normalizeConfiguredValue(value: unknown): string | undefined {
   return trimmed.length > 0 ? trimmed : undefined;
 }
 
-function readConfigEnvValue(key: string, codexHomeOverride?: string): string | undefined {
-  const config = readOmcpConfigFile(codexHomeOverride);
+function readConfigEnvValue(key: string, copilotHomeOverride?: string): string | undefined {
+  const config = readOmcpConfigFile(copilotHomeOverride);
   if (!config || !config.env || typeof config.env !== 'object' || Array.isArray(config.env)) {
     return undefined;
   }
   return normalizeConfiguredValue(config.env[key]);
 }
 
-function readTeamLowComplexityOverride(codexHomeOverride?: string): string | undefined {
-  const models = readModelsBlock(codexHomeOverride);
+function readTeamLowComplexityOverride(copilotHomeOverride?: string): string | undefined {
+  const models = readModelsBlock(copilotHomeOverride);
   if (!models) return undefined;
   for (const key of TEAM_LOW_COMPLEXITY_MODEL_KEYS) {
     const value = normalizeConfiguredValue(models[key]);
@@ -110,8 +110,8 @@ function readTeamLowComplexityOverride(codexHomeOverride?: string): string | und
   return undefined;
 }
 
-export function readConfiguredEnvOverrides(codexHomeOverride?: string): NodeJS.ProcessEnv {
-  const config = readOmcpConfigFile(codexHomeOverride);
+export function readConfiguredEnvOverrides(copilotHomeOverride?: string): NodeJS.ProcessEnv {
+  const config = readOmcpConfigFile(copilotHomeOverride);
   if (!config || !config.env || typeof config.env !== 'object' || Array.isArray(config.env)) {
     return {};
   }
@@ -126,9 +126,9 @@ export function readConfiguredEnvOverrides(codexHomeOverride?: string): NodeJS.P
 
 export function readActiveProviderEnvOverrides(
   env: NodeJS.ProcessEnv = process.env,
-  codexHomeOverride?: string,
+  copilotHomeOverride?: string,
 ): NodeJS.ProcessEnv {
-  const config = readCodexConfigFile(codexHomeOverride);
+  const config = readCodexConfigFile(copilotHomeOverride);
   if (!config) return {};
 
   const activeProvider = normalizeConfiguredValue(config.model_provider);
@@ -153,36 +153,36 @@ export function readActiveProviderEnvOverrides(
 
 export function getEnvConfiguredMainDefaultModel(
   env: NodeJS.ProcessEnv = process.env,
-  codexHomeOverride?: string,
+  copilotHomeOverride?: string,
 ): string | undefined {
   return normalizeConfiguredValue(env[OMCP_DEFAULT_FRONTIER_MODEL_ENV])
-    ?? readConfigEnvValue(OMCP_DEFAULT_FRONTIER_MODEL_ENV, codexHomeOverride);
+    ?? readConfigEnvValue(OMCP_DEFAULT_FRONTIER_MODEL_ENV, copilotHomeOverride);
 }
 
 export function getEnvConfiguredStandardDefaultModel(
   env: NodeJS.ProcessEnv = process.env,
-  codexHomeOverride?: string,
+  copilotHomeOverride?: string,
 ): string | undefined {
   return normalizeConfiguredValue(env[OMCP_DEFAULT_STANDARD_MODEL_ENV])
-    ?? readConfigEnvValue(OMCP_DEFAULT_STANDARD_MODEL_ENV, codexHomeOverride);
+    ?? readConfigEnvValue(OMCP_DEFAULT_STANDARD_MODEL_ENV, copilotHomeOverride);
 }
 
 export function getEnvConfiguredSparkDefaultModel(
   env: NodeJS.ProcessEnv = process.env,
-  codexHomeOverride?: string,
+  copilotHomeOverride?: string,
 ): string | undefined {
   return normalizeConfiguredValue(env[OMCP_DEFAULT_SPARK_MODEL_ENV])
     ?? normalizeConfiguredValue(env[OMCP_SPARK_MODEL_ENV])
-    ?? readConfigEnvValue(OMCP_DEFAULT_SPARK_MODEL_ENV, codexHomeOverride)
-    ?? readConfigEnvValue(OMCP_SPARK_MODEL_ENV, codexHomeOverride);
+    ?? readConfigEnvValue(OMCP_DEFAULT_SPARK_MODEL_ENV, copilotHomeOverride)
+    ?? readConfigEnvValue(OMCP_SPARK_MODEL_ENV, copilotHomeOverride);
 }
 
 /**
  * Get the envvar-backed main/default model.
  * Resolution: OMCP_DEFAULT_FRONTIER_MODEL > DEFAULT_FRONTIER_MODEL
  */
-export function getMainDefaultModel(codexHomeOverride?: string): string {
-  return getEnvConfiguredMainDefaultModel(process.env, codexHomeOverride)
+export function getMainDefaultModel(copilotHomeOverride?: string): string {
+  return getEnvConfiguredMainDefaultModel(process.env, copilotHomeOverride)
     ?? DEFAULT_FRONTIER_MODEL;
 }
 
@@ -190,8 +190,8 @@ export function getMainDefaultModel(codexHomeOverride?: string): string {
  * Get the envvar-backed standard/default subagent model.
  * Resolution: OMCP_DEFAULT_STANDARD_MODEL > DEFAULT_STANDARD_MODEL
  */
-export function getStandardDefaultModel(codexHomeOverride?: string): string {
-  return getEnvConfiguredStandardDefaultModel(process.env, codexHomeOverride)
+export function getStandardDefaultModel(copilotHomeOverride?: string): string {
+  return getEnvConfiguredStandardDefaultModel(process.env, copilotHomeOverride)
     ?? DEFAULT_STANDARD_MODEL;
 }
 
@@ -199,15 +199,15 @@ export function getStandardDefaultModel(codexHomeOverride?: string): string {
  * Get the configured model for a specific mode.
  * Resolution: mode-specific override > "default" key > OMCP_DEFAULT_FRONTIER_MODEL > DEFAULT_FRONTIER_MODEL
  */
-export function getModelForMode(mode: string, codexHomeOverride?: string): string {
-  const models = readModelsBlock(codexHomeOverride);
+export function getModelForMode(mode: string, copilotHomeOverride?: string): string {
+  const models = readModelsBlock(copilotHomeOverride);
   const modeValue = normalizeConfiguredValue(models?.[mode]);
   if (modeValue) return modeValue;
 
   const defaultValue = normalizeConfiguredValue(models?.default);
   if (defaultValue) return defaultValue;
 
-  return getMainDefaultModel(codexHomeOverride);
+  return getMainDefaultModel(copilotHomeOverride);
 }
 
 const TEAM_LOW_COMPLEXITY_MODEL_KEYS = [
@@ -220,9 +220,9 @@ const TEAM_LOW_COMPLEXITY_MODEL_KEYS = [
  * Get the envvar-backed spark/low-complexity default model.
  * Resolution: OMCP_DEFAULT_SPARK_MODEL > OMCP_SPARK_MODEL > explicit low-complexity key(s) > DEFAULT_SPARK_MODEL
  */
-export function getSparkDefaultModel(codexHomeOverride?: string): string {
-  return getEnvConfiguredSparkDefaultModel(process.env, codexHomeOverride)
-    ?? readTeamLowComplexityOverride(codexHomeOverride)
+export function getSparkDefaultModel(copilotHomeOverride?: string): string {
+  return getEnvConfiguredSparkDefaultModel(process.env, copilotHomeOverride)
+    ?? readTeamLowComplexityOverride(copilotHomeOverride)
     ?? DEFAULT_SPARK_MODEL;
 }
 
@@ -230,6 +230,6 @@ export function getSparkDefaultModel(codexHomeOverride?: string): string {
  * Get the low-complexity team worker model.
  * Resolution: explicit low-complexity key(s) > OMCP_DEFAULT_SPARK_MODEL > OMCP_SPARK_MODEL > DEFAULT_SPARK_MODEL
  */
-export function getTeamLowComplexityModel(codexHomeOverride?: string): string {
-  return readTeamLowComplexityOverride(codexHomeOverride) ?? getSparkDefaultModel(codexHomeOverride);
+export function getTeamLowComplexityModel(copilotHomeOverride?: string): string {
+  return readTeamLowComplexityOverride(copilotHomeOverride) ?? getSparkDefaultModel(copilotHomeOverride);
 }

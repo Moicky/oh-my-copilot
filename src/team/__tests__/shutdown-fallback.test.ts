@@ -41,7 +41,7 @@ describe('shutdown fallback worktree reports', () => {
   it('shutdownTeam checkpoints dirty detached worker worktrees, merges them, and writes a report', async () => {
     const repo = await initRepo();
     const binDir = await mkdtemp(join(tmpdir(), 'omcp-shutdown-fallback-bin-'));
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     await writeFile(
       fakeCodexPath,
       `#!/usr/bin/env node
@@ -60,7 +60,7 @@ process.on('SIGTERM', () => process.exit(0));
     process.env.PATH = `${binDir}:${prevPath ?? ''}`;
     delete process.env.TMUX;
     process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-    process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+    process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
 
     let runtime: TeamRuntime | null = null;
     let preservedWorktreePath: string | null = null;

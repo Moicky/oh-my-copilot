@@ -80,8 +80,8 @@ async function attachDirtyWorkerRepo(teamName: string, cwd: string, repoName: st
 }
 
 
-function expectedLowComplexityModel(codexHomeOverride?: string): string {
-  return resolveTeamLowComplexityDefaultModel(codexHomeOverride);
+function expectedLowComplexityModel(copilotHomeOverride?: string): string {
+  return resolveTeamLowComplexityDefaultModel(copilotHomeOverride);
 }
 
 async function readTeamDeliveryLog(cwd: string): Promise<Array<Record<string, unknown>>> {
@@ -217,7 +217,7 @@ async function withPromptModeCodexEnv<T>(
     PATH: `${binDir}:${process.env.PATH ?? ''}`,
     TMUX: undefined,
     OMCP_TEAM_WORKER_LAUNCH_MODE: 'prompt',
-    OMCP_TEAM_WORKER_CLI: 'codex',
+    OMCP_TEAM_WORKER_CLI: 'copilot',
     OMCP_TEST_ALLOW_NONTTY_CODEX_PROMPT: '1',
     ...extraEnv,
   };
@@ -348,13 +348,13 @@ describe('runtime', () => {
   });
 
   it('resolveWorkerLaunchArgsFromEnv reads low-complexity model from config when present', async () => {
-    const previousCodexHome = process.env.CODEX_HOME;
+    const previousCodexHome = process.env.COPILOT_HOME;
     const tempCodexHome = await mkdtemp(join(tmpdir(), 'omcp-codex-home-'));
     await writeFile(
       join(tempCodexHome, '.omcp-config.json'),
       JSON.stringify({ models: { team_low_complexity: 'gpt-4.1-mini' } }),
     );
-    process.env.CODEX_HOME = tempCodexHome;
+    process.env.COPILOT_HOME = tempCodexHome;
     try {
       const args = resolveWorkerLaunchArgsFromEnv(
         { OMCP_TEAM_WORKER_LAUNCH_ARGS: '--no-alt-screen' },
@@ -362,8 +362,8 @@ describe('runtime', () => {
       );
       assert.deepEqual(args, ['--no-alt-screen', '--model', 'gpt-4.1-mini']);
     } finally {
-      if (typeof previousCodexHome === 'string') process.env.CODEX_HOME = previousCodexHome;
-      else delete process.env.CODEX_HOME;
+      if (typeof previousCodexHome === 'string') process.env.COPILOT_HOME = previousCodexHome;
+      else delete process.env.COPILOT_HOME;
       await rm(tempCodexHome, { recursive: true, force: true });
     }
   });
@@ -430,14 +430,14 @@ describe('runtime', () => {
         'executor',
         undefined,
         'low',
-        'codex',
+        'copilot',
       );
       const highArgs = resolveWorkerLaunchArgsFromEnv(
         { OMCP_TEAM_WORKER_LAUNCH_ARGS: '--no-alt-screen' },
         'executor',
         undefined,
         'high',
-        'codex',
+        'copilot',
       );
       assert.deepEqual(lowArgs, ['--no-alt-screen', '-c', 'model_reasoning_effort="low"', '--model', 'gpt-5.4']);
       assert.deepEqual(highArgs, ['--no-alt-screen', '-c', 'model_reasoning_effort="high"', '--model', 'gpt-5.4']);
@@ -545,7 +545,7 @@ describe('runtime', () => {
         'executor',
         undefined,
         'high',
-        'codex',
+        'copilot',
       );
       const claudeArgs = resolveWorkerLaunchArgsFromEnv(
         { OMCP_TEAM_WORKER_LAUNCH_ARGS: '--no-alt-screen --model claude-3-7-sonnet' },
@@ -631,7 +631,7 @@ describe('runtime', () => {
       const ackOnly = await waitForWorkerStartupEvidence({
         teamName: 'codex-startup',
         workerName: 'worker-1',
-        workerCli: 'codex',
+        workerCli: 'copilot',
         cwd,
         timeoutMs: 25,
         pollMs: 5,
@@ -649,7 +649,7 @@ describe('runtime', () => {
       const taskClaim = await waitForWorkerStartupEvidence({
         teamName: 'codex-startup',
         workerName: 'worker-1',
-        workerCli: 'codex',
+        workerCli: 'copilot',
         cwd,
         timeoutMs: 25,
         pollMs: 5,
@@ -676,7 +676,7 @@ describe('runtime', () => {
       const progress = await waitForWorkerStartupEvidence({
         teamName: 'codex-blocked-startup',
         workerName: 'worker-1',
-        workerCli: 'codex',
+        workerCli: 'copilot',
         cwd,
         timeoutMs: 25,
         pollMs: 5,
@@ -772,7 +772,7 @@ esac
           process.env.TMUX = 'leader-session';
           process.env.TMUX_PANE = '%1';
           process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'interactive';
-          process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+          process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
           process.env.OMCP_TEAM_SKIP_READY_WAIT = '1';
 
           receiptFailer = setInterval(() => {
@@ -1267,7 +1267,7 @@ esac
           delete process.env.TMUX;
           process.env.TMUX_PANE = '%1';
           process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'interactive';
-          process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+          process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
           process.env.OMCP_TEAM_SKIP_READY_WAIT = '1';
 
           runtime = await withoutTeamWorkerEnv(() =>
@@ -1418,7 +1418,7 @@ process.on('SIGTERM', () => process.exit(0));
           delete process.env.TMUX;
           process.env.TMUX_PANE = '%1';
           process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'interactive';
-          process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+          process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
           process.env.OMCP_TEAM_SKIP_READY_WAIT = '1';
           process.env.OMCP_TEAM_STARTUP_EVIDENCE_TIMEOUT_MS = '500';
 
@@ -1538,7 +1538,7 @@ esac
           delete process.env.TMUX;
           process.env.TMUX_PANE = '%1';
           process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'interactive';
-          process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+          process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
           process.env.OMCP_TEAM_STARTUP_EVIDENCE_TIMEOUT_MS = '500';
 
           await assert.rejects(
@@ -1674,7 +1674,7 @@ process.on('SIGTERM', () => process.exit(0));
           delete process.env.TMUX;
           process.env.TMUX_PANE = '%1';
           process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'interactive';
-          process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+          process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
           process.env.OMCP_TEAM_SKIP_READY_WAIT = '1';
           process.env.OMCP_TEAM_STARTUP_EVIDENCE_TIMEOUT_MS = '500';
 
@@ -1869,7 +1869,7 @@ sleep 5
   it('startTeam rejects codex prompt mode even when explicit launch args are provided', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-codex-explicit-launch-'));
     const binDir = join(cwd, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     await mkdir(binDir, { recursive: true });
     await writeFile(
       fakeCodexPath,
@@ -1888,7 +1888,7 @@ process.exit(0);
     process.env.PATH = `${binDir}:${prevPath ?? ''}`;
     delete process.env.TMUX;
     process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-    process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+    process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
     process.env.OMCP_TEAM_WORKER_LAUNCH_ARGS = '--model gpt-5.3-codex-spark -c model_reasoning_effort="low"';
     try {
       await assert.rejects(
@@ -1923,9 +1923,9 @@ process.exit(0);
   it('startTeam preserves routed task roles into team state and worker launch args', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-role-routing-'));
     const binDir = join(cwd, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     const captureDir = join(cwd, 'captures');
-    const promptsDir = join(cwd, '.codex', 'prompts');
+    const promptsDir = join(cwd, '.copilot', 'prompts');
     await mkdir(binDir, { recursive: true });
     await mkdir(captureDir, { recursive: true });
     await mkdir(promptsDir, { recursive: true });
@@ -1955,7 +1955,7 @@ process.on('SIGTERM', () => process.exit(0));
     process.env.PATH = `${binDir}:${prevPath ?? ''}`;
     delete process.env.TMUX;
     process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-    process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+    process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
     process.env.OMCP_ARGV_CAPTURE_DIR = captureDir;
 
     let runtime: TeamRuntime | null = null;
@@ -2044,9 +2044,9 @@ process.on('SIGTERM', () => process.exit(0));
   it('startTeam does not apply mini guidance for exact-match negatives like gpt-5.4-mini-tuned', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-mini-tuned-'));
     const binDir = join(cwd, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     const captureDir = join(cwd, 'captures');
-    const promptsDir = join(cwd, '.codex', 'prompts');
+    const promptsDir = join(cwd, '.copilot', 'prompts');
     await mkdir(binDir, { recursive: true });
     await mkdir(captureDir, { recursive: true });
     await mkdir(promptsDir, { recursive: true });
@@ -2076,7 +2076,7 @@ process.on('SIGTERM', () => process.exit(0));
     process.env.PATH = `${binDir}:${prevPath ?? ''}`;
     delete process.env.TMUX;
     process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-    process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+    process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
     process.env.OMCP_ARGV_CAPTURE_DIR = captureDir;
     process.env.OMCP_TEAM_WORKER_LAUNCH_ARGS = '--model gpt-5.4-mini-tuned';
 
@@ -2141,7 +2141,7 @@ process.on('SIGTERM', () => process.exit(0));
   it('startTeam rejects codex prompt mode without tmux with an explicit non-tty error', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-prompt-'));
     const binDir = join(cwd, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     await mkdir(binDir, { recursive: true });
     await writeFile(
       fakeCodexPath,
@@ -2161,7 +2161,7 @@ process.on('SIGTERM', () => process.exit(0));
     process.env.PATH = `${binDir}:${prevPath ?? ''}`;
     delete process.env.TMUX;
     process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-    process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+    process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
 
     try {
       await assert.rejects(
@@ -2330,7 +2330,7 @@ exit 0
     const repo = await initRepo();
     const toolingDir = await mkdtemp(join(tmpdir(), 'omcp-runtime-worktree-tools-'));
     const binDir = join(toolingDir, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     const logDir = join(toolingDir, 'worker-logs');
     const stdinLogPath = join(logDir, 'stdin.log');
     const envLogPath = join(logDir, 'env.json');
@@ -2366,7 +2366,7 @@ process.on('SIGTERM', () => process.exit(0));
     process.env.PATH = `${binDir}:${prevPath ?? ''}`;
     delete process.env.TMUX;
     process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-    process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+    process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
     process.env.OMCP_TEST_LOG_DIR = logDir;
 
     let runtime: TeamRuntime | null = null;
@@ -2450,7 +2450,7 @@ process.on('SIGTERM', () => process.exit(0));
     const repo = await initRepo();
     const toolingDir = await mkdtemp(join(tmpdir(), 'omcp-runtime-worktree-tools-'));
     const binDir = join(toolingDir, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     await mkdir(binDir, { recursive: true });
     await writeFile(
       fakeCodexPath,
@@ -2470,7 +2470,7 @@ process.on('SIGTERM', () => process.exit(0));
     process.env.PATH = `${binDir}:${prevPath ?? ''}`;
     delete process.env.TMUX;
     process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-    process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+    process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
 
     let runtime: TeamRuntime | null = null;
     try {
@@ -2517,7 +2517,7 @@ process.on('SIGTERM', () => process.exit(0));
   it('resumeTeam preserves detached worktree metadata for live prompt workers', async () => {
     const repo = await initRepo();
     const binDir = await mkdtemp(join(tmpdir(), 'omcp-runtime-prompt-bin-'));
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     const logDir = await mkdtemp(join(tmpdir(), 'omcp-runtime-prompt-logs-'));
     const envLogPath = join(logDir, 'env.json');
     await writeFile(
@@ -2548,7 +2548,7 @@ process.on('SIGTERM', () => process.exit(0));
     process.env.PATH = `${binDir}:${prevPath ?? ''}`;
     delete process.env.TMUX;
     process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-    process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+    process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
     process.env.OMCP_TEST_LOG_DIR = logDir;
 
     let runtime: TeamRuntime | null = null;
@@ -2628,7 +2628,7 @@ process.on('SIGTERM', () => process.exit(0));
   it('shutdownTeam force-kills prompt workers that ignore SIGTERM', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-prompt-stubborn-'));
     const binDir = join(cwd, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     await mkdir(binDir, { recursive: true });
     await writeFakePromptWorkerBinary(
       fakeCodexPath,
@@ -2685,7 +2685,7 @@ process.on('SIGTERM', () => {
   it('shutdownTeam reaps detached prompt-worker descendants', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-prompt-descendants-'));
     const binDir = join(cwd, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     const helperPidPath = join(cwd, 'helper.pid');
     await mkdir(binDir, { recursive: true });
     await writeFakePromptWorkerBinary(

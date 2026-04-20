@@ -30,7 +30,7 @@ async function readJson<T>(path: string): Promise<T> {
 function withPatchedEnv<T>(patch: Record<string, string>, run: () => Promise<T>): Promise<T> {
   const managedKeys = new Set([
     ...Object.keys(patch),
-    'CODEX_HOME',
+    'COPILOT_HOME',
     'OMCP_SESSION_ID',
     'OMCP_RUNTIME_BRIDGE',
     'OMCP_NOTIFY_FALLBACK',

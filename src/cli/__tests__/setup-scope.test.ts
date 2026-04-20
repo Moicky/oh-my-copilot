@@ -28,8 +28,8 @@ function runOmcp(
     encoding: "utf-8",
     env: {
       ...process.env,
-      ...(resolvedHome && !envOverrides.CODEX_HOME
-        ? { CODEX_HOME: join(resolvedHome, ".codex") }
+      ...(resolvedHome && !envOverrides.COPILOT_HOME
+        ? { COPILOT_HOME: join(resolvedHome, ".copilot") }
         : {}),
       ...envOverrides,
     },
@@ -115,21 +115,21 @@ describe("omcp setup scope behavior", () => {
         JSON.stringify({ scope: "project" }),
       );
 
-      await mkdir(join(wd, ".codex", "prompts"), { recursive: true });
-      await mkdir(join(wd, ".codex", "skills", "sample-skill"), {
+      await mkdir(join(wd, ".copilot", "prompts"), { recursive: true });
+      await mkdir(join(wd, ".copilot", "skills", "sample-skill"), {
         recursive: true,
       });
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
       await writeFile(
-        join(wd, ".codex", "prompts", "executor.md"),
+        join(wd, ".copilot", "prompts", "executor.md"),
         "# executor\n",
       );
       await writeFile(
-        join(wd, ".codex", "skills", "sample-skill", "SKILL.md"),
+        join(wd, ".copilot", "skills", "sample-skill", "SKILL.md"),
         "# skill\n",
       );
       await writeFile(
-        join(wd, ".codex", "config.toml"),
+        join(wd, ".copilot", "config.toml"),
         'omcp_enabled = true\n[mcp_servers.omcp_state]\ncommand = "node"\n',
       );
 
@@ -146,7 +146,7 @@ describe("omcp setup scope behavior", () => {
           `Codex home: (?:/private)?${wd.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/\\.codex`,
         ),
       );
-      assert.doesNotMatch(res.stdout, /Codex home: .*\/home\/\.codex/);
+      assert.doesNotMatch(res.stdout, /Codex home: .*\/home\/\.copilot/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -177,11 +177,11 @@ describe("omcp setup scope behavior", () => {
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
 
-      const localPrompts = join(wd, ".codex", "prompts");
-      const localSkills = join(wd, ".codex", "skills");
-      const localConfig = join(wd, ".codex", "config.toml");
-      const localHooks = join(wd, ".codex", "hooks.json");
-      const localAgents = join(wd, ".codex", "agents");
+      const localPrompts = join(wd, ".copilot", "prompts");
+      const localSkills = join(wd, ".copilot", "skills");
+      const localConfig = join(wd, ".copilot", "config.toml");
+      const localHooks = join(wd, ".copilot", "hooks.json");
+      const localAgents = join(wd, ".copilot", "agents");
       const scopeFile = join(wd, ".omcp", "setup-scope.json");
       const agentsMdPath = join(wd, "AGENTS.md");
 
@@ -239,7 +239,7 @@ describe("omcp setup scope behavior", () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-scope-"));
     try {
       const home = join(wd, "home");
-      const codexDir = join(wd, ".codex");
+      const codexDir = join(wd, ".copilot");
       await mkdir(home, { recursive: true });
       await mkdir(codexDir, { recursive: true });
       await writeFile(
@@ -327,18 +327,18 @@ describe("omcp setup scope behavior", () => {
         /User scope leaves project AGENTS\.md unchanged\./,
       );
 
-      assert.equal(existsSync(join(home, ".codex", "prompts")), true);
-      assert.equal(existsSync(join(home, ".codex", "skills")), true);
-      assert.equal(existsSync(join(home, ".codex", "agents")), true);
-      assert.equal(existsSync(join(home, ".codex", "hooks.json")), true);
-      assert.equal(existsSync(join(home, ".codex", "AGENTS.md")), true);
+      assert.equal(existsSync(join(home, ".copilot", "prompts")), true);
+      assert.equal(existsSync(join(home, ".copilot", "skills")), true);
+      assert.equal(existsSync(join(home, ".copilot", "agents")), true);
+      assert.equal(existsSync(join(home, ".copilot", "hooks.json")), true);
+      assert.equal(existsSync(join(home, ".copilot", "AGENTS.md")), true);
       assert.equal(existsSync(join(wd, ".omcp", "setup-scope.json")), true);
       const persistedScope = JSON.parse(
         await readFile(join(wd, ".omcp", "setup-scope.json"), "utf-8"),
       ) as { scope: string };
       assert.equal(persistedScope.scope, "user");
       const agentsMd = await readFile(
-        join(home, ".codex", "AGENTS.md"),
+        join(home, ".copilot", "AGENTS.md"),
         "utf-8",
       );
       assert.match(agentsMd, /~\/\.codex\/skills/);
@@ -355,33 +355,33 @@ describe("omcp setup scope behavior", () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-doctor-user-scope-"));
     try {
       const home = join(wd, "home");
-      await mkdir(join(home, ".codex", "prompts"), { recursive: true });
-      await mkdir(join(home, ".codex", "skills", "sample-skill"), {
+      await mkdir(join(home, ".copilot", "prompts"), { recursive: true });
+      await mkdir(join(home, ".copilot", "skills", "sample-skill"), {
         recursive: true,
       });
-      await mkdir(join(home, ".codex", "agents"), { recursive: true });
+      await mkdir(join(home, ".copilot", "agents"), { recursive: true });
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
       await writeFile(
         join(wd, ".omcp", "setup-scope.json"),
         JSON.stringify({ scope: "user" }),
       );
-      await writeFile(join(home, ".codex", "AGENTS.md"), "# user agents\n");
+      await writeFile(join(home, ".copilot", "AGENTS.md"), "# user agents\n");
       await writeFile(
-        join(home, ".codex", "prompts", "executor.md"),
+        join(home, ".copilot", "prompts", "executor.md"),
         "# executor\n",
       );
       await writeFile(
-        join(home, ".codex", "skills", "sample-skill", "SKILL.md"),
+        join(home, ".copilot", "skills", "sample-skill", "SKILL.md"),
         "# skill\n",
       );
       await writeFile(
-        join(home, ".codex", "config.toml"),
+        join(home, ".copilot", "config.toml"),
         'omcp_enabled = true\n[mcp_servers.omcp_state]\ncommand = "node"\n',
       );
 
       const res = runOmcp(wd, ["doctor"], {
         HOME: home,
-        CODEX_HOME: join(home, ".codex"),
+        COPILOT_HOME: join(home, ".copilot"),
       });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);

@@ -104,7 +104,7 @@ import {
 } from './worker-bootstrap.js';
 import { loadRolePrompt } from './role-router.js';
 import { composeRoleInstructionsForRole } from '../agents/native-config.js';
-import { codexPromptsDir } from '../utils/paths.js';
+import { copilotPromptsDir } from '../utils/paths.js';
 import { isTerminalPhase, type TeamPhase, type TerminalPhase } from './orchestrator.js';
 import {
   resolveTeamWorkerLaunchArgs,
@@ -1293,7 +1293,7 @@ function resolveInstructionStateRoot(worktreePath?: string | null): string | und
 
 function assertPromptModeWorkerCliSupported(workerCliPlan: readonly TeamWorkerCli[]): void {
   if (
-    workerCliPlan.some((workerCli) => workerCli === 'codex')
+    workerCliPlan.some((workerCli) => workerCli === 'copilot')
     && process.env[PROMPT_MODE_CODEX_TEST_ALLOW_ENV] !== '1'
   ) {
     throw new Error(
@@ -1390,7 +1390,7 @@ function doesStartupEvidenceSettle(
   evidence: WorkerStartupEvidence,
 ): boolean {
   if (evidence === 'none') return false;
-  if (workerCli === 'codex' && evidence === 'leader_ack') return false;
+  if (workerCli === 'copilot' && evidence === 'leader_ack') return false;
   return true;
 }
 
@@ -1818,7 +1818,7 @@ function spawnPromptWorker(
   workerCwd: string,
   launchArgs: string[],
   workerEnv: Record<string, string>,
-  workerCli: 'codex' | 'claude' | 'gemini',
+  workerCli: 'copilot' | 'claude' | 'gemini',
   initialPrompt?: string,
   workerRole?: string,
 ): ChildProcessByStdio<Writable, null, null> {
@@ -1856,7 +1856,7 @@ export function resolveWorkerLaunchArgsFromEnv(
   const inheritedArgs = (typeof inheritedLeaderModel === 'string' && inheritedLeaderModel.trim() !== '')
     ? ['--model', inheritedLeaderModel.trim()]
     : [];
-  const fallbackModel = resolveAgentDefaultModel(agentType, env.CODEX_HOME);
+  const fallbackModel = resolveAgentDefaultModel(agentType, env.COPILOT_HOME);
 
   // Detect if an explicit reasoning override exists before resolving (for log source labelling)
   const preEnvArgs = splitWorkerLaunchArgs(env.OMCP_TEAM_WORKER_LAUNCH_ARGS);
@@ -1893,7 +1893,7 @@ export function resolveWorkerLaunchArgsFromEnv(
 function resolveEffectiveWorkerCliForStartupLog(
   resolvedLaunchArgs: string[],
   env: NodeJS.ProcessEnv,
-): 'codex' | 'claude' | 'gemini' {
+): 'copilot' | 'claude' | 'gemini' {
   const rawCliMap = String(env.OMCP_TEAM_WORKER_CLI_MAP ?? '').trim();
   if (rawCliMap !== '') {
     const entries = rawCliMap
@@ -1905,14 +1905,14 @@ function resolveEffectiveWorkerCliForStartupLog(
         ...env,
         OMCP_TEAM_WORKER_CLI: 'auto',
       });
-      const resolvedMap = entries.map((entry): 'codex' | 'claude' | 'gemini' | null => {
+      const resolvedMap = entries.map((entry): 'copilot' | 'claude' | 'gemini' | null => {
         if (entry === 'auto') return autoCli;
-        if (entry === 'codex' || entry === 'claude' || entry === 'gemini') return entry;
+        if (entry === 'copilot' || entry === 'claude' || entry === 'gemini') return entry;
         return null;
       });
       if (resolvedMap.every((entry) => entry === 'claude')) return 'claude';
       if (resolvedMap.every((entry) => entry === 'gemini')) return 'gemini';
-      if (resolvedMap.some((entry) => entry === 'codex')) return 'codex';
+      if (resolvedMap.some((entry) => entry === 'copilot')) return 'copilot';
     }
   }
 
@@ -2007,7 +2007,7 @@ export async function startTeam(
   let config: TeamConfig | null = null;
   const sharedWorkerLaunchArgs = resolveTeamWorkerLaunchArgs({
     existingRaw: process.env.OMCP_TEAM_WORKER_LAUNCH_ARGS,
-    fallbackModel: resolveAgentDefaultModel(agentType, process.env.CODEX_HOME),
+    fallbackModel: resolveAgentDefaultModel(agentType, process.env.COPILOT_HOME),
   });
   const workerCliPlan = resolveTeamWorkerCliPlan(workerCount, sharedWorkerLaunchArgs, process.env);
   if (workerLaunchMode === 'prompt') {
@@ -2097,8 +2097,8 @@ export async function startTeam(
         ? taskRoles[0]
         : agentType;
       const runtimeRole = workerRole;
-      const rawRolePromptContent = await loadRolePrompt(runtimeRole, join(leaderCwd, '.codex', 'prompts'))
-        ?? await loadRolePrompt(runtimeRole, codexPromptsDir());
+      const rawRolePromptContent = await loadRolePrompt(runtimeRole, join(leaderCwd, '.copilot', 'prompts'))
+        ?? await loadRolePrompt(runtimeRole, copilotPromptsDir());
       const preferredReasoning = resolveAgentReasoningEffort(runtimeRole) ?? resolveAgentReasoningEffort(agentType);
       const workerLaunchArgs = resolveWorkerLaunchArgsFromEnv(
         process.env,
@@ -3650,7 +3650,7 @@ async function dispatchCriticalInboxInstruction(params: {
     return { ok: true, transport: 'hook', reason: 'hook_receipt_delivered', request_id: queued.request_id };
   }
   const requiresObservedStartupEvidence = requireWorkerStartupEvidence === true
-    && (workerCli === 'claude' || workerCli === 'codex');
+    && (workerCli === 'claude' || workerCli === 'copilot');
   let startupEvidence: WorkerStartupEvidence = 'none';
   if (receipt?.status === 'notified') {
     if (!requiresObservedStartupEvidence) {
@@ -3833,7 +3833,7 @@ async function waitForRequiredStartupEvidenceAfterDirectFallback(params: {
     timeoutMs,
   } = params;
   const requiresObservedStartupEvidence = requireWorkerStartupEvidence === true
-    && (workerCli === 'claude' || workerCli === 'codex');
+    && (workerCli === 'claude' || workerCli === 'copilot');
   if (!requiresObservedStartupEvidence || !workerCli) {
     return 'none';
   }

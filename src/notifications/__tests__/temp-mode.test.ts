@@ -8,7 +8,7 @@ import { shouldDispatchOpenClaw } from '../index.js';
 import { resetOpenClawConfigCache } from '../../openclaw/config.js';
 
 const ENV_KEYS = [
-  'CODEX_HOME',
+  'COPILOT_HOME',
   'OMCP_NOTIFY_TEMP',
   'OMCP_NOTIFY_TEMP_CONTRACT',
   'OMCP_NOTIFY_PROFILE',
@@ -39,7 +39,7 @@ describe('notification temp mode', () => {
     clearEnv();
     resetOpenClawConfigCache();
     tempCodexHome = await mkdtemp(join(tmpdir(), 'omcp-notify-temp-'));
-    process.env.CODEX_HOME = tempCodexHome;
+    process.env.COPILOT_HOME = tempCodexHome;
   });
 
   afterEach(async () => {
@@ -201,7 +201,7 @@ describe('notification temp mode', () => {
       true,
     );
     assert.equal(
-      await shouldDispatchOpenClaw('session-end', activeWithOpenClaw, { OMCP_OPENCLAW: '0', CODEX_HOME: tempCodexHome }),
+      await shouldDispatchOpenClaw('session-end', activeWithOpenClaw, { OMCP_OPENCLAW: '0', COPILOT_HOME: tempCodexHome }),
       false,
     );
   });

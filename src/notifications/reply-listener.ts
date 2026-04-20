@@ -72,7 +72,7 @@ const MAX_REPLY_MAX_MESSAGE_LENGTH = 4_000;
 const DEFAULT_REPLY_MAX_MESSAGE_LENGTH = 500;
 const REPLY_ACK_CAPTURE_LINES = 200;
 const REPLY_ACK_SUMMARY_MAX_CHARS = 700;
-const REPLY_ACK_PREFIX = 'Injected into Codex CLI session.';
+const REPLY_ACK_PREFIX = 'Injected into Copilot CLI session.';
 const REPLY_ACK_FALLBACK = 'Recent output summary unavailable.';
 
 export interface ReplyListenerState {
@@ -473,7 +473,7 @@ function injectReply(
   const analysis = analyzePaneContent(content);
 
   if (analysis.confidence < 0.4) {
-    log(`WARN: Pane ${paneId} does not appear to be running Codex CLI (confidence: ${analysis.confidence}). Skipping injection, removing stale mapping.`);
+    log(`WARN: Pane ${paneId} does not appear to be running Copilot CLI (confidence: ${analysis.confidence}). Skipping injection, removing stale mapping.`);
     removeMessagesByPane(paneId);
     return false;
   }

@@ -7,7 +7,7 @@ import {
   getFixLoopInstructions,
   getVerificationInstructions,
 } from "../verification/verifier.js";
-import { codexHome, listInstalledSkillDirectories } from "../utils/paths.js";
+import { copilotHome, listInstalledSkillDirectories } from "../utils/paths.js";
 import { sleep } from "../utils/sleep.js";
 import type { TeamReminderDirective } from "./reminder-intents.js";
 
@@ -84,8 +84,8 @@ This file is generated for a live OMCP team worker run and is disposable.
 ## Protocol
 1. Read your inbox at \`${options.teamStateRoot}/team/${options.teamName}/workers/${options.workerName}/inbox.md\`.
 2. Load the worker skill from the first existing path:
-   - \`${"${CODEX_HOME:-~/.codex}"}/skills/worker/SKILL.md\`
-   - \`${options.leaderCwd}/.codex/skills/worker/SKILL.md\`
+   - \`${"${COPILOT_HOME:-~/.codex}"}/skills/worker/SKILL.md\`
+   - \`${options.leaderCwd}/.copilot/skills/worker/SKILL.md\`
    - \`${options.leaderCwd}/skills/worker/SKILL.md\`
 3. Send startup ACK before task work:
 
@@ -299,8 +299,8 @@ You are a team worker in team "${teamName}". Your identity and assigned tasks ar
 ## Protocol
 1. Read your inbox file at the path provided in your first instruction
 2. Load the worker skill instructions from the first path that exists:
-   - \`${"${CODEX_HOME:-~/.codex}"}/skills/worker/SKILL.md\`
-   - \`<leader_cwd>/.codex/skills/worker/SKILL.md\`
+   - \`${"${COPILOT_HOME:-~/.codex}"}/skills/worker/SKILL.md\`
+   - \`<leader_cwd>/.copilot/skills/worker/SKILL.md\`
    - \`<leader_cwd>/skills/worker/SKILL.md\` (repo fallback)
 3. Send an ACK to the lead using CLI interop \`omcp team api send-message --json\` (to_worker="leader-fixed") once initialized
 4. Resolve canonical team state root in this order:
@@ -431,7 +431,7 @@ function dropShadowedSkillReferenceLines(
 
 /**
  * Write a team-scoped model instructions file that composes user-level
- * CODEX_HOME AGENTS.md, the project's AGENTS.md (if any), and the worker
+ * COPILOT_HOME AGENTS.md, the project's AGENTS.md (if any), and the worker
  * overlay. This avoids mutating the source AGENTS.md files directly.
  *
  * Returns the absolute path to the composed file.
@@ -442,7 +442,7 @@ export async function writeTeamWorkerInstructionsFile(
   overlay: string,
 ): Promise<string> {
   const baseParts: string[] = [];
-  const userAgentsPath = join(codexHome(), "AGENTS.md");
+  const userAgentsPath = join(copilotHome(), "AGENTS.md");
   const sourcePaths = [userAgentsPath, join(cwd, "AGENTS.md")];
   const seenPaths = new Set<string>();
   const installedSkills = await listInstalledSkillDirectories(cwd);
@@ -685,8 +685,8 @@ ${taskList}
 ## Instructions
 
 1. Load and follow the worker skill from the first existing path:
-   - \`${"${CODEX_HOME:-~/.codex}"}/skills/worker/SKILL.md\`
-   - \`${leaderCwd}/.codex/skills/worker/SKILL.md\`
+   - \`${"${COPILOT_HOME:-~/.codex}"}/skills/worker/SKILL.md\`
+   - \`${leaderCwd}/.copilot/skills/worker/SKILL.md\`
    - \`${leaderCwd}/skills/worker/SKILL.md\` (repo fallback)
 2. Send startup ACK to the lead mailbox BEFORE any task work (run this exact command):
 

@@ -2,11 +2,11 @@
  * Task Size Detector — ported from OMC src/hooks/task-size-detector/index.ts
  *
  * IMPORTANT: In OMC, this module runs at prompt time via bridge.ts hook interception
- * (mandatory enforcement). In OMCP, Codex CLI does not support pre-tool hooks, so this
+ * (mandatory enforcement). In OMCP, Copilot CLI does not support pre-tool hooks, so this
  * module serves as:
  *   1. Instruction generator — feeds generateKeywordDetectionSection() in emulator.ts
  *   2. Test infrastructure — verifies gate logic correctness
- *   3. Future hook readiness — will be promoted to runtime enforcement when Codex CLI
+ *   3. Future hook readiness — will be promoted to runtime enforcement when Copilot CLI
  *      adds pre-hook support
  *
  * The actual gate enforcement in OMCP is advisory: AGENTS.md instructs the model to

@@ -22,7 +22,7 @@ function runOmcp(
     encoding: 'utf-8',
     env: {
       ...process.env,
-      ...(resolvedHome && !envOverrides.CODEX_HOME ? { CODEX_HOME: join(resolvedHome, '.codex') } : {}),
+      ...(resolvedHome && !envOverrides.COPILOT_HOME ? { COPILOT_HOME: join(resolvedHome, '.copilot') } : {}),
       ...envOverrides,
     },
   });
@@ -95,7 +95,7 @@ function buildOmcpConfig(): string {
     'description = "Code implementation"',
     'config_file = "/path/to/executor.toml"',
     '',
-    '# OMCP TUI StatusLine (Codex CLI v0.101.0+)',
+    '# OMCP TUI StatusLine (Copilot CLI v0.101.0+)',
     '[tui]',
     'status_line = ["model-with-reasoning", "git-branch"]',
     '',
@@ -206,7 +206,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(join(codexDir, 'config.toml'), buildOmcpConfig());
       await writeFile(
@@ -235,7 +235,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(join(codexDir, 'config.toml'), buildOmcpConfig());
       await writeFile(
@@ -274,7 +274,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(join(codexDir, 'config.toml'), buildMixedConfig());
 
@@ -303,7 +303,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(join(codexDir, 'config.toml'), buildOmcpConfig());
       await writeFile(
@@ -346,7 +346,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(join(codexDir, 'config.toml'), buildConfigWithSeededModelContext());
 
@@ -371,7 +371,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(join(codexDir, 'config.toml'), buildOmcpConfig());
 
@@ -420,7 +420,7 @@ describe('omcp uninstall', () => {
 
       // Create project-scoped setup
       const omcpDir = join(wd, '.omcp');
-      const codexDir = join(wd, '.codex');
+      const codexDir = join(wd, '.copilot');
       await mkdir(omcpDir, { recursive: true });
       await mkdir(join(codexDir, 'prompts'), { recursive: true });
       await writeFile(join(omcpDir, 'setup-scope.json'), JSON.stringify({ scope: 'project' }));
@@ -460,7 +460,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(join(codexDir, 'config.toml'), buildOmcpConfig());
 
@@ -482,7 +482,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       const canonicalHelp = join(codexDir, 'skills', 'help');
       const legacyHelp = join(home, '.agents', 'skills', 'help');
       await mkdir(canonicalHelp, { recursive: true });
@@ -508,7 +508,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       const canonicalHelp = join(codexDir, 'skills', 'help');
       const legacyDoctor = join(home, '.agents', 'skills', 'doctor');
       await mkdir(canonicalHelp, { recursive: true });
@@ -534,7 +534,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       const canonicalHelp = join(codexDir, 'skills', 'help');
       await mkdir(canonicalHelp, { recursive: true });
       await writeFile(join(canonicalHelp, 'SKILL.md'), '# canonical help\n');
@@ -553,7 +553,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const projectSkillsHelp = join(wd, '.codex', 'skills', 'help');
+      const projectSkillsHelp = join(wd, '.copilot', 'skills', 'help');
       const legacyHelp = join(home, '.agents', 'skills', 'help');
       await mkdir(projectSkillsHelp, { recursive: true });
       await mkdir(legacyHelp, { recursive: true });
@@ -577,7 +577,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-legacy-link-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       const canonicalSkillsRoot = join(codexDir, 'skills');
       const canonicalSkill = join(canonicalSkillsRoot, 'doctor');
       const legacyRoot = join(home, '.agents', 'skills');
@@ -590,7 +590,7 @@ describe('omcp uninstall', () => {
         process.platform === 'win32' ? 'junction' : 'dir',
       );
 
-      const res = runOmcp(wd, ['uninstall', '--keep-config'], { HOME: home, CODEX_HOME: codexDir });
+      const res = runOmcp(wd, ['uninstall', '--keep-config'], { HOME: home, COPILOT_HOME: codexDir });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.doesNotMatch(res.stdout, /legacy ~\/\.agents\/skills/);
@@ -627,7 +627,7 @@ describe('omcp uninstall', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(join(codexDir, 'config.toml'), buildOmcpConfig());
 
@@ -666,16 +666,16 @@ describe('omcp uninstall', () => {
     }
   });
 
-  it('removes managed user-scope AGENTS.md from CODEX_HOME', async () => {
+  it('removes managed user-scope AGENTS.md from COPILOT_HOME', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
-      const codexHome = join(home, '.codex');
-      await mkdir(codexHome, { recursive: true });
+      const copilotHome = join(home, '.copilot');
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(join(wd, '.omcp'), { recursive: true });
       await writeFile(join(wd, '.omcp', 'setup-scope.json'), JSON.stringify({ scope: 'user' }));
       await writeFile(
-        join(codexHome, 'AGENTS.md'),
+        join(copilotHome, 'AGENTS.md'),
         '<!-- AUTONOMY DIRECTIVE — DO NOT REMOVE -->\n'
           + 'YOU ARE AN AUTONOMOUS CODING AGENT. EXECUTE TASKS TO COMPLETION WITHOUT ASKING FOR PERMISSION.\n'
           + 'DO NOT STOP TO ASK "SHOULD I PROCEED?" — PROCEED. DO NOT WAIT FOR CONFIRMATION ON OBVIOUS NEXT STEPS.\n'
@@ -688,7 +688,7 @@ describe('omcp uninstall', () => {
       const res = runOmcp(wd, ['uninstall', '--keep-config'], { HOME: home });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
-      assert.equal(existsSync(join(codexHome, 'AGENTS.md')), false);
+      assert.equal(existsSync(join(copilotHome, 'AGENTS.md')), false);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }

@@ -330,7 +330,7 @@ export function buildOpenClawDoctorReport(
 		issues,
 		nextSteps: [
 			"Run omcp adapt openclaw init --write.",
-			"Set OMCP_OPENCLAW=1 and configure notifications.openclaw or compatible aliases in ~/.codex/.omcp-config.json.",
+			"Set OMCP_OPENCLAW=1 and configure notifications.openclaw or compatible aliases in ~/.copilot/.omcp-config.json.",
 			"If command gateways are configured, also set OMCP_OPENCLAW_COMMAND=1 before expecting command mappings to be locally ready.",
 		],
 	};

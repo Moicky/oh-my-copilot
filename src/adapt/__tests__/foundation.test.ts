@@ -21,7 +21,7 @@ beforeEach(async () => {
 	originalEnv = { ...process.env };
 	tempDir = await mkdtemp(join(tmpdir(), "omcp-adapt-foundation-"));
 	process.env.HOME = tempDir;
-	process.env.CODEX_HOME = join(tempDir, ".codex");
+	process.env.COPILOT_HOME = join(tempDir, ".copilot");
 	delete process.env.OMCP_OPENCLAW;
 	delete process.env.OMCP_OPENCLAW_CONFIG;
 	delete process.env.OMCP_OPENCLAW_COMMAND;
@@ -40,7 +40,7 @@ afterEach(async () => {
 });
 
 async function writeOpenClawOmcpConfig(config: unknown): Promise<void> {
-	const configDir = join(tempDir, ".codex");
+	const configDir = join(tempDir, ".copilot");
 	await mkdir(configDir, { recursive: true });
 	await writeFile(
 		join(configDir, ".omcp-config.json"),

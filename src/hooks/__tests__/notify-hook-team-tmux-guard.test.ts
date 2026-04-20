@@ -184,7 +184,7 @@ exit 0
       const parsed = JSON.parse(result.stdout);
       assert.equal(parsed.ok, false);
       assert.equal(parsed.reason, 'pane_not_ready');
-      assert.equal(parsed.paneCurrentCommand, 'codex');
+      assert.equal(parsed.paneCurrentCommand, 'copilot');
       assert.match(parsed.paneCapture, /loading workspace state/);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -239,7 +239,7 @@ exit 0
       const parsed = JSON.parse(result.stdout);
       assert.equal(parsed.ok, true);
       assert.equal(parsed.reason, 'ok');
-      assert.equal(parsed.paneCurrentCommand, 'codex');
+      assert.equal(parsed.paneCurrentCommand, 'copilot');
       assert.equal(parsed.paneCapture, '');
     } finally {
       await rm(cwd, { recursive: true, force: true });

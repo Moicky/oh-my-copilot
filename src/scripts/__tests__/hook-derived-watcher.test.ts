@@ -10,7 +10,7 @@ function todaySessionDir(baseHome: string): string {
   const now = new Date();
   return join(
     baseHome,
-    '.codex',
+    '.copilot',
     'sessions',
     String(now.getUTCFullYear()),
     String(now.getUTCMonth() + 1).padStart(2, '0'),

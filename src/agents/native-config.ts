@@ -1,6 +1,6 @@
 /**
- * Native agent config generators for Codex CLI.
- * Writes standalone TOML files under ~/.codex/agents/ or ./.codex/agents/.
+ * Native agent config generators for Copilot CLI.
+ * Writes standalone TOML files under ~/.copilot/agents/ or ./.copilot/agents/.
  */
 
 import { existsSync, readFileSync } from "fs";
@@ -14,7 +14,7 @@ import {
   getStandardDefaultModel,
 } from "../config/models.js";
 import { getRootModelName } from "../config/generator.js";
-import { codexAgentsDir } from "../utils/paths.js";
+import { copilotAgentsDir } from "../utils/paths.js";
 
 export const EXACT_GPT_5_4_MINI_MODEL = "gpt-5.4-mini";
 
@@ -106,7 +106,7 @@ export interface GeneratedNativeAgentConfig {
 }
 
 interface AgentModelResolutionOptions {
-  codexHomeOverride?: string;
+  copilotHomeOverride?: string;
   configTomlContent?: string;
   env?: NodeJS.ProcessEnv;
 }
@@ -119,12 +119,12 @@ interface RoleInstructionMetadata {
 }
 
 function readConfigTomlContent(
-  codexHomeOverride?: string,
+  copilotHomeOverride?: string,
   provided?: string,
 ): string {
   if (typeof provided === "string") return provided;
-  const configPath = join(codexHomeOverride ?? process.env.CODEX_HOME ?? "", "config.toml");
-  if (codexHomeOverride && existsSync(configPath)) {
+  const configPath = join(copilotHomeOverride ?? process.env.COPILOT_HOME ?? "", "config.toml");
+  if (copilotHomeOverride && existsSync(configPath)) {
     return readFileSync(configPath, "utf-8");
   }
   return "";
@@ -132,21 +132,21 @@ function readConfigTomlContent(
 
 function resolveFrontierModel(options: AgentModelResolutionOptions): string {
   const configTomlContent = readConfigTomlContent(
-    options.codexHomeOverride,
+    options.copilotHomeOverride,
     options.configTomlContent,
   );
   return getRootModelName(configTomlContent)
-    ?? getMainDefaultModel(options.codexHomeOverride);
+    ?? getMainDefaultModel(options.copilotHomeOverride);
 }
 
 function resolveStandardModel(options: AgentModelResolutionOptions): string {
   const explicitStandardModel = getEnvConfiguredStandardDefaultModel(
     options.env ?? process.env,
-    options.codexHomeOverride,
+    options.copilotHomeOverride,
   );
 
   if (explicitStandardModel) return explicitStandardModel;
-  return getStandardDefaultModel(options.codexHomeOverride);
+  return getStandardDefaultModel(options.copilotHomeOverride);
 }
 
 function resolveAgentModel(
@@ -161,7 +161,7 @@ function resolveAgentModel(
     case "frontier":
       return resolveFrontierModel(options);
     case "fast":
-      return getSparkDefaultModel(options.codexHomeOverride);
+      return getSparkDefaultModel(options.copilotHomeOverride);
     case "standard":
     default:
       return resolveStandardModel(options);
@@ -307,7 +307,7 @@ export function generateAgentToml(
 }
 
 /**
- * Install prompt-backed native agent config .toml files to ~/.codex/agents/
+ * Install prompt-backed native agent config .toml files to ~/.copilot/agents/
  * Returns the number of agent files written.
  */
 export async function installNativeAgentConfigs(
@@ -323,9 +323,9 @@ export async function installNativeAgentConfigs(
     force = false,
     dryRun = false,
     verbose = false,
-    agentsDir = codexAgentsDir(),
+    agentsDir = copilotAgentsDir(),
   } = options;
-  const codexHomeOverride = join(agentsDir, "..");
+  const copilotHomeOverride = join(agentsDir, "..");
 
   if (!dryRun) {
     await mkdir(agentsDir, { recursive: true });
@@ -347,7 +347,7 @@ export async function installNativeAgentConfigs(
     }
 
     const promptContent = await readFile(promptPath, "utf-8");
-    const toml = generateAgentToml(agent, promptContent, { codexHomeOverride });
+    const toml = generateAgentToml(agent, promptContent, { copilotHomeOverride });
 
     if (!dryRun) {
       await writeFile(dst, toml);

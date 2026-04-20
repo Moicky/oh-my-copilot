@@ -4,12 +4,12 @@ import { chmodSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
-const ENV_KEYS = ['CODEX_HOME', 'TMUX', 'TMUX_PANE', 'PATH'] as const;
+const ENV_KEYS = ['COPILOT_HOME', 'TMUX', 'TMUX_PANE', 'PATH'] as const;
 
 const originalFetch = globalThis.fetch;
 
-function writeNotificationConfig(codexHome: string): void {
-  writeFileSync(join(codexHome, '.omcp-config.json'), JSON.stringify({
+function writeNotificationConfig(copilotHome: string): void {
+  writeFileSync(join(copilotHome, '.omcp-config.json'), JSON.stringify({
     notifications: {
       enabled: true,
       webhook: {
@@ -39,19 +39,19 @@ exit 2
 
 describe('notifyLifecycle tmux tail auto-capture', () => {
   let originalEnv: NodeJS.ProcessEnv;
-  const codexHome = mkdtempSync(join(tmpdir(), 'omcp-notify-index-codex-home-'));
+  const copilotHome = mkdtempSync(join(tmpdir(), 'omcp-notify-index-codex-home-'));
   const fakeBinDir = mkdtempSync(join(tmpdir(), 'omcp-notify-index-fake-bin-'));
 
   before(() => {
     originalEnv = { ...process.env };
-    process.env.CODEX_HOME = codexHome;
+    process.env.COPILOT_HOME = copilotHome;
     process.env.PATH = `${fakeBinDir}:${originalEnv.PATH || ''}`;
     process.env.TMUX = '/tmp/tmux-1000/default,12345,0';
     process.env.TMUX_PANE = '%42';
   });
 
   beforeEach(() => {
-    process.env.CODEX_HOME = codexHome;
+    process.env.COPILOT_HOME = copilotHome;
     process.env.PATH = `${fakeBinDir}:${originalEnv.PATH || ''}`;
     process.env.TMUX = '/tmp/tmux-1000/default,12345,0';
     process.env.TMUX_PANE = '%42';
@@ -66,13 +66,13 @@ describe('notifyLifecycle tmux tail auto-capture', () => {
       if (originalEnv[key] === undefined) delete process.env[key];
       else process.env[key] = originalEnv[key];
     }
-    rmSync(codexHome, { recursive: true, force: true });
+    rmSync(copilotHome, { recursive: true, force: true });
     rmSync(fakeBinDir, { recursive: true, force: true });
   });
 
   it('does not auto-capture historical tmux tail for terminal notifications', async () => {
     writeFakeTmux(fakeBinDir, 'historical risk line');
-    writeNotificationConfig(codexHome);
+    writeNotificationConfig(copilotHome);
     const { notifyLifecycle } = await import('../index.js');
 
     for (const eventName of ['session-end', 'session-stop'] as const) {
@@ -115,7 +115,7 @@ describe('notifyLifecycle tmux tail auto-capture', () => {
       return new Response('', { status: 200 });
     };
 
-    writeFileSync(join(codexHome, '.omcp-config.json'), JSON.stringify({
+    writeFileSync(join(copilotHome, '.omcp-config.json'), JSON.stringify({
       notifications: {
         enabled: true,
         verbosity: 'verbose',
@@ -196,7 +196,7 @@ describe('notifyLifecycle tmux tail auto-capture', () => {
       capturedBody = typeof init?.body === 'string' ? init.body : '';
       return new Response('', { status: 200 });
     };
-    writeNotificationConfig(codexHome);
+    writeNotificationConfig(copilotHome);
 
     const projectPath = mkdtempSync(join(tmpdir(), 'omcp-notify-index-project-idle-'));
     const { notifyLifecycle } = await import('../index.js');

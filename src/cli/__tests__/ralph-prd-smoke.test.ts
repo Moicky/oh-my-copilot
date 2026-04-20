@@ -48,7 +48,7 @@ async function initRepo(prefix: string): Promise<string> {
 
 async function installFakeCodex(fakeBin: string, launchLog: string): Promise<void> {
   await mkdir(fakeBin, { recursive: true });
-  const fakeCodexPath = join(fakeBin, 'codex');
+  const fakeCodexPath = join(fakeBin, 'copilot');
   const fakePsPath = join(fakeBin, 'ps');
   await writeFile(
     fakeCodexPath,

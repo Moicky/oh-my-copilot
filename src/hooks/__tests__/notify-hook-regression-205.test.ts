@@ -98,7 +98,7 @@ exit 0
 function runNotifyHook(
   cwd: string,
   fakeBinDir: string,
-  codexHome: string,
+  copilotHome: string,
   payloadOverrides: Record<string, unknown> = {},
 ) {
   const payload = {
@@ -118,7 +118,7 @@ function runNotifyHook(
     env: {
       ...process.env,
       PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-      CODEX_HOME: codexHome,
+      COPILOT_HOME: copilotHome,
       OMCP_SESSION_ID: 'sess-managed-regression',
       OMCP_TEST_TMUX_SESSION_NAME: buildTmuxSessionName(cwd, 'sess-managed-regression'),
       TMUX_PANE: '%99',
@@ -208,16 +208,16 @@ describe('regression-205: notify-hook ignores "if you want" for default auto-nud
     await withTempWorkingDir(async (cwd) => {
       const stateDir = join(cwd, '.omcp', 'state');
       const logsDir = join(cwd, '.omcp', 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(stateDir, { recursive: true });
       await mkdir(logsDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0 },
       });
       await writeSessionStart(cwd, 'sess-managed-regression');
@@ -225,7 +225,7 @@ describe('regression-205: notify-hook ignores "if you want" for default auto-nud
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'I checked the files. If you want, I can keep going and apply the fix.',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);

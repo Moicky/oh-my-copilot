@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 const ENV_KEYS = [
-  'CODEX_HOME',
+  'COPILOT_HOME',
   'OMCP_DISCORD_NOTIFIER_BOT_TOKEN',
   'OMCP_DISCORD_NOTIFIER_CHANNEL',
   'OMCP_REPLY_ENABLED',
@@ -14,7 +14,7 @@ const ENV_KEYS = [
   'OMCP_REPLY_RATE_LIMIT',
 ] as const;
 
-let codexHomeDir = '';
+let copilotHomeDir = '';
 
 function clearReplyEnv(): void {
   for (const key of ENV_KEYS) {
@@ -30,15 +30,15 @@ async function importConfigFresh(): Promise<typeof import('../config.js')> {
 describe('getReplyConfig validation', () => {
   beforeEach(async () => {
     clearReplyEnv();
-    codexHomeDir = await mkdtemp(join(tmpdir(), 'omcp-reply-config-'));
-    await mkdir(codexHomeDir, { recursive: true });
-    process.env.CODEX_HOME = codexHomeDir;
+    copilotHomeDir = await mkdtemp(join(tmpdir(), 'omcp-reply-config-'));
+    await mkdir(copilotHomeDir, { recursive: true });
+    process.env.COPILOT_HOME = copilotHomeDir;
   });
 
   afterEach(async () => {
     clearReplyEnv();
-    if (codexHomeDir) {
-      await rm(codexHomeDir, { recursive: true, force: true });
+    if (copilotHomeDir) {
+      await rm(copilotHomeDir, { recursive: true, force: true });
     }
   });
 
@@ -58,7 +58,7 @@ describe('getReplyConfig validation', () => {
   });
 
   it('normalizes invalid config file reply values', async () => {
-    const configFile = join(codexHomeDir, '.omcp-config.json');
+    const configFile = join(copilotHomeDir, '.omcp-config.json');
     const raw = {
       notifications: {
         enabled: true,

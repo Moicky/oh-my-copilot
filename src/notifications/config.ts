@@ -7,7 +7,7 @@
 
 import { readFileSync, existsSync } from "fs";
 import { join } from "path";
-import { codexHome } from "../utils/paths.js";
+import { copilotHome } from "../utils/paths.js";
 import type {
   FullNotificationConfig,
   NotificationsBlock,
@@ -27,7 +27,7 @@ import {
   readNotifyTempContractFromEnv,
 } from "./temp-contract.js";
 
-const CONFIG_FILE = join(codexHome(), ".omcp-config.json");
+const CONFIG_FILE = join(copilotHome(), ".omcp-config.json");
 
 function readRawConfig(): Record<string, unknown> | null {
   if (!existsSync(CONFIG_FILE)) return null;

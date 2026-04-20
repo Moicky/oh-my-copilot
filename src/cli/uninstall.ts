@@ -398,7 +398,7 @@ function printSummary(summary: UninstallSummary, dryRun: boolean): void {
   }
 
   if (summary.hooksFileRemoved) {
-    console.log(`  ${prefix} OMCP-managed entries in .codex/hooks.json`);
+    console.log(`  ${prefix} OMCP-managed entries in .copilot/hooks.json`);
   }
 
   if (summary.promptsRemoved > 0) {
@@ -542,7 +542,7 @@ export async function uninstall(options: UninstallOptions = {}): Promise<void> {
   const agentsMdPath =
     scope === "project"
       ? join(projectRoot, "AGENTS.md")
-      : join(scopeDirs.codexHomeDir, "AGENTS.md");
+      : join(scopeDirs.copilotHomeDir, "AGENTS.md");
   summary.agentsMdRemoved = await removeAgentsMd(agentsMdPath, {
     dryRun,
     verbose,

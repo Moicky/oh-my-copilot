@@ -40,7 +40,7 @@ describe('nested help routing', () => {
         const result = runOmcp(cwd, argv);
         assert.equal(result.status, 0, result.stderr || result.stdout);
         assert.match(result.stdout, expectedUsage);
-        assert.doesNotMatch(result.stdout, /oh-my-copilot \(omcp\) - Multi-agent orchestration for Codex CLI/i);
+        assert.doesNotMatch(result.stdout, /oh-my-copilot \(omcp\) - Multi-agent orchestration for Copilot CLI/i);
       } finally {
         await rm(cwd, { recursive: true, force: true });
       }

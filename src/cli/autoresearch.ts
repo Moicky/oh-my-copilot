@@ -1,4 +1,4 @@
-import { CODEX_BYPASS_FLAG, MADMAX_FLAG } from './constants.js';
+import { COPILOT_BYPASS_FLAG, MADMAX_FLAG } from './constants.js';
 import { parseInitArgs } from './autoresearch-guided.js';
 
 export const AUTORESEARCH_DEPRECATION_MESSAGE = [
@@ -47,12 +47,12 @@ export function normalizeAutoresearchCodexArgs(codexArgs: readonly string[]): st
   for (const arg of codexArgs) {
     if (arg === MADMAX_FLAG) {
       if (!hasBypass) {
-        normalized.push(CODEX_BYPASS_FLAG);
+        normalized.push(COPILOT_BYPASS_FLAG);
         hasBypass = true;
       }
       continue;
     }
-    if (arg === CODEX_BYPASS_FLAG) {
+    if (arg === COPILOT_BYPASS_FLAG) {
       if (!hasBypass) {
         normalized.push(arg);
         hasBypass = true;
@@ -63,7 +63,7 @@ export function normalizeAutoresearchCodexArgs(codexArgs: readonly string[]): st
   }
 
   if (!hasBypass) {
-    normalized.push(CODEX_BYPASS_FLAG);
+    normalized.push(COPILOT_BYPASS_FLAG);
   }
 
   return normalized;

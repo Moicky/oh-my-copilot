@@ -12,7 +12,7 @@ import { readTriageConfig, resetTriageConfigCache } from '../triage-config.js';
 let savedCodexHome: string | undefined;
 
 before(() => {
-  savedCodexHome = process.env.CODEX_HOME;
+  savedCodexHome = process.env.COPILOT_HOME;
   // Ensure a clean cache before the suite starts
   resetTriageConfigCache();
 });
@@ -20,9 +20,9 @@ before(() => {
 after(() => {
   // Restore env and clear cache after the entire suite
   if (savedCodexHome === undefined) {
-    delete process.env.CODEX_HOME;
+    delete process.env.COPILOT_HOME;
   } else {
-    process.env.CODEX_HOME = savedCodexHome;
+    process.env.COPILOT_HOME = savedCodexHome;
   }
   resetTriageConfigCache();
 });
@@ -35,7 +35,7 @@ let tmp: string;
 
 function setupTmp(): void {
   tmp = mkdtempSync(join(tmpdir(), 'triage-config-test-'));
-  process.env.CODEX_HOME = tmp;
+  process.env.COPILOT_HOME = tmp;
   resetTriageConfigCache();
 }
 

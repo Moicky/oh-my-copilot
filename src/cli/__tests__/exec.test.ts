@@ -36,17 +36,17 @@ function runOmcp(
 }
 
 describe('omcp exec', () => {
-  it('runs codex exec with session-scoped instructions that preserve AGENTS and overlay content', async () => {
+  it('runs copilot -p with session-scoped instructions that preserve AGENTS and overlay content', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-exec-cli-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
 
-      await mkdir(join(home, '.codex'), { recursive: true });
+      await mkdir(join(home, '.copilot'), { recursive: true });
       await mkdir(fakeBin, { recursive: true });
-      await writeFile(join(home, '.codex', 'AGENTS.md'), '# User Instructions\n\nGlobal guidance.\n');
+      await writeFile(join(home, '.copilot', 'AGENTS.md'), '# User Instructions\n\nGlobal guidance.\n');
       await writeFile(join(wd, 'AGENTS.md'), '# Project Instructions\n\nProject guidance.\n');
       await writeFile(
         fakeCodexPath,
@@ -97,12 +97,12 @@ describe('omcp exec', () => {
     }
   });
 
-  it('passes exec --help through to codex exec', async () => {
+  it('passes exec --help through to copilot -p', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-exec-help-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
 
       await mkdir(home, { recursive: true });
@@ -123,7 +123,7 @@ describe('omcp exec', () => {
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);
       assert.match(result.stdout, /fake-codex:exec --help\b/);
-      assert.doesNotMatch(result.stdout, /oh-my-copilot \(omcp\) - Multi-agent orchestration for Codex CLI/i);
+      assert.doesNotMatch(result.stdout, /oh-my-copilot \(omcp\) - Multi-agent orchestration for Copilot CLI/i);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }

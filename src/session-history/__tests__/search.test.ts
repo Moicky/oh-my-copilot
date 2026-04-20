@@ -6,13 +6,13 @@ import { join } from 'node:path';
 import { parseSinceSpec, searchSessionHistory } from '../search.js';
 
 async function writeRollout(
-  codexHomeDir: string,
+  copilotHomeDir: string,
   isoDate: string,
   fileName: string,
   lines: Array<Record<string, unknown>>,
 ): Promise<string> {
   const [year, month, day] = isoDate.slice(0, 10).split('-');
-  const dir = join(codexHomeDir, 'sessions', year, month, day);
+  const dir = join(copilotHomeDir, 'sessions', year, month, day);
   await mkdir(dir, { recursive: true });
   const path = join(dir, fileName);
   await writeFile(path, `${lines.map((line) => JSON.stringify(line)).join('\n')}\n`, 'utf-8');
@@ -30,9 +30,9 @@ describe('parseSinceSpec', () => {
 describe('searchSessionHistory', () => {
   it('returns structured matches with snippets from rollout transcripts', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-session-search-'));
-    const codexHomeDir = join(cwd, '.codex-home');
+    const copilotHomeDir = join(cwd, '.codex-home');
     try {
-      await writeRollout(codexHomeDir, '2026-03-10T12:00:00.000Z', 'rollout-2026-03-10T12-00-00-session-a.jsonl', [
+      await writeRollout(copilotHomeDir, '2026-03-10T12:00:00.000Z', 'rollout-2026-03-10T12-00-00-session-a.jsonl', [
         {
           type: 'session_meta',
           payload: {
@@ -52,7 +52,7 @@ describe('searchSessionHistory', () => {
 
       const report = await searchSessionHistory({
         query: 'worker inbox path',
-        codexHomeDir,
+        copilotHomeDir,
         cwd,
       });
 
@@ -69,9 +69,9 @@ describe('searchSessionHistory', () => {
 
   it('supports session, project, and limit filters', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-session-search-'));
-    const codexHomeDir = join(cwd, '.codex-home');
+    const copilotHomeDir = join(cwd, '.codex-home');
     try {
-      await writeRollout(codexHomeDir, '2026-03-10T12:00:00.000Z', 'rollout-2026-03-10T12-00-00-session-a.jsonl', [
+      await writeRollout(copilotHomeDir, '2026-03-10T12:00:00.000Z', 'rollout-2026-03-10T12-00-00-session-a.jsonl', [
         {
           type: 'session_meta',
           payload: {
@@ -88,7 +88,7 @@ describe('searchSessionHistory', () => {
           },
         },
       ]);
-      await writeRollout(codexHomeDir, '2026-03-09T12:00:00.000Z', 'rollout-2026-03-09T12-00-00-session-b.jsonl', [
+      await writeRollout(copilotHomeDir, '2026-03-09T12:00:00.000Z', 'rollout-2026-03-09T12-00-00-session-b.jsonl', [
         {
           type: 'session_meta',
           payload: {
@@ -111,7 +111,7 @@ describe('searchSessionHistory', () => {
         project: '/repo/current',
         session: 'session-a',
         limit: 1,
-        codexHomeDir,
+        copilotHomeDir,
         cwd,
       });
       assert.equal(projectReport.results.length, 1);
@@ -121,7 +121,7 @@ describe('searchSessionHistory', () => {
         query: 'all_workers_idle',
         since: '12h',
         now: Date.parse('2026-03-10T18:00:00.000Z'),
-        codexHomeDir,
+        copilotHomeDir,
         cwd,
       });
       assert.equal(sinceReport.results.length, 1);
@@ -133,9 +133,9 @@ describe('searchSessionHistory', () => {
 
   it('returns no results cleanly when nothing matches', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-session-search-'));
-    const codexHomeDir = join(cwd, '.codex-home');
+    const copilotHomeDir = join(cwd, '.codex-home');
     try {
-      await writeRollout(codexHomeDir, '2026-03-10T12:00:00.000Z', 'rollout-2026-03-10T12-00-00-session-a.jsonl', [
+      await writeRollout(copilotHomeDir, '2026-03-10T12:00:00.000Z', 'rollout-2026-03-10T12-00-00-session-a.jsonl', [
         {
           type: 'session_meta',
           payload: {
@@ -148,7 +148,7 @@ describe('searchSessionHistory', () => {
 
       const report = await searchSessionHistory({
         query: 'startup evidence',
-        codexHomeDir,
+        copilotHomeDir,
         cwd,
       });
 

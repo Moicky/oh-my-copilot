@@ -18,7 +18,7 @@ import { readFile, writeFile, mkdir, rm } from "fs/promises";
 import { dirname, join } from "path";
 import { existsSync } from "fs";
 import {
-  codexHome,
+  copilotHome,
   listInstalledSkillDirectories,
   omcpNotepadPath,
   omcpProjectMemoryPath,
@@ -628,7 +628,7 @@ function dropShadowedSkillReferenceLines(
 }
 
 /**
- * Build a session-scoped AGENTS.md that combines user-level CODEX_HOME
+ * Build a session-scoped AGENTS.md that combines user-level COPILOT_HOME
  * instructions, project instructions (if any), and the runtime overlay,
  * without mutating the source AGENTS.md files.
  */
@@ -641,7 +641,7 @@ export async function writeSessionModelInstructionsFile(
   await mkdir(dirname(sessionPath), { recursive: true });
 
   const baseParts: string[] = [];
-  const sourcePaths = [join(codexHome(), "AGENTS.md"), join(cwd, "AGENTS.md")];
+  const sourcePaths = [join(copilotHome(), "AGENTS.md"), join(cwd, "AGENTS.md")];
   const seenPaths = new Set<string>();
   const installedSkills = await listInstalledSkillDirectories(cwd);
   const projectSkillNames = new Set(
@@ -656,7 +656,7 @@ export async function writeSessionModelInstructionsFile(
 
     let content = await readFile(sourcePath, "utf-8");
     content = stripOverlayContent(content).trim();
-    if (sourcePath === join(codexHome(), "AGENTS.md")) {
+    if (sourcePath === join(copilotHome(), "AGENTS.md")) {
       content = dropShadowedSkillReferenceLines(
         content,
         projectSkillNames,

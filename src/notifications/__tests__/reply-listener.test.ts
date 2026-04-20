@@ -370,7 +370,7 @@ describe('formatReplyAcknowledgement', () => {
 
     assert.equal(
       message,
-      'Injected into Codex CLI session.\n\nRecent output:\nLine 1\nLine 2',
+      'Injected into Copilot CLI session.\n\nRecent output:\nLine 1\nLine 2',
     );
   });
 
@@ -379,7 +379,7 @@ describe('formatReplyAcknowledgement', () => {
 
     assert.equal(
       message,
-      'Injected into Codex CLI session.\n\nRecent output summary unavailable.',
+      'Injected into Copilot CLI session.\n\nRecent output summary unavailable.',
     );
   });
 });
@@ -609,7 +609,7 @@ describe('pollDiscordOnce', () => {
     const acknowledgementBody = JSON.parse(String(acknowledgementCall.init?.body));
     assert.equal(
       acknowledgementBody.content,
-      'Injected into Codex CLI session.\n\nRecent output:\nRecent pane output',
+      'Injected into Copilot CLI session.\n\nRecent output:\nRecent pane output',
     );
     assert.deepEqual(acknowledgementBody.message_reference, { message_id: 'discord-reply-1' });
     assert.deepEqual(acknowledgementBody.allowed_mentions, { users: ['123'] });
@@ -824,7 +824,7 @@ describe('pollTelegramOnce', () => {
     assert.equal(parsedBody.reply_to_message_id, 333);
     assert.equal(
       parsedBody.text,
-      'Injected into Codex CLI session.\n\nRecent output:\nRecent telegram output',
+      'Injected into Copilot CLI session.\n\nRecent output:\nRecent telegram output',
     );
   });
 

@@ -31,7 +31,7 @@ const DEFAULT_LIST_LIMIT = 12;
 const IGNORE_DIRECTORY_NAMES = new Set([
   ".git",
   ".omcp",
-  ".codex",
+  ".copilot",
   "node_modules",
   "dist",
   "build",

@@ -53,13 +53,13 @@ function runCompatTarget(cwd: string, argv: string[], envOverrides: Record<strin
 function normalizeInstallDoctorOutput(text: string, home: string, cwd: string): string {
   const repoStateDir = join(cwd, '.omcp', 'state').replace(/\\/g, '/');
   return text
-    .replaceAll(join(home, '.codex').replace(/\\/g, '/'), '<CODEX_HOME>')
+    .replaceAll(join(home, '.copilot').replace(/\\/g, '/'), '<COPILOT_HOME>')
     .replaceAll(`/private${repoStateDir}`, '<REPO_STATE_DIR>')
     .replaceAll(repoStateDir, '<REPO_STATE_DIR>')
     .replace(/\\/g, '/')
     .split('\n')
     .map((line) => {
-      if (line.startsWith('  [OK] Codex CLI:') || line.startsWith('  [XX] Codex CLI:')) {
+      if (line.startsWith('  [OK] Copilot CLI:') || line.startsWith('  [XX] Copilot CLI:')) {
         return '  [CODEX_CLI_STATUS]';
       }
       if (line.startsWith('  [OK] Node.js:')) {
@@ -83,12 +83,12 @@ describe('compat doctor contract', () => {
   it('matches onboarding warning copy for first setup expectations', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-compat-doctor-'));
     const home = join(wd, 'home');
-    const codexHome = join(home, '.codex');
-    await mkdir(codexHome, { recursive: true });
-    await writeFile(join(codexHome, 'config.toml'), '[mcp_servers.non_omcp]\ncommand = "node"\n');
+    const copilotHome = join(home, '.copilot');
+    await mkdir(copilotHome, { recursive: true });
+    await writeFile(join(copilotHome, 'config.toml'), '[mcp_servers.non_omcp]\ncommand = "node"\n');
 
     try {
-      const result = runCompatTarget(wd, ['doctor'], { HOME: home, CODEX_HOME: codexHome });
+      const result = runCompatTarget(wd, ['doctor'], { HOME: home, COPILOT_HOME: copilotHome });
       if (shouldSkipForSpawnPermissions(result.error)) return;
       assert.equal(result.status, Number.parseInt(readFixture('install-onboarding.exitcode.txt').trim(), 10), result.stderr || result.stdout);
       assert.equal(result.stderr, '');

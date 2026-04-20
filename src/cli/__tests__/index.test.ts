@@ -69,8 +69,8 @@ import type { ProcessEntry } from "../cleanup.js";
 const testDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(testDir, "..", "..", "..");
 
-function expectedLowComplexityModel(codexHomeOverride?: string): string {
-  return getTeamLowComplexityModel(codexHomeOverride);
+function expectedLowComplexityModel(copilotHomeOverride?: string): string {
+  return getTeamLowComplexityModel(copilotHomeOverride);
 }
 
 afterEach(() => {
@@ -80,7 +80,7 @@ afterEach(() => {
 describe("normalizeCodexLaunchArgs", () => {
   it("maps --madmax to codex bypass flag", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--madmax"]), [
-      "--dangerously-bypass-approvals-and-sandbox",
+      "--allow-all-tools",
     ]);
   });
 
@@ -91,7 +91,7 @@ describe("normalizeCodexLaunchArgs", () => {
         "--model",
         "gpt-5",
         "--yolo",
-        "--dangerously-bypass-approvals-and-sandbox",
+        "--allow-all-tools",
       ],
     );
   });
@@ -99,10 +99,10 @@ describe("normalizeCodexLaunchArgs", () => {
   it("avoids duplicate bypass flags when both are present", () => {
     assert.deepEqual(
       normalizeCodexLaunchArgs([
-        "--dangerously-bypass-approvals-and-sandbox",
+        "--allow-all-tools",
         "--madmax",
       ]),
-      ["--dangerously-bypass-approvals-and-sandbox"],
+      ["--allow-all-tools"],
     );
   });
 
@@ -110,11 +110,11 @@ describe("normalizeCodexLaunchArgs", () => {
     assert.deepEqual(
       normalizeCodexLaunchArgs([
         "--madmax",
-        "--dangerously-bypass-approvals-and-sandbox",
+        "--allow-all-tools",
         "--madmax",
-        "--dangerously-bypass-approvals-and-sandbox",
+        "--allow-all-tools",
       ]),
-      ["--dangerously-bypass-approvals-and-sandbox"],
+      ["--allow-all-tools"],
     );
   });
 
@@ -149,7 +149,7 @@ describe("normalizeCodexLaunchArgs", () => {
 
   it("maps --xhigh --madmax to codex-native flags only", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--xhigh", "--madmax"]), [
-      "--dangerously-bypass-approvals-and-sandbox",
+      "--allow-all-tools",
       "-c",
       'model_reasoning_effort="xhigh"',
     ]);
@@ -167,13 +167,13 @@ describe("normalizeCodexLaunchArgs", () => {
 
   it("--madmax-spark adds bypass flag to leader args and is otherwise consumed", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--madmax-spark"]), [
-      "--dangerously-bypass-approvals-and-sandbox",
+      "--allow-all-tools",
     ]);
   });
 
   it("--madmax-spark deduplicates bypass when --madmax also present", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--madmax", "--madmax-spark"]), [
-      "--dangerously-bypass-approvals-and-sandbox",
+      "--allow-all-tools",
     ]);
   });
 
@@ -624,13 +624,13 @@ describe("watcher script path resolution", () => {
 });
 
 describe("buildNotifyFallbackWatcherEnv", () => {
-  it("enables watcher authority and propagates CODEX_HOME override when requested", () => {
+  it("enables watcher authority and propagates COPILOT_HOME override when requested", () => {
     const env = buildNotifyFallbackWatcherEnv(
       { HOME: "/tmp/home", OMCP_HUD_AUTHORITY: "0", TMUX: "sock,1,0", TMUX_PANE: "%2" },
-      { codexHomeOverride: "/tmp/codex-home", enableAuthority: true },
+      { copilotHomeOverride: "/tmp/codex-home", enableAuthority: true },
     );
     assert.equal(env.OMCP_HUD_AUTHORITY, "1");
-    assert.equal(env.CODEX_HOME, "/tmp/codex-home");
+    assert.equal(env.COPILOT_HOME, "/tmp/codex-home");
     assert.equal(env.HOME, "/tmp/home");
     assert.equal(env.TMUX, undefined);
     assert.equal(env.TMUX_PANE, undefined);
@@ -820,19 +820,19 @@ describe("resolveWorkerSparkModel", () => {
     assert.equal(resolveWorkerSparkModel([]), undefined);
   });
 
-  it("reads low-complexity team model from config when codexHomeOverride is provided", async () => {
-    const codexHome = await mkdtemp(join(tmpdir(), "omcp-codex-home-"));
+  it("reads low-complexity team model from config when copilotHomeOverride is provided", async () => {
+    const copilotHome = await mkdtemp(join(tmpdir(), "omcp-codex-home-"));
     try {
       await writeFile(
-        join(codexHome, ".omcp-config.json"),
+        join(copilotHome, ".omcp-config.json"),
         JSON.stringify({ models: { team_low_complexity: "gpt-4.1-mini" } }),
       );
       assert.equal(
-        resolveWorkerSparkModel(["--spark"], codexHome),
+        resolveWorkerSparkModel(["--spark"], copilotHome),
         "gpt-4.1-mini",
       );
     } finally {
-      await rm(codexHome, { recursive: true, force: true });
+      await rm(copilotHome, { recursive: true, force: true });
     }
   });
 });
@@ -1103,7 +1103,7 @@ describe("project launch scope helpers", () => {
     }
   });
 
-  it("uses project CODEX_HOME when persisted scope is project", async () => {
+  it("uses project COPILOT_HOME when persisted scope is project", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-launch-scope-"));
     try {
       await mkdir(join(wd, ".omcp"), { recursive: true });
@@ -1111,7 +1111,7 @@ describe("project launch scope helpers", () => {
         join(wd, ".omcp", "setup-scope.json"),
         JSON.stringify({ scope: "project" }),
       );
-      assert.equal(resolveCodexHomeForLaunch(wd, {}), join(wd, ".codex"));
+      assert.equal(resolveCodexHomeForLaunch(wd, {}), join(wd, ".copilot"));
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -1127,14 +1127,14 @@ describe("project launch scope helpers", () => {
       );
       assert.equal(
         resolveCodexConfigPathForLaunch(wd, {}),
-        join(wd, ".codex", "config.toml"),
+        join(wd, ".copilot", "config.toml"),
       );
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
-  it("keeps explicit CODEX_HOME override from env", async () => {
+  it("keeps explicit COPILOT_HOME override from env", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-launch-scope-"));
     try {
       await mkdir(join(wd, ".omcp"), { recursive: true });
@@ -1144,7 +1144,7 @@ describe("project launch scope helpers", () => {
       );
       assert.equal(
         resolveCodexHomeForLaunch(wd, {
-          CODEX_HOME: "/tmp/explicit-codex-home",
+          COPILOT_HOME: "/tmp/explicit-codex-home",
         }),
         "/tmp/explicit-codex-home",
       );
@@ -1153,7 +1153,7 @@ describe("project launch scope helpers", () => {
     }
   });
 
-  it("uses explicit CODEX_HOME config.toml for launch repair overrides", async () => {
+  it("uses explicit COPILOT_HOME config.toml for launch repair overrides", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-launch-scope-"));
     try {
       await mkdir(join(wd, ".omcp"), { recursive: true });
@@ -1163,7 +1163,7 @@ describe("project launch scope helpers", () => {
       );
       assert.equal(
         resolveCodexConfigPathForLaunch(wd, {
-          CODEX_HOME: "/tmp/explicit-codex-home",
+          COPILOT_HOME: "/tmp/explicit-codex-home",
         }),
         "/tmp/explicit-codex-home/config.toml",
       );
@@ -1186,7 +1186,7 @@ describe("project launch scope helpers", () => {
     }
   });
 
-  it('resolves CODEX_HOME for legacy "project-local" persisted scope', async () => {
+  it('resolves COPILOT_HOME for legacy "project-local" persisted scope', async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-launch-scope-"));
     try {
       await mkdir(join(wd, ".omcp"), { recursive: true });
@@ -1194,7 +1194,7 @@ describe("project launch scope helpers", () => {
         join(wd, ".omcp", "setup-scope.json"),
         JSON.stringify({ scope: "project-local" }),
       );
-      assert.equal(resolveCodexHomeForLaunch(wd, {}), join(wd, ".codex"));
+      assert.equal(resolveCodexHomeForLaunch(wd, {}), join(wd, ".copilot"));
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -1481,7 +1481,7 @@ describe("detached tmux new-session sequencing", () => {
     const steps = buildDetachedSessionBootstrapSteps(
       "omcp-demo",
       "C:/project",
-      "'codex' '--dangerously-bypass-approvals-and-sandbox'",
+      "'codex' '--allow-all-tools'",
       hudCmd,
       "--model gpt-5",
       "C:/codex-home",
@@ -1647,7 +1647,7 @@ exit 0
         cwd,
         buildTmuxPaneCommand(
           "codex",
-          ["--dangerously-bypass-approvals-and-sandbox"],
+          ["--allow-all-tools"],
           "/bin/sh",
         ),
         "'node' '/tmp/omcp.js' 'hud' '--watch'",
@@ -1725,7 +1725,7 @@ exit 0
         cwd,
         buildTmuxPaneCommand(
           "codex",
-          ["--dangerously-bypass-approvals-and-sandbox"],
+          ["--allow-all-tools"],
           "/bin/sh",
         ),
         "'node' '/tmp/omcp.js' 'hud' '--watch'",
@@ -2207,11 +2207,11 @@ describe("buildTmuxShellCommand", () => {
   it("preserves quoted config values for tmux shell-command execution", () => {
     assert.equal(
       buildTmuxShellCommand("codex", [
-        "--dangerously-bypass-approvals-and-sandbox",
+        "--allow-all-tools",
         "-c",
         'model_reasoning_effort="xhigh"',
       ]),
-      `'codex' '--dangerously-bypass-approvals-and-sandbox' '-c' 'model_reasoning_effort="xhigh"'`,
+      `'codex' '--allow-all-tools' '-c' 'model_reasoning_effort="xhigh"'`,
     );
   });
 });
@@ -2284,7 +2284,7 @@ describe("buildTmuxPaneCommand", () => {
 describe("buildWindowsPromptCommand", () => {
   it("encodes detached Windows commands for safe PowerShell prompt injection", () => {
     const result = buildWindowsPromptCommand("codex", [
-      "--dangerously-bypass-approvals-and-sandbox",
+      "--allow-all-tools",
       "-c",
       'model_reasoning_effort="high"',
       "it's",
@@ -2295,7 +2295,7 @@ describe("buildWindowsPromptCommand", () => {
     const decoded = Buffer.from(payload, "base64").toString("utf16le");
     assert.equal(
       decoded,
-      "$ErrorActionPreference = 'Stop'; & { & 'codex' '--dangerously-bypass-approvals-and-sandbox' '-c' 'model_reasoning_effort=\"high\"' 'it''s' }",
+      "$ErrorActionPreference = 'Stop'; & { & 'codex' '--allow-all-tools' '-c' 'model_reasoning_effort=\"high\"' 'it''s' }",
     );
   });
 });
@@ -2441,14 +2441,14 @@ describe("team worker launch arg inheritance helpers", () => {
   it("collectInheritableTeamWorkerArgs extracts bypass, reasoning, and model overrides", () => {
     assert.deepEqual(
       collectInheritableTeamWorkerArgs([
-        "--dangerously-bypass-approvals-and-sandbox",
+        "--allow-all-tools",
         "-c",
         'model_reasoning_effort="xhigh"',
         "--model",
         "gpt-5",
       ]),
       [
-        "--dangerously-bypass-approvals-and-sandbox",
+        "--allow-all-tools",
         "-c",
         'model_reasoning_effort="xhigh"',
         "--model",
@@ -2471,7 +2471,7 @@ describe("team worker launch arg inheritance helpers", () => {
         [
           "-c",
           'model_reasoning_effort="xhigh"',
-          "--dangerously-bypass-approvals-and-sandbox",
+          "--allow-all-tools",
           "--model",
           "gpt-5",
         ],
@@ -2486,7 +2486,7 @@ describe("team worker launch arg inheritance helpers", () => {
       resolveTeamWorkerLaunchArgsEnv(
         "--no-alt-screen",
         [
-          "--dangerously-bypass-approvals-and-sandbox",
+          "--allow-all-tools",
           "-c",
           'model_reasoning_effort="xhigh"',
         ],
@@ -2511,7 +2511,7 @@ describe("team worker launch arg inheritance helpers", () => {
     assert.equal(
       resolveTeamWorkerLaunchArgsEnv(
         "--no-alt-screen",
-        ["--dangerously-bypass-approvals-and-sandbox"],
+        ["--allow-all-tools"],
         true,
         DEFAULT_FRONTIER_MODEL,
       ),
