@@ -1,3 +1,6 @@
+# Workflows inherited from oh-my-codex; functional behavior re-validated in
+# subsequent sub-projects (#2 onward). Tag/branch triggers retained as-is;
+# npm publish step targets the @moicky scope only.
 name: PR Check
 
 on:

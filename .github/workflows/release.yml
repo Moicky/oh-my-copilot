@@ -1,3 +1,6 @@
+# Workflows inherited from oh-my-codex; functional behavior re-validated in
+# subsequent sub-projects (#2 onward). Tag/branch triggers retained as-is;
+# npm publish step targets the @moicky scope only.
 name: Release
 
 on:
@@ -308,6 +311,5 @@ jobs:
           console.log(`[version-sync] OK package=${pkg.version} workspace=${workspace.workspace?.package?.version} tag=${tag ?? ''}`.trim());
           EOF
       - run: npm pack --dry-run
-      - run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Skip npm publish (rebrand-only release)
+        run: echo "npm publish disabled until runtime port (sub-project #2+) lands"
