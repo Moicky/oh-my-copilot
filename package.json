@@ -76,7 +76,6 @@
     "type": "git",
     "url": "git+https://github.com/Moicky/oh-my-copilot.git"
   },
-  "homepage": "https://yeachan-heo.github.io/oh-my-copilot",
   "bugs": {
     "url": "https://github.com/Moicky/oh-my-copilot/issues"
   },

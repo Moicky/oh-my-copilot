@@ -1,7 +1,6 @@
 # oh-my-codex (OMX)
 
 <p align="center">
-  <img src="https://yeachan-heo.github.io/oh-my-codex-website/omx-character-nobg.png" alt="oh-my-codex character" width="280">
   <br>
   <em>Seu codex não está sozinho.</em>
 </p>
@@ -10,7 +9,6 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 
-> **[Website](https://yeachan-heo.github.io/oh-my-codex-website/)** | **[Documentation](https://yeachan-heo.github.io/oh-my-codex-website/docs.html)** | **[CLI Reference](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#cli-reference)** | **[Workflows](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#workflows)** | **[Guia de integração OpenClaw](../openclaw-integration.pt.md)** | **[GitHub](https://github.com/Yeachan-Heo/oh-my-codex)** | **[npm](https://www.npmjs.com/package/oh-my-codex)**
 
 Camada de orquestração multiagente para [OpenAI Codex CLI](https://github.com/openai/codex).
 
@@ -240,11 +238,6 @@ npm test
 
 ## Documentação
 
-- **[Documentação completa](https://yeachan-heo.github.io/oh-my-codex-website/docs.html)** — Guia completo
-- **[Referência CLI](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#cli-reference)** — Todos os comandos `omx`, flags e ferramentas
-- **[Guia de notificações](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#notifications)** — Configuração de Discord, Telegram, Slack e webhooks
-- **[Fluxos de trabalho recomendados](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#workflows)** — Cadeias de skills testadas em batalha para tarefas comuns
-- **[Notas de versão](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#release-notes)** — Novidades em cada versão
 
 ## Notas
 

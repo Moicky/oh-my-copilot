@@ -1,7 +1,6 @@
 # oh-my-codex (OMX)
 
 <p align="center">
-  <img src="https://yeachan-heo.github.io/oh-my-codex-website/omx-character-nobg.png" alt="oh-my-codex character" width="280">
   <br>
   <em>你的 Codex，從不孤行。</em>
 </p>
@@ -9,9 +8,7 @@
 [![npm version](https://img.shields.io/npm/v/oh-my-codex)](https://www.npmjs.com/package/oh-my-codex)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
-[![Discord](https://img.shields.io/discord/1452487457085063218?color=5865F2&logo=discord&logoColor=white&label=Discord)](https://discord.gg/PUwSMR9XNk)
 
-> **[官方網站](https://yeachan-heo.github.io/oh-my-codex-website/)** | **[說明文件](https://yeachan-heo.github.io/oh-my-codex-website/docs.html)** | **[CLI 參考手冊](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#cli-reference)** | **[工作流程](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#workflows)** | **[OpenClaw 整合指南](../openclaw-integration.zh-TW.md)** | **[GitHub](https://github.com/Yeachan-Heo/oh-my-codex)** | **[npm](https://www.npmjs.com/package/oh-my-codex)**
 
 [OpenAI Codex CLI](https://github.com/openai/codex) 的多智能體編排層。
 
@@ -270,11 +267,6 @@ npm test
 
 ## 說明文件
 
-- **[完整說明文件](https://yeachan-heo.github.io/oh-my-codex-website/docs.html)** — 完整指南
-- **[CLI 參考手冊](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#cli-reference)** — 所有 `omx` 指令、旗標與工具
-- **[通知設定指南](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#notifications)** — Discord、Telegram、Slack 及 Webhook 設定
-- **[推薦工作流程](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#workflows)** — 實戰驗證的技能鏈，適用常見任務
-- **[版本發行說明](https://yeachan-heo.github.io/oh-my-codex-website/docs.html#release-notes)** — 每個版本的新功能
 
 ## 附註
 

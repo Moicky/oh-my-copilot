@@ -1,7 +1,6 @@
 # oh-my-codex (OMX)
 
 <p align="center">
-  <img src="https://yeachan-heo.github.io/oh-my-codex-website/omx-character-nobg.png" alt="oh-my-codex character" width="280">
   <br>
   <em>Dùng Codex hiệu quả hơn — OMX lo phần prompt, workflow và runtime khi dự án phức tạp dần.</em>
 </p>
@@ -9,9 +8,7 @@
 [![npm version](https://img.shields.io/npm/v/oh-my-codex)](https://www.npmjs.com/package/oh-my-codex)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
-[![Discord](https://img.shields.io/discord/1452487457085063218?color=5865F2&logo=discord&logoColor=white&label=Discord)](https://discord.gg/PUwSMR9XNk)
 
-**Website:** https://yeachan-heo.github.io/oh-my-codex-website/
 **Tài liệu:** [Bắt đầu](../getting-started.html) · [Agent](../agents.html) · [Skill](../skills.html) · [Tích hợp](../integrations.html) · [Demo](../../DEMO.md) · [Hướng dẫn OpenClaw](../openclaw-integration.md)
 
 OMX là lớp workflow mở rộng cho [OpenAI Codex CLI](https://github.com/openai/codex).
@@ -216,7 +213,6 @@ Nếu gặp tình trạng này, thử:
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Yeachan-Heo/oh-my-codex&type=date&legend=top-left)](https://www.star-history.com/#Yeachan-Heo/oh-my-codex&type=date&legend=top-left)
 
 ## Giấy phép
 
