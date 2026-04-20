@@ -135,9 +135,9 @@ jq \
    }' "$CONFIG_FILE" > "$CONFIG_FILE.tmp" && mv "$CONFIG_FILE.tmp" "$CONFIG_FILE"
 ```
 
-> Activation gate: OpenClaw-backed dispatch is active only when `OMX_OPENCLAW=1`.
-> For command gateways, also require `OMX_OPENCLAW_COMMAND=1`.
-> Optional timeout env override: `OMX_OPENCLAW_COMMAND_TIMEOUT_MS` (ms).
+> Activation gate: OpenClaw-backed dispatch is active only when `OMCP_OPENCLAW=1`.
+> For command gateways, also require `OMCP_OPENCLAW_COMMAND=1`.
+> Optional timeout env override: `OMCP_OPENCLAW_COMMAND_TIMEOUT_MS` (ms).
 
 ### 4b-1) OpenClaw + Clawdbot Agent Workflow (recommended for dev)
 
@@ -150,7 +150,7 @@ Notes:
 - OMCP shell-escapes template substitutions for command gateways (including `{{instruction}}`).
 - Keep `instruction` templates concise and avoid untrusted shell metacharacters.
 - During troubleshooting, avoid swallowing command output; route it to a log file.
-- Timeout precedence: `gateways.<name>.timeout` > `OMX_OPENCLAW_COMMAND_TIMEOUT_MS` > `5000`.
+- Timeout precedence: `gateways.<name>.timeout` > `OMCP_OPENCLAW_COMMAND_TIMEOUT_MS` > `5000`.
 - For clawdbot agent workflows, set `gateways.<name>.timeout` to `120000` (recommended).
 - For dev operations, enforce Korean output in all hook instructions.
 - Include both `session={{sessionId}}` and `tmux={{tmuxSession}}` in hook text for traceability.
@@ -256,7 +256,7 @@ Deterministic precedence:
 
 ### Reply listener
 - `notifications.reply.enabled`
-- env gates: `OMX_REPLY_ENABLED=true`, and for Discord `OMX_REPLY_DISCORD_USER_IDS=...`
+- env gates: `OMCP_REPLY_ENABLED=true`, and for Discord `OMCP_REPLY_DISCORD_USER_IDS=...`
 - For Discord bot replies, an authorized operator can reply with exact-match `status` to a tracked OMCP notification to receive a bounded read-only session summary. This is a reply-thread-scoped status probe, not a general remote control surface.
 
 ## Step 6: Disable All Notifications

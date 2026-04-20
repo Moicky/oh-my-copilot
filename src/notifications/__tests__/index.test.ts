@@ -148,7 +148,7 @@ describe('notifyLifecycle tmux tail auto-capture', () => {
       },
     }, null, 2));
 
-    process.env.OMX_OPENCLAW = '1';
+    process.env.OMCP_OPENCLAW = '1';
     const { resetOpenClawConfigCache } = await import('../../openclaw/config.js');
     resetOpenClawConfigCache();
 
@@ -185,7 +185,7 @@ describe('notifyLifecycle tmux tail auto-capture', () => {
     assert.ok(startElapsed < 50, `session-start should stay non-blocking, got ${startElapsed}ms`);
 
     rmSync(projectPath, { recursive: true, force: true });
-    delete process.env.OMX_OPENCLAW;
+    delete process.env.OMCP_OPENCLAW;
   });
 
   it('keeps auto-capturing tmux tail for live session-idle notifications', async () => {

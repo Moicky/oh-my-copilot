@@ -8,11 +8,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const projectRoot = join(__dirname, '..', '..');
 const nativeRoot = join(projectRoot, 'crates', 'omcp-sparkshell');
-const manifestPath = process.env.OMX_SPARKSHELL_MANIFEST ?? join(nativeRoot, 'Cargo.toml');
+const manifestPath = process.env.OMCP_SPARKSHELL_MANIFEST ?? join(nativeRoot, 'Cargo.toml');
 const binaryName = platform() === 'win32' ? 'omcp-sparkshell.exe' : 'omcp-sparkshell';
 const releaseBinaryPath = join(projectRoot, 'target', 'release', binaryName);
-const stagedBinaryRoot = process.env.OMX_SPARKSHELL_STAGE_DIR
-  ? join(process.env.OMX_SPARKSHELL_STAGE_DIR, `${platform()}-${arch()}`)
+const stagedBinaryRoot = process.env.OMCP_SPARKSHELL_STAGE_DIR
+  ? join(process.env.OMCP_SPARKSHELL_STAGE_DIR, `${platform()}-${arch()}`)
   : join(projectRoot, 'bin', 'native', `${platform()}-${arch()}`);
 const packagedBinaryDir = stagedBinaryRoot;
 const packagedBinaryPath = join(packagedBinaryDir, binaryName);

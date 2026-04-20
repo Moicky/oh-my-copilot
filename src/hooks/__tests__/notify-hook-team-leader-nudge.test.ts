@@ -184,12 +184,12 @@ function runNotifyHook(
     env: {
       ...process.env,
       PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-      OMX_TEAM_LEADER_NUDGE_MS: '10000',
-      OMX_TEAM_LEADER_STALE_MS: '10000',
-      OMX_TEAM_WORKER: '',
-      OMX_TEAM_STATE_ROOT: '',
-      OMX_TEAM_LEADER_CWD: '',
-      OMX_MODEL_INSTRUCTIONS_FILE: '',
+      OMCP_TEAM_LEADER_NUDGE_MS: '10000',
+      OMCP_TEAM_LEADER_STALE_MS: '10000',
+      OMCP_TEAM_WORKER: '',
+      OMCP_TEAM_STATE_ROOT: '',
+      OMCP_TEAM_LEADER_CWD: '',
+      OMCP_MODEL_INSTRUCTIONS_FILE: '',
       TMUX: '',
       TMUX_PANE: '',
       ...extraEnv,
@@ -245,7 +245,7 @@ describe('notify-hook leader-side authority handoff', () => {
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_SESSION_ID: 'sess-canonical-missing',
+        OMCP_SESSION_ID: 'sess-canonical-missing',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -273,7 +273,7 @@ describe('notify-hook leader-side authority handoff', () => {
       }, cwd);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_SESSION_ID: 'sess-canonical-inactive',
+        OMCP_SESSION_ID: 'sess-canonical-inactive',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -331,7 +331,7 @@ describe('notify-hook leader-side authority handoff', () => {
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_SESSION_ID: 'sess-current',
+        OMCP_SESSION_ID: 'sess-current',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -389,7 +389,7 @@ describe('notify-hook team leader nudge', () => {
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_SESSION_ID: 'sess-canonical-missing',
+        OMCP_SESSION_ID: 'sess-canonical-missing',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8').catch(() => '');
@@ -446,7 +446,7 @@ describe('notify-hook team leader nudge', () => {
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_SESSION_ID: 'sess-canonical-inactive',
+        OMCP_SESSION_ID: 'sess-canonical-inactive',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -454,8 +454,8 @@ describe('notify-hook team leader nudge', () => {
       assert.match(tmuxLog, /send-keys/);
       assert.match(tmuxLog, /-t %99/, 'should target leader pane when present');
       assert.match(tmuxLog, /\[OMCP\] All 2 workers idle/, 'should emit all-workers-idle nudge');
-      assert.doesNotMatch(tmuxLog, /\[OMX_INTENT:/, 'should keep orchestration intent out of injected display text');
-      assert.match(tmuxLog, /\[OMX_TMUX_INJECT\]/, 'should include injection marker');
+      assert.doesNotMatch(tmuxLog, /\[OMCP_INTENT:/, 'should keep orchestration intent out of injected display text');
+      assert.match(tmuxLog, /\[OMCP_TMUX_INJECT\]/, 'should include injection marker');
       const submitMatches = tmuxLog.match(/send-keys -t %99 C-m/g) || [];
       assert.equal(submitMatches.length, 2, 'leader nudge should submit with isolated double C-m');
       assert.ok(!/send-keys[^\n]*-l[^\n]*C-m/.test(tmuxLog), 'must not mix literal payload with submit keypresses');
@@ -528,7 +528,7 @@ describe('notify-hook team leader nudge', () => {
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_SESSION_ID: 'sess-canonical-missing',
+        OMCP_SESSION_ID: 'sess-canonical-missing',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -596,7 +596,7 @@ describe('notify-hook team leader nudge', () => {
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_SESSION_ID: 'sess-canonical-inactive',
+        OMCP_SESSION_ID: 'sess-canonical-inactive',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -749,7 +749,7 @@ describe('notify-hook team leader nudge', () => {
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_SESSION_ID: 'sess-canonical-missing',
+        OMCP_SESSION_ID: 'sess-canonical-missing',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -777,7 +777,7 @@ describe('notify-hook team leader nudge', () => {
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_SESSION_ID: 'sess-canonical-inactive',
+        OMCP_SESSION_ID: 'sess-canonical-inactive',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -846,7 +846,7 @@ describe('notify-hook team leader nudge', () => {
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_SESSION_ID: 'sess-canonical-safe',
+        OMCP_SESSION_ID: 'sess-canonical-safe',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -907,7 +907,7 @@ describe('notify-hook team leader nudge', () => {
       assert.match(tmuxLog, /-t %91/);
       assert.doesNotMatch(tmuxLog, /-t devsess:0/);
       assert.match(tmuxLog, /Team alpha:/);
-      assert.match(tmuxLog, /\[OMX_TMUX_INJECT\]/, 'should include injection marker');
+      assert.match(tmuxLog, /\[OMCP_TMUX_INJECT\]/, 'should include injection marker');
 
       const deliveryLog = await readTeamDeliveryLog(cwd);
       assert.ok(deliveryLog.some((entry) =>
@@ -1011,7 +1011,7 @@ exit 0
       assert.match(tmuxLog, /display-message -p -t %93 #\{pane_in_mode\}/);
       assert.match(tmuxLog, /capture-pane -t %93 -p -S -80/);
       assert.match(tmuxLog, /send-keys -t %93 -l .*Team busy-live-pane:/);
-      assert.match(tmuxLog, /\[OMX_TMUX_INJECT\]/, 'should keep the injection marker on busy-pane sends');
+      assert.match(tmuxLog, /\[OMCP_TMUX_INJECT\]/, 'should keep the injection marker on busy-pane sends');
 
       const eventsPath = join(teamDir, 'events', 'events.ndjson');
       assert.ok(existsSync(eventsPath), 'events.ndjson should exist');
@@ -1078,7 +1078,7 @@ exit 0
       assert.match(tmuxLog, /no start evidence/);
       assert.match(tmuxLog, /status: unknown/);
       assert.match(tmuxLog, /Next: check worker-1 msg\/output, confirm task in omcp team status ack-missing-start/);
-      assert.doesNotMatch(tmuxLog, /\[OMX_INTENT:/);
+      assert.doesNotMatch(tmuxLog, /\[OMCP_INTENT:/);
 
       const eventsPath = join(teamDir, 'events', 'events.ndjson');
       const events = (await readFile(eventsPath, 'utf-8')).trim().split('\n').map(line => JSON.parse(line));
@@ -1221,9 +1221,9 @@ exit 0
       await writeFile(fakeTmuxPath, buildFakeTmux(tmuxLogPath));
       await chmod(fakeTmuxPath, 0o755);
 
-      const first = runNotifyHook(cwd, fakeBinDir, { OMX_TEAM_LEADER_NUDGE_MS: '600000' });
+      const first = runNotifyHook(cwd, fakeBinDir, { OMCP_TEAM_LEADER_NUDGE_MS: '600000' });
       assert.equal(first.status, 0, `notify-hook failed: ${first.stderr || first.stdout}`);
-      const second = runNotifyHook(cwd, fakeBinDir, { OMX_TEAM_LEADER_NUDGE_MS: '600000' });
+      const second = runNotifyHook(cwd, fakeBinDir, { OMCP_TEAM_LEADER_NUDGE_MS: '600000' });
       assert.equal(second.status, 0, `notify-hook failed: ${second.stderr || second.stdout}`);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
@@ -1952,7 +1952,7 @@ exit 0
       assert.match(tmuxLog, /leader stale, \d+ worker pane\(s\) still active\./);
       assert.match(tmuxLog, /Next: check messages; keep orchestrating; if done, gracefully shut down: omcp team shutdown beta\./);
       assert.doesNotMatch(tmuxLog, /keep polling/);
-      assert.match(tmuxLog, /\[OMX_TMUX_INJECT\]/, 'should include injection marker');
+      assert.match(tmuxLog, /\[OMCP_TMUX_INJECT\]/, 'should include injection marker');
     });
   });
 
@@ -2063,8 +2063,8 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_TEAM_PROGRESS_STALL_MS: '60000',
-        OMX_TEAM_LEADER_NUDGE_MS: '30000',
+        OMCP_TEAM_PROGRESS_STALL_MS: '60000',
+        OMCP_TEAM_LEADER_NUDGE_MS: '30000',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -2072,8 +2072,8 @@ exit 0
       assert.match(tmuxLog, /Team stalled-progress: leader stale, no progress 3m\./);
       assert.match(tmuxLog, /Next: omcp team status stalled-progress; read worker messages; unblock\/reassign or shutdown\./);
       assert.doesNotMatch(tmuxLog, /keep polling/);
-      assert.doesNotMatch(tmuxLog, /\[OMX_INTENT:/);
-      assert.match(tmuxLog, /\[OMX_TMUX_INJECT\]/);
+      assert.doesNotMatch(tmuxLog, /\[OMCP_INTENT:/);
+      assert.match(tmuxLog, /\[OMCP_TMUX_INJECT\]/);
 
       const eventsPath = join(teamDir, 'events', 'events.ndjson');
       const events = (await readFile(eventsPath, 'utf-8')).trim().split('\n').map(line => JSON.parse(line));
@@ -2190,9 +2190,9 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_TEAM_PROGRESS_STALL_MS: '60000',
-        OMX_TEAM_LEADER_NUDGE_MS: '30000',
-        OMX_TEAM_LEADER_STALE_MS: '60000',
+        OMCP_TEAM_PROGRESS_STALL_MS: '60000',
+        OMCP_TEAM_LEADER_NUDGE_MS: '30000',
+        OMCP_TEAM_LEADER_STALE_MS: '60000',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -2301,10 +2301,10 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_TEAM_PROGRESS_STALL_MS: '120000',
-        OMX_TEAM_WORKER_TURN_STALL_MS: '30000',
-        OMX_TEAM_LEADER_NUDGE_MS: '30000',
-        OMX_TEAM_LEADER_STALE_MS: '60000',
+        OMCP_TEAM_PROGRESS_STALL_MS: '120000',
+        OMCP_TEAM_WORKER_TURN_STALL_MS: '30000',
+        OMCP_TEAM_LEADER_NUDGE_MS: '30000',
+        OMCP_TEAM_LEADER_STALE_MS: '60000',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -2420,9 +2420,9 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_TEAM_PROGRESS_STALL_MS: '60000',
-        OMX_TEAM_LEADER_NUDGE_MS: '30000',
-        OMX_TEAM_LEADER_STALE_MS: '60000',
+        OMCP_TEAM_PROGRESS_STALL_MS: '60000',
+        OMCP_TEAM_LEADER_NUDGE_MS: '30000',
+        OMCP_TEAM_LEADER_STALE_MS: '60000',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -2532,16 +2532,16 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const first = runNotifyHook(cwd, fakeBinDir, {
-        OMX_TEAM_PROGRESS_STALL_MS: '60000',
-        OMX_TEAM_LEADER_NUDGE_MS: '30000',
-        OMX_TEAM_LEADER_STALE_MS: '60000',
+        OMCP_TEAM_PROGRESS_STALL_MS: '60000',
+        OMCP_TEAM_LEADER_NUDGE_MS: '30000',
+        OMCP_TEAM_LEADER_STALE_MS: '60000',
       });
       assert.equal(first.status, 0, `notify-hook failed: ${first.stderr || first.stdout}`);
 
       const second = runNotifyHook(cwd, fakeBinDir, {
-        OMX_TEAM_PROGRESS_STALL_MS: '60000',
-        OMX_TEAM_LEADER_NUDGE_MS: '30000',
-        OMX_TEAM_LEADER_STALE_MS: '60000',
+        OMCP_TEAM_PROGRESS_STALL_MS: '60000',
+        OMCP_TEAM_LEADER_NUDGE_MS: '30000',
+        OMCP_TEAM_LEADER_STALE_MS: '60000',
       });
       assert.equal(second.status, 0, `notify-hook failed: ${second.stderr || second.stdout}`);
 
@@ -2632,7 +2632,7 @@ exit 0
       await writeFile(fakeTmuxPath, buildFakeTmux(tmuxLogPath));
       await chmod(fakeTmuxPath, 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, { OMX_TEAM_LEADER_NUDGE_MS: '30000' });
+      const result = runNotifyHook(cwd, fakeBinDir, { OMCP_TEAM_LEADER_NUDGE_MS: '30000' });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
       if (existsSync(tmuxLogPath)) {
@@ -2687,7 +2687,7 @@ exit 0
       await writeFile(fakeTmuxPath, buildFakeTmux(tmuxLogPath));
       await chmod(fakeTmuxPath, 0o755);
 
-      const blocked = runNotifyHook(cwd, fakeBinDir, { OMX_TEAM_LEADER_NUDGE_MS: '30000' });
+      const blocked = runNotifyHook(cwd, fakeBinDir, { OMCP_TEAM_LEADER_NUDGE_MS: '30000' });
       assert.equal(blocked.status, 0, `notify-hook failed: ${blocked.stderr || blocked.stdout}`);
 
       if (existsSync(tmuxLogPath)) {
@@ -2705,7 +2705,7 @@ exit 0
         },
       });
 
-      const allowed = runNotifyHook(cwd, fakeBinDir, { OMX_TEAM_LEADER_NUDGE_MS: '30000' });
+      const allowed = runNotifyHook(cwd, fakeBinDir, { OMCP_TEAM_LEADER_NUDGE_MS: '30000' });
       assert.equal(allowed.status, 0, `notify-hook failed: ${allowed.stderr || allowed.stdout}`);
 
       const finalLog = await readFile(tmuxLogPath, 'utf-8');
@@ -2803,9 +2803,9 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_TEAM_PROGRESS_STALL_MS: '60000',
-        OMX_TEAM_LEADER_NUDGE_MS: '30000',
-        OMX_TEAM_LEADER_STALE_MS: '60000',
+        OMCP_TEAM_PROGRESS_STALL_MS: '60000',
+        OMCP_TEAM_LEADER_NUDGE_MS: '30000',
+        OMCP_TEAM_LEADER_STALE_MS: '60000',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -3010,15 +3010,15 @@ exit 0
       await writeFile(fakeTmuxPath, buildFakeTmux(tmuxLogPath));
       await chmod(fakeTmuxPath, 0o755);
 
-      const first = runNotifyHook(cwd, fakeBinDir, { OMX_TEAM_LEADER_ALL_IDLE_COOLDOWN_MS: '600000' });
+      const first = runNotifyHook(cwd, fakeBinDir, { OMCP_TEAM_LEADER_ALL_IDLE_COOLDOWN_MS: '600000' });
       assert.equal(first.status, 0, `notify-hook failed: ${first.stderr || first.stdout}`);
-      const second = runNotifyHook(cwd, fakeBinDir, { OMX_TEAM_LEADER_ALL_IDLE_COOLDOWN_MS: '600000' });
+      const second = runNotifyHook(cwd, fakeBinDir, { OMCP_TEAM_LEADER_ALL_IDLE_COOLDOWN_MS: '600000' });
       assert.equal(second.status, 0, `notify-hook failed: ${second.stderr || second.stdout}`);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
       const sends = tmuxLog.match(/send-keys -t %98 -l \[OMCP\] All 2 workers idle/g) || [];
       assert.equal(sends.length, 1, 'cooldown should keep repeated all-workers-idle leader nudges bounded');
-      assert.doesNotMatch(tmuxLog, /\[OMX_INTENT:/);
+      assert.doesNotMatch(tmuxLog, /\[OMCP_INTENT:/);
     });
   });
 
@@ -3110,7 +3110,7 @@ exit 0
       assert.match(tmuxLog, /Team delta: leader stale, \d+ pane\(s\) active, 1 msg\(s\) pending\./);
       assert.match(tmuxLog, /Next: read messages; keep orchestrating; if done, gracefully shut down: omcp team shutdown delta\./);
       assert.doesNotMatch(tmuxLog, /keep polling/);
-      assert.match(tmuxLog, /\[OMX_TMUX_INJECT\]/, 'should include injection marker');
+      assert.match(tmuxLog, /\[OMCP_TMUX_INJECT\]/, 'should include injection marker');
 
       // Verify event reason
       const eventsPath = join(eventsDir, 'events.ndjson');
@@ -3179,7 +3179,7 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHook(cwd, fakeBinDir, {
-        OMX_SESSION_ID: 'sess-current',
+        OMCP_SESSION_ID: 'sess-current',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 

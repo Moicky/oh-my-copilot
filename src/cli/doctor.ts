@@ -21,7 +21,7 @@ import { getPackageRoot } from '../utils/package.js';
 import { hasLegacyOmxTeamRunTable } from '../config/generator.js';
 import { getMissingManagedCodexHookEvents } from '../config/codex-hooks.js';
 import { getDefaultBridge, isBridgeEnabled } from '../runtime/bridge.js';
-import { OMX_EXPLORE_CMD_ENV, isExploreCommandRoutingEnabled } from '../hooks/explore-routing.js';
+import { OMCP_EXPLORE_CMD_ENV, isExploreCommandRoutingEnabled } from '../hooks/explore-routing.js';
 import { isLeaderRuntimeStale } from '../team/leader-activity.js';
 import { triagePrompt } from '../hooks/triage-heuristic.js';
 import { readTriageConfig } from '../hooks/triage-config.js';
@@ -494,7 +494,7 @@ export function checkExploreHarness(
     return {
       name: 'Explore Harness',
       status: 'warn',
-      message: 'Rust harness sources not found in this install (omcp explore unavailable until packaged or OMX_EXPLORE_BIN is set)',
+      message: 'Rust harness sources not found in this install (omcp explore unavailable until packaged or OMCP_EXPLORE_BIN is set)',
     };
   }
 
@@ -511,7 +511,7 @@ export function checkExploreHarness(
     return {
       name: 'Explore Harness',
       status: 'warn',
-      message: `OMX_EXPLORE_BIN is set but path was not found (${override})`,
+      message: `OMCP_EXPLORE_BIN is set but path was not found (${override})`,
     };
   }
 
@@ -638,7 +638,7 @@ async function checkConfig(configPath: string): Promise<Check> {
 
 
 async function checkExploreRouting(configPath: string): Promise<Check> {
-  const envValue = process.env[OMX_EXPLORE_CMD_ENV];
+  const envValue = process.env[OMCP_EXPLORE_CMD_ENV];
   if (typeof envValue === 'string' && !isExploreCommandRoutingEnabled(process.env)) {
     return {
       name: 'Explore routing',

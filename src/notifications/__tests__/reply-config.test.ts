@@ -6,12 +6,12 @@ import { tmpdir } from 'node:os';
 
 const ENV_KEYS = [
   'CODEX_HOME',
-  'OMX_DISCORD_NOTIFIER_BOT_TOKEN',
-  'OMX_DISCORD_NOTIFIER_CHANNEL',
-  'OMX_REPLY_ENABLED',
-  'OMX_REPLY_DISCORD_USER_IDS',
-  'OMX_REPLY_POLL_INTERVAL_MS',
-  'OMX_REPLY_RATE_LIMIT',
+  'OMCP_DISCORD_NOTIFIER_BOT_TOKEN',
+  'OMCP_DISCORD_NOTIFIER_CHANNEL',
+  'OMCP_REPLY_ENABLED',
+  'OMCP_REPLY_DISCORD_USER_IDS',
+  'OMCP_REPLY_POLL_INTERVAL_MS',
+  'OMCP_REPLY_RATE_LIMIT',
 ] as const;
 
 let codexHomeDir = '';
@@ -43,12 +43,12 @@ describe('getReplyConfig validation', () => {
   });
 
   it('clamps invalid env poll interval and rate limit', async () => {
-    process.env.OMX_DISCORD_NOTIFIER_BOT_TOKEN = 'bot-token';
-    process.env.OMX_DISCORD_NOTIFIER_CHANNEL = 'channel-id';
-    process.env.OMX_REPLY_ENABLED = 'true';
-    process.env.OMX_REPLY_DISCORD_USER_IDS = '12345678901234567';
-    process.env.OMX_REPLY_POLL_INTERVAL_MS = '0';
-    process.env.OMX_REPLY_RATE_LIMIT = '-2';
+    process.env.OMCP_DISCORD_NOTIFIER_BOT_TOKEN = 'bot-token';
+    process.env.OMCP_DISCORD_NOTIFIER_CHANNEL = 'channel-id';
+    process.env.OMCP_REPLY_ENABLED = 'true';
+    process.env.OMCP_REPLY_DISCORD_USER_IDS = '12345678901234567';
+    process.env.OMCP_REPLY_POLL_INTERVAL_MS = '0';
+    process.env.OMCP_REPLY_RATE_LIMIT = '-2';
 
     const { getReplyConfig } = await importConfigFresh();
     const config = getReplyConfig();

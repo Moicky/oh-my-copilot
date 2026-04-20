@@ -46,7 +46,7 @@ interface UninstallSummary {
   legacySkillRootWarning: string | null;
 }
 
-const OMX_MCP_SERVERS = [
+const OMCP_MCP_SERVERS = [
   "omx_state",
   "omx_memory",
   "omx_code_intel",
@@ -62,7 +62,7 @@ function detectOmxConfigArtifacts(config: string): {
   hasFeatureFlags: boolean;
   hasExploreRoutingEnv: boolean;
 } {
-  const hasMcpServers = OMX_MCP_SERVERS.filter((name) =>
+  const hasMcpServers = OMCP_MCP_SERVERS.filter((name) =>
     new RegExp(`\\[mcp_servers\\.${name}\\]`).test(config),
   );
 

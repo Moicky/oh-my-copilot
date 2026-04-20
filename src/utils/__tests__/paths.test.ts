@@ -20,8 +20,8 @@ import {
   omxAdaptersDir,
   omxLogsDir,
   packageRoot,
-  OMX_ENTRY_PATH_ENV,
-  OMX_STARTUP_CWD_ENV,
+  OMCP_ENTRY_PATH_ENV,
+  OMCP_STARTUP_CWD_ENV,
   rememberOmxLaunchContext,
   resolveOmxCliEntryPath,
   resolveOmxEntryPath,
@@ -408,19 +408,19 @@ describe("packageRoot", () => {
 });
 
 describe("OMCP launcher path resolution", () => {
-  const originalEntryPath = process.env[OMX_ENTRY_PATH_ENV];
-  const originalStartupCwd = process.env[OMX_STARTUP_CWD_ENV];
+  const originalEntryPath = process.env[OMCP_ENTRY_PATH_ENV];
+  const originalStartupCwd = process.env[OMCP_STARTUP_CWD_ENV];
 
   afterEach(() => {
     if (typeof originalEntryPath === "string") {
-      process.env[OMX_ENTRY_PATH_ENV] = originalEntryPath;
+      process.env[OMCP_ENTRY_PATH_ENV] = originalEntryPath;
     } else {
-      delete process.env[OMX_ENTRY_PATH_ENV];
+      delete process.env[OMCP_ENTRY_PATH_ENV];
     }
     if (typeof originalStartupCwd === "string") {
-      process.env[OMX_STARTUP_CWD_ENV] = originalStartupCwd;
+      process.env[OMCP_STARTUP_CWD_ENV] = originalStartupCwd;
     } else {
-      delete process.env[OMX_STARTUP_CWD_ENV];
+      delete process.env[OMCP_STARTUP_CWD_ENV];
     }
   });
 
@@ -438,7 +438,7 @@ describe("OMCP launcher path resolution", () => {
         cwd: laterCwd,
         env: {
           ...process.env,
-          [OMX_STARTUP_CWD_ENV]: startupCwd,
+          [OMCP_STARTUP_CWD_ENV]: startupCwd,
         },
       });
 
@@ -457,16 +457,16 @@ describe("OMCP launcher path resolution", () => {
       await mkdir(launcherDir, { recursive: true });
       await writeFile(launcherPath, "#!/usr/bin/env node\n", "utf-8");
 
-      delete process.env[OMX_ENTRY_PATH_ENV];
-      delete process.env[OMX_STARTUP_CWD_ENV];
+      delete process.env[OMCP_ENTRY_PATH_ENV];
+      delete process.env[OMCP_STARTUP_CWD_ENV];
       rememberOmxLaunchContext({
         argv1: "dist/cli/omcp.js",
         cwd: startupCwd,
         env: process.env,
       });
 
-      assert.equal(process.env[OMX_STARTUP_CWD_ENV], startupCwd);
-      assert.equal(process.env[OMX_ENTRY_PATH_ENV], launcherPath);
+      assert.equal(process.env[OMCP_STARTUP_CWD_ENV], startupCwd);
+      assert.equal(process.env[OMCP_ENTRY_PATH_ENV], launcherPath);
     } finally {
       await rm(startupCwd, { recursive: true, force: true });
     }
@@ -490,7 +490,7 @@ describe("OMCP launcher path resolution", () => {
         cwd: startupCwd,
         env: {
           ...process.env,
-          [OMX_STARTUP_CWD_ENV]: startupCwd,
+          [OMCP_STARTUP_CWD_ENV]: startupCwd,
         },
         packageRootDir,
       });
@@ -515,7 +515,7 @@ describe("OMCP launcher path resolution", () => {
         cwd: startupCwd,
         env: {
           ...process.env,
-          [OMX_STARTUP_CWD_ENV]: startupCwd,
+          [OMCP_STARTUP_CWD_ENV]: startupCwd,
         },
       });
 
@@ -541,7 +541,7 @@ describe("OMCP launcher path resolution", () => {
         cwd: startupCwd,
         env: {
           ...process.env,
-          [OMX_STARTUP_CWD_ENV]: startupCwd,
+          [OMCP_STARTUP_CWD_ENV]: startupCwd,
         },
         packageRootDir,
       });

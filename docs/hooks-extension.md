@@ -37,13 +37,13 @@ Plugins are **enabled by default**.
 Disable plugin dispatch explicitly:
 
 ```bash
-export OMX_HOOK_PLUGINS=0
+export OMCP_HOOK_PLUGINS=0
 ```
 
 Optional timeout tuning (default: 1500ms):
 
 ```bash
-export OMX_HOOK_PLUGIN_TIMEOUT_MS=1500
+export OMCP_HOOK_PLUGIN_TIMEOUT_MS=1500
 ```
 
 ## Native event pipeline (v1)
@@ -83,7 +83,7 @@ Envelope fields include:
 Best-effort derived events are gated and disabled by default.
 
 ```bash
-export OMX_HOOK_DERIVED_SIGNALS=1
+export OMCP_HOOK_DERIVED_SIGNALS=1
 ```
 
 Derived signals include:
@@ -100,7 +100,7 @@ Derived events are labeled with:
 
 ## Team-safety behavior
 
-In team-worker sessions (`OMX_TEAM_WORKER` set), plugin side effects are skipped by default.
+In team-worker sessions (`OMCP_TEAM_WORKER` set), plugin side effects are skipped by default.
 This keeps the lead session as the canonical side-effect emitter and avoids duplicate sends.
 
 ## Plugin contract

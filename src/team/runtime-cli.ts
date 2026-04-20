@@ -77,7 +77,7 @@ async function writePanesFile(
   paneIds: string[],
   leaderPaneId: string,
 ): Promise<void> {
-  const omxJobsDir = process.env.OMX_JOBS_DIR;
+  const omxJobsDir = process.env.OMCP_JOBS_DIR;
   if (!jobId || !omxJobsDir) return;
 
   const panesPath = join(omxJobsDir, `${jobId}-panes.json`);
@@ -304,9 +304,9 @@ async function main(): Promise<void> {
   const agentType = 'executor';
   try {
     const providers = normalizeAgentTypes(agentTypes, workerCount);
-    const previousCliMap = process.env.OMX_TEAM_WORKER_CLI_MAP;
+    const previousCliMap = process.env.OMCP_TEAM_WORKER_CLI_MAP;
     try {
-      process.env.OMX_TEAM_WORKER_CLI_MAP = providers.join(',');
+      process.env.OMCP_TEAM_WORKER_CLI_MAP = providers.join(',');
       runtime = await startTeam(
         teamName,
         tasks.map(t => t.subject).join('; '),
@@ -317,8 +317,8 @@ async function main(): Promise<void> {
         { confirmStaleCleanup: promptStaleCleanup },
       );
     } finally {
-      if (typeof previousCliMap === 'string') process.env.OMX_TEAM_WORKER_CLI_MAP = previousCliMap;
-      else delete process.env.OMX_TEAM_WORKER_CLI_MAP;
+      if (typeof previousCliMap === 'string') process.env.OMCP_TEAM_WORKER_CLI_MAP = previousCliMap;
+      else delete process.env.OMCP_TEAM_WORKER_CLI_MAP;
     }
   } catch (err) {
     process.stderr.write(`[runtime-cli] startTeam failed: ${err}\n`);
@@ -326,7 +326,7 @@ async function main(): Promise<void> {
   }
 
   // Persist pane IDs when a background launcher provides an OMCP job ID.
-  const jobId = process.env.OMX_JOB_ID;
+  const jobId = process.env.OMCP_JOB_ID;
   try {
     const livePanes = await loadLivePaneState(teamName, cwd);
     if (livePanes) {
@@ -406,7 +406,7 @@ async function main(): Promise<void> {
   }
 }
 
-const shouldAutoStart = process.env.OMX_RUNTIME_CLI_DISABLE_AUTO_START !== '1';
+const shouldAutoStart = process.env.OMCP_RUNTIME_CLI_DISABLE_AUTO_START !== '1';
 
 if (shouldAutoStart) {
   main().catch(err => {

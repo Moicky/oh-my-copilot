@@ -91,8 +91,8 @@ describe('evaluateInjectionGuards', () => {
     allowed_modes: ['ralph'],
     cooldown_ms: 1000,
     max_injections_per_session: 2,
-    prompt_template: 'Continue [OMX_TMUX_INJECT]',
-    marker: '[OMX_TMUX_INJECT]',
+    prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+    marker: '[OMCP_TMUX_INJECT]',
     dry_run: false,
     log_level: 'info',
   });

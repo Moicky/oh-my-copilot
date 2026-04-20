@@ -33,15 +33,15 @@ function runWorkerNotify(
 
   const inheritedEnv: NodeJS.ProcessEnv = {
     ...process.env,
-    OMX_TEAM_WORKER: teamWorker,
+    OMCP_TEAM_WORKER: teamWorker,
     TMUX: '',
     TMUX_PANE: '',
   };
-  if (!Object.prototype.hasOwnProperty.call(extraEnv, 'OMX_TEAM_STATE_ROOT')) {
-    delete inheritedEnv.OMX_TEAM_STATE_ROOT;
+  if (!Object.prototype.hasOwnProperty.call(extraEnv, 'OMCP_TEAM_STATE_ROOT')) {
+    delete inheritedEnv.OMCP_TEAM_STATE_ROOT;
   }
-  if (!Object.prototype.hasOwnProperty.call(extraEnv, 'OMX_TEAM_LEADER_CWD')) {
-    delete inheritedEnv.OMX_TEAM_LEADER_CWD;
+  if (!Object.prototype.hasOwnProperty.call(extraEnv, 'OMCP_TEAM_LEADER_CWD')) {
+    delete inheritedEnv.OMCP_TEAM_LEADER_CWD;
   }
 
   return spawnSync(process.execPath, [NOTIFY_HOOK_SCRIPT.pathname, JSON.stringify(payload)], {
@@ -83,7 +83,7 @@ describe('notify-hook cross-worktree heartbeat resolution', () => {
     });
   });
 
-  it('writes heartbeat under OMX_TEAM_STATE_ROOT even when payload cwd is a different worktree', async () => {
+  it('writes heartbeat under OMCP_TEAM_STATE_ROOT even when payload cwd is a different worktree', async () => {
     await withTempDir(async (root) => {
       const leaderCwd = join(root, 'leader');
       const workerCwd = join(root, 'worker-worktree');
@@ -95,7 +95,7 @@ describe('notify-hook cross-worktree heartbeat resolution', () => {
       await mkdir(workerCwd, { recursive: true });
 
       const result = runWorkerNotify(workerCwd, `${teamName}/${workerName}`, {
-        OMX_TEAM_STATE_ROOT: join(leaderCwd, '.omcp', 'state'),
+        OMCP_TEAM_STATE_ROOT: join(leaderCwd, '.omcp', 'state'),
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -121,7 +121,7 @@ describe('notify-hook cross-worktree heartbeat resolution', () => {
       await mkdir(workerCwd, { recursive: true });
 
       const result = runWorkerNotify(workerCwd, `${teamName}/${workerName}`, {
-        OMX_TEAM_STATE_ROOT: join(leaderCwd, '.omcp', 'state'),
+        OMCP_TEAM_STATE_ROOT: join(leaderCwd, '.omcp', 'state'),
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -133,7 +133,7 @@ describe('notify-hook cross-worktree heartbeat resolution', () => {
     });
   });
 
-  it('falls back to worker identity/config metadata when OMX_TEAM_STATE_ROOT is absent', async () => {
+  it('falls back to worker identity/config metadata when OMCP_TEAM_STATE_ROOT is absent', async () => {
     await withTempDir(async (root) => {
       const leaderCwd = join(root, 'leader');
       const workerCwd = join(root, 'worker-worktree');
@@ -168,7 +168,7 @@ describe('notify-hook cross-worktree heartbeat resolution', () => {
       );
 
       const result = runWorkerNotify(workerCwd, `${teamName}/${workerName}`, {
-        OMX_TEAM_LEADER_CWD: leaderCwd,
+        OMCP_TEAM_LEADER_CWD: leaderCwd,
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 

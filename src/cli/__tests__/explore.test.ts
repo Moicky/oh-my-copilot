@@ -450,7 +450,7 @@ describe('resolvePackagedExploreHarnessCommand', () => {
 
 describe('resolveExploreHarnessCommand', () => {
   it('uses env override when provided', () => {
-    const resolved = resolveExploreHarnessCommand('/repo', { OMX_EXPLORE_BIN: '/tmp/omcp-explore-stub' } as NodeJS.ProcessEnv);
+    const resolved = resolveExploreHarnessCommand('/repo', { OMCP_EXPLORE_BIN: '/tmp/omcp-explore-stub' } as NodeJS.ProcessEnv);
     assert.deepEqual(resolved, { command: '/tmp/omcp-explore-stub', args: [] });
   });
 
@@ -580,8 +580,8 @@ describe('resolveExploreHarnessCommand', () => {
         }, null, 2));
 
         const resolved = await resolveExploreHarnessCommandWithHydration(wd, {
-          OMX_NATIVE_MANIFEST_URL: `${server.baseUrl}/native-release-manifest.json`,
-          OMX_NATIVE_CACHE_DIR: cacheDir,
+          OMCP_NATIVE_MANIFEST_URL: `${server.baseUrl}/native-release-manifest.json`,
+          OMCP_NATIVE_CACHE_DIR: cacheDir,
         } as NodeJS.ProcessEnv);
         assert.notEqual(resolved.command, 'cargo');
         assert.match(resolved.command, /cache/);
@@ -618,8 +618,8 @@ describe('resolveExploreHarnessCommand', () => {
       try {
         await assert.rejects(
           () => resolveExploreHarnessCommandWithHydration(wd, {
-            OMX_NATIVE_MANIFEST_URL: `${server.baseUrl}/native-release-manifest.json`,
-            OMX_NATIVE_CACHE_DIR: join(wd, 'cache'),
+            OMCP_NATIVE_MANIFEST_URL: `${server.baseUrl}/native-release-manifest.json`,
+            OMCP_NATIVE_CACHE_DIR: join(wd, 'cache'),
           } as NodeJS.ProcessEnv),
           /no compatible native harness is available/,
         );
@@ -636,7 +636,7 @@ describe('buildExploreHarnessArgs', () => {
   it('includes cwd, prompt, prompt contract, and constrained model settings', () => {
     const wd = join(tmpdir(), 'omcp-explore-arg-test');
     const args = buildExploreHarnessArgs('find auth', wd, {
-      OMX_EXPLORE_SPARK_MODEL: 'spark-model',
+      OMCP_EXPLORE_SPARK_MODEL: 'spark-model',
     } as NodeJS.ProcessEnv, '/pkg');
     assert.deepEqual(args.slice(0, 3), ['--cwd', wd, '--prompt']);
     assert.match(args[3] || '', /Original Explore Prompt/);
@@ -693,8 +693,8 @@ describe('exploreCommand', () => {
       await chmod(harnessStub, 0o755);
 
       const result = runOmx(wd, ['explore', '--prompt', 'git log --oneline'], {
-        OMX_SPARKSHELL_BIN: sparkshellStub,
-        OMX_EXPLORE_BIN: harnessStub,
+        OMCP_SPARKSHELL_BIN: sparkshellStub,
+        OMCP_EXPLORE_BIN: harnessStub,
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
@@ -719,8 +719,8 @@ describe('exploreCommand', () => {
       await chmod(harnessStub, 0o755);
 
       const result = runOmx(wd, ['explore', '--prompt', 'git log --oneline'], {
-        OMX_SPARKSHELL_BIN: join(wd, 'missing-sparkshell'),
-        OMX_EXPLORE_BIN: harnessStub,
+        OMCP_SPARKSHELL_BIN: join(wd, 'missing-sparkshell'),
+        OMCP_EXPLORE_BIN: harnessStub,
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
@@ -750,8 +750,8 @@ describe('exploreCommand', () => {
       await chmod(harnessStub, 0o755);
 
       const result = runOmx(wd, ['explore', '--prompt', 'git log --oneline'], {
-        OMX_SPARKSHELL_BIN: sparkshellStub,
-        OMX_EXPLORE_BIN: harnessStub,
+        OMCP_SPARKSHELL_BIN: sparkshellStub,
+        OMCP_EXPLORE_BIN: harnessStub,
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
@@ -789,16 +789,16 @@ describe('exploreCommand', () => {
         return true;
       }) as typeof process.stderr.write;
 
-      const originalEnv = process.env.OMX_EXPLORE_BIN;
-      process.env.OMX_EXPLORE_BIN = stub;
+      const originalEnv = process.env.OMCP_EXPLORE_BIN;
+      process.env.OMCP_EXPLORE_BIN = stub;
       const originalCwd = process.cwd();
       process.chdir(wd);
       try {
         await exploreCommand(['--prompt', 'find', 'auth']);
       } finally {
         process.chdir(originalCwd);
-        if (originalEnv === undefined) delete process.env.OMX_EXPLORE_BIN;
-        else process.env.OMX_EXPLORE_BIN = originalEnv;
+        if (originalEnv === undefined) delete process.env.OMCP_EXPLORE_BIN;
+        else process.env.OMCP_EXPLORE_BIN = originalEnv;
         process.stdout.write = originalStdout;
         process.stderr.write = originalStderr;
       }
@@ -825,7 +825,7 @@ describe('exploreCommand', () => {
       );
       await chmod(stub, 0o755);
 
-      const result = runOmx(wd, ['explore', '--prompt', 'find auth'], { OMX_EXPLORE_BIN: stub });
+      const result = runOmx(wd, ['explore', '--prompt', 'find auth'], { OMCP_EXPLORE_BIN: stub });
       if (shouldSkipForSpawnPermissions(result.error)) return;
       assert.equal(result.status, 0, result.stderr || result.stdout);
       assert.equal(result.stdout, '# Answer\nReady to proceed\n');
@@ -843,7 +843,7 @@ describe('exploreCommand', () => {
         const testPath = await createExploreTestPath(wd);
 
         const result = runOmx(wd, ['explore', '--prompt', 'find buildTmuxPaneCommand'], {
-          OMX_EXPLORE_CODEX_BIN: codexStub,
+          OMCP_EXPLORE_CODEX_BIN: codexStub,
           PATH: testPath,
         });
         if (shouldSkipForSpawnPermissions(result.error)) return;
@@ -873,7 +873,7 @@ describe('exploreCommand', () => {
         const testPath = await createExploreTestPath(wd);
 
         const result = runOmx(wd, ['explore', '--prompt', 'find buildTmuxPaneCommand'], {
-          OMX_EXPLORE_CODEX_BIN: codexShim,
+          OMCP_EXPLORE_CODEX_BIN: codexShim,
           PATH: testPath,
         });
         if (shouldSkipForSpawnPermissions(result.error)) return;
@@ -902,7 +902,7 @@ describe('exploreCommand', () => {
         await writeFile(promptPath, 'find prompt-file support\n');
 
         const result = runOmx(wd, ['explore', '--prompt-file', promptPath], {
-          OMX_EXPLORE_CODEX_BIN: codexStub,
+          OMCP_EXPLORE_CODEX_BIN: codexStub,
           PATH: testPath,
         });
         if (shouldSkipForSpawnPermissions(result.error)) return;
@@ -935,7 +935,7 @@ exit 0
         );
 
         const result = await runExploreCommandForTest(wd, ['--prompt', 'surface the critical facts'], {
-          OMX_EXPLORE_BIN: harnessStub,
+          OMCP_EXPLORE_BIN: harnessStub,
         });
 
         assert.equal(result.exitCode, 0, result.stderr || result.stdout);
@@ -974,7 +974,7 @@ exit 0
         );
 
         const result = await runExploreCommandForTest(wd, ['--prompt', 'extract buried signals'], {
-          OMX_EXPLORE_BIN: harnessStub,
+          OMCP_EXPLORE_BIN: harnessStub,
         });
 
         assert.equal(result.exitCode, 0, result.stderr || result.stdout);
@@ -994,15 +994,15 @@ exit 0
         const harnessStub = await writeExploreHarnessScenarioStub(
           wd,
           `
-printf '[omcp explore] spark model \`%s\` unavailable or failed (exit 17). Falling back to \`gpt-5.4\`.\n' "\${OMX_EXPLORE_SPARK_MODEL:-spark-test-model}" >&2
+printf '[omcp explore] spark model \`%s\` unavailable or failed (exit 17). Falling back to \`gpt-5.4\`.\n' "\${OMCP_EXPLORE_SPARK_MODEL:-spark-test-model}" >&2
 printf '[omcp explore] spark stderr: spark timed out; retry with the frontier fallback\n' >&2
 printf '%s\n' '# Answer' '- recovered with fallback model' '- MUST: actionable recovery path remained available'
 `,
         );
 
         const result = await runExploreCommandForTest(wd, ['--prompt', 'validate fallback recovery'], {
-          OMX_EXPLORE_BIN: harnessStub,
-          OMX_EXPLORE_SPARK_MODEL: 'spark-test-model',
+          OMCP_EXPLORE_BIN: harnessStub,
+          OMCP_EXPLORE_SPARK_MODEL: 'spark-test-model',
         });
 
         assert.equal(result.exitCode, 0, result.stderr || result.stdout);
@@ -1023,16 +1023,16 @@ printf '%s\n' '# Answer' '- recovered with fallback model' '- MUST: actionable r
         const harnessStub = await writeExploreHarnessScenarioStub(
           wd,
           `
-printf '[omcp explore] spark model \`%s\` unavailable or failed (exit 23). Falling back to \`gpt-5.4\`.\n' "\${OMX_EXPLORE_SPARK_MODEL:-spark-test-model}" >&2
+printf '[omcp explore] spark model \`%s\` unavailable or failed (exit 23). Falling back to \`gpt-5.4\`.\n' "\${OMCP_EXPLORE_SPARK_MODEL:-spark-test-model}" >&2
 printf '[omcp explore] spark stderr: spark backend unavailable; install the fallback runtime\n' >&2
-printf '[omcp explore] both spark (\`%s\`) and fallback (\`gpt-5.4\`) attempts failed (codes 23 / 29). Last stderr: fallback backend unavailable; set OMX_EXPLORE_BIN to a working harness\n' "\${OMX_EXPLORE_SPARK_MODEL:-spark-test-model}" >&2
+printf '[omcp explore] both spark (\`%s\`) and fallback (\`gpt-5.4\`) attempts failed (codes 23 / 29). Last stderr: fallback backend unavailable; set OMCP_EXPLORE_BIN to a working harness\n' "\${OMCP_EXPLORE_SPARK_MODEL:-spark-test-model}" >&2
 exit 1
 `,
         );
 
         const result = await runExploreCommandForTest(wd, ['--prompt', 'validate failure guidance'], {
-          OMX_EXPLORE_BIN: harnessStub,
-          OMX_EXPLORE_SPARK_MODEL: 'spark-test-model',
+          OMCP_EXPLORE_BIN: harnessStub,
+          OMCP_EXPLORE_SPARK_MODEL: 'spark-test-model',
         });
 
         assert.equal(result.exitCode, 1, result.stderr || result.stdout);
@@ -1040,7 +1040,7 @@ exit 1
         assert.match(result.stderr, /spark stderr: spark backend unavailable; install the fallback runtime/);
         assert.match(
           result.stderr,
-          /both spark \(`spark-test-model`\) and fallback \(`gpt-5\.4`\) attempts failed \(codes 23 \/ 29\)\. Last stderr: fallback backend unavailable; set OMX_EXPLORE_BIN to a working harness/,
+          /both spark \(`spark-test-model`\) and fallback \(`gpt-5\.4`\) attempts failed \(codes 23 \/ 29\)\. Last stderr: fallback backend unavailable; set OMCP_EXPLORE_BIN to a working harness/,
         );
       });
     } finally {

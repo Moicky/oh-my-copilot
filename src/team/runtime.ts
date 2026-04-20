@@ -1264,10 +1264,10 @@ function resolveEffectiveTeamWorktreeMode(
   return { enabled: false };
 }
 
-const MODEL_INSTRUCTIONS_FILE_ENV = 'OMX_MODEL_INSTRUCTIONS_FILE';
-const TEAM_STATE_ROOT_ENV = 'OMX_TEAM_STATE_ROOT';
-const TEAM_LEADER_CWD_ENV = 'OMX_TEAM_LEADER_CWD';
-const WORKTREE_TRIGGER_STATE_ROOT = '$OMX_TEAM_STATE_ROOT';
+const MODEL_INSTRUCTIONS_FILE_ENV = 'OMCP_MODEL_INSTRUCTIONS_FILE';
+const TEAM_STATE_ROOT_ENV = 'OMCP_TEAM_STATE_ROOT';
+const TEAM_LEADER_CWD_ENV = 'OMCP_TEAM_LEADER_CWD';
+const WORKTREE_TRIGGER_STATE_ROOT = '$OMCP_TEAM_STATE_ROOT';
 const STARTUP_EVIDENCE_TIMEOUT_MS = 2_000;
 const STARTUP_EVIDENCE_POLL_MS = 100;
 const STARTUP_EVIDENCE_LAUNCH_TIMEOUT_MS = 5_000;
@@ -1285,7 +1285,7 @@ const PROMPT_WORKER_SIGKILL_WAIT_MS = 2_000;
 const PROMPT_WORKER_EXIT_POLL_MS = 100;
 const PROMPT_MODE_CODEX_UNSUPPORTED_REASON = 'prompt_mode_codex_requires_tty';
 // Test-only escape hatch for fake prompt workers that intentionally do not require a real TTY.
-const PROMPT_MODE_CODEX_TEST_ALLOW_ENV = 'OMX_TEST_ALLOW_NONTTY_CODEX_PROMPT';
+const PROMPT_MODE_CODEX_TEST_ALLOW_ENV = 'OMCP_TEST_ALLOW_NONTTY_CODEX_PROMPT';
 
 function resolveInstructionStateRoot(worktreePath?: string | null): string | undefined {
   return worktreePath ? WORKTREE_TRIGGER_STATE_ROOT : undefined;
@@ -1297,13 +1297,13 @@ function assertPromptModeWorkerCliSupported(workerCliPlan: readonly TeamWorkerCl
     && process.env[PROMPT_MODE_CODEX_TEST_ALLOW_ENV] !== '1'
   ) {
     throw new Error(
-      `${PROMPT_MODE_CODEX_UNSUPPORTED_REASON}: Codex prompt workers require a terminal; use interactive team mode or set OMX_TEAM_WORKER_CLI=claude/gemini for prompt-mode teammates.`,
+      `${PROMPT_MODE_CODEX_UNSUPPORTED_REASON}: Codex prompt workers require a terminal; use interactive team mode or set OMCP_TEAM_WORKER_CLI=claude/gemini for prompt-mode teammates.`,
     );
   }
 }
 
 function resolveWorkerReadyTimeoutMs(env: NodeJS.ProcessEnv): number {
-  const raw = env.OMX_TEAM_READY_TIMEOUT_MS;
+  const raw = env.OMCP_TEAM_READY_TIMEOUT_MS;
   const parsed = Number.parseInt(String(raw ?? ''), 10);
   if (Number.isFinite(parsed) && parsed >= 5_000) return parsed;
   return 45_000;
@@ -1313,7 +1313,7 @@ function resolveWorkerStartupEvidenceTimeoutMs(
   env: NodeJS.ProcessEnv,
   workerReadyTimeoutMs: number,
 ): number {
-  const raw = Number.parseInt(String(env.OMX_TEAM_STARTUP_EVIDENCE_TIMEOUT_MS ?? ''), 10);
+  const raw = Number.parseInt(String(env.OMCP_TEAM_STARTUP_EVIDENCE_TIMEOUT_MS ?? ''), 10);
   if (Number.isFinite(raw) && raw >= 500) return raw;
   return Math.max(
     STARTUP_EVIDENCE_TIMEOUT_MS,
@@ -1351,7 +1351,7 @@ function resolveGovernancePolicy(
 }
 
 async function assertNestedTeamAllowed(cwd: string): Promise<void> {
-  const workerContext = parseTeamWorkerContext(process.env.OMX_TEAM_WORKER);
+  const workerContext = parseTeamWorkerContext(process.env.OMCP_TEAM_WORKER);
   if (!workerContext) return;
 
   for (const candidateCwd of resolveManifestLookupCwds(cwd)) {
@@ -1425,7 +1425,7 @@ export async function waitForClaudeStartupEvidence(params: {
 }
 
 function shouldSkipWorkerReadyWait(env: NodeJS.ProcessEnv): boolean {
-  return env.OMX_TEAM_SKIP_READY_WAIT === '1';
+  return env.OMCP_TEAM_SKIP_READY_WAIT === '1';
 }
 
 function isRecoverableInteractiveStartupReason(reason: string): boolean {
@@ -1859,12 +1859,12 @@ export function resolveWorkerLaunchArgsFromEnv(
   const fallbackModel = resolveAgentDefaultModel(agentType, env.CODEX_HOME);
 
   // Detect if an explicit reasoning override exists before resolving (for log source labelling)
-  const preEnvArgs = splitWorkerLaunchArgs(env.OMX_TEAM_WORKER_LAUNCH_ARGS);
+  const preEnvArgs = splitWorkerLaunchArgs(env.OMCP_TEAM_WORKER_LAUNCH_ARGS);
   const preAllArgs = [...preEnvArgs, ...inheritedArgs];
   const hasExplicitReasoning = parseTeamWorkerLaunchArgs(preAllArgs).reasoningOverride !== null;
 
   const resolved = resolveTeamWorkerLaunchArgs({
-    existingRaw: env.OMX_TEAM_WORKER_LAUNCH_ARGS,
+    existingRaw: env.OMCP_TEAM_WORKER_LAUNCH_ARGS,
     inheritedArgs,
     fallbackModel,
     preferredReasoning,
@@ -1894,7 +1894,7 @@ function resolveEffectiveWorkerCliForStartupLog(
   resolvedLaunchArgs: string[],
   env: NodeJS.ProcessEnv,
 ): 'codex' | 'claude' | 'gemini' {
-  const rawCliMap = String(env.OMX_TEAM_WORKER_CLI_MAP ?? '').trim();
+  const rawCliMap = String(env.OMCP_TEAM_WORKER_CLI_MAP ?? '').trim();
   if (rawCliMap !== '') {
     const entries = rawCliMap
       .split(',')
@@ -1903,7 +1903,7 @@ function resolveEffectiveWorkerCliForStartupLog(
     if (entries.length > 0) {
       const autoCli = resolveTeamWorkerCli(resolvedLaunchArgs, {
         ...env,
-        OMX_TEAM_WORKER_CLI: 'auto',
+        OMCP_TEAM_WORKER_CLI: 'auto',
       });
       const resolvedMap = entries.map((entry): 'codex' | 'claude' | 'gemini' | null => {
         if (entry === 'auto') return autoCli;
@@ -2006,7 +2006,7 @@ export async function startTeam(
   let createdLeaderPaneId: string | undefined;
   let config: TeamConfig | null = null;
   const sharedWorkerLaunchArgs = resolveTeamWorkerLaunchArgs({
-    existingRaw: process.env.OMX_TEAM_WORKER_LAUNCH_ARGS,
+    existingRaw: process.env.OMCP_TEAM_WORKER_LAUNCH_ARGS,
     fallbackModel: resolveAgentDefaultModel(agentType, process.env.CODEX_HOME),
   });
   const workerCliPlan = resolveTeamWorkerCliPlan(workerCount, sharedWorkerLaunchArgs, process.env);
@@ -2029,7 +2029,7 @@ export async function startTeam(
       workerCount,
       leaderCwd,
       DEFAULT_MAX_WORKERS,
-      { ...process.env, OMX_TEAM_DISPLAY_MODE: displayMode, OMX_TEAM_WORKER_LAUNCH_MODE: workerLaunchMode },
+      { ...process.env, OMCP_TEAM_DISPLAY_MODE: displayMode, OMCP_TEAM_WORKER_LAUNCH_MODE: workerLaunchMode },
       {
         leader_cwd: leaderCwd,
         team_state_root: teamStateRoot,
@@ -2166,13 +2166,13 @@ export async function startTeam(
         [MODEL_INSTRUCTIONS_FILE_ENV]: plan.instructionsFilePath,
       };
       if (plan.workerWorkspace.worktreePath) {
-        env.OMX_TEAM_WORKTREE_PATH = plan.workerWorkspace.worktreePath;
+        env.OMCP_TEAM_WORKTREE_PATH = plan.workerWorkspace.worktreePath;
       }
       if (plan.workerWorkspace.worktreeBranch) {
-        env.OMX_TEAM_WORKTREE_BRANCH = plan.workerWorkspace.worktreeBranch;
+        env.OMCP_TEAM_WORKTREE_BRANCH = plan.workerWorkspace.worktreeBranch;
       }
       if (typeof plan.workerWorkspace.worktreeDetached === 'boolean') {
-        env.OMX_TEAM_WORKTREE_DETACHED = plan.workerWorkspace.worktreeDetached ? '1' : '0';
+        env.OMCP_TEAM_WORKTREE_DETACHED = plan.workerWorkspace.worktreeDetached ? '1' : '0';
       }
       return {
         cwd: plan.workerWorkspace.cwd,
@@ -3377,7 +3377,7 @@ async function detectAndCleanStaleTeam(
 }
 
 async function resolveLeaderSessionId(cwd: string): Promise<string> {
-  const fromEnv = process.env.OMX_SESSION_ID || process.env.CODEX_SESSION_ID || process.env.SESSION_ID;
+  const fromEnv = process.env.OMCP_SESSION_ID || process.env.CODEX_SESSION_ID || process.env.SESSION_ID;
   if (fromEnv && fromEnv.trim() !== '') return fromEnv.trim();
 
   const p = join(cwd, '.omcp', 'state', 'session.json');

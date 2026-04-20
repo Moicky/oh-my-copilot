@@ -80,7 +80,7 @@ export async function reconcileHudForPromptSubmit(
   const readHudConfigFn = deps.readHudConfig ?? readHudConfig;
   const hudConfig = await readHudConfigFn(cwd).catch(() => null);
   const preset = hudConfig?.preset;
-  const resolvedSessionId = deps.sessionId?.trim() || env.OMX_SESSION_ID?.trim() || undefined;
+  const resolvedSessionId = deps.sessionId?.trim() || env.OMCP_SESSION_ID?.trim() || undefined;
   const hudCmd = buildHudWatchCommand(omxBin, preset, resolvedSessionId);
 
   if (hudPaneIds.length === 1) {

@@ -56,8 +56,8 @@ omcp                    # standard launch</code></pre>
       <p>OMCP layers project instructions by default (extends Codex behavior, does not replace/bypass Codex core system policies):</p>
       <pre><code>-c model_instructions_file="&lt;cwd&gt;/AGENTS.md"</code></pre>
       <p>Override behavior when needed:</p>
-      <pre><code>OMX_BYPASS_DEFAULT_SYSTEM_PROMPT=0 omcp
-OMX_MODEL_INSTRUCTIONS_FILE=/path/to/instructions.md omcp</code></pre>
+      <pre><code>OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT=0 omcp
+OMCP_MODEL_INSTRUCTIONS_FILE=/path/to/instructions.md omcp</code></pre>
 
       <h2>Troubleshooting</h2>
       <table>

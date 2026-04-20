@@ -169,7 +169,7 @@ async function waitForExit(child: ReturnType<typeof spawn>, timeoutMs: number = 
 }
 
 function defaultAutoNudgePattern(targetPane: string): RegExp {
-  return new RegExp(`send-keys -t ${targetPane} -l ${DEFAULT_AUTO_NUDGE_RESPONSE.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')} \\[OMX_TMUX_INJECT\\]`);
+  return new RegExp(`send-keys -t ${targetPane} -l ${DEFAULT_AUTO_NUDGE_RESPONSE.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')} \\[OMCP_TMUX_INJECT\\]`);
 }
 
 function buildFakeTmux(
@@ -182,21 +182,21 @@ echo "$@" >> "${tmuxLogPath}"
 cmd="$1"
 shift || true
 if [[ "$cmd" == "capture-pane" ]]; then
-  if [[ -n "\${OMX_TEST_CAPTURE_SEQUENCE_FILE:-}" && -f "\${OMX_TEST_CAPTURE_SEQUENCE_FILE}" ]]; then
-    counterFile="\${OMX_TEST_CAPTURE_COUNTER_FILE:-\${OMX_TEST_CAPTURE_SEQUENCE_FILE}.idx}"
+  if [[ -n "\${OMCP_TEST_CAPTURE_SEQUENCE_FILE:-}" && -f "\${OMCP_TEST_CAPTURE_SEQUENCE_FILE}" ]]; then
+    counterFile="\${OMCP_TEST_CAPTURE_COUNTER_FILE:-\${OMCP_TEST_CAPTURE_SEQUENCE_FILE}.idx}"
     idx=0
     if [[ -f "$counterFile" ]]; then idx="$(cat "$counterFile")"; fi
     lineNo=$((idx + 1))
-    line="$(sed -n "\${lineNo}p" "\${OMX_TEST_CAPTURE_SEQUENCE_FILE}" || true)"
+    line="$(sed -n "\${lineNo}p" "\${OMCP_TEST_CAPTURE_SEQUENCE_FILE}" || true)"
     if [[ -z "$line" ]]; then
-      line="$(tail -n 1 "\${OMX_TEST_CAPTURE_SEQUENCE_FILE}" || true)"
+      line="$(tail -n 1 "\${OMCP_TEST_CAPTURE_SEQUENCE_FILE}" || true)"
     fi
     printf "%s\\n" "$line"
     echo "$lineNo" > "$counterFile"
     exit 0
   fi
-  if [[ -n "\${OMX_TEST_CAPTURE_FILE:-}" && -f "\${OMX_TEST_CAPTURE_FILE}" ]]; then
-    cat "\${OMX_TEST_CAPTURE_FILE}"
+  if [[ -n "\${OMCP_TEST_CAPTURE_FILE:-}" && -f "\${OMCP_TEST_CAPTURE_FILE}" ]]; then
+    cat "\${OMCP_TEST_CAPTURE_FILE}"
   fi
   exit 0
 fi
@@ -232,7 +232,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$fmt" == "#S" ]]; then
-    echo "\${OMX_TEST_TMUX_SESSION_NAME:-session-test}"
+    echo "\${OMCP_TEST_TMUX_SESSION_NAME:-session-test}"
     exit 0
   fi
   exit 0
@@ -381,10 +381,10 @@ function buildCleanNotifyEnv(
 ): NodeJS.ProcessEnv {
   return {
     ...process.env,
-    OMX_TEAM_WORKER: '',
-    OMX_TEAM_STATE_ROOT: '',
-    OMX_TEAM_LEADER_CWD: '',
-    OMX_MODEL_INSTRUCTIONS_FILE: '',
+    OMCP_TEAM_WORKER: '',
+    OMCP_TEAM_STATE_ROOT: '',
+    OMCP_TEAM_LEADER_CWD: '',
+    OMCP_MODEL_INSTRUCTIONS_FILE: '',
     TMUX: '',
     TMUX_PANE: '',
     ...overrides,
@@ -854,10 +854,10 @@ describe('notify-fallback watcher', () => {
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
             CODEX_HOME: codexHome,
-            OMX_SESSION_ID: 'sess-managed-fallback',
+            OMCP_SESSION_ID: 'sess-managed-fallback',
             TMUX: '1',
             TMUX_PANE: '%42',
-            OMX_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
+            OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
           }),
         },
       );
@@ -918,7 +918,7 @@ describe('notify-fallback watcher', () => {
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            OMX_SESSION_ID: 'sess-cwd-alias',
+            OMCP_SESSION_ID: 'sess-cwd-alias',
             TMUX: '1',
             TMUX_PANE: '%42',
           }),
@@ -988,7 +988,7 @@ describe('notify-fallback watcher', () => {
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
       assert.doesNotMatch(tmuxLog, /Ralph loop active continue/);
       assert.doesNotMatch(tmuxLog, /Team dispatch-team:/);
-      assert.doesNotMatch(tmuxLog, new RegExp(`${DEFAULT_AUTO_NUDGE_RESPONSE.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')} \\[OMX_TMUX_INJECT\\]`));
+      assert.doesNotMatch(tmuxLog, new RegExp(`${DEFAULT_AUTO_NUDGE_RESPONSE.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')} \\[OMCP_TMUX_INJECT\\]`));
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -1059,7 +1059,7 @@ describe('notify-fallback watcher', () => {
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
       assert.doesNotMatch(tmuxLog, /Ralph loop active continue/);
       assert.doesNotMatch(tmuxLog, /Team dispatch-team:/);
-      assert.doesNotMatch(tmuxLog, new RegExp(`${DEFAULT_AUTO_NUDGE_RESPONSE.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')} \\[OMX_TMUX_INJECT\\]`));
+      assert.doesNotMatch(tmuxLog, new RegExp(`${DEFAULT_AUTO_NUDGE_RESPONSE.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')} \\[OMCP_TMUX_INJECT\\]`));
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -1100,7 +1100,7 @@ describe('notify-fallback watcher', () => {
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            OMX_SESSION_ID: 'sess-canonical-inactive',
+            OMCP_SESSION_ID: 'sess-canonical-inactive',
           }),
         },
       );
@@ -1160,7 +1160,7 @@ describe('notify-fallback watcher', () => {
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            OMX_SESSION_ID: 'sess-canonical-inactive',
+            OMCP_SESSION_ID: 'sess-canonical-inactive',
           }),
         },
       );
@@ -1263,7 +1263,7 @@ describe('notify-fallback watcher', () => {
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            OMX_SESSION_ID: 'sess-canonical-inactive',
+            OMCP_SESSION_ID: 'sess-canonical-inactive',
           }),
         },
       );
@@ -1448,9 +1448,9 @@ exit 0
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            OMX_TEAM_PROGRESS_STALL_MS: '60000',
-            OMX_TEAM_LEADER_NUDGE_MS: '30000',
-            OMX_TEAM_LEADER_STALE_MS: '60000',
+            OMCP_TEAM_PROGRESS_STALL_MS: '60000',
+            OMCP_TEAM_LEADER_NUDGE_MS: '30000',
+            OMCP_TEAM_LEADER_STALE_MS: '60000',
           }),
         },
       );
@@ -1504,11 +1504,11 @@ exit 0
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
             CODEX_HOME: codexHome,
-            OMX_SESSION_ID: 'sess-managed-fallback',
-            OMX_TEST_TMUX_SESSION_NAME: 'omcp-fallback-auto-nudge-stalled-managed',
+            OMCP_SESSION_ID: 'sess-managed-fallback',
+            OMCP_TEST_TMUX_SESSION_NAME: 'omcp-fallback-auto-nudge-stalled-managed',
             TMUX: '1',
             TMUX_PANE: '%42',
-            OMX_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
+            OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
           }),
         },
       );
@@ -1564,10 +1564,10 @@ exit 0
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
             CODEX_HOME: codexHome,
-            OMX_SESSION_ID: 'sess-managed-fallback',
+            OMCP_SESSION_ID: 'sess-managed-fallback',
             TMUX: '1',
             TMUX_PANE: '%42',
-            OMX_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
+            OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
           }),
         },
       );
@@ -1613,7 +1613,7 @@ exit 0
             CODEX_HOME: codexHome,
             TMUX: '1',
             TMUX_PANE: '%42',
-            OMX_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
+            OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
           }),
         },
       );
@@ -1667,7 +1667,7 @@ exit 0
             CODEX_HOME: codexHome,
             TMUX: '1',
             TMUX_PANE: '%42',
-            OMX_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
+            OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
           }),
         },
       );
@@ -1726,7 +1726,7 @@ exit 0
             CODEX_HOME: codexHome,
             TMUX: '1',
             TMUX_PANE: '%42',
-            OMX_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
+            OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
           }),
         },
       );
@@ -1785,7 +1785,7 @@ exit 0
             CODEX_HOME: codexHome,
             TMUX: '1',
             TMUX_PANE: '%42',
-            OMX_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
+            OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
           }),
         },
       );
@@ -1805,9 +1805,9 @@ exit 0
 
   it('runs bounded non-turn team dispatch drain tick in leader context', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-fallback-dispatch-'));
-    const previousRuntimeBridge = process.env.OMX_RUNTIME_BRIDGE;
+    const previousRuntimeBridge = process.env.OMCP_RUNTIME_BRIDGE;
     try {
-      process.env.OMX_RUNTIME_BRIDGE = '0';
+      process.env.OMCP_RUNTIME_BRIDGE = '0';
       await initTeamState('dispatch-team', 'task', 'executor', 1, wd);
       const queued = await enqueueDispatchRequest('dispatch-team', {
         kind: 'inbox',
@@ -1827,17 +1827,17 @@ exit 0
       assert.ok(request);
       assert.notEqual(request?.status, 'pending');
     } finally {
-      if (typeof previousRuntimeBridge === 'string') process.env.OMX_RUNTIME_BRIDGE = previousRuntimeBridge;
-      else delete process.env.OMX_RUNTIME_BRIDGE;
+      if (typeof previousRuntimeBridge === 'string') process.env.OMCP_RUNTIME_BRIDGE = previousRuntimeBridge;
+      else delete process.env.OMCP_RUNTIME_BRIDGE;
       await rm(wd, { recursive: true, force: true });
     }
   });
 
   it('skips dispatch drain in worker context (leader-only guard)', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-fallback-dispatch-worker-'));
-    const previousRuntimeBridge = process.env.OMX_RUNTIME_BRIDGE;
+    const previousRuntimeBridge = process.env.OMCP_RUNTIME_BRIDGE;
     try {
-      process.env.OMX_RUNTIME_BRIDGE = '0';
+      process.env.OMCP_RUNTIME_BRIDGE = '0';
       await initTeamState('dispatch-team', 'task', 'executor', 1, wd);
       const queued = await enqueueDispatchRequest('dispatch-team', {
         kind: 'inbox',
@@ -1850,7 +1850,7 @@ exit 0
       const result = spawnSync(
         process.execPath,
         [watcherScript, '--once', '--cwd', wd, '--notify-script', notifyHook, '--poll-ms', '50', '--dispatch-max-per-tick', '1'],
-        { encoding: 'utf-8', env: buildCleanNotifyEnv({ OMX_TEAM_WORKER: 'dispatch-team/worker-1', OMX_TEAM_STATE_ROOT: join(wd, '.omcp', 'state') }) },
+        { encoding: 'utf-8', env: buildCleanNotifyEnv({ OMCP_TEAM_WORKER: 'dispatch-team/worker-1', OMCP_TEAM_STATE_ROOT: join(wd, '.omcp', 'state') }) },
       );
       assert.equal(result.status, 0, result.stderr || result.stdout);
       const request = await readDispatchRequest('dispatch-team', queued.request.request_id, wd);
@@ -1867,8 +1867,8 @@ exit 0
       const drainEvent = logEntries.find((entry: { type?: string }) => entry.type === 'dispatch_drain_tick');
       assert.equal(drainEvent, undefined);
     } finally {
-      if (typeof previousRuntimeBridge === 'string') process.env.OMX_RUNTIME_BRIDGE = previousRuntimeBridge;
-      else delete process.env.OMX_RUNTIME_BRIDGE;
+      if (typeof previousRuntimeBridge === 'string') process.env.OMCP_RUNTIME_BRIDGE = previousRuntimeBridge;
+      else delete process.env.OMCP_RUNTIME_BRIDGE;
       await rm(wd, { recursive: true, force: true });
     }
   });
@@ -1878,9 +1878,9 @@ exit 0
     const fakeBinDir = join(wd, 'fake-bin');
     const tmuxLogPath = join(wd, 'tmux.log');
     const captureFile = join(wd, 'capture.txt');
-    const previousRuntimeBridge = process.env.OMX_RUNTIME_BRIDGE;
+    const previousRuntimeBridge = process.env.OMCP_RUNTIME_BRIDGE;
     try {
-      process.env.OMX_RUNTIME_BRIDGE = '0';
+      process.env.OMCP_RUNTIME_BRIDGE = '0';
       await mkdir(fakeBinDir, { recursive: true });
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
@@ -1900,7 +1900,7 @@ exit 0
       const env = {
         ...buildCleanNotifyEnv(),
         PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-        OMX_TEST_CAPTURE_FILE: captureFile,
+        OMCP_TEST_CAPTURE_FILE: captureFile,
       };
 
       const first = spawnSync(
@@ -1929,8 +1929,8 @@ exit 0
       assert.equal(request?.attempt_count, 2);
       assert.equal(request?.last_reason, 'tmux_send_keys_unconfirmed');
     } finally {
-      if (typeof previousRuntimeBridge === 'string') process.env.OMX_RUNTIME_BRIDGE = previousRuntimeBridge;
-      else delete process.env.OMX_RUNTIME_BRIDGE;
+      if (typeof previousRuntimeBridge === 'string') process.env.OMCP_RUNTIME_BRIDGE = previousRuntimeBridge;
+      else delete process.env.OMCP_RUNTIME_BRIDGE;
       await rm(wd, { recursive: true, force: true });
     }
   });
@@ -1995,7 +1995,7 @@ exit 0
       assert.equal(second.status, 0, second.stderr || second.stdout);
 
       const boundedLog = await readFile(tmuxLogPath, 'utf8');
-      let sends = boundedLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      let sends = boundedLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 1, 'cadence should suppress a second Ralph steer inside 60s');
 
       const watcherState = JSON.parse(await readFile(statePath, 'utf-8'));
@@ -2013,7 +2013,7 @@ exit 0
       assert.equal(third.status, 0, third.stderr || third.stdout);
 
       const finalLog = await readFile(tmuxLogPath, 'utf8');
-      sends = finalLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      sends = finalLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 2, 'Ralph steer should fire again once the 60s cadence elapses');
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -2060,7 +2060,7 @@ exit 0
       assert.equal(run.status, 0, run.stderr || run.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 0, 'fresh progress should suppress continue steer even after cooldown elapses');
 
       const watcherState = JSON.parse(await readFile(statePath, 'utf-8'));
@@ -2110,7 +2110,7 @@ exit 0
       assert.equal(run.status, 0, run.stderr || run.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 1, 'stale progress should still allow continue steer once cooldown elapses');
 
       const watcherState = JSON.parse(await readFile(statePath, 'utf-8'));
@@ -2164,7 +2164,7 @@ exit 0
       assert.equal(run.status, 0, run.stderr || run.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 0, 'stale starting phase should suppress continue steer');
 
       const watcherState = JSON.parse(await readFile(watcherStatePath, 'utf-8'));
@@ -2247,7 +2247,7 @@ exit 0
       assert.equal(run.status, 0, run.stderr || run.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 0, 'active native subagents should block fallback continue steer');
 
       const watcherState = JSON.parse(await readFile(statePath, 'utf-8'));
@@ -2313,7 +2313,7 @@ exit 0
       assert.equal(watcherState.ralph_continue_steer?.pane_id, '%42');
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 0, 'missing or invalid progress should fail closed without sending steer');
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -2363,7 +2363,7 @@ exit 0
       assert.equal(watcherState.ralph_continue_steer?.pane_id, '');
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
-      assert.equal(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/.test(tmuxLog), false);
+      assert.equal(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/.test(tmuxLog), false);
       assert.equal(/display-message -p -t %42 #{pane_id}/.test(tmuxLog), false, 'watcher should not guess a pane when tmux_pane_id is missing');
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -2435,8 +2435,8 @@ exit 0
       assert.equal(watcherState.ralph_continue_steer?.pane_id, livePane);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8');
-      assert.match(tmuxLog, /send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/);
-      assert.doesNotMatch(tmuxLog, /send-keys -t %99 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/);
+      assert.match(tmuxLog, /send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/);
+      assert.doesNotMatch(tmuxLog, /send-keys -t %99 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -2639,8 +2639,8 @@ exit 0
       assert.equal(watcherState.ralph_continue_steer?.pane_id, anchorPane);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8');
-      assert.match(tmuxLog, /send-keys -t %99 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/);
-      assert.doesNotMatch(tmuxLog, /send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/);
+      assert.match(tmuxLog, /send-keys -t %99 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/);
+      assert.doesNotMatch(tmuxLog, /send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -2710,8 +2710,8 @@ exit 0
       assert.equal(watcherState.ralph_continue_steer?.pane_id, livePane);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8');
-      assert.match(tmuxLog, /send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/);
-      assert.doesNotMatch(tmuxLog, /send-keys -t %99 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/);
+      assert.match(tmuxLog, /send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/);
+      assert.doesNotMatch(tmuxLog, /send-keys -t %99 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -2784,8 +2784,8 @@ exit 0
       const tmuxLog = await readFile(tmuxLogPath, 'utf8');
       assert.match(tmuxLog, /display-message -p -t %99 #S/);
       assert.match(tmuxLog, /list-panes -s -t .*sess-ralph-dead-anchor/);
-      assert.match(tmuxLog, /send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/);
-      assert.doesNotMatch(tmuxLog, /send-keys -t %99 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/);
+      assert.match(tmuxLog, /send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/);
+      assert.doesNotMatch(tmuxLog, /send-keys -t %99 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -2831,7 +2831,7 @@ exit 0
       assert.equal(first.status, 0, first.stderr || first.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 1, 'empty startup state should send the first Ralph steer immediately once progress is stale');
 
       const watcherState = JSON.parse(await readFile(statePath, 'utf-8'));
@@ -2892,7 +2892,7 @@ exit 0
       assert.equal(run.status, 0, run.stderr || run.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 1, 'invalid last_sent_at should fall back to the persisted cooldown anchor once 60s have elapsed');
 
       const watcherState = JSON.parse(await readFile(statePath, 'utf-8'));
@@ -2952,7 +2952,7 @@ exit 0
       assert.equal(run.status, 0, run.stderr || run.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 0, 'blocked_on_user should suppress Ralph continue steer');
 
       const watcherState = JSON.parse(await readFile(watcherStatePath, 'utf-8'));
@@ -3032,7 +3032,7 @@ exit 0
       assert.equal(clearedRun.status, 0, clearedRun.stderr || clearedRun.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 1, 'terminal/cleared Ralph state must stop additional periodic steer sends');
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -3081,7 +3081,7 @@ exit 0
       assert.equal(run.status, 0, run.stderr || run.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 0, 'stale starting phase should block Ralph continue steer');
 
       const watcherState = JSON.parse(await readFile(watcherStatePath, 'utf-8'));
@@ -3133,7 +3133,7 @@ exit 0
       assert.equal(run.status, 0, run.stderr || run.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 0, 'blocked_on_user should suppress Ralph continue steer');
 
       const watcherState = JSON.parse(await readFile(watcherStatePath, 'utf-8'));
@@ -3192,7 +3192,7 @@ exit 0
       assert.equal(second.exitCode, 0);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 1, 'shared timestamp + lock should allow only one concurrent Ralph steer send');
 
       const sharedTimestamp = (await readFile(sharedTimestampPath, 'utf-8')).trim();
@@ -3215,9 +3215,9 @@ exit 0
     const wd = await mkdtemp(join(tmpdir(), 'omcp-fallback-control-plane-split-'));
     const fakeBinDir = join(wd, 'fake-bin');
     const tmuxLogPath = join(wd, 'tmux.log');
-    const previousRuntimeBridge = process.env.OMX_RUNTIME_BRIDGE;
+    const previousRuntimeBridge = process.env.OMCP_RUNTIME_BRIDGE;
     try {
-      process.env.OMX_RUNTIME_BRIDGE = '0';
+      process.env.OMCP_RUNTIME_BRIDGE = '0';
       await mkdir(join(wd, '.omcp', 'state'), { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath, {
@@ -3280,8 +3280,8 @@ exit 0
       ));
       assert.ok(ralphFailureEvent, 'expected Ralph failure to be logged without aborting team control-plane pumping');
     } finally {
-      if (typeof previousRuntimeBridge === 'string') process.env.OMX_RUNTIME_BRIDGE = previousRuntimeBridge;
-      else delete process.env.OMX_RUNTIME_BRIDGE;
+      if (typeof previousRuntimeBridge === 'string') process.env.OMCP_RUNTIME_BRIDGE = previousRuntimeBridge;
+      else delete process.env.OMCP_RUNTIME_BRIDGE;
       await rm(wd, { recursive: true, force: true });
     }
   });
@@ -3292,9 +3292,9 @@ exit 0
     const tmuxLogPath = join(wd, 'tmux.log');
     const captureSeqFile = join(wd, 'capture-seq.txt');
     const captureCounterFile = join(wd, 'capture-seq.idx');
-    const previousRuntimeBridge = process.env.OMX_RUNTIME_BRIDGE;
+    const previousRuntimeBridge = process.env.OMCP_RUNTIME_BRIDGE;
     try {
-      process.env.OMX_RUNTIME_BRIDGE = '0';
+      process.env.OMCP_RUNTIME_BRIDGE = '0';
       await mkdir(fakeBinDir, { recursive: true });
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
@@ -3324,8 +3324,8 @@ exit 0
       const env = {
         ...buildCleanNotifyEnv(),
         PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-        OMX_TEST_CAPTURE_SEQUENCE_FILE: captureSeqFile,
-        OMX_TEST_CAPTURE_COUNTER_FILE: captureCounterFile,
+        OMCP_TEST_CAPTURE_SEQUENCE_FILE: captureSeqFile,
+        OMCP_TEST_CAPTURE_COUNTER_FILE: captureCounterFile,
       };
 
       for (let i = 0; i < 3; i += 1) {
@@ -3345,8 +3345,8 @@ exit 0
       assert.equal(request?.status, 'failed');
       assert.equal(request?.last_reason, 'unconfirmed_after_max_retries');
     } finally {
-      if (typeof previousRuntimeBridge === 'string') process.env.OMX_RUNTIME_BRIDGE = previousRuntimeBridge;
-      else delete process.env.OMX_RUNTIME_BRIDGE;
+      if (typeof previousRuntimeBridge === 'string') process.env.OMCP_RUNTIME_BRIDGE = previousRuntimeBridge;
+      else delete process.env.OMCP_RUNTIME_BRIDGE;
       await rm(wd, { recursive: true, force: true });
     }
   });
@@ -3452,7 +3452,7 @@ exit 0
       assert.equal(run.status, 0, run.stderr || run.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 0, 'stale current-session identity must block Ralph continue injection');
 
       const watcherState = JSON.parse(await readFile(watcherStatePath, 'utf-8'));
@@ -3502,7 +3502,7 @@ exit 0
       assert.equal(run.status, 0, run.stderr || run.stdout);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf8').catch(() => '');
-      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/g) || [];
       assert.equal(sends.length, 0, 'fresh sessions must ignore stale root Ralph state');
 
       const watcherState = JSON.parse(await readFile(watcherStatePath, 'utf-8'));
@@ -3578,7 +3578,7 @@ exit 0
 
       await waitFor(async () => {
         const tmuxLog = await readFile(tmuxLogPath, 'utf-8').catch(() => '');
-        return /send-keys -t %42 -l Ralph loop active continue \[OMX_TMUX_INJECT\]/.test(tmuxLog);
+        return /send-keys -t %42 -l Ralph loop active continue \[OMCP_TMUX_INJECT\]/.test(tmuxLog);
       }, 4000, 50);
 
       assert.ok(isPidAlive(child.pid), 'expected watcher to stay alive while Ralph remains active');
@@ -4252,7 +4252,7 @@ exit 0
         {
           cwd: wd,
           stdio: 'ignore',
-          env: buildCleanNotifyEnv({ HOME: tempHome, OMX_NOTIFY_FALLBACK_IDLE_MAX_POLL_MS: '200' }),
+          env: buildCleanNotifyEnv({ HOME: tempHome, OMCP_NOTIFY_FALLBACK_IDLE_MAX_POLL_MS: '200' }),
         }
       );
 

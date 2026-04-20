@@ -12,16 +12,16 @@ pub const DEFAULT_SPARK_MODEL: &str = "gpt-5.3-codex-spark";
 pub const DEFAULT_FRONTIER_MODEL: &str = "gpt-5.4";
 
 pub fn resolve_model() -> String {
-    env::var("OMX_SPARKSHELL_MODEL")
+    env::var("OMCP_SPARKSHELL_MODEL")
         .ok()
         .filter(|value| !value.trim().is_empty())
         .or_else(|| {
-            env::var("OMX_DEFAULT_SPARK_MODEL")
+            env::var("OMCP_DEFAULT_SPARK_MODEL")
                 .ok()
                 .filter(|value| !value.trim().is_empty())
         })
         .or_else(|| {
-            env::var("OMX_SPARK_MODEL")
+            env::var("OMCP_SPARK_MODEL")
                 .ok()
                 .filter(|value| !value.trim().is_empty())
         })
@@ -29,11 +29,11 @@ pub fn resolve_model() -> String {
 }
 
 pub fn resolve_fallback_model() -> String {
-    env::var("OMX_SPARKSHELL_FALLBACK_MODEL")
+    env::var("OMCP_SPARKSHELL_FALLBACK_MODEL")
         .ok()
         .filter(|value| !value.trim().is_empty())
         .or_else(|| {
-            env::var("OMX_DEFAULT_FRONTIER_MODEL")
+            env::var("OMCP_DEFAULT_FRONTIER_MODEL")
                 .ok()
                 .filter(|value| !value.trim().is_empty())
         })
@@ -41,7 +41,7 @@ pub fn resolve_fallback_model() -> String {
 }
 
 pub fn read_summary_timeout_ms() -> u64 {
-    env::var("OMX_SPARKSHELL_SUMMARY_TIMEOUT_MS")
+    env::var("OMCP_SPARKSHELL_SUMMARY_TIMEOUT_MS")
         .ok()
         .and_then(|value| value.trim().parse::<u64>().ok())
         .filter(|value| *value > 0)
@@ -281,14 +281,14 @@ mod tests {
     fn model_resolution_prefers_sparkshell_override() {
         let _guard = env_lock();
         unsafe {
-            env::set_var("OMX_SPARKSHELL_MODEL", "spark-a");
-            env::set_var("OMX_DEFAULT_SPARK_MODEL", "spark-b");
+            env::set_var("OMCP_SPARKSHELL_MODEL", "spark-a");
+            env::set_var("OMCP_DEFAULT_SPARK_MODEL", "spark-b");
         }
         assert_eq!(resolve_model(), "spark-a");
         unsafe {
-            env::remove_var("OMX_SPARKSHELL_MODEL");
-            env::remove_var("OMX_DEFAULT_SPARK_MODEL");
-            env::remove_var("OMX_SPARK_MODEL");
+            env::remove_var("OMCP_SPARKSHELL_MODEL");
+            env::remove_var("OMCP_DEFAULT_SPARK_MODEL");
+            env::remove_var("OMCP_SPARK_MODEL");
         }
     }
 
@@ -296,18 +296,18 @@ mod tests {
     fn fallback_model_resolution_prefers_override_then_default_frontier() {
         let _guard = env_lock();
         unsafe {
-            env::remove_var("OMX_SPARKSHELL_FALLBACK_MODEL");
-            env::remove_var("OMX_DEFAULT_FRONTIER_MODEL");
+            env::remove_var("OMCP_SPARKSHELL_FALLBACK_MODEL");
+            env::remove_var("OMCP_DEFAULT_FRONTIER_MODEL");
         }
         assert_eq!(resolve_fallback_model(), DEFAULT_FRONTIER_MODEL);
 
         unsafe {
-            env::set_var("OMX_DEFAULT_FRONTIER_MODEL", "frontier-a");
+            env::set_var("OMCP_DEFAULT_FRONTIER_MODEL", "frontier-a");
         }
         assert_eq!(resolve_fallback_model(), "frontier-a");
 
         unsafe {
-            env::set_var("OMX_SPARKSHELL_FALLBACK_MODEL", "frontier-b");
+            env::set_var("OMCP_SPARKSHELL_FALLBACK_MODEL", "frontier-b");
         }
         assert_eq!(resolve_fallback_model(), "frontier-b");
     }
@@ -316,9 +316,9 @@ mod tests {
     fn model_resolution_falls_back_to_default() {
         let _guard = env_lock();
         unsafe {
-            env::remove_var("OMX_SPARKSHELL_MODEL");
-            env::remove_var("OMX_DEFAULT_SPARK_MODEL");
-            env::remove_var("OMX_SPARK_MODEL");
+            env::remove_var("OMCP_SPARKSHELL_MODEL");
+            env::remove_var("OMCP_DEFAULT_SPARK_MODEL");
+            env::remove_var("OMCP_SPARK_MODEL");
         }
         assert_eq!(resolve_model(), DEFAULT_SPARK_MODEL);
     }
@@ -327,7 +327,7 @@ mod tests {
     fn timeout_defaults_when_unset() {
         let _guard = env_lock();
         unsafe {
-            env::remove_var("OMX_SPARKSHELL_SUMMARY_TIMEOUT_MS");
+            env::remove_var("OMCP_SPARKSHELL_SUMMARY_TIMEOUT_MS");
         }
         assert_eq!(read_summary_timeout_ms(), 60_000);
     }
@@ -336,14 +336,14 @@ mod tests {
     fn model_resolution_ignores_blank_override_and_uses_secondary_env() {
         let _guard = env_lock();
         unsafe {
-            env::set_var("OMX_SPARKSHELL_MODEL", "   ");
-            env::set_var("OMX_DEFAULT_SPARK_MODEL", "spark-b");
+            env::set_var("OMCP_SPARKSHELL_MODEL", "   ");
+            env::set_var("OMCP_DEFAULT_SPARK_MODEL", "spark-b");
         }
         assert_eq!(resolve_model(), "spark-b");
         unsafe {
-            env::remove_var("OMX_SPARKSHELL_MODEL");
-            env::remove_var("OMX_DEFAULT_SPARK_MODEL");
-            env::remove_var("OMX_SPARK_MODEL");
+            env::remove_var("OMCP_SPARKSHELL_MODEL");
+            env::remove_var("OMCP_DEFAULT_SPARK_MODEL");
+            env::remove_var("OMCP_SPARK_MODEL");
         }
     }
 
@@ -351,17 +351,17 @@ mod tests {
     fn timeout_defaults_for_zero_and_invalid_values() {
         let _guard = env_lock();
         unsafe {
-            env::set_var("OMX_SPARKSHELL_SUMMARY_TIMEOUT_MS", "0");
+            env::set_var("OMCP_SPARKSHELL_SUMMARY_TIMEOUT_MS", "0");
         }
         assert_eq!(read_summary_timeout_ms(), DEFAULT_SUMMARY_TIMEOUT_MS);
 
         unsafe {
-            env::set_var("OMX_SPARKSHELL_SUMMARY_TIMEOUT_MS", "bogus");
+            env::set_var("OMCP_SPARKSHELL_SUMMARY_TIMEOUT_MS", "bogus");
         }
         assert_eq!(read_summary_timeout_ms(), DEFAULT_SUMMARY_TIMEOUT_MS);
 
         unsafe {
-            env::remove_var("OMX_SPARKSHELL_SUMMARY_TIMEOUT_MS");
+            env::remove_var("OMCP_SPARKSHELL_SUMMARY_TIMEOUT_MS");
         }
     }
 

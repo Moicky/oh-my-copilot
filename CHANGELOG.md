@@ -466,7 +466,7 @@ Patch release for degraded-state auto-nudge recovery, tighter team control-plane
 ### Verified
 - **Commit-window review** — parallel module review across `main...dev` found `3` main-only merge commits (`#995`, `#997`, `#1000`) but no main-only patch content after cherry-pick elimination, so the shipped release delta is entirely on the `dev` side.
 - **Targeted hook + watcher regression suite** — `notify-fallback-watcher` and `notify-hook auto-nudge` pass with the degraded-state coverage (`49/49` passing).
-- **Real tmux smoke for degraded auto-nudge** — a live Codex pane received `yes, proceed [OMX_TMUX_INJECT]` from the fallback watcher after a 5s stalled-turn window with only HUD state available.
+- **Real tmux smoke for degraded auto-nudge** — a live Codex pane received `yes, proceed [OMCP_TMUX_INJECT]` from the fallback watcher after a 5s stalled-turn window with only HUD state available.
 - **Real tmux smoke for Ralph anti-spam** — two back-to-back fallback watcher ticks did not emit repeated `Ralph loop active continue` sends; the persisted state stayed in cooldown (`startup_cooldown`).
 
 ## [0.11.6] - 2026-03-21
@@ -1051,7 +1051,7 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 - Dynamic team worker scaling — Phase 1 manual `scale_up` / `scale_down` mid-session (#363).
 - Per-worker idle notification forwarded to leader pane (#335).
 - Prompt-mode worker launch transport for interactive team workflows (#264).
-- Worker model defaults resolved from config with `OMX_TEAM_WORKER_CLI_MAP` (#263).
+- Worker model defaults resolved from config with `OMCP_TEAM_WORKER_CLI_MAP` (#263).
 - Worker hard cap raised to 20 (#343).
 - Team shutdown gated on unresolved tasks to prevent premature teardown (#320, #322).
 - MSYS2 / Git Bash tmux worker support (#266).
@@ -1178,12 +1178,12 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 - Added a new "What's New in 0.6.0" section to the docs site homepage with highlights for mixed Codex/Claude teammates and reliability updates.
 
 ### Changed
-- Clarified `skills/team/SKILL.md` docs that `N:agent-type` selects worker role prompts (not CLI choice), and documented `OMX_TEAM_WORKER_CLI` / `OMX_TEAM_WORKER_CLI_MAP` usage for launching Claude teammates.
+- Clarified `skills/team/SKILL.md` docs that `N:agent-type` selects worker role prompts (not CLI choice), and documented `OMCP_TEAM_WORKER_CLI` / `OMCP_TEAM_WORKER_CLI_MAP` usage for launching Claude teammates.
 
 ## [0.6.0] - 2026-02-23
 
 ### Added
-- Mixed team worker CLI routing via `OMX_TEAM_WORKER_CLI_MAP` so a single `$team` run can launch Codex and Claude workers together (e.g. `codex,codex,claude,claude`).
+- Mixed team worker CLI routing via `OMCP_TEAM_WORKER_CLI_MAP` so a single `$team` run can launch Codex and Claude workers together (e.g. `codex,codex,claude,claude`).
 - Leader-side all-workers-idle nudge fallback for Claude teams, so leader notifications still fire even when worker-side Codex hooks are unavailable.
 - Adaptive trigger submit retry guard helper and tests to reduce false-positive resend escalation.
 
@@ -1193,8 +1193,8 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 
 ### Fixed
 - Pre-assigned worker tasks can now be claimed by their assigned owner in `pending` state, unblocking Codex worker bootstrap claim flow.
-- `OMX_TEAM_WORKER_CLI_MAP` parsing now rejects empty entries and reports map-specific validation errors.
-- `OMX_TEAM_WORKER_CLI_MAP=auto` now resolves from launch args/model detection and no longer inherits `OMX_TEAM_WORKER_CLI` overrides unexpectedly.
+- `OMCP_TEAM_WORKER_CLI_MAP` parsing now rejects empty entries and reports map-specific validation errors.
+- `OMCP_TEAM_WORKER_CLI_MAP=auto` now resolves from launch args/model detection and no longer inherits `OMCP_TEAM_WORKER_CLI` overrides unexpectedly.
 - Team leader nudge targeting now prioritizes `leader_pane_id`, improving reliability with mixed/Claude worker setups.
 
 ## [0.5.1] - 2026-02-23
@@ -1288,7 +1288,7 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 ### Added
 - Added broader auto-nudge stall detection patterns (for example: "next I can", "say go", and "keep driving") with a focused last-lines hot zone.
 - Added worker-idle aggregation notifications so team leaders are alerted when all workers are idle/done (with cooldown and event logging).
-- Added automatic tmux mouse scrolling for team sessions (opt-out via `OMX_TEAM_MOUSE=0`).
+- Added automatic tmux mouse scrolling for team sessions (opt-out via `OMCP_TEAM_MOUSE=0`).
 
 ### Fixed
 - Fixed worker message submission reliability by adding settle/delay timing before and during submit key rounds.
@@ -1316,7 +1316,7 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 - Updated team skill docs to describe team-scoped `worker-agents.md` composition (no project `AGENTS.md` mutation).
 
 ### Fixed
-- Preserved and restored pre-existing `OMX_MODEL_INSTRUCTIONS_FILE` values during team start rollback/shutdown to avoid clobbering leader config.
+- Preserved and restored pre-existing `OMCP_MODEL_INSTRUCTIONS_FILE` values during team start rollback/shutdown to avoid clobbering leader config.
 
 ## [0.3.8] - 2026-02-15
 

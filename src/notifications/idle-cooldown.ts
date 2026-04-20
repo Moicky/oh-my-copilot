@@ -5,7 +5,7 @@
  * minimum interval between dispatches. Ported from OMC persistent-mode hook.
  *
  * Config key : notifications.idleCooldownSeconds in ~/.codex/.omcp-config.json
- * Env var    : OMX_IDLE_COOLDOWN_SECONDS  (overrides config)
+ * Env var    : OMCP_IDLE_COOLDOWN_SECONDS  (overrides config)
  * State file : .omcp/state/idle-notif-cooldown.json
  *              (session-scoped when sessionId is available)
  *
@@ -32,13 +32,13 @@ interface IdleNotificationState {
  * Read the idle notification cooldown in seconds.
  *
  * Resolution order:
- *   1. OMX_IDLE_COOLDOWN_SECONDS env var
+ *   1. OMCP_IDLE_COOLDOWN_SECONDS env var
  *   2. notifications.idleCooldownSeconds in ~/.codex/.omcp-config.json
  *   3. Default: 60 seconds
  */
 export function getIdleNotificationCooldownSeconds(): number {
   // 1. Environment variable override
-  const envVal = process.env.OMX_IDLE_COOLDOWN_SECONDS;
+  const envVal = process.env.OMCP_IDLE_COOLDOWN_SECONDS;
   if (envVal !== undefined) {
     const parsed = Number(envVal);
     if (Number.isFinite(parsed) && parsed >= 0) {

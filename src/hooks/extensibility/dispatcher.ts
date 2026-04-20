@@ -53,7 +53,7 @@ async function appendHooksLog(
 
 function isTeamWorker(env: NodeJS.ProcessEnv): boolean {
 	return (
-		typeof env.OMX_TEAM_WORKER === "string" && env.OMX_TEAM_WORKER.trim() !== ""
+		typeof env.OMCP_TEAM_WORKER === "string" && env.OMCP_TEAM_WORKER.trim() !== ""
 	);
 }
 

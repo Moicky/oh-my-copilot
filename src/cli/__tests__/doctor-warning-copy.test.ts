@@ -40,7 +40,7 @@ describe('omcp doctor onboarding warning copy', () => {
     assert.equal(check.name, 'Explore Harness');
     assert.equal(check.status, 'warn');
     assert.match(check.message, /not ready on Windows/i);
-    assert.match(check.message, /OMX_EXPLORE_BIN/);
+    assert.match(check.message, /OMCP_EXPLORE_BIN/);
   });
 
   it('explains first-setup expectation for config and MCP onboarding warnings', async () => {
@@ -137,7 +137,7 @@ enabled = true
         assert.equal(res.status, 0, res.stderr || res.stdout);
         assert.match(
           res.stdout,
-          /Explore Harness: (Rust harness sources are packaged, but no compatible packaged prebuilt or cargo was found \(install Rust or set OMX_EXPLORE_BIN for omcp explore\)|not ready \(no packaged binary, OMX_EXPLORE_BIN, or cargo toolchain\))/,
+          /Explore Harness: (Rust harness sources are packaged, but no compatible packaged prebuilt or cargo was found \(install Rust or set OMCP_EXPLORE_BIN for omcp explore\)|not ready \(no packaged binary, OMCP_EXPLORE_BIN, or cargo toolchain\))/,
         );
       });
     } finally {

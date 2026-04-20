@@ -60,7 +60,7 @@ function runNotifyHook(
     encoding: 'utf-8',
     env: {
       ...process.env,
-      OMX_TEAM_WORKER: '',
+      OMCP_TEAM_WORKER: '',
       TMUX: '',
       TMUX_PANE: '',
       ...envOverrides,
@@ -128,7 +128,7 @@ describe('notify-hook session-idle dedupe', () => {
   });
 
 
-  it('writes session-idle hook state into the fork session scope when OMX_SESSION_ID targets a fork', async () => {
+  it('writes session-idle hook state into the fork session scope when OMCP_SESSION_ID targets a fork', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-idle-fork-scope-'));
     const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
@@ -145,7 +145,7 @@ describe('notify-hook session-idle dedupe', () => {
       await writeFile(join(hooksDir, 'session-idle-counter.mjs'), buildSessionIdlePlugin(pluginStatePath), 'utf-8');
 
       const result = runNotifyHook(repoRoot, wd, 'Waiting on forked review.', 'turn-idle-fork', {
-        OMX_SESSION_ID: forkSessionId,
+        OMCP_SESSION_ID: forkSessionId,
       });
       assert.equal(result.status, 0, result.stderr || result.stdout);
 
@@ -173,12 +173,12 @@ describe('notify-hook session-idle dedupe', () => {
       await writeFile(join(hooksDir, 'session-idle-counter.mjs'), buildSessionIdlePlugin(pluginStatePath), 'utf-8');
 
       const first = runNotifyHook(repoRoot, wd, 'Waiting for your next instruction.', 'turn-idle-5', {
-        OMX_IDLE_COOLDOWN_SECONDS: '0',
+        OMCP_IDLE_COOLDOWN_SECONDS: '0',
       });
       assert.equal(first.status, 0, first.stderr || first.stdout);
 
       const second = runNotifyHook(repoRoot, wd, 'Waiting for your next instruction.', 'turn-idle-6', {
-        OMX_IDLE_COOLDOWN_SECONDS: '0',
+        OMCP_IDLE_COOLDOWN_SECONDS: '0',
       });
       assert.equal(second.status, 0, second.stderr || second.stdout);
 

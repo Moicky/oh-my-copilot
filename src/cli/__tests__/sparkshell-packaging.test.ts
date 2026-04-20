@@ -54,8 +54,8 @@ describe('sparkshell packaging scaffold', () => {
         encoding: 'utf-8',
         env: {
           ...process.env,
-          OMX_SPARKSHELL_MANIFEST: join(process.cwd(), 'crates', 'omcp-sparkshell', 'Cargo.toml'),
-          OMX_SPARKSHELL_STAGE_DIR: stagedRoot,
+          OMCP_SPARKSHELL_MANIFEST: join(process.cwd(), 'crates', 'omcp-sparkshell', 'Cargo.toml'),
+          OMCP_SPARKSHELL_STAGE_DIR: stagedRoot,
         },
       });
       assert.equal(buildResult.status, 0, buildResult.stderr || buildResult.stdout);

@@ -193,9 +193,9 @@ describe('createHookPluginSdk', () => {
 
     it('returns loop_guard_input_marker when text contains loop marker', async () => {
       const cwd = await mkdtemp(join(tmpdir(), 'omcp-sdk-'));
-      const originalMarker = process.env.OMX_HOOK_PLUGIN_LOOP_MARKER;
+      const originalMarker = process.env.OMCP_HOOK_PLUGIN_LOOP_MARKER;
       try {
-        process.env.OMX_HOOK_PLUGIN_LOOP_MARKER = '[TESTMARK]';
+        process.env.OMCP_HOOK_PLUGIN_LOOP_MARKER = '[TESTMARK]';
         const sdk = createHookPluginSdk({
           cwd,
           pluginName: 'test',
@@ -207,9 +207,9 @@ describe('createHookPluginSdk', () => {
         assert.equal(result.reason, 'loop_guard_input_marker');
       } finally {
         if (originalMarker === undefined) {
-          delete process.env.OMX_HOOK_PLUGIN_LOOP_MARKER;
+          delete process.env.OMCP_HOOK_PLUGIN_LOOP_MARKER;
         } else {
-          process.env.OMX_HOOK_PLUGIN_LOOP_MARKER = originalMarker;
+          process.env.OMCP_HOOK_PLUGIN_LOOP_MARKER = originalMarker;
         }
         await rm(cwd, { recursive: true, force: true });
       }

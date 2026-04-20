@@ -38,7 +38,7 @@ Common patterns:
 
 const VALUE_TAKING_FLAGS = new Set(['--model', '--provider', '--config', '-c', '-i', '--images-dir']);
 const RALPH_OMX_FLAGS = new Set(['--prd', '--no-deslop']);
-const RALPH_APPEND_ENV = 'OMX_RALPH_APPEND_INSTRUCTIONS_FILE';
+const RALPH_APPEND_ENV = 'OMCP_RALPH_APPEND_INSTRUCTIONS_FILE';
 const REQUIRED_RALPH_PRD_JSON_PATH = '.omcp/prd.json';
 const COMPLETED_RALPH_STORY_STATUSES = new Set(['passed', 'complete', 'completed']);
 const APPROVED_RALPH_ARCHITECT_VERDICTS = new Set(['approve', 'approved']);

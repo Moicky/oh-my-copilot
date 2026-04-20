@@ -31,7 +31,7 @@ export function resolveQuestionRendererStrategy(
   env: NodeJS.ProcessEnv = process.env,
   tmuxBinary = resolveTmuxBinaryForPlatform(),
 ): QuestionRendererStrategy {
-  if (safeString(env.OMX_QUESTION_TEST_RENDERER).trim() === 'noop') return 'test-noop';
+  if (safeString(env.OMCP_QUESTION_TEST_RENDERER).trim() === 'noop') return 'test-noop';
   if (safeString(env.TMUX).trim() !== '') return 'inside-tmux';
   if (tmuxBinary) return 'detached-tmux';
   return 'unsupported';
@@ -40,7 +40,7 @@ export function resolveQuestionRendererStrategy(
 function buildQuestionUiCommand(recordPath: string, sessionId?: string): string {
   const omxBin = resolveOmxCliEntryPath() || process.argv[1];
   if (!omxBin) throw new Error('Unable to resolve OMCP CLI entry path for question UI launch.');
-  const sessionPrefix = sessionId ? `OMX_SESSION_ID=${shellEscapeSingle(sessionId)} ` : '';
+  const sessionPrefix = sessionId ? `OMCP_SESSION_ID=${shellEscapeSingle(sessionId)} ` : '';
   return `${sessionPrefix}${shellEscapeSingle(process.execPath)} ${shellEscapeSingle(omxBin)} question --ui --state-path ${shellEscapeSingle(recordPath)}`;
 }
 

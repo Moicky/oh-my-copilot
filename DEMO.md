@@ -210,9 +210,9 @@ export TEAM_TASK="e2e team demo"
 export TEAM_NAME="e2e-team-demo"   # slugified from TEAM_TASK
 
 # Mixed worker CLIs (5+ workers, codex + claude)
-export OMX_TEAM_WORKER_CLI=auto
-export OMX_TEAM_WORKER_CLI_MAP=codex,codex,codex,claude,claude,claude
-export OMX_TEAM_WORKER_LAUNCH_ARGS='-c model_reasoning_effort="low"'
+export OMCP_TEAM_WORKER_CLI=auto
+export OMCP_TEAM_WORKER_CLI_MAP=codex,codex,codex,claude,claude,claude
+export OMCP_TEAM_WORKER_LAUNCH_ARGS='-c model_reasoning_effort="low"'
 
 # 5-worker baseline
 omcp team 5:executor "parallel team smoke"
@@ -320,7 +320,7 @@ Optional overrides:
 TEAM_TASK="e2e team demo" \
 TEAM_NAME="e2e-team-demo" \
 WORKER_COUNT=6 \
-OMX_TEAM_WORKER_LAUNCH_MODE=prompt \
+OMCP_TEAM_WORKER_LAUNCH_MODE=prompt \
 ./scripts/demo-team-e2e.sh
 ```
 
@@ -331,9 +331,9 @@ set -euo pipefail
 
 export TEAM_TASK="e2e team demo"
 export TEAM_NAME="e2e-team-demo"
-export OMX_TEAM_WORKER_CLI=auto
-export OMX_TEAM_WORKER_CLI_MAP=codex,codex,codex,claude,claude,claude
-export OMX_TEAM_WORKER_LAUNCH_ARGS='-c model_reasoning_effort="low"'
+export OMCP_TEAM_WORKER_CLI=auto
+export OMCP_TEAM_WORKER_CLI_MAP=codex,codex,codex,claude,claude,claude
+export OMCP_TEAM_WORKER_LAUNCH_ARGS='-c model_reasoning_effort="low"'
 
 echo "[1/8] start team (6 workers mixed codex/claude)"
 omcp team 6:executor "$TEAM_TASK"
@@ -439,9 +439,9 @@ The bundled E2E demo script provides a complete, automated test of the tmux clau
 | `WORKER_COUNT` | `6` | Number of workers to spawn (minimum: 5) |
 | `TEAM_TASK` | `e2e team demo <timestamp>` | Task description for the team |
 | `TEAM_NAME` | (slugified from TEAM_TASK) | Unique team identifier |
-| `OMX_TEAM_WORKER_CLI` | `auto` | Worker CLI selection mode |
-| `OMX_TEAM_WORKER_CLI_MAP` | (auto-generated) | Comma-separated CLI assignments per worker |
-| `OMX_TEAM_WORKER_LAUNCH_ARGS` | `-c model_reasoning_effort="low"` | Arguments passed to worker CLIs (worker model falls back to `OMX_DEFAULT_SPARK_MODEL`) |
+| `OMCP_TEAM_WORKER_CLI` | `auto` | Worker CLI selection mode |
+| `OMCP_TEAM_WORKER_CLI_MAP` | (auto-generated) | Comma-separated CLI assignments per worker |
+| `OMCP_TEAM_WORKER_LAUNCH_ARGS` | `-c model_reasoning_effort="low"` | Arguments passed to worker CLIs (worker model falls back to `OMCP_DEFAULT_SPARK_MODEL`) |
 
 #### Demo Flow
 
@@ -470,6 +470,6 @@ The bundled E2E demo script provides a complete, automated test of the tmux clau
 # Run with 8 workers and custom task
 WORKER_COUNT=8 \
 TEAM_TASK="load test $(date +%s)" \
-OMX_TEAM_WORKER_CLI_MAP=codex,codex,codex,codex,claude,claude,claude,claude \
+OMCP_TEAM_WORKER_CLI_MAP=codex,codex,codex,codex,claude,claude,claude,claude \
 ./scripts/demo-team-e2e.sh
 ```

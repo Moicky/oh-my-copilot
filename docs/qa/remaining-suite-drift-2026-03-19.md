@@ -2,7 +2,7 @@
 
 Date: **2026-03-19**  
 Baseline commit: **`8106d67`**  
-Execution surface: active OMCP team worker pane (`worker-3`) with local verification run from repository root after clearing `OMX_TEAM_*` env vars.
+Execution surface: active OMCP team worker pane (`worker-3`) with local verification run from repository root after clearing `OMCP_TEAM_*` env vars.
 
 ## Scope
 
@@ -13,7 +13,7 @@ This note captures the remaining local full-suite drift observed after the earli
 Command sequence used from the repository root:
 
 ```bash
-unset OMX_TEAM_STATE_ROOT OMX_TEAM_WORKER OMX_TEAM_LEADER_CWD
+unset OMCP_TEAM_STATE_ROOT OMCP_TEAM_WORKER OMCP_TEAM_LEADER_CWD
 npm run build
 npm run lint
 npm test

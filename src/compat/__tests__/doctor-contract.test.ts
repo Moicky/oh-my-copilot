@@ -28,7 +28,7 @@ function shouldSkipForSpawnPermissions(err?: string): boolean {
 }
 
 function resolveCompatTarget(): { command: string; argsPrefix: string[] } {
-  const override = process.env.OMX_COMPAT_TARGET?.trim();
+  const override = process.env.OMCP_COMPAT_TARGET?.trim();
   const targetPath = override
     ? (isAbsolute(override) ? override : resolve(process.cwd(), override))
     : defaultTarget;

@@ -34,7 +34,7 @@ function safeString(value: unknown): string {
 }
 
 function hasWorkerContext(env: NodeJS.ProcessEnv): boolean {
-  return safeString(env.OMX_TEAM_WORKER).trim() !== '';
+  return safeString(env.OMCP_TEAM_WORKER).trim() !== '';
 }
 
 export async function evaluateQuestionPolicy(

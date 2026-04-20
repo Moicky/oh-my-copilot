@@ -58,7 +58,7 @@ describe('notify-hook managed tmux windows fallback', () => {
   const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
   const originalTmux = process.env.TMUX;
   const originalTmuxPane = process.env.TMUX_PANE;
-  const originalTeamWorker = process.env.OMX_TEAM_WORKER;
+  const originalTeamWorker = process.env.OMCP_TEAM_WORKER;
 
   afterEach(() => {
     if (originalPlatform) Object.defineProperty(process, 'platform', originalPlatform);
@@ -66,8 +66,8 @@ describe('notify-hook managed tmux windows fallback', () => {
     else delete process.env.TMUX;
     if (originalTmuxPane !== undefined) process.env.TMUX_PANE = originalTmuxPane;
     else delete process.env.TMUX_PANE;
-    if (originalTeamWorker !== undefined) process.env.OMX_TEAM_WORKER = originalTeamWorker;
-    else delete process.env.OMX_TEAM_WORKER;
+    if (originalTeamWorker !== undefined) process.env.OMCP_TEAM_WORKER = originalTeamWorker;
+    else delete process.env.OMCP_TEAM_WORKER;
   });
 
   it('does not rely on ps ancestry checks on native Windows', async () => {
@@ -87,7 +87,7 @@ describe('notify-hook managed tmux windows fallback', () => {
       Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
       delete process.env.TMUX;
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const result = await resolveManagedSessionContext(cwd, { session_id: sessionId }, { allowTeamWorker: false });
       assert.equal(result.managed, false);
@@ -111,7 +111,7 @@ describe('notify-hook managed tmux windows fallback', () => {
 
       delete process.env.TMUX;
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const result = await resolveManagedSessionContext(cwd, { session_id: 'codex-native-session' }, { allowTeamWorker: false });
       assert.equal(result.managed, true);
@@ -133,7 +133,7 @@ describe('notify-hook managed tmux windows fallback', () => {
 
       delete process.env.TMUX;
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const result = await resolveManagedSessionContext(aliasCwd, { session_id: 'omcp-alias-session' }, { allowTeamWorker: false });
       assert.equal(result.managed, true);
@@ -156,7 +156,7 @@ describe('notify-hook managed tmux windows fallback', () => {
 
       delete process.env.TMUX;
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
       await withFakeTmux(cwd, `#!/usr/bin/env bash
@@ -274,7 +274,7 @@ exit 1
       process.env.PATH = `${fakeBinDir}:${originalPath || ''}`;
       process.env.TMUX = '1';
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const paneId = await resolveManagedPaneFromAnchor('%42', cwd, { session_id: sessionId }, { allowTeamWorker: false });
       assert.equal(paneId, '%42');
@@ -365,7 +365,7 @@ exit 1
       process.env.PATH = `${fakeBinDir}:${originalPath || ''}`;
       process.env.TMUX = '1';
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const paneId = await resolveManagedPaneFromAnchor('%42', cwd, { session_id: sessionId }, { allowTeamWorker: false });
       assert.equal(paneId, '%55');
@@ -444,7 +444,7 @@ exit 1
       process.env.PATH = `${fakeBinDir}:${originalPath || ''}`;
       process.env.TMUX = '1';
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const paneId = await resolveManagedSessionPane(cwd, { session_id: sessionId });
       assert.equal(paneId, '');
@@ -535,7 +535,7 @@ exit 1
       process.env.PATH = `${fakeBinDir}:${originalPath || ''}`;
       process.env.TMUX = '1';
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const paneId = await resolveManagedPaneFromAnchor('%42', cwd, { session_id: sessionId }, { allowTeamWorker: false });
       assert.equal(paneId, '%42');
@@ -626,7 +626,7 @@ exit 1
       process.env.PATH = `${fakeBinDir}:${originalPath || ''}`;
       process.env.TMUX = '1';
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const paneId = await resolveManagedPaneFromAnchor('%42', cwd, { session_id: sessionId }, { allowTeamWorker: false });
       assert.equal(paneId, '');
@@ -717,7 +717,7 @@ exit 1
       process.env.PATH = `${fakeBinDir}:${originalPath || ''}`;
       process.env.TMUX = '1';
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const paneId = await resolveManagedPaneFromAnchor('%42', cwd, { session_id: sessionId }, { allowTeamWorker: false });
       assert.equal(paneId, '%55');
@@ -808,7 +808,7 @@ exit 1
       process.env.PATH = `${fakeBinDir}:${originalPath || ''}`;
       process.env.TMUX = '1';
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const paneId = await resolveManagedPaneFromAnchor('%42', cwd, { session_id: sessionId }, { allowTeamWorker: false });
       assert.equal(paneId, '%55');
@@ -910,7 +910,7 @@ exit 1
       process.env.PATH = `${fakeBinDir}:${originalPath || ''}`;
       process.env.TMUX = '1';
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const paneId = await resolveManagedPaneFromAnchor('%42', cwd, { session_id: sessionId }, { allowTeamWorker: false });
       assert.equal(paneId, '%55');
@@ -1001,7 +1001,7 @@ exit 1
       process.env.PATH = `${fakeBinDir}:${originalPath || ''}`;
       process.env.TMUX = '1';
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const paneId = await resolveManagedPaneFromAnchor('%42', cwd, { session_id: sessionId }, { allowTeamWorker: false });
       assert.equal(paneId, '');
@@ -1088,7 +1088,7 @@ exit 1
       process.env.PATH = `${fakeBinDir}:${originalPath || ''}`;
       process.env.TMUX = '1';
       delete process.env.TMUX_PANE;
-      process.env.OMX_TEAM_WORKER = '';
+      process.env.OMCP_TEAM_WORKER = '';
 
       const paneId = await resolveManagedPaneFromAnchor('%42', cwd, { session_id: sessionId }, { allowTeamWorker: false });
       assert.equal(paneId, '%42');

@@ -294,9 +294,9 @@ describe("resolveNotifyTempContract", () => {
     assert.equal(parsed.contract.warnings.length >= 1, true);
   });
 
-  it("activates from OMX_NOTIFY_TEMP=1 env parity", () => {
+  it("activates from OMCP_NOTIFY_TEMP=1 env parity", () => {
     const parsed = resolveNotifyTempContract(["--model", "gpt-5"], {
-      OMX_NOTIFY_TEMP: "1",
+      OMCP_NOTIFY_TEMP: "1",
     });
     assert.equal(parsed.contract.active, true);
     assert.equal(parsed.contract.source, "env");
@@ -626,10 +626,10 @@ describe("watcher script path resolution", () => {
 describe("buildNotifyFallbackWatcherEnv", () => {
   it("enables watcher authority and propagates CODEX_HOME override when requested", () => {
     const env = buildNotifyFallbackWatcherEnv(
-      { HOME: "/tmp/home", OMX_HUD_AUTHORITY: "0", TMUX: "sock,1,0", TMUX_PANE: "%2" },
+      { HOME: "/tmp/home", OMCP_HUD_AUTHORITY: "0", TMUX: "sock,1,0", TMUX_PANE: "%2" },
       { codexHomeOverride: "/tmp/codex-home", enableAuthority: true },
     );
-    assert.equal(env.OMX_HUD_AUTHORITY, "1");
+    assert.equal(env.OMCP_HUD_AUTHORITY, "1");
     assert.equal(env.CODEX_HOME, "/tmp/codex-home");
     assert.equal(env.HOME, "/tmp/home");
     assert.equal(env.TMUX, undefined);
@@ -638,10 +638,10 @@ describe("buildNotifyFallbackWatcherEnv", () => {
 
   it("disables watcher authority explicitly when not requested", () => {
     const env = buildNotifyFallbackWatcherEnv(
-      { HOME: "/tmp/home", OMX_HUD_AUTHORITY: "1", TMUX: "sock,1,0", TMUX_PANE: "%3" },
+      { HOME: "/tmp/home", OMCP_HUD_AUTHORITY: "1", TMUX: "sock,1,0", TMUX_PANE: "%3" },
       { enableAuthority: false },
     );
-    assert.equal(env.OMX_HUD_AUTHORITY, "0");
+    assert.equal(env.OMCP_HUD_AUTHORITY, "0");
     assert.equal(env.HOME, "/tmp/home");
     assert.equal(env.TMUX, undefined);
     assert.equal(env.TMUX_PANE, undefined);
@@ -655,7 +655,7 @@ describe("shouldEnableNotifyFallbackWatcher", () => {
 
   it("disables notify fallback explicitly on non-Windows hosts", () => {
     assert.equal(
-      shouldEnableNotifyFallbackWatcher({ OMX_NOTIFY_FALLBACK: "0" }, "linux"),
+      shouldEnableNotifyFallbackWatcher({ OMCP_NOTIFY_FALLBACK: "0" }, "linux"),
       false,
     );
   });
@@ -666,7 +666,7 @@ describe("shouldEnableNotifyFallbackWatcher", () => {
 
   it("allows explicit opt-in for notify fallback on win32", () => {
     assert.equal(
-      shouldEnableNotifyFallbackWatcher({ OMX_NOTIFY_FALLBACK: "1" }, "win32"),
+      shouldEnableNotifyFallbackWatcher({ OMCP_NOTIFY_FALLBACK: "1" }, "win32"),
       true,
     );
   });
@@ -1417,7 +1417,7 @@ describe("detached tmux new-session sequencing", () => {
     assert.equal(steps[1]?.args.includes("#{pane_id}"), true);
     assert.equal(steps[0]?.args.includes("-e"), true);
     assert.equal(
-      steps[0]?.args.includes('OMX_NOTIFY_TEMP_CONTRACT={\"active\":true}'),
+      steps[0]?.args.includes('OMCP_NOTIFY_TEMP_CONTRACT={\"active\":true}'),
       true,
     );
   });
@@ -1437,17 +1437,17 @@ describe("detached tmux new-session sequencing", () => {
     assert.equal(
       newSession!.args.includes("-e") &&
         newSession!.args.some((arg) =>
-          arg.startsWith("OMX_NOTIFY_TEMP_CONTRACT="),
+          arg.startsWith("OMCP_NOTIFY_TEMP_CONTRACT="),
         ),
       true,
     );
   });
 
-  it("buildDetachedSessionBootstrapSteps forwards OMX_SESSION_ID to detached tmux session", () => {
+  it("buildDetachedSessionBootstrapSteps forwards OMCP_SESSION_ID to detached tmux session", () => {
     const steps = buildDetachedSessionBootstrapSteps(
       "omcp-demo",
       "/tmp/project",
-      "'env' 'OMX_SESSION_ID=sess-detached-managed' 'codex' '--model' 'gpt-5'",
+      "'env' 'OMCP_SESSION_ID=sess-detached-managed' 'codex' '--model' 'gpt-5'",
       "'node' '/tmp/omcp.js' 'hud' '--watch'",
       null,
       undefined,
@@ -1459,16 +1459,16 @@ describe("detached tmux new-session sequencing", () => {
     assert.ok(newSession);
     assert.equal(
       newSession!.args.includes("-e") &&
-        newSession!.args.some((arg) => arg === "OMX_SESSION_ID=sess-detached-managed"),
+        newSession!.args.some((arg) => arg === "OMCP_SESSION_ID=sess-detached-managed"),
       true,
     );
   });
 
-  it("runCodex builds inside-tmux HUD command with OMX_SESSION_ID", async () => {
+  it("runCodex builds inside-tmux HUD command with OMCP_SESSION_ID", async () => {
     const source = await readFile(join(repoRoot, 'src', 'cli', 'index.ts'), 'utf-8');
     assert.match(
       source,
-      /buildTmuxPaneCommand\("env", \[`OMX_SESSION_ID=\$\{sessionId\}`, "node", omxBin, "hud", "--watch"\]\)/,
+      /buildTmuxPaneCommand\("env", \[`OMCP_SESSION_ID=\$\{sessionId\}`, "node", omxBin, "hud", "--watch"\]\)/,
     );
   });
 
@@ -2581,7 +2581,7 @@ describe("injectModelInstructionsBypassArgs", () => {
     const args = injectModelInstructionsBypassArgs(
       "/tmp/my-project",
       ["--model", "gpt-5"],
-      { OMX_BYPASS_DEFAULT_SYSTEM_PROMPT: "0" },
+      { OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT: "0" },
     );
     assert.deepEqual(args, ["--model", "gpt-5"]);
   });
@@ -2595,9 +2595,9 @@ describe("injectModelInstructionsBypassArgs", () => {
     assert.deepEqual(args, ["-c", 'model_instructions_file="/tmp/custom.md"']);
   });
 
-  it("respects OMX_MODEL_INSTRUCTIONS_FILE env override", () => {
+  it("respects OMCP_MODEL_INSTRUCTIONS_FILE env override", () => {
     const args = injectModelInstructionsBypassArgs("/tmp/my-project", [], {
-      OMX_MODEL_INSTRUCTIONS_FILE: "/tmp/alt instructions.md",
+      OMCP_MODEL_INSTRUCTIONS_FILE: "/tmp/alt instructions.md",
     });
     assert.deepEqual(args, [
       "-c",

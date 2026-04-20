@@ -52,7 +52,7 @@ function normalizeValidTeamName(value) {
 }
 
 export function resolveLeaderNudgeIntervalMs() {
-  const raw = safeString(process.env.OMX_TEAM_LEADER_NUDGE_MS || '');
+  const raw = safeString(process.env.OMCP_TEAM_LEADER_NUDGE_MS || '');
   const parsed = asNumber(raw);
   // Default: 30 seconds for stale-leader follow-up. Guard against spam.
   if (parsed !== null && parsed >= 10_000 && parsed <= 30 * 60_000) return parsed;
@@ -60,7 +60,7 @@ export function resolveLeaderNudgeIntervalMs() {
 }
 
 export function resolveLeaderAllIdleNudgeCooldownMs() {
-  const raw = safeString(process.env.OMX_TEAM_LEADER_ALL_IDLE_COOLDOWN_MS || '');
+  const raw = safeString(process.env.OMCP_TEAM_LEADER_ALL_IDLE_COOLDOWN_MS || '');
   const parsed = asNumber(raw);
   // Default: 30 seconds.
   if (parsed !== null && parsed >= 5_000 && parsed <= 10 * 60_000) return parsed;
@@ -68,7 +68,7 @@ export function resolveLeaderAllIdleNudgeCooldownMs() {
 }
 
 export function resolveLeaderStalenessThresholdMs() {
-  const raw = safeString(process.env.OMX_TEAM_LEADER_STALE_MS || '');
+  const raw = safeString(process.env.OMCP_TEAM_LEADER_STALE_MS || '');
   const parsed = asNumber(raw);
   // Default: 3 minutes. Guard against unreasonable values.
   if (parsed !== null && parsed >= 10_000 && parsed <= 30 * 60_000) return parsed;
@@ -76,7 +76,7 @@ export function resolveLeaderStalenessThresholdMs() {
 }
 
 export function resolveFallbackProgressStallThresholdMs() {
-  const raw = safeString(process.env.OMX_TEAM_PROGRESS_STALL_MS || '');
+  const raw = safeString(process.env.OMCP_TEAM_PROGRESS_STALL_MS || '');
   const parsed = asNumber(raw);
   // Fallback-only threshold used when worker turn-count signals are unavailable.
   // Default: 2 minutes. Guard against unreasonable values.
@@ -85,7 +85,7 @@ export function resolveFallbackProgressStallThresholdMs() {
 }
 
 export function resolveWorkerTurnStallThresholdMs() {
-  const raw = safeString(process.env.OMX_TEAM_WORKER_TURN_STALL_MS || '');
+  const raw = safeString(process.env.OMCP_TEAM_WORKER_TURN_STALL_MS || '');
   const parsed = asNumber(raw);
   // Default: 30 seconds. Guard against unreasonable values.
   if (parsed !== null && parsed >= 10_000 && parsed <= 10 * 60_000) return parsed;
@@ -263,7 +263,7 @@ async function syncScopedTeamStateFromPhase(teamStatePath, teamName, phaseSnapsh
 
 async function resolveCurrentSessionId(stateDir) {
   const fromEnv = safeString(
-    process.env.OMX_SESSION_ID
+    process.env.OMCP_SESSION_ID
     || process.env.CODEX_SESSION_ID
     || process.env.SESSION_ID
     || '',

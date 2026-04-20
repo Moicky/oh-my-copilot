@@ -71,10 +71,10 @@ const DEFAULT_AUTO_NUDGE_RESPONSE =
   "continue with the current task only if it is already authorized";
 
 const TEAM_ENV_KEYS = [
-  "OMX_TEAM_WORKER",
-  "OMX_TEAM_STATE_ROOT",
-  "OMX_TEAM_LEADER_CWD",
-  "OMX_SESSION_ID",
+  "OMCP_TEAM_WORKER",
+  "OMCP_TEAM_STATE_ROOT",
+  "OMCP_TEAM_LEADER_CWD",
+  "OMCP_SESSION_ID",
 ] as const;
 
 const priorTeamEnv = new Map<(typeof TEAM_ENV_KEYS)[number], string | undefined>();
@@ -1821,7 +1821,7 @@ esac
       );
       assert.match(
         additionalContext,
-        /OMX_MCP_TRANSPORT_DEBUG=1/,
+        /OMCP_MCP_TRANSPORT_DEBUG=1/,
       );
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -1862,7 +1862,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-transport" },
+        { ...process.env, OMCP_SESSION_ID: "sess-transport" },
       );
       await writeJson(join(cwd, ".omcp", "state", "team-state.json"), {
         active: true,
@@ -1926,7 +1926,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: canonicalSessionId },
+        { ...process.env, OMCP_SESSION_ID: canonicalSessionId },
       );
       await writeJson(join(cwd, ".omcp", "state", "team-state.json"), {
         active: true,
@@ -2029,7 +2029,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-mcp-dead" },
+        { ...process.env, OMCP_SESSION_ID: "sess-mcp-dead" },
       );
 
       const result = await dispatchCodexNativeHook(
@@ -2112,7 +2112,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-stop-mcp-transport" },
+        { ...process.env, OMCP_SESSION_ID: "sess-stop-mcp-transport" },
       );
       await writeJson(join(cwd, ".omcp", "state", "team-state.json"), {
         active: true,
@@ -2143,7 +2143,7 @@ esac
         hookSpecificOutput: {
           hookEventName: "PostToolUse",
           additionalContext:
-            "Clear MCP transport-death signal detected. Preserve current team/runtime state. Retry via CLI parity with `omcp state state_write --input '{\"mode\":\"team\",\"active\":true}' --json`. OMCP MCP servers are plain Node stdio processes, so they still shut down when stdin/transport closes. If this happened during team runtime, inspect first with `omcp team status <team>` or `omcp team api read-stall-state --input '{\"team_name\":\"<team>\"}' --json`, and only force cleanup after capturing needed state. For root-cause debugging, rerun with `OMX_MCP_TRANSPORT_DEBUG=1` to log why the stdio transport closed.",
+            "Clear MCP transport-death signal detected. Preserve current team/runtime state. Retry via CLI parity with `omcp state state_write --input '{\"mode\":\"team\",\"active\":true}' --json`. OMCP MCP servers are plain Node stdio processes, so they still shut down when stdin/transport closes. If this happened during team runtime, inspect first with `omcp team status <team>` or `omcp team api read-stall-state --input '{\"team_name\":\"<team>\"}' --json`, and only force cleanup after capturing needed state. For root-cause debugging, rerun with `OMCP_MCP_TRANSPORT_DEBUG=1` to log why the stdio transport closed.",
         },
       });
 
@@ -2311,9 +2311,9 @@ esac
 
   it("blocks Stop for a team worker with a non-terminal assigned task via native worker context", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omcp-native-hook-stop-team-worker-"));
-    const prevTeamWorker = process.env.OMX_TEAM_WORKER;
-    const prevTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
-    const prevLeaderCwd = process.env.OMX_TEAM_LEADER_CWD;
+    const prevTeamWorker = process.env.OMCP_TEAM_WORKER;
+    const prevTeamStateRoot = process.env.OMCP_TEAM_STATE_ROOT;
+    const prevLeaderCwd = process.env.OMCP_TEAM_LEADER_CWD;
     try {
       await initTeamState(
         "worker-stop-team",
@@ -2322,7 +2322,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-stop-team-worker" },
+        { ...process.env, OMCP_SESSION_ID: "sess-stop-team-worker" },
       );
       const workerDir = join(cwd, ".omcp", "state", "team", "worker-stop-team", "workers", "worker-1");
       await writeJson(join(workerDir, "status.json"), {
@@ -2339,9 +2339,9 @@ esac
         created_at: new Date().toISOString(),
       });
 
-      process.env.OMX_TEAM_WORKER = "worker-stop-team/worker-1";
-      process.env.OMX_TEAM_STATE_ROOT = join(cwd, ".omcp", "state");
-      process.env.OMX_TEAM_LEADER_CWD = cwd;
+      process.env.OMCP_TEAM_WORKER = "worker-stop-team/worker-1";
+      process.env.OMCP_TEAM_STATE_ROOT = join(cwd, ".omcp", "state");
+      process.env.OMCP_TEAM_LEADER_CWD = cwd;
 
       const result = await dispatchCodexNativeHook(
         {
@@ -2360,20 +2360,20 @@ esac
         systemMessage: "OMCP team worker worker-1 is still assigned task 1 (in_progress).",
       });
     } finally {
-      if (typeof prevTeamWorker === "string") process.env.OMX_TEAM_WORKER = prevTeamWorker;
-      else delete process.env.OMX_TEAM_WORKER;
-      if (typeof prevTeamStateRoot === "string") process.env.OMX_TEAM_STATE_ROOT = prevTeamStateRoot;
-      else delete process.env.OMX_TEAM_STATE_ROOT;
-      if (typeof prevLeaderCwd === "string") process.env.OMX_TEAM_LEADER_CWD = prevLeaderCwd;
-      else delete process.env.OMX_TEAM_LEADER_CWD;
+      if (typeof prevTeamWorker === "string") process.env.OMCP_TEAM_WORKER = prevTeamWorker;
+      else delete process.env.OMCP_TEAM_WORKER;
+      if (typeof prevTeamStateRoot === "string") process.env.OMCP_TEAM_STATE_ROOT = prevTeamStateRoot;
+      else delete process.env.OMCP_TEAM_STATE_ROOT;
+      if (typeof prevLeaderCwd === "string") process.env.OMCP_TEAM_LEADER_CWD = prevLeaderCwd;
+      else delete process.env.OMCP_TEAM_LEADER_CWD;
       await rm(cwd, { recursive: true, force: true });
     }
   });
 
   it("does not block Stop for a team worker when assigned task is terminal", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omcp-native-hook-stop-team-worker-terminal-"));
-    const prevTeamWorker = process.env.OMX_TEAM_WORKER;
-    const prevTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
+    const prevTeamWorker = process.env.OMCP_TEAM_WORKER;
+    const prevTeamStateRoot = process.env.OMCP_TEAM_STATE_ROOT;
     try {
       await initTeamState(
         "worker-stop-team-terminal",
@@ -2382,7 +2382,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-stop-team-worker-terminal" },
+        { ...process.env, OMCP_SESSION_ID: "sess-stop-team-worker-terminal" },
       );
       const workerDir = join(cwd, ".omcp", "state", "team", "worker-stop-team-terminal", "workers", "worker-1");
       await writeJson(join(workerDir, "status.json"), {
@@ -2399,8 +2399,8 @@ esac
         created_at: new Date().toISOString(),
       });
 
-      process.env.OMX_TEAM_WORKER = "worker-stop-team-terminal/worker-1";
-      process.env.OMX_TEAM_STATE_ROOT = join(cwd, ".omcp", "state");
+      process.env.OMCP_TEAM_WORKER = "worker-stop-team-terminal/worker-1";
+      process.env.OMCP_TEAM_STATE_ROOT = join(cwd, ".omcp", "state");
 
       const result = await dispatchCodexNativeHook(
         {
@@ -2419,10 +2419,10 @@ esac
         systemMessage: "OMCP team pipeline is still active at phase team-exec.",
       });
     } finally {
-      if (typeof prevTeamWorker === "string") process.env.OMX_TEAM_WORKER = prevTeamWorker;
-      else delete process.env.OMX_TEAM_WORKER;
-      if (typeof prevTeamStateRoot === "string") process.env.OMX_TEAM_STATE_ROOT = prevTeamStateRoot;
-      else delete process.env.OMX_TEAM_STATE_ROOT;
+      if (typeof prevTeamWorker === "string") process.env.OMCP_TEAM_WORKER = prevTeamWorker;
+      else delete process.env.OMCP_TEAM_WORKER;
+      if (typeof prevTeamStateRoot === "string") process.env.OMCP_TEAM_STATE_ROOT = prevTeamStateRoot;
+      else delete process.env.OMCP_TEAM_STATE_ROOT;
       await rm(cwd, { recursive: true, force: true });
     }
   });
@@ -2437,7 +2437,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-stop-team-canonical" },
+        { ...process.env, OMCP_SESSION_ID: "sess-stop-team-canonical" },
       );
 
       const result = await dispatchCodexNativeHook(
@@ -2472,7 +2472,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-stop-release-ready" },
+        { ...process.env, OMCP_SESSION_ID: "sess-stop-release-ready" },
       );
       await writeReleaseReadinessLeaderAttention(
         "release-ready-team",
@@ -2523,7 +2523,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-stop-general-review" },
+        { ...process.env, OMCP_SESSION_ID: "sess-stop-general-review" },
       );
       await writeReleaseReadinessLeaderAttention(
         "general-review-team",
@@ -2567,7 +2567,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-stop-team-canonical-refire" },
+        { ...process.env, OMCP_SESSION_ID: "sess-stop-team-canonical-refire" },
       );
 
       await dispatchCodexNativeHook(
@@ -2616,7 +2616,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-stop-team-terminal" },
+        { ...process.env, OMCP_SESSION_ID: "sess-stop-team-terminal" },
       );
       await writeJson(join(cwd, ".omcp", "state", "team", "terminal-team", "phase.json"), {
         current_phase: "complete",
@@ -2652,7 +2652,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-stop-team-legacy" },
+        { ...process.env, OMCP_SESSION_ID: "sess-stop-team-legacy" },
       );
       const manifestPath = join(cwd, ".omcp", "state", "team", "legacy-team", "manifest.v2.json");
       const manifest = JSON.parse(await readFile(manifestPath, "utf-8")) as Record<string, unknown>;
@@ -2687,12 +2687,12 @@ esac
   });
 
 
-  it("reads canonical Stop fallback team state from OMX_TEAM_STATE_ROOT when configured", async () => {
+  it("reads canonical Stop fallback team state from OMCP_TEAM_STATE_ROOT when configured", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omcp-native-hook-stop-team-root-"));
     const sharedRoot = join(cwd, "shared-root");
-    const priorTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
+    const priorTeamStateRoot = process.env.OMCP_TEAM_STATE_ROOT;
     try {
-      process.env.OMX_TEAM_STATE_ROOT = "shared-root";
+      process.env.OMCP_TEAM_STATE_ROOT = "shared-root";
       await initTeamState(
         "canonical-root-team",
         "canonical stop root fallback",
@@ -2700,7 +2700,7 @@ esac
         1,
         cwd,
         undefined,
-        { ...process.env, OMX_SESSION_ID: "sess-stop-team-root", OMX_TEAM_STATE_ROOT: "shared-root" },
+        { ...process.env, OMCP_SESSION_ID: "sess-stop-team-root", OMCP_TEAM_STATE_ROOT: "shared-root" },
       );
 
       const result = await dispatchCodexNativeHook(
@@ -2722,17 +2722,17 @@ esac
       });
       assert.equal(existsSync(join(sharedRoot, "team", "canonical-root-team", "phase.json")), true);
     } finally {
-      if (typeof priorTeamStateRoot === "string") process.env.OMX_TEAM_STATE_ROOT = priorTeamStateRoot;
-      else delete process.env.OMX_TEAM_STATE_ROOT;
+      if (typeof priorTeamStateRoot === "string") process.env.OMCP_TEAM_STATE_ROOT = priorTeamStateRoot;
+      else delete process.env.OMCP_TEAM_STATE_ROOT;
       await rm(cwd, { recursive: true, force: true });
     }
   });
 
-  it("returns Stop continuation output from canonical team state rooted via OMX_TEAM_STATE_ROOT", async () => {
+  it("returns Stop continuation output from canonical team state rooted via OMCP_TEAM_STATE_ROOT", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omcp-native-hook-stop-team-env-root-"));
-    const previousTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
+    const previousTeamStateRoot = process.env.OMCP_TEAM_STATE_ROOT;
     try {
-      process.env.OMX_TEAM_STATE_ROOT = "shared-team-state";
+      process.env.OMCP_TEAM_STATE_ROOT = "shared-team-state";
       await initTeamState(
         "env-root-team",
         "env root stop fallback",
@@ -2742,8 +2742,8 @@ esac
         undefined,
         {
           ...process.env,
-          OMX_SESSION_ID: "sess-stop-team-env-root",
-          OMX_TEAM_STATE_ROOT: "shared-team-state",
+          OMCP_SESSION_ID: "sess-stop-team-env-root",
+          OMCP_TEAM_STATE_ROOT: "shared-team-state",
         },
       );
 
@@ -2765,8 +2765,8 @@ esac
         systemMessage: "OMCP team pipeline is still active at phase team-exec.",
       });
     } finally {
-      if (typeof previousTeamStateRoot === "string") process.env.OMX_TEAM_STATE_ROOT = previousTeamStateRoot;
-      else delete process.env.OMX_TEAM_STATE_ROOT;
+      if (typeof previousTeamStateRoot === "string") process.env.OMCP_TEAM_STATE_ROOT = previousTeamStateRoot;
+      else delete process.env.OMCP_TEAM_STATE_ROOT;
       await rm(cwd, { recursive: true, force: true });
     }
   });
@@ -3596,7 +3596,7 @@ esac
 
   it("keeps blocking Ralph Stop replays until the active task advances", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omcp-native-hook-stop-ralph-replay-"));
-    const previousOmxSessionId = process.env.OMX_SESSION_ID;
+    const previousOmxSessionId = process.env.OMCP_SESSION_ID;
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(stateDir, { recursive: true });
@@ -3608,7 +3608,7 @@ esac
         }),
       );
 
-      process.env.OMX_SESSION_ID = "sess-stop-ralph-replay";
+      process.env.OMCP_SESSION_ID = "sess-stop-ralph-replay";
       const payload = {
         hook_event_name: "Stop",
         cwd,
@@ -3637,8 +3637,8 @@ esac
       assert.equal(replay.omxEventName, "stop");
       assert.deepEqual(replay.outputJson, expected);
     } finally {
-      if (typeof previousOmxSessionId === "string") process.env.OMX_SESSION_ID = previousOmxSessionId;
-      else delete process.env.OMX_SESSION_ID;
+      if (typeof previousOmxSessionId === "string") process.env.OMCP_SESSION_ID = previousOmxSessionId;
+      else delete process.env.OMCP_SESSION_ID;
       await rm(cwd, { recursive: true, force: true });
     }
   });
@@ -3649,7 +3649,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(stateDir, { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto";
 
       const result = await dispatchCodexNativeHook(
         {
@@ -3679,7 +3679,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(stateDir, { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto-once";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto-once";
 
       await dispatchCodexNativeHook(
         {
@@ -3724,7 +3724,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(stateDir, { recursive: true });
-      process.env.OMX_SESSION_ID = "omcp-canonical";
+      process.env.OMCP_SESSION_ID = "omcp-canonical";
       await writeJson(join(stateDir, "session.json"), {
         session_id: "omcp-canonical",
         native_session_id: "codex-native",
@@ -3778,7 +3778,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(stateDir, { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto-refire";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto-refire";
 
       await dispatchCodexNativeHook(
         {
@@ -3822,7 +3822,7 @@ esac
     const cwd = await mkdtemp(join(tmpdir(), "omcp-native-hook-auto-nudge-permission-"));
     try {
       await mkdir(join(cwd, ".omcp", "state"), { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto-permission";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto-permission";
 
       const result = await dispatchCodexNativeHook(
         {
@@ -3851,7 +3851,7 @@ esac
     const cwd = await mkdtemp(join(tmpdir(), "omcp-native-hook-auto-nudge-if-you-want-"));
     try {
       await mkdir(join(cwd, ".omcp", "state"), { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto-if-you-want";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto-if-you-want";
 
       const result = await dispatchCodexNativeHook(
         {
@@ -3881,7 +3881,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(join(stateDir, "sessions", "sess-stop-auto-question"), { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto-question";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto-question";
       await writeJson(join(stateDir, "session.json"), { session_id: "sess-stop-auto-question" });
       await writeJson(join(stateDir, "sessions", "sess-stop-auto-question", "skill-active-state.json"), {
         version: 1,
@@ -3932,7 +3932,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(join(stateDir, "sessions", "sess-stop-auto-interview"), { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto-interview";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto-interview";
       await writeJson(join(stateDir, "session.json"), { session_id: "sess-stop-auto-interview" });
       await writeJson(join(stateDir, "sessions", "sess-stop-auto-interview", "deep-interview-state.json"), {
         active: true,
@@ -3965,7 +3965,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(stateDir, { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto-mode";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto-mode";
       await writeJson(join(stateDir, "deep-interview-state.json"), {
         active: true,
         mode: "deep-interview",
@@ -3994,7 +3994,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(stateDir, { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto-stale-root-mode";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto-stale-root-mode";
       await writeJson(join(stateDir, "deep-interview-state.json"), {
         active: true,
         mode: "deep-interview",
@@ -4031,7 +4031,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(stateDir, { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto-stale-root-skill";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto-stale-root-skill";
       await writeJson(join(stateDir, "skill-active-state.json"), {
         active: true,
         skill: "deep-interview",
@@ -4068,7 +4068,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(stateDir, { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto-stale-root-lock";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto-stale-root-lock";
       await writeJson(join(stateDir, "skill-active-state.json"), {
         active: true,
         skill: "deep-interview",
@@ -4111,7 +4111,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(join(stateDir, "sessions", "sess-stop-auto-inactive-mode"), { recursive: true });
-      process.env.OMX_SESSION_ID = "sess-stop-auto-inactive-mode";
+      process.env.OMCP_SESSION_ID = "sess-stop-auto-inactive-mode";
       await writeJson(join(stateDir, "session.json"), { session_id: "sess-stop-auto-inactive-mode" });
       await writeJson(join(stateDir, "sessions", "sess-stop-auto-inactive-mode", "deep-interview-state.json"), {
         active: false,
@@ -4248,7 +4248,7 @@ esac
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(join(stateDir, "sessions", "omcp-canonical"), { recursive: true });
-      process.env.OMX_SESSION_ID = "omcp-canonical";
+      process.env.OMCP_SESSION_ID = "omcp-canonical";
       await writeJson(join(stateDir, "session.json"), {
         session_id: "omcp-canonical",
         native_session_id: "codex-native",

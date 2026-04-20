@@ -24,7 +24,7 @@ describe('resolveQuestionRendererStrategy', () => {
 
   it('uses noop test renderer override when requested', () => {
     assert.equal(
-      resolveQuestionRendererStrategy({ OMX_QUESTION_TEST_RENDERER: 'noop' } as NodeJS.ProcessEnv, '/usr/bin/tmux'),
+      resolveQuestionRendererStrategy({ OMCP_QUESTION_TEST_RENDERER: 'noop' } as NodeJS.ProcessEnv, '/usr/bin/tmux'),
       'test-noop',
     );
   });

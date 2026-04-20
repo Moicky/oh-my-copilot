@@ -8,14 +8,14 @@ use std::path::{Path, PathBuf};
 use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-const CODEX_BIN_ENV: &str = "OMX_EXPLORE_CODEX_BIN";
-const HARNESS_ROOT_ENV: &str = "OMX_EXPLORE_ROOT";
+const CODEX_BIN_ENV: &str = "OMCP_EXPLORE_CODEX_BIN";
+const HARNESS_ROOT_ENV: &str = "OMCP_EXPLORE_ROOT";
 const INTERNAL_DIRECT_WRAPPER_FLAG: &str = "--internal-allowlist-direct";
 const INTERNAL_SHELL_WRAPPER_FLAG: &str = "--internal-allowlist-shell";
 const TEMP_ALLOWLIST_DIR_PREFIX: &str = "omcp-explore-allowlist-";
 const SHELL_STARTUP_ENV_VARS: &[&str] = &["BASH_ENV", "ENV", "PROMPT_COMMAND"];
 const WINDOWS_UNSUPPORTED_ALLOWLIST_MESSAGE: &str =
-    "omcp explore built-in harness is not ready on Windows because its allowlist runtime relies on POSIX sh/bash wrappers. Set OMX_EXPLORE_BIN to a compatible custom harness, prefer `omcp sparkshell` for shell-native read-only lookups, or run `omcp doctor` for readiness details.";
+    "omcp explore built-in harness is not ready on Windows because its allowlist runtime relies on POSIX sh/bash wrappers. Set OMCP_EXPLORE_BIN to a compatible custom harness, prefer `omcp sparkshell` for shell-native read-only lookups, or run `omcp doctor` for readiness details.";
 
 const ALLOWED_DIRECT_COMMANDS: &[&str] = &[
     "rg", "grep", "ls", "find", "wc", "cat", "head", "tail", "pwd", "printf",
@@ -1453,7 +1453,7 @@ exec node "$basedir/../@openai/codex/bin/codex.js" "$@"
         let diagnostic = allowlist_platform_diagnostic("windows").expect("windows diagnostic");
 
         assert!(diagnostic.contains("not ready on Windows"));
-        assert!(diagnostic.contains("OMX_EXPLORE_BIN"));
+        assert!(diagnostic.contains("OMCP_EXPLORE_BIN"));
         assert!(allowlist_platform_diagnostic("linux").is_none());
     }
 

@@ -169,7 +169,7 @@ Rules:
 - Child agents should report recommended handoffs upward.
 - Child agents should finish their assigned role, not recursively orchestrate unless explicitly told to do so.
 - Prefer inheriting the leader model by omitting `spawn_agent.model` unless a task truly requires a different model.
-- Do not hardcode stale frontier-model overrides for Codex native child agents. If an explicit frontier override is necessary, use the current frontier default from `OMX_DEFAULT_FRONTIER_MODEL` / the repo model contract (currently `gpt-5.4`), not older values such as `gpt-5.2`.
+- Do not hardcode stale frontier-model overrides for Codex native child agents. If an explicit frontier override is necessary, use the current frontier default from `OMCP_DEFAULT_FRONTIER_MODEL` / the repo model contract (currently `gpt-5.4`), not older values such as `gpt-5.2`.
 - Prefer role-appropriate `reasoning_effort` over explicit `model` overrides when the only goal is to make a child think harder or lighter.
 </child_agent_protocol>
 
@@ -286,12 +286,12 @@ Terminal states: `complete`, `failed`, `cancelled`.
 <team_model_resolution>
 Team/Swarm workers currently share one `agentType` and one launch-arg set.
 Model precedence:
-1. Explicit model in `OMX_TEAM_WORKER_LAUNCH_ARGS`
+1. Explicit model in `OMCP_TEAM_WORKER_LAUNCH_ARGS`
 2. Inherited leader `--model`
-3. Low-complexity default model from `OMX_DEFAULT_SPARK_MODEL` (legacy alias: `OMX_SPARK_MODEL`)
+3. Low-complexity default model from `OMCP_DEFAULT_SPARK_MODEL` (legacy alias: `OMCP_SPARK_MODEL`)
 
 Normalize model flags to one canonical `--model <value>` entry.
-Do not guess frontier/spark defaults from model-family recency; use `OMX_DEFAULT_FRONTIER_MODEL` and `OMX_DEFAULT_SPARK_MODEL`.
+Do not guess frontier/spark defaults from model-family recency; use `OMCP_DEFAULT_FRONTIER_MODEL` and `OMCP_DEFAULT_SPARK_MODEL`.
 </team_model_resolution>
 
 <!-- OMCP:MODELS:START -->

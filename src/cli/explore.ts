@@ -26,9 +26,9 @@ export const EXPLORE_USAGE = [
 const PROMPT_FLAG = '--prompt';
 const PROMPT_FILE_FLAG = '--prompt-file';
 export const EXPLORE_BIN_ENV = EXPLORE_BIN_ENV_SHARED;
-const EXPLORE_SPARK_MODEL_ENV = 'OMX_EXPLORE_SPARK_MODEL';
+const EXPLORE_SPARK_MODEL_ENV = 'OMCP_EXPLORE_SPARK_MODEL';
 const WINDOWS_BUILTIN_EXPLORE_HARNESS_REASON =
-  'the built-in explore harness is not ready on Windows because its allowlist runtime relies on POSIX sh/bash wrappers. Set OMX_EXPLORE_BIN to a compatible custom harness, prefer `omcp sparkshell` for shell-native read-only lookups, or run `omcp doctor` for readiness details.';
+  'the built-in explore harness is not ready on Windows because its allowlist runtime relies on POSIX sh/bash wrappers. Set OMCP_EXPLORE_BIN to a compatible custom harness, prefer `omcp sparkshell` for shell-native read-only lookups, or run `omcp doctor` for readiness details.';
 
 export interface ParsedExploreArgs {
   prompt?: string;
@@ -387,7 +387,7 @@ export async function resolveExploreHarnessCommandWithHydration(
   if (!isRepositoryCheckout(packageRoot)) {
     const hydrated = await hydrateNativeBinary('omcp-explore-harness', { packageRoot, env });
     if (hydrated) return { command: hydrated, args: [] };
-    throw new Error('[explore] no compatible native harness is available for this install. Reconnect to the network so OMCP can fetch the release asset, or set OMX_EXPLORE_BIN to a prebuilt harness binary.');
+    throw new Error('[explore] no compatible native harness is available for this install. Reconnect to the network so OMCP can fetch the release asset, or set OMCP_EXPLORE_BIN to a prebuilt harness binary.');
   }
 
   return resolveExploreHarnessCommand(packageRoot, env);
@@ -451,7 +451,7 @@ export async function exploreCommand(args: string[]): Promise<void> {
   if (result.error) {
     const errno = result.error as NodeJS.ErrnoException;
     if (harness.command === 'cargo' && errno.code === 'ENOENT') {
-      throw new Error('[explore] cargo was not found. Install a Rust toolchain, use a compatible packaged omcp-explore prebuilt, or set OMX_EXPLORE_BIN to a prebuilt harness binary.');
+      throw new Error('[explore] cargo was not found. Install a Rust toolchain, use a compatible packaged omcp-explore prebuilt, or set OMCP_EXPLORE_BIN to a prebuilt harness binary.');
     }
     throw new Error(`[explore] failed to launch harness: ${result.error.message}`);
   }
@@ -460,7 +460,7 @@ export async function exploreCommand(args: string[]): Promise<void> {
     if (harness.command === 'cargo' && result.stderr?.includes('rustup could not choose')) {
       throw new Error(
         '[explore] cargo is a rustup shim but no default toolchain is configured. ' +
-        'Run `rustup default stable`, set OMX_EXPLORE_BIN to a prebuilt binary, or run `omcp doctor` for guidance.',
+        'Run `rustup default stable`, set OMCP_EXPLORE_BIN to a prebuilt binary, or run `omcp doctor` for guidance.',
       );
     }
     process.exitCode = result.status ?? 1;

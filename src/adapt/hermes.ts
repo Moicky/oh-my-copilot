@@ -12,8 +12,8 @@ import {
 } from "./contracts.js";
 
 const HERMES_HOME_ENV = "HERMES_HOME";
-const HERMES_ROOT_ENV = "OMX_ADAPT_HERMES_ROOT";
-const HERMES_BOOTSTRAP_ENV = "OMX_ADAPT_HERMES_BOOTSTRAP";
+const HERMES_ROOT_ENV = "OMCP_ADAPT_HERMES_ROOT";
+const HERMES_BOOTSTRAP_ENV = "OMCP_ADAPT_HERMES_BOOTSTRAP";
 const HERMES_DEFAULT_HOME = join(homedir(), ".hermes");
 const ACP_COMMANDS = ["hermes acp", "hermes-acp", "python -m acp_adapter"];
 const STATUS_COMMANDS = [

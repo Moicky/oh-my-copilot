@@ -86,7 +86,7 @@ export async function runHudAuthorityTick(
       env: {
         ...process.env,
         ...(options.env ?? {}),
-        OMX_HUD_AUTHORITY: '1',
+        OMCP_HUD_AUTHORITY: '1',
       },
       timeoutMs,
     },

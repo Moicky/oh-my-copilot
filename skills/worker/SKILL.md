@@ -9,7 +9,7 @@ This skill is for a Codex session that was started as an OMCP Team worker (a tmu
 
 ## Identity
 
-You MUST be running with `OMX_TEAM_WORKER` set. It looks like:
+You MUST be running with `OMCP_TEAM_WORKER` set. It looks like:
 
 `<team-name>/worker-<n>`
 
@@ -26,7 +26,7 @@ When a worker inbox tells you to load this skill, resolve the first existing pat
 
 ## Startup Protocol (ACK)
 
-1. Parse `OMX_TEAM_WORKER` into:
+1. Parse `OMCP_TEAM_WORKER` into:
    - `teamName` (before the `/`)
    - `workerName` (after the `/`, usually `worker-<n>`)
 2. Send a startup ACK to the lead mailbox **before task work**:
@@ -50,7 +50,7 @@ omcp team api send-message --input "{\"team_name\":\"<teamName>\",\"from_worker\
 ## Inbox + Tasks
 
 1. Resolve canonical team state root in this order:
-   1) `OMX_TEAM_STATE_ROOT` env
+   1) `OMCP_TEAM_STATE_ROOT` env
    2) worker identity `team_state_root`
    3) team config/manifest `team_state_root`
    4) local cwd fallback (`.omcp/state`)

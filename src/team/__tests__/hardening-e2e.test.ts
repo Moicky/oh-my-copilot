@@ -20,15 +20,15 @@ async function initRepo(): Promise<string> {
   return cwd;
 }
 
-const ORIGINAL_OMX_TEAM_STATE_ROOT = process.env.OMX_TEAM_STATE_ROOT;
+const ORIGINAL_OMX_TEAM_STATE_ROOT = process.env.OMCP_TEAM_STATE_ROOT;
 
 beforeEach(() => {
-  delete process.env.OMX_TEAM_STATE_ROOT;
+  delete process.env.OMCP_TEAM_STATE_ROOT;
 });
 
 afterEach(() => {
-  if (typeof ORIGINAL_OMX_TEAM_STATE_ROOT === 'string') process.env.OMX_TEAM_STATE_ROOT = ORIGINAL_OMX_TEAM_STATE_ROOT;
-  else delete process.env.OMX_TEAM_STATE_ROOT;
+  if (typeof ORIGINAL_OMX_TEAM_STATE_ROOT === 'string') process.env.OMCP_TEAM_STATE_ROOT = ORIGINAL_OMX_TEAM_STATE_ROOT;
+  else delete process.env.OMCP_TEAM_STATE_ROOT;
 });
 
 describe('team hardening e2e', () => {
@@ -88,7 +88,7 @@ describe('team hardening e2e', () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-team-hardening-worker-state-'));
     const sharedRoot = join(cwd, 'shared-state');
     try {
-      process.env.OMX_TEAM_STATE_ROOT = sharedRoot;
+      process.env.OMCP_TEAM_STATE_ROOT = sharedRoot;
       await initTeamState('team-hardening-worker-state', 'worker status corruption smoke', 'executor', 1, cwd);
 
       const statusPath = join(

@@ -67,12 +67,12 @@ function escapeRegex(value: string): string {
 }
 
 function defaultAutoNudgePattern(targetPane: string): RegExp {
-  return new RegExp(`send-keys -t ${escapeRegex(targetPane)} -l ${escapeRegex(DEFAULT_AUTO_NUDGE_RESPONSE)} \\[OMX_TMUX_INJECT\\]`);
+  return new RegExp(`send-keys -t ${escapeRegex(targetPane)} -l ${escapeRegex(DEFAULT_AUTO_NUDGE_RESPONSE)} \\[OMCP_TMUX_INJECT\\]`);
 }
 
 /**
  * Build a fake tmux binary that logs all invocations and optionally returns
- * capture-pane content from OMX_TEST_CAPTURE_FILE.
+ * capture-pane content from OMCP_TEST_CAPTURE_FILE.
  */
 function buildFakeTmux(tmuxLogPath: string, paneInMode: '0' | '1' = '0'): string {
   return `#!/usr/bin/env bash
@@ -81,8 +81,8 @@ echo "$@" >> "${tmuxLogPath}"
 cmd="\$1"
 shift || true
 if [[ "\$cmd" == "capture-pane" ]]; then
-  if [[ -n "\${OMX_TEST_CAPTURE_FILE:-}" && -f "\${OMX_TEST_CAPTURE_FILE}" ]]; then
-    cat "\${OMX_TEST_CAPTURE_FILE}"
+  if [[ -n "\${OMCP_TEST_CAPTURE_FILE:-}" && -f "\${OMCP_TEST_CAPTURE_FILE}" ]]; then
+    cat "\${OMCP_TEST_CAPTURE_FILE}"
   fi
   exit 0
 fi
@@ -112,7 +112,7 @@ if [[ "\$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "\$format" == "#S" ]]; then
-    echo "${'${OMX_TEST_TMUX_SESSION_NAME:-devsess}'}"
+    echo "${'${OMCP_TEST_TMUX_SESSION_NAME:-devsess}'}"
     exit 0
   fi
   exit 0
@@ -125,7 +125,7 @@ if [[ "\$cmd" == "list-panes" ]]; then
       *) shift ;;
     esac
   done
-  if [[ -n "\$target" && "\$target" == "${'${OMX_TEST_TMUX_SESSION_NAME:-devsess}'}" ]]; then
+  if [[ -n "\$target" && "\$target" == "${'${OMCP_TEST_TMUX_SESSION_NAME:-devsess}'}" ]]; then
     printf '%%99\t1\tnode\tcodex --model gpt-5\n'
     exit 0
   fi
@@ -143,7 +143,7 @@ function runNotifyHook(
   payloadOverrides: Record<string, unknown> = {},
   extraEnv: Record<string, string> = {},
 ): ReturnType<typeof spawnSync> {
-  if (extraEnv.OMX_TEST_UNMANAGED_SESSION !== '1' && !extraEnv.OMX_TEAM_WORKER) {
+  if (extraEnv.OMCP_TEST_UNMANAGED_SESSION !== '1' && !extraEnv.OMCP_TEAM_WORKER) {
     const sessionPath = join(cwd, '.omcp', 'state', 'session.json');
     const sessionState = {
       session_id: 'sess-managed',
@@ -162,7 +162,7 @@ function runNotifyHook(
     type: 'agent-turn-complete',
     'thread-id': 'thread-test',
     'turn-id': `turn-${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
-    ...(extraEnv.OMX_TEST_UNMANAGED_SESSION !== '1' && !extraEnv.OMX_TEAM_WORKER ? { 'session-id': 'sess-managed' } : {}),
+    ...(extraEnv.OMCP_TEST_UNMANAGED_SESSION !== '1' && !extraEnv.OMCP_TEAM_WORKER ? { 'session-id': 'sess-managed' } : {}),
     'input-messages': ['test'],
     'last-assistant-message': 'done',
     ...payloadOverrides,
@@ -175,13 +175,13 @@ function runNotifyHook(
       ...process.env,
       PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
       CODEX_HOME: codexHome,
-      ...(extraEnv.OMX_TEST_UNMANAGED_SESSION !== '1' && !extraEnv.OMX_TEAM_WORKER ? { OMX_SESSION_ID: 'sess-managed' } : {}),
-      ...(extraEnv.OMX_TEST_UNMANAGED_SESSION !== '1' && !extraEnv.OMX_TEAM_WORKER ? { OMX_TEST_TMUX_SESSION_NAME: buildTmuxSessionName(cwd, 'sess-managed') } : {}),
+      ...(extraEnv.OMCP_TEST_UNMANAGED_SESSION !== '1' && !extraEnv.OMCP_TEAM_WORKER ? { OMCP_SESSION_ID: 'sess-managed' } : {}),
+      ...(extraEnv.OMCP_TEST_UNMANAGED_SESSION !== '1' && !extraEnv.OMCP_TEAM_WORKER ? { OMCP_TEST_TMUX_SESSION_NAME: buildTmuxSessionName(cwd, 'sess-managed') } : {}),
       TMUX_PANE: '%99',
       TMUX: '1',
-      OMX_TEAM_WORKER: '',
-      OMX_TEAM_LEADER_NUDGE_MS: '9999999',
-      OMX_TEAM_LEADER_STALE_MS: '9999999',
+      OMCP_TEAM_WORKER: '',
+      OMCP_TEAM_LEADER_NUDGE_MS: '9999999',
+      OMCP_TEAM_LEADER_STALE_MS: '9999999',
       ...extraEnv,
     },
   });
@@ -384,8 +384,8 @@ describe('notify-hook auto-nudge', () => {
         'session-id': 'sess-managed',
         'last-assistant-message': 'I analyzed the code. If you want me to make these changes, let me know.',
       }, {
-        OMX_SESSION_ID: 'sess-managed',
-        OMX_TEST_UNMANAGED_SESSION: '1',
+        OMCP_SESSION_ID: 'sess-managed',
+        OMCP_TEST_UNMANAGED_SESSION: '1',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
@@ -418,7 +418,7 @@ describe('notify-hook auto-nudge', () => {
       const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
         'last-assistant-message': 'I analyzed the code. If you want me to make these changes, let me know.',
       }, {
-        OMX_TEST_UNMANAGED_SESSION: '1',
+        OMCP_TEST_UNMANAGED_SESSION: '1',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
@@ -457,8 +457,8 @@ describe('notify-hook auto-nudge', () => {
         'session-id': 'sess-other',
         'last-assistant-message': 'I analyzed the code. If you want me to make these changes, let me know.',
       }, {
-        OMX_SESSION_ID: 'sess-managed',
-        OMX_TEST_TMUX_SESSION_NAME: managedSessionName,
+        OMCP_SESSION_ID: 'sess-managed',
+        OMCP_TEST_TMUX_SESSION_NAME: managedSessionName,
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
@@ -496,8 +496,8 @@ describe('notify-hook auto-nudge', () => {
         'session-id': 'sess-managed',
         'last-assistant-message': 'I analyzed the code. If you want me to make these changes, let me know.',
       }, {
-        OMX_SESSION_ID: 'sess-managed',
-        OMX_TEST_TMUX_SESSION_NAME: mismatchedDetachedSessionName,
+        OMCP_SESSION_ID: 'sess-managed',
+        OMCP_TEST_TMUX_SESSION_NAME: mismatchedDetachedSessionName,
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
@@ -540,7 +540,7 @@ describe('notify-hook auto-nudge', () => {
       const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
         'last-assistant-message': 'clean output with no stall',
       }, {
-        OMX_TEST_CAPTURE_FILE: captureFile,
+        OMCP_TEST_CAPTURE_FILE: captureFile,
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
@@ -585,7 +585,7 @@ describe('notify-hook auto-nudge', () => {
       const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
         'last-assistant-message': 'clean output with no stall',
       }, {
-        OMX_TEST_CAPTURE_FILE: captureFile,
+        OMCP_TEST_CAPTURE_FILE: captureFile,
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
@@ -1118,8 +1118,8 @@ exit 0
       const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
         'last-assistant-message': 'I can continue with the worker follow-up from here.',
       }, {
-        OMX_TEAM_WORKER: 'auto-nudge/worker-1',
-        OMX_TEAM_STATE_ROOT: workerStateRoot,
+        OMCP_TEAM_WORKER: 'auto-nudge/worker-1',
+        OMCP_TEAM_STATE_ROOT: workerStateRoot,
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
@@ -1200,8 +1200,8 @@ exit 0
       const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
         'last-assistant-message': 'I can continue with the worker follow-up from here.',
       }, {
-        OMX_TEAM_WORKER: 'auto-nudge/worker-1',
-        OMX_TEAM_STATE_ROOT: workerStateRoot,
+        OMCP_TEAM_WORKER: 'auto-nudge/worker-1',
+        OMCP_TEAM_STATE_ROOT: workerStateRoot,
         TMUX_PANE: '',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -1480,7 +1480,7 @@ exit 0
       const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
         'last-assistant-message': 'Would you like me to continue with the next step?',
       }, {
-        OMX_TEST_CAPTURE_FILE: captureFile,
+        OMCP_TEST_CAPTURE_FILE: captureFile,
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
@@ -1768,7 +1768,7 @@ exit 0
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-      assert.match(tmuxLog, /send-keys -t %99 -l continue now \[OMX_TMUX_INJECT\]/, 'should use custom response with marker');
+      assert.match(tmuxLog, /send-keys -t %99 -l continue now \[OMCP_TMUX_INJECT\]/, 'should use custom response with marker');
     });
   });
 
@@ -2090,8 +2090,8 @@ exit 0
         assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
         const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-        assert.doesNotMatch(tmuxLog, /Deep interview is active; auto-approval shortcuts are blocked until the interview finishes\. \[OMX_TMUX_INJECT\]/);
-        assert.equal(tmuxLog.includes(`send-keys -t %99 -l ${blockedResponse} [OMX_TMUX_INJECT]`), false);
+        assert.doesNotMatch(tmuxLog, /Deep interview is active; auto-approval shortcuts are blocked until the interview finishes\. \[OMCP_TMUX_INJECT\]/);
+        assert.equal(tmuxLog.includes(`send-keys -t %99 -l ${blockedResponse} [OMCP_TMUX_INJECT]`), false);
       });
     });
   }
@@ -2140,7 +2140,7 @@ exit 0
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-      assert.doesNotMatch(tmuxLog, /send-keys -t %99 -l Deep interview is active; auto-approval shortcuts are blocked until the interview finishes\. \[OMX_TMUX_INJECT\]/);
+      assert.doesNotMatch(tmuxLog, /send-keys -t %99 -l Deep interview is active; auto-approval shortcuts are blocked until the interview finishes\. \[OMCP_TMUX_INJECT\]/);
     });
   });
 
@@ -2188,8 +2188,8 @@ exit 0
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-      assert.doesNotMatch(tmuxLog, /Deep interview is active; auto-approval shortcuts are blocked until the interview finishes\. \[OMX_TMUX_INJECT\]/);
-      assert.equal(tmuxLog.includes(`send-keys -t %99 -l ${NEXT_I_SHOULD_RESPONSE} [OMX_TMUX_INJECT]`), false);
+      assert.doesNotMatch(tmuxLog, /Deep interview is active; auto-approval shortcuts are blocked until the interview finishes\. \[OMCP_TMUX_INJECT\]/);
+      assert.equal(tmuxLog.includes(`send-keys -t %99 -l ${NEXT_I_SHOULD_RESPONSE} [OMCP_TMUX_INJECT]`), false);
     });
   });
 
@@ -2240,14 +2240,14 @@ exit 0
       const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
         'last-assistant-message': 'Keep going and finish the cleanup.',
       }, {
-        OMX_TEST_CAPTURE_FILE: capturePath,
+        OMCP_TEST_CAPTURE_FILE: capturePath,
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
       assert.match(
         tmuxLog,
-        new RegExp(`send-keys -t %99 -l ${customResponse} \\[OMX_TMUX_INJECT\\]`),
+        new RegExp(`send-keys -t %99 -l ${customResponse} \\[OMCP_TMUX_INJECT\\]`),
         'should allow a non-blocked continuation response during deep interview',
       );
     });
@@ -2733,7 +2733,7 @@ exit 0
       }, {
         TMUX_PANE: '',  // No pane available
         TMUX: '',
-        OMX_TEST_CAPTURE_FILE: captureFile,
+        OMCP_TEST_CAPTURE_FILE: captureFile,
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
 

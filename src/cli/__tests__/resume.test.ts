@@ -49,9 +49,9 @@ describe('omcp resume', () => {
       const result = runOmx(wd, ['resume', '--last'], {
         HOME: home,
         PATH: `${fakeBin}:/usr/bin:/bin`,
-        OMX_AUTO_UPDATE: '0',
-        OMX_NOTIFY_FALLBACK: '0',
-        OMX_HOOK_DERIVED_SIGNALS: '0',
+        OMCP_AUTO_UPDATE: '0',
+        OMCP_NOTIFY_FALLBACK: '0',
+        OMCP_HOOK_DERIVED_SIGNALS: '0',
       });
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);
@@ -79,9 +79,9 @@ describe('omcp resume', () => {
       const result = runOmx(wd, ['resume', '--help'], {
         HOME: home,
         PATH: `${fakeBin}:/usr/bin:/bin`,
-        OMX_AUTO_UPDATE: '0',
-        OMX_NOTIFY_FALLBACK: '0',
-        OMX_HOOK_DERIVED_SIGNALS: '0',
+        OMCP_AUTO_UPDATE: '0',
+        OMCP_NOTIFY_FALLBACK: '0',
+        OMCP_HOOK_DERIVED_SIGNALS: '0',
       });
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);

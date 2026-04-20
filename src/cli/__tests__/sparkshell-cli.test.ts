@@ -46,14 +46,14 @@ function shouldSkipForSpawnPermissions(err?: string): boolean {
 }
 
 describe('resolveSparkShellBinaryPath', () => {
-  it('prefers OMX_SPARKSHELL_BIN override', async () => {
+  it('prefers OMCP_SPARKSHELL_BIN override', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-sparkshell-override-'));
     try {
       const binary = join(cwd, 'bin', 'custom-sparkshell');
       assert.equal(
         resolveSparkShellBinaryPath({
           cwd,
-          env: { OMX_SPARKSHELL_BIN: './bin/custom-sparkshell' },
+          env: { OMCP_SPARKSHELL_BIN: './bin/custom-sparkshell' },
           packageRoot: '/unused',
         }),
         binary,
@@ -207,8 +207,8 @@ describe('resolveSparkShellBinaryPath', () => {
           platform: process.platform === 'win32' ? 'win32' : 'linux',
           arch: 'x64',
           env: {
-            OMX_NATIVE_MANIFEST_URL: `${server.baseUrl}/native-release-manifest.json`,
-            OMX_NATIVE_CACHE_DIR: cacheDir,
+            OMCP_NATIVE_MANIFEST_URL: `${server.baseUrl}/native-release-manifest.json`,
+            OMCP_NATIVE_CACHE_DIR: cacheDir,
           },
           exists: () => false,
         });
@@ -253,8 +253,8 @@ describe('resolveSparkShellBinaryPath', () => {
             platform: process.platform === 'win32' ? 'win32' : 'linux',
             arch: 'x64',
             env: {
-              OMX_NATIVE_MANIFEST_URL: `${server.baseUrl}/native-release-manifest.json`,
-              OMX_NATIVE_CACHE_DIR: join(wd, 'cache'),
+              OMCP_NATIVE_MANIFEST_URL: `${server.baseUrl}/native-release-manifest.json`,
+              OMCP_NATIVE_CACHE_DIR: join(wd, 'cache'),
             },
             exists: () => false,
           }),
@@ -299,8 +299,8 @@ describe('runSparkShellBinary', () => {
     const codexHome = await mkdtemp(join(tmpdir(), 'omcp-sparkshell-config-env-'));
     await writeFile(join(codexHome, '.omcp-config.json'), JSON.stringify({
       env: {
-        OMX_DEFAULT_FRONTIER_MODEL: 'frontier-local',
-        OMX_DEFAULT_SPARK_MODEL: 'spark-local',
+        OMCP_DEFAULT_FRONTIER_MODEL: 'frontier-local',
+        OMCP_DEFAULT_SPARK_MODEL: 'spark-local',
       },
     }));
 
@@ -310,7 +310,7 @@ describe('runSparkShellBinary', () => {
         cwd: codexHome,
         env: {
           CODEX_HOME: codexHome,
-          OMX_DEFAULT_FRONTIER_MODEL: 'frontier-shell',
+          OMCP_DEFAULT_FRONTIER_MODEL: 'frontier-shell',
         },
         spawnImpl: ((_: string, __: string[], options: { env?: NodeJS.ProcessEnv }) => {
           invokedEnv = options.env;
@@ -325,8 +325,8 @@ describe('runSparkShellBinary', () => {
         }) as unknown as typeof spawnSync,
       });
 
-      assert.equal(invokedEnv?.OMX_DEFAULT_FRONTIER_MODEL, 'frontier-shell');
-      assert.equal(invokedEnv?.OMX_DEFAULT_SPARK_MODEL, 'spark-local');
+      assert.equal(invokedEnv?.OMCP_DEFAULT_FRONTIER_MODEL, 'frontier-shell');
+      assert.equal(invokedEnv?.OMCP_DEFAULT_SPARK_MODEL, 'spark-local');
     } finally {
       await rm(codexHome, { recursive: true, force: true });
     }
@@ -438,7 +438,7 @@ describe('omcp sparkshell', () => {
       }
 
       const result = runOmx(cwd, ['sparkshell', 'git', 'status'], {
-        OMX_SPARKSHELL_BIN: stubPath,
+        OMCP_SPARKSHELL_BIN: stubPath,
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
@@ -469,7 +469,7 @@ describe('omcp sparkshell', () => {
       if (process.platform !== 'win32') await chmod(stubPath, 0o755);
 
       const result = runOmx(cwd, ['sparkshell', 'node', '-e', 'process.stdout.write("raw-fallback\\n")'], {
-        OMX_NATIVE_CACHE_DIR: cacheDir,
+        OMCP_NATIVE_CACHE_DIR: cacheDir,
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
@@ -487,7 +487,7 @@ describe('omcp sparkshell', () => {
     try {
       const missingBinary = join(cwd, 'bin', 'does-not-exist');
       const result = runOmx(cwd, ['sparkshell', 'ls'], {
-        OMX_SPARKSHELL_BIN: missingBinary,
+        OMCP_SPARKSHELL_BIN: missingBinary,
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;
 

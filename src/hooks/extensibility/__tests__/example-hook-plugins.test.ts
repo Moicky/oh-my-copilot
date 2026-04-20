@@ -94,7 +94,7 @@ describe('example hook plugins', () => {
         cwd,
         env: {
           ...process.env,
-          OMX_HOOK_PLUGINS: '1',
+          OMCP_HOOK_PLUGINS: '1',
         },
       });
 
@@ -139,7 +139,7 @@ describe('example hook plugins', () => {
           cwd,
           env: {
             ...process.env,
-            OMX_HOOK_PLUGINS: '1',
+            OMCP_HOOK_PLUGINS: '1',
           },
         });
 

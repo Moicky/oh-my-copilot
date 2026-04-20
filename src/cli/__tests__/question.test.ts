@@ -34,7 +34,7 @@ describe('omcp question CLI', () => {
         allow_other: true,
       }), '--json'], {
         cwd,
-        env: { ...process.env, OMX_TEAM_WORKER: 'demo/worker-1', OMX_AUTO_UPDATE: '0' },
+        env: { ...process.env, OMCP_TEAM_WORKER: 'demo/worker-1', OMCP_AUTO_UPDATE: '0' },
         stdio: ['ignore', 'pipe', 'pipe'],
       });
       let stdout = '';
@@ -63,7 +63,7 @@ describe('omcp question CLI', () => {
 
     const child = spawn(process.execPath, [omxBin, 'question', '--input', input, '--json'], {
       cwd,
-      env: { ...process.env, OMX_AUTO_UPDATE: '0', OMX_NOTIFY_FALLBACK: '0', OMX_HOOK_DERIVED_SIGNALS: '0', OMX_QUESTION_TEST_RENDERER: 'noop' },
+      env: { ...process.env, OMCP_AUTO_UPDATE: '0', OMCP_NOTIFY_FALLBACK: '0', OMCP_HOOK_DERIVED_SIGNALS: '0', OMCP_QUESTION_TEST_RENDERER: 'noop' },
       stdio: ['ignore', 'pipe', 'pipe'],
     });
 

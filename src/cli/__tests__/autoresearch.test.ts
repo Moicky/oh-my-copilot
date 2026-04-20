@@ -26,9 +26,9 @@ function runOmx(
     encoding: 'utf-8',
     env: {
       ...process.env,
-      OMX_AUTO_UPDATE: '0',
-      OMX_NOTIFY_FALLBACK: '0',
-      OMX_HOOK_DERIVED_SIGNALS: '0',
+      OMCP_AUTO_UPDATE: '0',
+      OMCP_NOTIFY_FALLBACK: '0',
+      OMCP_HOOK_DERIVED_SIGNALS: '0',
       ...envOverrides,
     },
   });

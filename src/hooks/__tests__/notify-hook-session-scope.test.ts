@@ -16,7 +16,7 @@ function runNotifyHook(payload: Record<string, unknown>) {
     encoding: 'utf-8',
     env: {
       ...process.env,
-      OMX_TEAM_WORKER: '',
+      OMCP_TEAM_WORKER: '',
       TMUX: '',
       TMUX_PANE: '',
     },
@@ -256,8 +256,8 @@ describe('notify-hook session-scoped iteration updates', () => {
         encoding: 'utf-8',
         env: {
           ...process.env,
-          OMX_SESSION_ID: forkSessionId,
-          OMX_TEAM_WORKER: '',
+          OMCP_SESSION_ID: forkSessionId,
+          OMCP_TEAM_WORKER: '',
           TMUX: '',
           TMUX_PANE: '',
         },

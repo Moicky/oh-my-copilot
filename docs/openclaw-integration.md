@@ -12,14 +12,14 @@ This guide covers two supported setup paths:
 export HOOKS_TOKEN="your-openclaw-hooks-token"
 
 # Required for OpenClaw dispatch pipeline
-export OMX_OPENCLAW=1
+export OMCP_OPENCLAW=1
 
 # Required in addition for command gateways
-export OMX_OPENCLAW_COMMAND=1
+export OMCP_OPENCLAW_COMMAND=1
 
 # Optional global default for command gateway timeout (ms)
 # Precedence: gateway timeout > env override > 5000 default
-export OMX_OPENCLAW_COMMAND_TIMEOUT_MS=120000
+export OMCP_OPENCLAW_COMMAND_TIMEOUT_MS=120000
 ```
 
 ## Prompt tuning guide (concise + context-aware)
@@ -203,7 +203,7 @@ message/webhook forwarding), e.g. for `#omc-dev`.
 > command string. Keep templates simple and avoid shell metacharacters in user-derived content.
 > For troubleshooting, temporarily remove output redirection and inspect command output.
 >
-> Command gateway timeout precedence: `gateways.<name>.timeout` > `OMX_OPENCLAW_COMMAND_TIMEOUT_MS` > `5000`.
+> Command gateway timeout precedence: `gateways.<name>.timeout` > `OMCP_OPENCLAW_COMMAND_TIMEOUT_MS` > `5000`.
 > For `clawdbot agent` workflows, use `120000` (2 minutes) to avoid premature timeout.
 >
 > **Production best practices:**
@@ -361,8 +361,8 @@ test -n "$HOOKS_TOKEN" && echo "token ok" || echo "token missing"
 curl -sS -o /dev/null -w "HTTP %{http_code}\n" http://127.0.0.1:18789 || echo "gateway unreachable"
 
 # gate checks
-test "$OMX_OPENCLAW" = "1" && echo "OMX_OPENCLAW=1" || echo "missing OMX_OPENCLAW=1"
-test "$OMX_OPENCLAW_COMMAND" = "1" && echo "OMX_OPENCLAW_COMMAND=1" || echo "missing OMX_OPENCLAW_COMMAND=1"
+test "$OMCP_OPENCLAW" = "1" && echo "OMCP_OPENCLAW=1" || echo "missing OMCP_OPENCLAW=1"
+test "$OMCP_OPENCLAW_COMMAND" = "1" && echo "OMCP_OPENCLAW_COMMAND=1" || echo "missing OMCP_OPENCLAW_COMMAND=1"
 ```
 
 ## Pass/Fail Diagnostics
@@ -371,8 +371,8 @@ test "$OMX_OPENCLAW_COMMAND" = "1" && echo "OMX_OPENCLAW_COMMAND=1" || echo "mis
 - **404**: wrong path; verify `/hooks/agent` and `/hooks/wake`.
 - **5xx**: gateway runtime issue; inspect logs.
 - **Timeout/connection refused**: host/port/firewall issue.
-- **Command gateway disabled**: set both `OMX_OPENCLAW=1` and `OMX_OPENCLAW_COMMAND=1`.
-- **Command killed by `SIGTERM`**: increase `gateways.<name>.timeout` (recommend `120000` for clawdbot agent) or set `OMX_OPENCLAW_COMMAND_TIMEOUT_MS`.
+- **Command gateway disabled**: set both `OMCP_OPENCLAW=1` and `OMCP_OPENCLAW_COMMAND=1`.
+- **Command killed by `SIGTERM`**: increase `gateways.<name>.timeout` (recommend `120000` for clawdbot agent) or set `OMCP_OPENCLAW_COMMAND_TIMEOUT_MS`.
 - **Hook failures blocking sessions**: ensure command ends with `|| true` to prevent OMCP from waiting on clawdbot failures.
 - **Missing logs**: use `.jsonl` extension with append (`>>`) for persistent structured logging.
 - **Discord delivery failures**: use `--reply-to 'channel:CHANNEL_ID'` format instead of channel aliases.

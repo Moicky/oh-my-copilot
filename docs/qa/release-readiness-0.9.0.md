@@ -35,10 +35,10 @@ Verdict: **GO** ✅
 | Setup dry-run smoke | `node bin/omcp.js setup --dry-run` | PASS |
 | Explore help smoke | `node bin/omcp.js explore --help` | PASS |
 | Explore prompt-file smoke | `node bin/omcp.js explore --prompt-file /tmp/omcp-explore-smoke.txt` | PASS |
-| Explore→sparkshell routing smoke | `OMX_SPARKSHELL_LINES=1 node bin/omcp.js explore --prompt 'git log --oneline -10'` | PASS (summary output emitted) |
+| Explore→sparkshell routing smoke | `OMCP_SPARKSHELL_LINES=1 node bin/omcp.js explore --prompt 'git log --oneline -10'` | PASS (summary output emitted) |
 | Sparkshell help smoke | `node bin/omcp.js sparkshell --help` | PASS |
 | Sparkshell direct smoke | `node bin/omcp.js sparkshell git --version` | PASS (`git version 2.34.1`) |
-| Sparkshell summary smoke | `OMX_SPARKSHELL_LINES=1 node bin/omcp.js sparkshell git log --oneline -10` | PASS (summary output emitted) |
+| Sparkshell summary smoke | `OMCP_SPARKSHELL_LINES=1 node bin/omcp.js sparkshell git log --oneline -10` | PASS (summary output emitted) |
 | Sparkshell tmux-pane smoke | `node bin/omcp.js sparkshell --tmux-pane %2141 --tail-lines 120` | PASS |
 | Full test suite | `npm test` | PASS (`2375` pass / `0` fail) |
 | Packed tarball dry run | `npm pack --dry-run` | PASS (`oh-my-copilot-0.9.0.tgz`) |

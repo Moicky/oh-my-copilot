@@ -3,7 +3,7 @@ import { execFileSync } from 'child_process';
 import { resolveTmuxBinaryForPlatform } from '../utils/platform-command.js';
 
 export const DEFAULT_ALLOWED_MODES = ['ralph', 'ultrawork', 'team'];
-export const DEFAULT_MARKER = '[OMX_TMUX_INJECT]';
+export const DEFAULT_MARKER = '[OMCP_TMUX_INJECT]';
 const PLACEHOLDER_TARGET_VALUES = new Set([
   'replace-with-tmux-pane-id',
   'replace-with-tmux-session-name',

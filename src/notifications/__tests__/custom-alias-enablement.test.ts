@@ -4,7 +4,7 @@ import { mkdtemp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
-const ENV_KEYS = ['CODEX_HOME', 'OMX_OPENCLAW'] as const;
+const ENV_KEYS = ['CODEX_HOME', 'OMCP_OPENCLAW'] as const;
 
 let tempCodexHome: string;
 let getNotificationConfig: typeof import('../config.js').getNotificationConfig;
@@ -27,7 +27,7 @@ describe('notification custom alias enablement defaults', () => {
     clearEnv();
     tempCodexHome = await mkdtemp(join(tmpdir(), 'omcp-custom-alias-'));
     process.env.CODEX_HOME = tempCodexHome;
-    process.env.OMX_OPENCLAW = '1';
+    process.env.OMCP_OPENCLAW = '1';
 
     ({ getNotificationConfig } = await import('../config.js'));
     ({ getOpenClawConfig, resetOpenClawConfigCache } = await import('../../openclaw/config.js'));
@@ -35,7 +35,7 @@ describe('notification custom alias enablement defaults', () => {
 
   beforeEach(() => {
     process.env.CODEX_HOME = tempCodexHome;
-    process.env.OMX_OPENCLAW = '1';
+    process.env.OMCP_OPENCLAW = '1';
     resetOpenClawConfigCache();
   });
 

@@ -1072,7 +1072,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     "  5. Native agent defaults configured in config.toml [agents] and TOML files written to .codex/agents/",
   );
   console.log(
-    '  6. "omcp explore" and "omcp sparkshell" can hydrate native release binaries on first use; source installs still allow repo-local fallbacks and OMX_EXPLORE_BIN / OMX_SPARKSHELL_BIN overrides',
+    '  6. "omcp explore" and "omcp sparkshell" can hydrate native release binaries on first use; source installs still allow repo-local fallbacks and OMCP_EXPLORE_BIN / OMCP_SPARKSHELL_BIN overrides',
   );
   if (isGitHubCliConfigured()) {
     console.log("\nSupport the project: gh repo star Moicky/oh-my-copilot");

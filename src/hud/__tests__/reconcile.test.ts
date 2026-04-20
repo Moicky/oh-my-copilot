@@ -44,7 +44,7 @@ describe('reconcileHudForPromptSubmit', () => {
     const created: Array<{ cmd: string }> = [];
 
     const result = await reconcileHudForPromptSubmit('/repo', {
-      env: { TMUX: '1', TMUX_PANE: '%1', OMX_SESSION_ID: 'sess-stale' },
+      env: { TMUX: '1', TMUX_PANE: '%1', OMCP_SESSION_ID: 'sess-stale' },
       sessionId: 'sess-canonical',
       listCurrentWindowPanes: () => [
         { paneId: '%1', currentCommand: 'codex', startCommand: 'codex' },
@@ -59,7 +59,7 @@ describe('reconcileHudForPromptSubmit', () => {
 
     assert.equal(result.status, 'recreated');
     assert.equal(created.length, 1);
-    assert.match(created[0]?.cmd || '', /^OMX_SESSION_ID='sess-canonical' node '.*omcp\.js' hud --watch/);
+    assert.match(created[0]?.cmd || '', /^OMCP_SESSION_ID='sess-canonical' node '.*omcp\.js' hud --watch/);
     assert.doesNotMatch(created[0]?.cmd || '', /sess-stale/);
   });
 

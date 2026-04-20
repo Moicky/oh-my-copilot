@@ -31,17 +31,17 @@ function withPatchedEnv<T>(patch: Record<string, string>, run: () => Promise<T>)
   const managedKeys = new Set([
     ...Object.keys(patch),
     'CODEX_HOME',
-    'OMX_SESSION_ID',
-    'OMX_RUNTIME_BRIDGE',
-    'OMX_NOTIFY_FALLBACK',
-    'OMX_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS',
-    'OMX_HOOK_CONFIG',
-    'OMX_NOTIFY_PROFILE',
-    'OMX_NOTIFY_VERBOSITY',
-    'OMX_TEAM_WORKER',
-    'OMX_TEAM_STATE_ROOT',
-    'OMX_TEAM_LEADER_CWD',
-    'OMX_MODEL_INSTRUCTIONS_FILE',
+    'OMCP_SESSION_ID',
+    'OMCP_RUNTIME_BRIDGE',
+    'OMCP_NOTIFY_FALLBACK',
+    'OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS',
+    'OMCP_HOOK_CONFIG',
+    'OMCP_NOTIFY_PROFILE',
+    'OMCP_NOTIFY_VERBOSITY',
+    'OMCP_TEAM_WORKER',
+    'OMCP_TEAM_STATE_ROOT',
+    'OMCP_TEAM_LEADER_CWD',
+    'OMCP_MODEL_INSTRUCTIONS_FILE',
     'TMUX',
     'TMUX_PANE',
   ]);
@@ -124,8 +124,8 @@ describe('notify-hook tmux target healing', () => {
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -183,17 +183,17 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX_PANE;
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);
@@ -240,8 +240,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -306,16 +306,16 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);
@@ -353,8 +353,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -439,18 +439,18 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       const previousTmuxPane = process.env.TMUX_PANE;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         process.env.TMUX_PANE = '%42';
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
         if (typeof previousTmuxPane === 'string') process.env.TMUX_PANE = previousTmuxPane;
         else delete process.env.TMUX_PANE;
       }
@@ -490,8 +490,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -576,18 +576,18 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       const previousTmuxPane = process.env.TMUX_PANE;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         process.env.TMUX_PANE = '%42';
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
         if (typeof previousTmuxPane === 'string') process.env.TMUX_PANE = previousTmuxPane;
         else delete process.env.TMUX_PANE;
       }
@@ -655,12 +655,12 @@ exit 1
       await chmod(fakeTmuxPath, 0o755);
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       const previousTmux = process.env.TMUX;
       const previousTmuxPane = process.env.TMUX_PANE;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX;
         delete process.env.TMUX_PANE;
 
@@ -677,8 +677,8 @@ exit 1
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
         if (typeof previousTmux === 'string') process.env.TMUX = previousTmux;
         else delete process.env.TMUX;
         if (typeof previousTmuxPane === 'string') process.env.TMUX_PANE = previousTmuxPane;
@@ -713,8 +713,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -790,17 +790,17 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX_PANE;
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);
@@ -834,8 +834,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -921,18 +921,18 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       const previousTmuxPane = process.env.TMUX_PANE;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         process.env.TMUX_PANE = '%99';
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
         if (typeof previousTmuxPane === 'string') process.env.TMUX_PANE = previousTmuxPane;
         else delete process.env.TMUX_PANE;
       }
@@ -976,8 +976,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -1035,17 +1035,17 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX_PANE;
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);
@@ -1087,8 +1087,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -1142,13 +1142,13 @@ exit 1
         session_id: sessionId,
         'thread-id': 'thread-test-preguard-heal',
         'turn-id': 'turn-test-preguard-heal',
-        'input-messages': ['already contains [OMX_TMUX_INJECT] marker'],
+        'input-messages': ['already contains [OMCP_TMUX_INJECT] marker'],
         'last-assistant-message': 'output',
       };
 
       await withPatchedEnv({
         PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-        OMX_TEAM_WORKER: '',
+        OMCP_TEAM_WORKER: '',
       }, async () => {
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       });
@@ -1196,8 +1196,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -1263,17 +1263,17 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX_PANE;
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);
@@ -1311,8 +1311,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -1378,17 +1378,17 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX_PANE;
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);

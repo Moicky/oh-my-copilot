@@ -62,14 +62,14 @@ function runNotifyHookAsWorker(
     env: {
       ...process.env,
       PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-      OMX_TEAM_WORKER: workerEnv,
-      OMX_TEAM_WORKER_IDLE_COOLDOWN_MS: '500',
-      OMX_TEAM_ALL_IDLE_COOLDOWN_MS: '600000', // suppress all-idle to isolate per-worker
+      OMCP_TEAM_WORKER: workerEnv,
+      OMCP_TEAM_WORKER_IDLE_COOLDOWN_MS: '500',
+      OMCP_TEAM_ALL_IDLE_COOLDOWN_MS: '600000', // suppress all-idle to isolate per-worker
       TMUX: '',
       TMUX_PANE: '',
       // Isolate from inherited team env (same pattern as all-workers-idle tests)
-      OMX_TEAM_STATE_ROOT: '',
-      OMX_TEAM_LEADER_CWD: '',
+      OMCP_TEAM_STATE_ROOT: '',
+      OMCP_TEAM_LEADER_CWD: '',
       ...extraEnv,
     },
   });
@@ -503,7 +503,7 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHookAsWorker(cwd, fakeBinDir, `${teamName}/worker-1`, {
-        OMX_TEAM_WORKER_IDLE_COOLDOWN_MS: '600000', // 10 minute cooldown
+        OMCP_TEAM_WORKER_IDLE_COOLDOWN_MS: '600000', // 10 minute cooldown
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -514,7 +514,7 @@ exit 0
     });
   });
 
-  it('can be disabled via OMX_TEAM_WORKER_IDLE_NOTIFY=false', async () => {
+  it('can be disabled via OMCP_TEAM_WORKER_IDLE_NOTIFY=false', async () => {
     await withTempWorkingDir(async (cwd) => {
       const stateDir = join(cwd, '.omcp', 'state');
       const logsDir = join(cwd, '.omcp', 'logs');
@@ -551,7 +551,7 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHookAsWorker(cwd, fakeBinDir, `${teamName}/worker-1`, {
-        OMX_TEAM_WORKER_IDLE_NOTIFY: 'false',
+        OMCP_TEAM_WORKER_IDLE_NOTIFY: 'false',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -562,7 +562,7 @@ exit 0
     });
   });
 
-  it('can be disabled via OMX_TEAM_WORKER_IDLE_NOTIFY=0', async () => {
+  it('can be disabled via OMCP_TEAM_WORKER_IDLE_NOTIFY=0', async () => {
     await withTempWorkingDir(async (cwd) => {
       const stateDir = join(cwd, '.omcp', 'state');
       const logsDir = join(cwd, '.omcp', 'logs');
@@ -595,7 +595,7 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHookAsWorker(cwd, fakeBinDir, `${teamName}/worker-1`, {
-        OMX_TEAM_WORKER_IDLE_NOTIFY: '0',
+        OMCP_TEAM_WORKER_IDLE_NOTIFY: '0',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -606,7 +606,7 @@ exit 0
     });
   });
 
-  it('can be disabled via OMX_TEAM_WORKER_IDLE_NOTIFY=off', async () => {
+  it('can be disabled via OMCP_TEAM_WORKER_IDLE_NOTIFY=off', async () => {
     await withTempWorkingDir(async (cwd) => {
       const stateDir = join(cwd, '.omcp', 'state');
       const logsDir = join(cwd, '.omcp', 'logs');
@@ -639,7 +639,7 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHookAsWorker(cwd, fakeBinDir, `${teamName}/worker-1`, {
-        OMX_TEAM_WORKER_IDLE_NOTIFY: 'off',
+        OMCP_TEAM_WORKER_IDLE_NOTIFY: 'off',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -708,7 +708,7 @@ exit 0
       assert.ok(workerIdleEvent.created_at, 'event should have a created_at');
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-      assert.doesNotMatch(tmuxLog, /\[OMX_INTENT:/);
+      assert.doesNotMatch(tmuxLog, /\[OMCP_INTENT:/);
     });
   });
 
@@ -791,7 +791,7 @@ exit 0
       await writeFile(fakeTmuxPath, buildFakeTmux(tmuxLogPath));
       await chmod(fakeTmuxPath, 0o755);
 
-      // Run as LEADER (no OMX_TEAM_WORKER env var)
+      // Run as LEADER (no OMCP_TEAM_WORKER env var)
       const payload = {
         cwd,
         type: 'agent-turn-complete',
@@ -805,7 +805,7 @@ exit 0
         env: {
           ...process.env,
           PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-          OMX_TEAM_WORKER: '',
+          OMCP_TEAM_WORKER: '',
           TMUX: '',
           TMUX_PANE: '',
         },
@@ -946,7 +946,7 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHookAsWorker(cwd, fakeBinDir, `${teamName}/worker-1`, {
-        OMX_TEAM_ALL_IDLE_COOLDOWN_MS: '500', // re-enable all-idle
+        OMCP_TEAM_ALL_IDLE_COOLDOWN_MS: '500', // re-enable all-idle
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 

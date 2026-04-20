@@ -20,10 +20,10 @@ function runOmx(
     encoding: 'utf-8',
     env: {
       ...process.env,
-      OMX_MODEL_INSTRUCTIONS_FILE: '',
-      OMX_TEAM_WORKER: '',
-      OMX_TEAM_STATE_ROOT: '',
-      OMX_TEAM_LEADER_CWD: '',
+      OMCP_MODEL_INSTRUCTIONS_FILE: '',
+      OMCP_TEAM_WORKER: '',
+      OMCP_TEAM_STATE_ROOT: '',
+      OMCP_TEAM_LEADER_CWD: '',
       ...envOverrides,
     },
   });
@@ -74,9 +74,9 @@ describe('omcp exec', () => {
         HOME: home,
         NODE_OPTIONS: '',
         PATH: `${fakeBin}:/usr/bin:/bin`,
-        OMX_AUTO_UPDATE: '0',
-        OMX_NOTIFY_FALLBACK: '0',
-        OMX_HOOK_DERIVED_SIGNALS: '0',
+        OMCP_AUTO_UPDATE: '0',
+        OMCP_NOTIFY_FALLBACK: '0',
+        OMCP_HOOK_DERIVED_SIGNALS: '0',
       });
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);
@@ -116,9 +116,9 @@ describe('omcp exec', () => {
         HOME: home,
         NODE_OPTIONS: '',
         PATH: `${fakeBin}:/usr/bin:/bin`,
-        OMX_AUTO_UPDATE: '0',
-        OMX_NOTIFY_FALLBACK: '0',
-        OMX_HOOK_DERIVED_SIGNALS: '0',
+        OMCP_AUTO_UPDATE: '0',
+        OMCP_NOTIFY_FALLBACK: '0',
+        OMCP_HOOK_DERIVED_SIGNALS: '0',
       });
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);

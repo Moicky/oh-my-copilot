@@ -109,7 +109,7 @@ In `scripts`, replace every literal `dist/cli/omcp.js` with `dist/cli/omcp.js`. 
 - `setup`            : `node dist/cli/omcp.js setup` → `node dist/cli/omcp.js setup`
 - `doctor`           : `node dist/cli/omcp.js doctor` → `node dist/cli/omcp.js doctor`
 
-In `scripts`, also replace `cargo build -p omcp-explore-harness` → `cargo build -p omcp-explore-harness` and `cargo test -p omcp-explore-harness` → `cargo test -p omcp-explore-harness`. And `OMX_COMPAT_TARGET=./target/debug/omcp` → `OMCP_COMPAT_TARGET=./target/debug/omcp`.
+In `scripts`, also replace `cargo build -p omcp-explore-harness` → `cargo build -p omcp-explore-harness` and `cargo test -p omcp-explore-harness` → `cargo test -p omcp-explore-harness`. And `OMCP_COMPAT_TARGET=./target/debug/omcp` → `OMCP_COMPAT_TARGET=./target/debug/omcp`.
 
 Do **not** change references to `@openai/codex`, `codex`, `.codex/`, or `CODEX_HOME` anywhere — those are out of scope.
 
@@ -554,13 +554,13 @@ git add -u
 git commit -m "chore(rebrand): rename state directory .omcp -> .omcp"
 ```
 
-### Task C8: Rule 7 — `OMX_` env-var prefix → `OMCP_`
+### Task C8: Rule 7 — `OMCP_` env-var prefix → `OMCP_`
 
 - [ ] **Step 1: Apply substitution**
 
 ```bash
 xargs -a /tmp/omcp-rename-files.txt -I{} sh -c '
-  if grep -l "OMX_" "$1" >/dev/null 2>&1; then
+  if grep -l "OMCP_" "$1" >/dev/null 2>&1; then
     perl -i -pe "s/\\bOMX_/OMCP_/g" "$1"
   fi
 ' _ {}
@@ -578,7 +578,7 @@ Expected: empty output.
 
 ```bash
 git add -u
-git commit -m "chore(rebrand): rename OMX_* env vars to OMCP_*"
+git commit -m "chore(rebrand): rename OMCP_* env vars to OMCP_*"
 ```
 
 ---

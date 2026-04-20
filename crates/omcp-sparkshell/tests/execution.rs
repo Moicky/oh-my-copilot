@@ -35,7 +35,7 @@ fn write_executable(path: &Path, body: &str) {
 #[test]
 fn raw_mode_preserves_stdout_and_stderr() {
     let output = Command::new(sparkshell_bin())
-        .env("OMX_SPARKSHELL_LINES", "5")
+        .env("OMCP_SPARKSHELL_LINES", "5")
         .arg("sh")
         .arg("-c")
         .arg("printf 'alpha\n'; printf 'warn\n' >&2")
@@ -69,8 +69,8 @@ fn summary_mode_uses_codex_exec_and_model_override() {
     );
     let output = Command::new(sparkshell_bin())
         .env("PATH", path)
-        .env("OMX_SPARKSHELL_LINES", "1")
-        .env("OMX_SPARKSHELL_MODEL", "spark-test-model")
+        .env("OMCP_SPARKSHELL_LINES", "1")
+        .env("OMCP_SPARKSHELL_MODEL", "spark-test-model")
         .arg("sh")
         .arg("-c")
         .arg("printf 'one\ntwo\n'")
@@ -113,7 +113,7 @@ fn summary_failure_falls_back_to_raw_output_with_notice() {
     );
     let output = Command::new(sparkshell_bin())
         .env("PATH", path)
-        .env("OMX_SPARKSHELL_LINES", "1")
+        .env("OMCP_SPARKSHELL_LINES", "1")
         .arg("/bin/sh")
         .arg("-c")
         .arg("printf 'one\ntwo\n'; printf 'child-err\n' >&2")
@@ -162,9 +162,9 @@ printf '%s\n' '- summary: fallback model recovered summary'
     );
     let output = Command::new(sparkshell_bin())
         .env("PATH", path)
-        .env("OMX_SPARKSHELL_LINES", "1")
-        .env("OMX_SPARKSHELL_MODEL", "spark-test-model")
-        .env("OMX_SPARKSHELL_FALLBACK_MODEL", "frontier-test-model")
+        .env("OMCP_SPARKSHELL_LINES", "1")
+        .env("OMCP_SPARKSHELL_MODEL", "spark-test-model")
+        .env("OMCP_SPARKSHELL_FALLBACK_MODEL", "frontier-test-model")
         .arg("sh")
         .arg("-c")
         .arg("printf 'one\ntwo\n'")
@@ -211,9 +211,9 @@ exit 29
     );
     let output = Command::new(sparkshell_bin())
         .env("PATH", path)
-        .env("OMX_SPARKSHELL_LINES", "1")
-        .env("OMX_SPARKSHELL_MODEL", "spark-test-model")
-        .env("OMX_SPARKSHELL_FALLBACK_MODEL", "frontier-test-model")
+        .env("OMCP_SPARKSHELL_LINES", "1")
+        .env("OMCP_SPARKSHELL_MODEL", "spark-test-model")
+        .env("OMCP_SPARKSHELL_FALLBACK_MODEL", "frontier-test-model")
         .arg("sh")
         .arg("-c")
         .arg("printf 'one\ntwo\n'; printf 'child-err\n' >&2")
@@ -246,7 +246,7 @@ fn summary_mode_preserves_child_exit_code() {
     );
     let output = Command::new(sparkshell_bin())
         .env("PATH", path)
-        .env("OMX_SPARKSHELL_LINES", "1")
+        .env("OMCP_SPARKSHELL_LINES", "1")
         .arg("sh")
         .arg("-c")
         .arg("printf 'one\ntwo\n'; exit 7")
@@ -290,7 +290,7 @@ fn tmux_pane_mode_captures_large_tail_and_summarizes() {
     );
     let output = Command::new(sparkshell_bin())
         .env("PATH", path)
-        .env("OMX_SPARKSHELL_LINES", "1")
+        .env("OMCP_SPARKSHELL_LINES", "1")
         .arg("--tmux-pane")
         .arg("%17")
         .arg("--tail-lines")
@@ -338,7 +338,7 @@ exit 0
     );
     let output = Command::new(sparkshell_bin())
         .env("PATH", path)
-        .env("OMX_SPARKSHELL_LINES", "2")
+        .env("OMCP_SPARKSHELL_LINES", "2")
         .arg("sh")
         .arg("-c")
         .arg("printf 'one\ntwo\n'")
@@ -383,7 +383,7 @@ printf '%s\n' '- summary: combined output exceeded threshold'
     );
     let output = Command::new(sparkshell_bin())
         .env("PATH", path)
-        .env("OMX_SPARKSHELL_LINES", "2")
+        .env("OMCP_SPARKSHELL_LINES", "2")
         .arg("sh")
         .arg("-c")
         .arg("printf 'one\n' && printf 'warn\nextra\n' >&2")
@@ -407,7 +407,7 @@ fn summary_failure_when_codex_is_missing_falls_back_to_raw_output() {
     let empty_path = unique_temp_dir("missing-codex");
     let output = Command::new(sparkshell_bin())
         .env("PATH", empty_path.display().to_string())
-        .env("OMX_SPARKSHELL_LINES", "1")
+        .env("OMCP_SPARKSHELL_LINES", "1")
         .arg("/bin/sh")
         .arg("-c")
         .arg("printf 'one\ntwo\n'; printf 'child-err\n' >&2")
@@ -458,7 +458,7 @@ printf '%s\n' '- summary: used default tmux tail'
     );
     let output = Command::new(sparkshell_bin())
         .env("PATH", path)
-        .env("OMX_SPARKSHELL_LINES", "1")
+        .env("OMCP_SPARKSHELL_LINES", "1")
         .arg("--tmux-pane")
         .arg("%21")
         .output()

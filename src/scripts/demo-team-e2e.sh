@@ -13,9 +13,9 @@
 #   WORKER_COUNT                    Number of workers (default: 6, minimum: 5)
 #   TEAM_TASK                       Task description (default: "e2e team demo <timestamp>")
 #   TEAM_NAME                       Team identifier (default: slugified TEAM_TASK)
-#   OMX_TEAM_WORKER_CLI             Worker CLI mode (default: auto)
-#   OMX_TEAM_WORKER_CLI_MAP         Comma-separated CLI assignments per worker
-#   OMX_TEAM_WORKER_LAUNCH_ARGS     Arguments passed to worker CLIs
+#   OMCP_TEAM_WORKER_CLI             Worker CLI mode (default: auto)
+#   OMCP_TEAM_WORKER_CLI_MAP         Comma-separated CLI assignments per worker
+#   OMCP_TEAM_WORKER_LAUNCH_ARGS     Arguments passed to worker CLIs
 #
 # Example:
 #   WORKER_COUNT=8 ./scripts/demo-team-e2e.sh
@@ -72,19 +72,19 @@ if ((WORKER_COUNT < 5)); then
 fi
 
 # Validate CLI map length matches worker count when explicitly provided
-if [[ -n "${OMX_TEAM_WORKER_CLI_MAP:-}" ]]; then
-  IFS=',' read -ra CLI_MAP_ENTRIES <<< "$OMX_TEAM_WORKER_CLI_MAP"
+if [[ -n "${OMCP_TEAM_WORKER_CLI_MAP:-}" ]]; then
+  IFS=',' read -ra CLI_MAP_ENTRIES <<< "$OMCP_TEAM_WORKER_CLI_MAP"
   if (("${#CLI_MAP_ENTRIES[@]}" != WORKER_COUNT)); then
-    echo "error: OMX_TEAM_WORKER_CLI_MAP has ${#CLI_MAP_ENTRIES[@]} entries but WORKER_COUNT is $WORKER_COUNT" >&2
+    echo "error: OMCP_TEAM_WORKER_CLI_MAP has ${#CLI_MAP_ENTRIES[@]} entries but WORKER_COUNT is $WORKER_COUNT" >&2
     exit 1
   fi
 fi
 
 TEAM_TASK="${TEAM_TASK:-e2e team demo $(date -u +%Y%m%d%H%M%S)}"
 TEAM_NAME="${TEAM_NAME:-$(slugify "$TEAM_TASK")}"
-OMX_TEAM_WORKER_CLI="${OMX_TEAM_WORKER_CLI:-auto}"
-OMX_TEAM_WORKER_CLI_MAP="${OMX_TEAM_WORKER_CLI_MAP:-$(build_default_cli_map "$WORKER_COUNT")}"
-OMX_TEAM_WORKER_LAUNCH_ARGS="${OMX_TEAM_WORKER_LAUNCH_ARGS:--c model_reasoning_effort=\"low\"}"
+OMCP_TEAM_WORKER_CLI="${OMCP_TEAM_WORKER_CLI:-auto}"
+OMCP_TEAM_WORKER_CLI_MAP="${OMCP_TEAM_WORKER_CLI_MAP:-$(build_default_cli_map "$WORKER_COUNT")}"
+OMCP_TEAM_WORKER_LAUNCH_ARGS="${OMCP_TEAM_WORKER_LAUNCH_ARGS:--c model_reasoning_effort=\"low\"}"
 
 TEAM_STARTED=0
 cleanup() {
@@ -101,9 +101,9 @@ echo "== OMCP Team E2E demo =="
 echo "TEAM_TASK=$TEAM_TASK"
 echo "TEAM_NAME=$TEAM_NAME"
 echo "WORKER_COUNT=$WORKER_COUNT"
-echo "OMX_TEAM_WORKER_CLI=$OMX_TEAM_WORKER_CLI"
-echo "OMX_TEAM_WORKER_CLI_MAP=$OMX_TEAM_WORKER_CLI_MAP"
-echo "OMX_TEAM_WORKER_LAUNCH_ARGS=$OMX_TEAM_WORKER_LAUNCH_ARGS"
+echo "OMCP_TEAM_WORKER_CLI=$OMCP_TEAM_WORKER_CLI"
+echo "OMCP_TEAM_WORKER_CLI_MAP=$OMCP_TEAM_WORKER_CLI_MAP"
+echo "OMCP_TEAM_WORKER_LAUNCH_ARGS=$OMCP_TEAM_WORKER_LAUNCH_ARGS"
 
 echo "[1/8] start team (${WORKER_COUNT} mixed workers)"
 omcp team "${WORKER_COUNT}:executor" "$TEAM_TASK"

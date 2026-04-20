@@ -68,13 +68,13 @@ To launch Claude teammates, use the team worker CLI env vars:
 
 ```bash
 # Force all teammates to Claude CLI
-OMX_TEAM_WORKER_CLI=claude omcp team 2:executor "update docs and report"
+OMCP_TEAM_WORKER_CLI=claude omcp team 2:executor "update docs and report"
 
 # Mixed team (worker 1 = Codex, worker 2 = Claude)
-OMX_TEAM_WORKER_CLI_MAP=codex,claude omcp team 2:executor "split doc/code tasks"
+OMCP_TEAM_WORKER_CLI_MAP=codex,claude omcp team 2:executor "split doc/code tasks"
 
 # Auto mode: Claude is selected when worker launch args/model contains 'claude'
-OMX_TEAM_WORKER_CLI=auto OMX_TEAM_WORKER_LAUNCH_ARGS="--model claude-..." omcp team 2:executor "run mixed validation"
+OMCP_TEAM_WORKER_CLI=auto OMCP_TEAM_WORKER_LAUNCH_ARGS="--model claude-..." omcp team 2:executor "run mixed validation"
 ```
 
 ## Preconditions
@@ -142,10 +142,10 @@ When `$team` is used as a follow-up mode from ralplan, carry forward the approve
 5. Resolve canonical shared state root from leader cwd (`<leader-cwd>/.omcp/state`)
 6. Split current tmux window into worker panes
 7. Launch workers with:
-   - `OMX_TEAM_WORKER=<team>/worker-<n>`
-   - `OMX_TEAM_STATE_ROOT=<leader-cwd>/.omcp/state`
-   - `OMX_TEAM_LEADER_CWD=<leader-cwd>`
-   - worker CLI selected by `OMX_TEAM_WORKER_CLI` / `OMX_TEAM_WORKER_CLI_MAP` (`codex` or `claude`)
+   - `OMCP_TEAM_WORKER=<team>/worker-<n>`
+   - `OMCP_TEAM_STATE_ROOT=<leader-cwd>/.omcp/state`
+   - `OMCP_TEAM_LEADER_CWD=<leader-cwd>`
+   - worker CLI selected by `OMCP_TEAM_WORKER_CLI` / `OMCP_TEAM_WORKER_CLI_MAP` (`codex` or `claude`)
    - optional worktree metadata envs when `--worktree` is used
 7. Wait for worker readiness (`capture-pane` polling)
 8. Write per-worker `inbox.md` and trigger via `tmux send-keys`
@@ -162,8 +162,8 @@ Important:
 - Notify hook updates worker heartbeat and nudges leader during active team mode
 - Submit routing uses this CLI resolution order per worker trigger:
   1) explicit worker CLI provided by runtime state (persisted on worker identity/config),
-  2) `OMX_TEAM_WORKER_CLI_MAP` entry for that worker index,
-  3) fallback `OMX_TEAM_WORKER_CLI` / auto detection.
+  2) `OMCP_TEAM_WORKER_CLI_MAP` entry for that worker index,
+  3) fallback `OMCP_TEAM_WORKER_CLI` / auto detection.
 - Mixed CLI-map teams are supported for both startup and trigger submit behavior.
 - Trigger submit differs by CLI:
   - Codex may use queue-first `Tab` on busy panes (strategy-dependent).
@@ -174,20 +174,20 @@ Important:
 Team mode resolves worker **model flags** from one shared launch-arg set (not per-worker model selection).
 
 Model precedence (highest to lowest):
-1. Explicit worker model in `OMX_TEAM_WORKER_LAUNCH_ARGS`
+1. Explicit worker model in `OMCP_TEAM_WORKER_LAUNCH_ARGS`
 2. Inherited leader `--model` flag
-3. Low-complexity default from `OMX_DEFAULT_SPARK_MODEL` (legacy alias: `OMX_SPARK_MODEL`) when 1+2 are absent and team `agentType` is low-complexity
+3. Low-complexity default from `OMCP_DEFAULT_SPARK_MODEL` (legacy alias: `OMCP_SPARK_MODEL`) when 1+2 are absent and team `agentType` is low-complexity
 
 Default-model rule:
 - Do **not** assume a frontier or spark model from recency or model-family heuristics.
-- Use `OMX_DEFAULT_FRONTIER_MODEL` for frontier-default guidance.
-- Use `OMX_DEFAULT_SPARK_MODEL` for spark/low-complexity worker-default guidance.
+- Use `OMCP_DEFAULT_FRONTIER_MODEL` for frontier-default guidance.
+- Use `OMCP_DEFAULT_SPARK_MODEL` for spark/low-complexity worker-default guidance.
 
 Thinking-level rule (critical):
 - **No model-name heuristic mapping.**
 - Team runtime must **not** infer `model_reasoning_effort` from model-name substrings (e.g., `spark`, `high-capability`, `mini`).
 - When the leader assigns teammate roles/tasks, OMCP allocates **per-worker reasoning effort dynamically** from the resolved worker role (`low`, `medium`, `high`).
-- Explicit launch args still win: if `OMX_TEAM_WORKER_LAUNCH_ARGS` already includes `-c model_reasoning_effort=...`, that explicit value overrides dynamic allocation for every worker.
+- Explicit launch args still win: if `OMCP_TEAM_WORKER_LAUNCH_ARGS` already includes `-c model_reasoning_effort=...`, that explicit value overrides dynamic allocation for every worker.
 
 Normalization requirements:
 - Parse both `--model <value>` and `--model=<value>`
@@ -261,7 +261,7 @@ Semantics:
 
 ### Control Plane
 
-- tmux panes/processes (`OMX_TEAM_WORKER` per worker)
+- tmux panes/processes (`OMCP_TEAM_WORKER` per worker)
 - leader notifications via `tmux display-message`
 
 ### Data Plane
@@ -337,32 +337,32 @@ Task ID rule (critical):
 
 Useful runtime env vars:
 
-- `OMX_TEAM_READY_TIMEOUT_MS`
+- `OMCP_TEAM_READY_TIMEOUT_MS`
   - Worker readiness timeout (default 45000)
-- `OMX_TEAM_SKIP_READY_WAIT=1`
+- `OMCP_TEAM_SKIP_READY_WAIT=1`
   - Skip readiness wait (debug only)
-- `OMX_TEAM_AUTO_TRUST=0`
+- `OMCP_TEAM_AUTO_TRUST=0`
   - Disable auto-advance for trust prompt (default behavior auto-advances)
-- `OMX_TEAM_AUTO_ACCEPT_BYPASS=0`
+- `OMCP_TEAM_AUTO_ACCEPT_BYPASS=0`
   - Disable Claude bypass-permissions prompt auto-accept (default behavior auto-accepts `2` + Enter)
-- `OMX_TEAM_WORKER_LAUNCH_ARGS`
+- `OMCP_TEAM_WORKER_LAUNCH_ARGS`
   - Extra args passed to worker launch command
-- `OMX_TEAM_WORKER_CLI`
+- `OMCP_TEAM_WORKER_CLI`
   - Worker CLI selector: `auto|codex|claude` (default: `auto`)
   - `auto` chooses `claude` when worker `--model` contains `claude`, otherwise `codex`
   - In `claude` mode, workers launch with exactly one `--dangerously-skip-permissions`
     and ignore explicit model/config/effort launch overrides (uses default `settings.json`)
-- `OMX_TEAM_WORKER_CLI_MAP`
+- `OMCP_TEAM_WORKER_CLI_MAP`
   - Per-worker CLI selector (comma-separated `auto|codex|claude`)
   - Length must be `1` (broadcast) or exactly the team worker count
-  - Example: `OMX_TEAM_WORKER_CLI_MAP=codex,codex,claude,claude`
-  - When present, overrides `OMX_TEAM_WORKER_CLI`
-- `OMX_TEAM_AUTO_INTERRUPT_RETRY`
+  - Example: `OMCP_TEAM_WORKER_CLI_MAP=codex,codex,claude,claude`
+  - When present, overrides `OMCP_TEAM_WORKER_CLI`
+- `OMCP_TEAM_AUTO_INTERRUPT_RETRY`
   - Trigger submit fallback (default: enabled)
   - `0` disables adaptive queue->resend escalation
-- `OMX_TEAM_LEADER_NUDGE_MS`
+- `OMCP_TEAM_LEADER_NUDGE_MS`
   - Leader nudge interval in ms (default 120000)
-- `OMX_TEAM_STRICT_SUBMIT=1`
+- `OMCP_TEAM_STRICT_SUBMIT=1`
   - Force strict send-keys submit failure behavior
 
 ## Failure Modes and Diagnosis

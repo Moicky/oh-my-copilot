@@ -40,7 +40,7 @@ function summarizeObservedState(
 		case "degraded":
 			return "OpenClaw local adapter evidence is partial; config is present but at least one mapped hook is locally blocked.";
 		case "disabled":
-			return "OpenClaw is disabled locally because OMX_OPENCLAW=1 is not set.";
+			return "OpenClaw is disabled locally because OMCP_OPENCLAW=1 is not set.";
 		case "missing-config":
 			return "OpenClaw is enabled, but no usable local config file was found.";
 		case "invalid-config":
@@ -110,7 +110,7 @@ function observeOpenClaw(
 					gatewayType,
 					status: "blocked",
 					detail:
-						"Mapped to a command gateway, but OMX_OPENCLAW_COMMAND=1 is not set.",
+						"Mapped to a command gateway, but OMCP_OPENCLAW_COMMAND=1 is not set.",
 				});
 				continue;
 			}
@@ -189,7 +189,7 @@ export function buildOpenClawEnvelope(
 		constraints: [
 			"Status reflects local OMCP/OpenClaw adapter evidence only; it does not claim downstream OpenClaw acknowledgement.",
 			"Bootstrap output stays under .omcp/adapters/openclaw/... and does not mutate .omcp/state or upstream OpenClaw config.",
-			"Command gateways remain gated by OMX_OPENCLAW_COMMAND=1 even when OMX_OPENCLAW=1 is enabled.",
+			"Command gateways remain gated by OMCP_OPENCLAW_COMMAND=1 even when OMCP_OPENCLAW=1 is enabled.",
 		],
 		openclaw,
 	};
@@ -286,7 +286,7 @@ export function buildOpenClawDoctorReport(
 		issues.push({
 			code: "openclaw_disabled",
 			message:
-				"OMX_OPENCLAW=1 is required before OpenClaw local config can be observed.",
+				"OMCP_OPENCLAW=1 is required before OpenClaw local config can be observed.",
 		});
 	} else if (
 		openclaw.observedState === "missing-config" ||
@@ -330,8 +330,8 @@ export function buildOpenClawDoctorReport(
 		issues,
 		nextSteps: [
 			"Run omcp adapt openclaw init --write.",
-			"Set OMX_OPENCLAW=1 and configure notifications.openclaw or compatible aliases in ~/.codex/.omcp-config.json.",
-			"If command gateways are configured, also set OMX_OPENCLAW_COMMAND=1 before expecting command mappings to be locally ready.",
+			"Set OMCP_OPENCLAW=1 and configure notifications.openclaw or compatible aliases in ~/.codex/.omcp-config.json.",
+			"If command gateways are configured, also set OMCP_OPENCLAW_COMMAND=1 before expecting command mappings to be locally ready.",
 		],
 	};
 }

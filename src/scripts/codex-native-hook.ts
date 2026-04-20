@@ -638,12 +638,12 @@ async function resolveTeamStateDirForWorkerContext(
   cwd: string,
   workerContext: { teamName: string; workerName: string },
 ): Promise<string> {
-  const explicitStateRoot = safeString(process.env.OMX_TEAM_STATE_ROOT).trim();
+  const explicitStateRoot = safeString(process.env.OMCP_TEAM_STATE_ROOT).trim();
   if (explicitStateRoot) {
     return resolve(cwd, explicitStateRoot);
   }
 
-  const leaderCwd = safeString(process.env.OMX_TEAM_LEADER_CWD).trim();
+  const leaderCwd = safeString(process.env.OMCP_TEAM_LEADER_CWD).trim();
   const candidateStateDirs = [
     ...(leaderCwd ? [join(resolve(leaderCwd), ".omcp", "state")] : []),
     join(cwd, ".omcp", "state"),
@@ -673,7 +673,7 @@ async function resolveTeamStateDirForWorkerContext(
 async function buildTeamWorkerStopOutput(
   cwd: string,
 ): Promise<Record<string, unknown> | null> {
-  const workerContext = parseTeamWorkerEnv(safeString(process.env.OMX_TEAM_WORKER));
+  const workerContext = parseTeamWorkerEnv(safeString(process.env.OMCP_TEAM_WORKER));
   if (!workerContext) return null;
 
   const stateDir = await resolveTeamStateDirForWorkerContext(cwd, workerContext);
@@ -712,7 +712,7 @@ async function buildTeamWorkerStopOutput(
 }
 
 function hasTeamWorkerContext(): boolean {
-  return parseTeamWorkerEnv(safeString(process.env.OMX_TEAM_WORKER)) !== null;
+  return parseTeamWorkerEnv(safeString(process.env.OMCP_TEAM_WORKER)) !== null;
 }
 
 function isStopExempt(payload: CodexHookPayload): boolean {
