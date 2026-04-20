@@ -1519,13 +1519,13 @@ describe("detached tmux new-session sequencing", () => {
     assert.match(leaderCmd!, /^\/bin\/sh -c '/);
     assert.doesNotMatch(leaderCmd!, /^\/bin\/sh -lc '/);
     assert.match(leaderCmd!, /acquireTmuxExtendedKeysLease/);
-    assert.match(leaderCmd!, /omx_detached_session_cleanup\(\)/);
-    assert.match(leaderCmd!, /trap omx_detached_session_cleanup 0 INT TERM HUP;/);
+    assert.match(leaderCmd!, /omcp_detached_session_cleanup\(\)/);
+    assert.match(leaderCmd!, /trap omcp_detached_session_cleanup 0 INT TERM HUP;/);
     assert.match(leaderCmd!, /exec 3<&0;/);
-    assert.match(leaderCmd!, /omx_codex_pid=\$!;/);
+    assert.match(leaderCmd!, /omcp_codex_pid=\$!;/);
     assert.match(leaderCmd!, /<\&3 &/);
-    assert.match(leaderCmd!, /wait "\$omx_codex_pid";/);
-    assert.match(leaderCmd!, /kill -TERM "\$omx_codex_pid"/);
+    assert.match(leaderCmd!, /wait "\$omcp_codex_pid";/);
+    assert.match(leaderCmd!, /kill -TERM "\$omcp_codex_pid"/);
     assert.match(leaderCmd!, /releaseTmuxExtendedKeysLease/);
     assert.match(leaderCmd!, /if \[ "\$status" -lt 128 \]; then/);
     assert.match(leaderCmd!, /tmux kill-session -t/);
@@ -2169,8 +2169,8 @@ exit 0
     const steps = buildDetachedSessionRollbackSteps(
       "omcp-demo",
       "omcp-demo:0",
-      "omx_resize_launch_demo_0_12",
-      "omx_attached_launch_demo_0_12",
+      "omcp_resize_launch_demo_0_12",
+      "omcp_attached_launch_demo_0_12",
     );
     assert.deepEqual(
       steps.map((step) => step.name),

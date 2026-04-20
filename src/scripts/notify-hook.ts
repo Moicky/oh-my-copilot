@@ -554,7 +554,7 @@ async function main() {
       input_messages: normalizeInputMessages(payload),
       output_preview: outputPreview,
       native_session_id: payloadSessionId || null,
-      omx_session_id: sessionIdForHooks || null,
+      omcp_session_id: sessionIdForHooks || null,
       ...readRepositoryMetadata(cwd),
       session_name: resolveOperationalSessionName(cwd, sessionIdForHooks),
       project_path: cwd,
@@ -577,7 +577,7 @@ async function main() {
         errorSummary: signal.error_summary,
         extra: {
           native_session_id: payloadSessionId || null,
-          omx_session_id: sessionIdForHooks || null,
+          omcp_session_id: sessionIdForHooks || null,
           source_event: safeString(payload.type || 'agent-turn-complete'),
         },
       }), {

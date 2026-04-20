@@ -7,7 +7,7 @@ It is intentionally **not** a literal OMC port.
 
 - Keep the reusable wiki domain under `src/wiki/*`.
 - Expose wiki operations from a dedicated MCP server at `src/mcp/wiki-server.ts`.
-- Register the server as `omx_wiki`.
+- Register the server as `omcp_wiki`.
 - Keep wiki storage under `.omcp/wiki/`.
 - Do **not** add vector embeddings; query stays keyword/tag based.
 
@@ -16,13 +16,13 @@ It is intentionally **not** a literal OMC port.
 `omcp setup` / the config generator should own the dedicated wiki MCP block:
 
 ```toml
-[mcp_servers.omx_wiki]
+[mcp_servers.omcp_wiki]
 command = "node"
 args = ["<repo>/dist/mcp/wiki-server.js"]
 enabled = true
 ```
 
-The bootstrap/config path should treat `omx_wiki` as a first-party OMCP server
+The bootstrap/config path should treat `omcp_wiki` as a first-party OMCP server
 alongside the existing built-ins, while keeping the diff small and idempotent.
 
 ## Storage contract
@@ -66,7 +66,7 @@ This keeps the routing surface specific enough to avoid false positives from ord
 
 ## MCP tool surface
 
-The dedicated `omx_wiki` server should expose the seven stabilized wiki tools:
+The dedicated `omcp_wiki` server should expose the seven stabilized wiki tools:
 
 - `wiki_ingest`
 - `wiki_query`

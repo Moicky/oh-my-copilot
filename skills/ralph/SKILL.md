@@ -102,7 +102,7 @@ Complex tasks often fail silently: partial implementations get declared "done", 
 
 ## State Management
 
-Use the `omx_state` MCP server tools (`state_write`, `state_read`, `state_clear`) for Ralph lifecycle state.
+Use the `omcp_state` MCP server tools (`state_write`, `state_read`, `state_clear`) for Ralph lifecycle state.
 
 - **On start**:
   `state_write({mode: "ralph", active: true, iteration: 1, max_iterations: 10, current_phase: "executing", started_at: "<now>", state: {context_snapshot_path: "<snapshot-path>"}})`

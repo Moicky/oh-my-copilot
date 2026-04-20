@@ -486,7 +486,7 @@ describe("codex native hook dispatch", () => {
       assert.equal(result.omxEventName, "keyword-detector");
       assert.equal(result.skillState?.skill, "ralplan");
       assert.ok(result.outputJson, "UserPromptSubmit should emit developer context");
-      assert.match(JSON.stringify(result.outputJson), /skill: ralplan activated and initial state initialized at \.omcp\/state\/sessions\/sess-1\/ralplan-state\.json; write subsequent updates via omx_state MCP\./);
+      assert.match(JSON.stringify(result.outputJson), /skill: ralplan activated and initial state initialized at \.omcp\/state\/sessions\/sess-1\/ralplan-state\.json; write subsequent updates via omcp_state MCP\./);
 
       const statePath = join(cwd, ".omcp", "state", "skill-active-state.json");
       assert.equal(existsSync(statePath), true);
@@ -621,7 +621,7 @@ describe("codex native hook dispatch", () => {
         (result.outputJson as { hookSpecificOutput?: { additionalContext?: string } })?.hookSpecificOutput?.additionalContext || "",
       );
       assert.match(message, /\$ralph" -> ralph/);
-      assert.match(message, /skill: ralph activated and initial state initialized at \.omcp\/state\/sessions\/sess-ralph-msg\/ralph-state\.json; write subsequent updates via omx_state MCP\./);
+      assert.match(message, /skill: ralph activated and initial state initialized at \.omcp\/state\/sessions\/sess-ralph-msg\/ralph-state\.json; write subsequent updates via omcp_state MCP\./);
       assert.match(message, /Prompt-side `\$ralph` activation seeds Ralph workflow state only; it does not invoke `omcp ralph`\./);
       assert.match(message, /Use `omcp ralph --prd \.\.\.` only when you explicitly want the PRD-gated CLI startup path\./);
     } finally {
@@ -704,7 +704,7 @@ describe("codex native hook dispatch", () => {
         (result.outputJson as { hookSpecificOutput?: { additionalContext?: string } })?.hookSpecificOutput?.additionalContext || "",
       );
       assert.match(message, /\$deep-interview" -> deep-interview/);
-      assert.match(message, /skill: deep-interview activated and initial state initialized at \.omcp\/state\/sessions\/sess-deep-interview-msg\/deep-interview-state\.json; write subsequent updates via omx_state MCP\./);
+      assert.match(message, /skill: deep-interview activated and initial state initialized at \.omcp\/state\/sessions\/sess-deep-interview-msg\/deep-interview-state\.json; write subsequent updates via omcp_state MCP\./);
       assert.match(message, /Deep-interview must ask each interview round via `omcp question`/);
       assert.match(message, /do not fall back to `request_user_input` or plain-text questioning/i);
       assert.match(message, /Stop remains blocked while a deep-interview question obligation is pending\./);
@@ -901,7 +901,7 @@ export async function onHookEvent(event) {
       assert.equal(result.skillState?.skill, "team");
       assert.match(
         JSON.stringify(result.outputJson),
-        /skill: team activated and initial state initialized at \.omcp\/state\/team-state\.json; write subsequent updates via omx_state MCP\./,
+        /skill: team activated and initial state initialized at \.omcp\/state\/team-state\.json; write subsequent updates via omcp_state MCP\./,
       );
       assert.match(JSON.stringify(result.outputJson), /Use the durable OMCP team runtime via `omcp team \.\.\.`/);
       assert.match(JSON.stringify(result.outputJson), /If you need runtime syntax, run `omcp team --help` yourself\./);
@@ -948,7 +948,7 @@ export async function onHookEvent(event) {
       assert.match(JSON.stringify(denied.outputJson), /denied workflow keyword/i);
       assert.match(JSON.stringify(denied.outputJson), /Unsupported workflow overlap: team \+ autopilot\./);
       assert.match(JSON.stringify(denied.outputJson), /`omcp state clear --mode <mode>`/);
-      assert.match(JSON.stringify(denied.outputJson), /`omx_state\.\*` MCP tools/);
+      assert.match(JSON.stringify(denied.outputJson), /`omcp_state\.\*` MCP tools/);
       assert.equal(
         existsSync(join(cwd, ".omcp", "state", "sessions", "sess-deny-1", "autopilot-state.json")),
         false,
@@ -1025,7 +1025,7 @@ export async function onHookEvent(event) {
       assert.match(message, /\$ralph" -> ralph/);
       assert.doesNotMatch(message, /mode transiting:/);
       assert.match(message, /planning preserved over simultaneous execution follow-up; deferred skills: team, ralph\./);
-      assert.match(message, /skill: ralplan activated and initial state initialized at \.omcp\/state\/sessions\/sess-multi-1\/ralplan-state\.json; write subsequent updates via omx_state MCP\./);
+      assert.match(message, /skill: ralplan activated and initial state initialized at \.omcp\/state\/sessions\/sess-multi-1\/ralplan-state\.json; write subsequent updates via omcp_state MCP\./);
       assert.doesNotMatch(message, /Use the durable OMCP team runtime via `omcp team \.\.\.`/);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -1173,7 +1173,7 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
@@ -1181,15 +1181,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1278,7 +1278,7 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
@@ -1286,15 +1286,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1320,7 +1320,7 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
@@ -1328,15 +1328,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1362,7 +1362,7 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
@@ -1370,15 +1370,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1404,7 +1404,7 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
@@ -1412,15 +1412,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1446,7 +1446,7 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
@@ -1454,15 +1454,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1488,7 +1488,7 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
@@ -1496,15 +1496,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1530,7 +1530,7 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
@@ -1538,15 +1538,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1572,7 +1572,7 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
@@ -1580,15 +1580,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1614,7 +1614,7 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
@@ -1622,15 +1622,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1656,7 +1656,7 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
@@ -1665,7 +1665,7 @@ esac
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           "- Use inline `git commit -m ...` paragraphs for Lore-format commits in this path; file/editor/reuse/fixup message sources are not inspectable safely from pre-tool-use enforcement.",
         ].join("\n"),
       });
@@ -1674,7 +1674,7 @@ esac
     }
   });
 
-  it("blocks PreToolUse git commit when Lore trailers exist but the OmX co-author trailer is missing", async () => {
+  it("blocks PreToolUse git commit when Lore trailers exist but the OMCP co-author trailer is missing", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omcp-native-hook-pretool-git-commit-missing-omcp-coauthor-"));
     try {
       const result = await dispatchCodexNativeHook(
@@ -1687,7 +1687,7 @@ esac
             command: [
               'git commit',
               '-m "Prevent invalid history from bypassing Lore enforcement"',
-              '-m "The native pre-tool-use hook now blocks inline git commit messages that skip Lore trailers or the required OmX co-author trailer."',
+              '-m "The native pre-tool-use hook now blocks inline git commit messages that skip Lore trailers or the required OMCP co-author trailer."',
               '-m "Constraint: Native PreToolUse can only inspect the Bash command text"',
               '-m "Tested: node --test dist/scripts/__tests__/codex-native-hook.test.js"',
             ].join(" "),
@@ -1700,17 +1700,17 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+          "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
           additionalContext: [
             "Lore-format git commit enforcement triggered.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1718,7 +1718,7 @@ esac
     }
   });
 
-  it("stays silent on PreToolUse for Lore-compliant git commit with OmX co-author trailer", async () => {
+  it("stays silent on PreToolUse for Lore-compliant git commit with OMCP co-author trailer", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omcp-native-hook-pretool-git-commit-valid-"));
     try {
       const result = await dispatchCodexNativeHook(
@@ -1731,10 +1731,10 @@ esac
             command: [
               'git commit',
               '-m "Prevent invalid history from bypassing Lore enforcement"',
-              '-m "The native pre-tool-use hook now blocks inline git commit messages that skip Lore trailers or the required OmX co-author trailer."',
+              '-m "The native pre-tool-use hook now blocks inline git commit messages that skip Lore trailers or the required OMCP co-author trailer."',
               '-m "Constraint: Native PreToolUse can only inspect the Bash command text"',
               '-m "Tested: node --test dist/scripts/__tests__/codex-native-hook.test.js"',
-              '-m "Co-authored-by: OmX <omcp@oh-my-copilot.dev>"',
+              '-m "Co-authored-by: OMCP <omcp@oh-my-copilot.dev>"',
             ].join(" "),
           },
         },

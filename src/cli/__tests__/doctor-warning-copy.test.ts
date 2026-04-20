@@ -76,7 +76,7 @@ command = "node"
     }
   });
 
-  it('warns about retired omx_team_run config left behind after upgrade', async () => {
+  it('warns about retired omcp_team_run config left behind after upgrade', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-doctor-copy-'));
     try {
       const home = join(wd, 'home');
@@ -85,7 +85,7 @@ command = "node"
       await writeFile(
         join(codexDir, 'config.toml'),
         `
-[mcp_servers.omx_team_run]
+[mcp_servers.omcp_team_run]
 command = "node"
 args = ["/tmp/team-server.js"]
 enabled = true
@@ -100,11 +100,11 @@ enabled = true
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Config: retired \[mcp_servers\.omx_team_run\] table still present; run "omcp setup --force" to repair the config/,
+        /Config: retired \[mcp_servers\.omcp_team_run\] table still present; run "omcp setup --force" to repair the config/,
       );
       assert.match(
         res.stdout,
-        /MCP Servers: 1 servers configured, but retired \[mcp_servers\.omx_team_run\] is not supported; run "omcp setup --force" to repair the config/,
+        /MCP Servers: 1 servers configured, but retired \[mcp_servers\.omcp_team_run\] is not supported; run "omcp setup --force" to repair the config/,
       );
       assert.doesNotMatch(res.stdout, /Config: config\.toml has OMCP entries/);
       assert.doesNotMatch(
@@ -312,8 +312,8 @@ USE_OMX_EXPLORE_CMD = "off"
       await writeFile(
         join(codexDir, 'config.toml'),
         `
-omx_enabled = true
-[mcp_servers.omx_state]
+omcp_enabled = true
+[mcp_servers.omcp_state]
 command = "node"
 `.trimStart(),
       );

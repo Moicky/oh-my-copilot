@@ -40,7 +40,7 @@ oh-my-copilot setup
   Done.
 
 [4.5/7] Verifying Team MCP comm tools...
-  omx_state exports: team_send_message, team_broadcast, team_mailbox_list, team_mailbox_mark_delivered
+  omcp_state exports: team_send_message, team_broadcast, team_mailbox_list, team_mailbox_mark_delivered
 
 [5/7] Generating AGENTS.md...
   Generated AGENTS.md in project root.
@@ -393,7 +393,7 @@ Expected:
 
 **Slash commands not appearing:** Run `omcp setup --force` to reinstall prompts
 
-**MCP servers not connecting:** Check `~/.codex/config.toml` for `[mcp_servers.omx_state]`, `[mcp_servers.omx_memory]`, `[mcp_servers.omx_code_intel]`, and `[mcp_servers.omx_trace]` entries
+**MCP servers not connecting:** Check `~/.codex/config.toml` for `[mcp_servers.omcp_state]`, `[mcp_servers.omcp_memory]`, `[mcp_servers.omcp_code_intel]`, and `[mcp_servers.omcp_trace]` entries
 
 **Doctor shows warnings:** Run `omcp setup` to install missing components
 

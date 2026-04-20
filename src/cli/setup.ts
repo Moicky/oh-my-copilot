@@ -858,7 +858,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   const resolvedConfig = managedConfig.finalConfig;
   if (managedConfig.repairedLegacyTeamRunTable) {
     console.log(
-      "  Removed retired [mcp_servers.omx_team_run] config during refresh.",
+      "  Removed retired [mcp_servers.omcp_team_run] config during refresh.",
     );
   }
   if (resolvedScope.scope === "user") {

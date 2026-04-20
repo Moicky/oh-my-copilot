@@ -42,7 +42,7 @@ describe('workflow transition rules', () => {
     assert.match(error, /Current state is unchanged\./);
     assert.match(error, /Clear incompatible workflow state yourself via/);
     assert.match(error, /`omcp state clear --mode <mode>`/);
-    assert.match(error, /`omx_state\.\*` MCP tools/);
+    assert.match(error, /`omcp_state\.\*` MCP tools/);
   });
 
   it('returns auto-complete decisions for allowlisted forward transitions', () => {

@@ -181,7 +181,7 @@ describe('chooseTeamLeaderPaneId', () => {
 describe('HUD resize hook command builders', () => {
   it('buildResizeHookName normalizes all segments into collision-safe tokens', () => {
     const name = buildResizeHookName('Team A', 'Session:Main', '0', '%12');
-    assert.equal(name, 'omx_resize_Team_A_Session_Main_0_12');
+    assert.equal(name, 'omcp_resize_Team_A_Session_Main_0_12');
   });
 
   it('buildResizeHookTarget uses session:window format', () => {
@@ -194,7 +194,7 @@ describe('HUD resize hook command builders', () => {
   });
 
   it('buildRegisterResizeHookArgs uses window target and numeric client-resized hook slot', () => {
-    const args = buildRegisterResizeHookArgs('my-session:0', 'omx_resize_team_session_0_1', '%1');
+    const args = buildRegisterResizeHookArgs('my-session:0', 'omcp_resize_team_session_0_1', '%1');
     assert.equal(args[0], 'set-hook');
     assert.equal(args[1], '-t');
     assert.equal(args[2], 'my-session:0');
@@ -203,18 +203,18 @@ describe('HUD resize hook command builders', () => {
   });
 
   it('buildUnregisterResizeHookArgs removes the exact numeric hook slot', () => {
-    const registered = buildRegisterResizeHookArgs('my-session:0', 'omx_resize_team_session_0_1', '%1');
-    const unregistered = buildUnregisterResizeHookArgs('my-session:0', 'omx_resize_team_session_0_1');
+    const registered = buildRegisterResizeHookArgs('my-session:0', 'omcp_resize_team_session_0_1', '%1');
+    const unregistered = buildUnregisterResizeHookArgs('my-session:0', 'omcp_resize_team_session_0_1');
     assert.deepEqual(unregistered, ['set-hook', '-u', '-t', 'my-session:0', registered[3] as string]);
   });
 
   it('buildClientAttachedReconcileHookName normalizes all segments into collision-safe tokens', () => {
     const name = buildClientAttachedReconcileHookName('Team A', 'Session:Main', '0', '%12');
-    assert.equal(name, 'omx_attached_Team_A_Session_Main_0_12');
+    assert.equal(name, 'omcp_attached_Team_A_Session_Main_0_12');
   });
 
   it('buildRegisterClientAttachedReconcileArgs installs one-shot client-attached reconcile hook', () => {
-    const args = buildRegisterClientAttachedReconcileArgs('my-session:0', 'omx_attached_team_session_0_1', '%1');
+    const args = buildRegisterClientAttachedReconcileArgs('my-session:0', 'omcp_attached_team_session_0_1', '%1');
     assert.equal(args[0], 'set-hook');
     assert.equal(args[1], '-t');
     assert.equal(args[2], 'my-session:0');
@@ -226,15 +226,15 @@ describe('HUD resize hook command builders', () => {
   });
 
   it('buildUnregisterClientAttachedReconcileArgs removes the exact numeric client-attached slot', () => {
-    const registered = buildRegisterClientAttachedReconcileArgs('my-session:0', 'omx_attached_team_session_0_1', '%1');
-    const unregistered = buildUnregisterClientAttachedReconcileArgs('my-session:0', 'omx_attached_team_session_0_1');
+    const registered = buildRegisterClientAttachedReconcileArgs('my-session:0', 'omcp_attached_team_session_0_1', '%1');
+    const unregistered = buildUnregisterClientAttachedReconcileArgs('my-session:0', 'omcp_attached_team_session_0_1');
     assert.deepEqual(unregistered, ['set-hook', '-u', '-t', 'my-session:0', registered[3] as string]);
   });
 
   it('hook indices stay within signed 32-bit range (issue #240)', () => {
     // buildResizeHookSlot and buildClientAttachedHookSlot must produce indices
     // in [0, 2147483647) so tmux (signed 32-bit) does not overflow.
-    const longName = 'omx_resize_' + 'a'.repeat(200);
+    const longName = 'omcp_resize_' + 'a'.repeat(200);
     const resizeArgs = buildRegisterResizeHookArgs('sess:0', longName, '%1');
     const attachedArgs = buildRegisterClientAttachedReconcileArgs('sess:0', longName, '%1');
 
@@ -251,7 +251,7 @@ describe('HUD resize hook command builders', () => {
   });
 
   it('hook indices are deterministic across calls', () => {
-    const name = 'omx_resize_team_session_0_1';
+    const name = 'omcp_resize_team_session_0_1';
     const a = buildRegisterResizeHookArgs('s:0', name, '%1');
     const b = buildRegisterResizeHookArgs('s:0', name, '%1');
     assert.equal(a[3], b[3]);
@@ -289,7 +289,7 @@ describe('HUD resize hook command builders', () => {
       process.env.PATHEXT = '.EXE';
       Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
 
-      const resizeArgs = buildRegisterResizeHookArgs('my-session:0', 'omx_resize_team_session_0_1', '%1');
+      const resizeArgs = buildRegisterResizeHookArgs('my-session:0', 'omcp_resize_team_session_0_1', '%1');
       const delayedArgs = buildScheduleDelayedHudResizeArgs('%1');
       const reconcileArgs = buildReconcileHudResizeArgs('%1');
 
@@ -321,7 +321,7 @@ describe('HUD resize hook command builders', () => {
       process.env.PATHEXT = '.EXE';
       Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
 
-      const args = buildRegisterClientAttachedReconcileArgs('my-session:0', 'omx_attached_team_session_0_1', '%1');
+      const args = buildRegisterClientAttachedReconcileArgs('my-session:0', 'omcp_attached_team_session_0_1', '%1');
       const matches = (args[4] ?? '').match(new RegExp(escapeRegExp(tmuxPath), 'g')) || [];
       assert.equal(matches.length, 2, 'client-attached hook should resolve tmux for both resize and unregister commands');
       assert.doesNotMatch(args[4] ?? '', /; tmux set-hook -u -t my-session:0 client-attached/);

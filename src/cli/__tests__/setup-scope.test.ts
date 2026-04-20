@@ -130,7 +130,7 @@ describe("omcp setup scope behavior", () => {
       );
       await writeFile(
         join(wd, ".codex", "config.toml"),
-        'omx_enabled = true\n[mcp_servers.omx_state]\ncommand = "node"\n',
+        'omcp_enabled = true\n[mcp_servers.omcp_state]\ncommand = "node"\n',
       );
 
       const res = runOmx(wd, ["doctor"], { HOME: home });
@@ -376,7 +376,7 @@ describe("omcp setup scope behavior", () => {
       );
       await writeFile(
         join(home, ".codex", "config.toml"),
-        'omx_enabled = true\n[mcp_servers.omx_state]\ncommand = "node"\n',
+        'omcp_enabled = true\n[mcp_servers.omcp_state]\ncommand = "node"\n',
       );
 
       const res = runOmx(wd, ["doctor"], {

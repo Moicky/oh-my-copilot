@@ -107,7 +107,7 @@ function matchesDestructiveFixture(command: string): boolean {
 }
 
 function isMcpLikeToolName(toolName: string): boolean {
-  return /^(mcp__|omx_(?:state|memory|trace|code_intel)\b|state_|project_memory_|notepad_|trace_)/i.test(toolName);
+  return /^(mcp__|omcp_(?:state|memory|trace|code_intel)\b|state_|project_memory_|notepad_|trace_)/i.test(toolName);
 }
 
 const MCP_TRANSPORT_FAILURE_PATTERNS = [
@@ -200,7 +200,7 @@ const LORE_TRAILER_PREFIXES = [
   "Related:",
 ] as const;
 
-const OMCP_COAUTHOR_TRAILER = "Co-authored-by: OmX <omcp@oh-my-copilot.dev>";
+const OMCP_COAUTHOR_TRAILER = "Co-authored-by: OMCP <omcp@oh-my-copilot.dev>";
 
 function isDoubleQuotedShellEscapeTarget(char: string | undefined): boolean {
   return char === "\"" || char === "\\" || char === "$" || char === "`" || char === "\n";
@@ -505,7 +505,7 @@ function buildGitCommitComplianceErrors(message: string | null): string[] {
   const normalized = message.replace(/\r\n?/g, "\n").trim();
   if (!normalized) {
     return [
-      "Provide a non-empty Lore-format commit message with an intent-first subject, narrative body, Lore trailers, and the OmX co-author trailer.",
+      "Provide a non-empty Lore-format commit message with an intent-first subject, narrative body, Lore trailers, and the OMCP co-author trailer.",
     ];
   }
 
@@ -547,7 +547,7 @@ function buildGitCommitEnforcementOutput(commandText: string): Record<string, un
   return {
     decision: "block",
     reason:
-      "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+      "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
       additionalContext: [
@@ -556,7 +556,7 @@ function buildGitCommitEnforcementOutput(commandText: string): Record<string, un
       ].join("\n"),
     },
     systemMessage: [
-      "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
+      "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
       ...errors.map((error) => `- ${error}`),
     ].join("\n"),
   };

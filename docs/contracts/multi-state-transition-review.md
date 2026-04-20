@@ -50,7 +50,7 @@ Primary gaps relative to the PRD/test-spec:
 3. **Invalid-transition guidance is not standardized.**
    - `src/modes/base.ts` still throws `Run cancel first.` for exclusivity
      failures, which does not meet the new requirement to mention explicit
-     clearing paths via `omcp state` and `omx_state.*`.
+     clearing paths via `omcp state` and `omcp_state.*`.
 4. **The contract is not documented in one operator-facing place.**
    - The PRD and test spec define the rollout, but the repo lacked a dedicated
      contract doc describing the allowed set, the denied set, and the required
@@ -122,7 +122,7 @@ messages can point operators at exact parity surfaces instead of vague
 placeholders:
 
 - `omcp state clear --input '{"mode":"team"}' --json`
-- `omx_state.state_clear({ mode: "team" })`
+- `omcp_state.state_clear({ mode: "team" })`
 
 ## Reviewer conclusion
 

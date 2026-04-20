@@ -27,34 +27,34 @@ function assertSingleOmxBlock(toml: string): void {
     "End marker should appear once",
   );
   assert.equal(
-    count(toml, /^\[mcp_servers\.omx_state\]$/gm),
+    count(toml, /^\[mcp_servers\.omcp_state\]$/gm),
     1,
-    "[mcp_servers.omx_state] should appear once",
+    "[mcp_servers.omcp_state] should appear once",
   );
   assert.equal(
-    count(toml, /^\[mcp_servers\.omx_memory\]$/gm),
+    count(toml, /^\[mcp_servers\.omcp_memory\]$/gm),
     1,
-    "[mcp_servers.omx_memory] should appear once",
+    "[mcp_servers.omcp_memory] should appear once",
   );
   assert.equal(
-    count(toml, /^\[mcp_servers\.omx_code_intel\]$/gm),
+    count(toml, /^\[mcp_servers\.omcp_code_intel\]$/gm),
     1,
-    "[mcp_servers.omx_code_intel] should appear once",
+    "[mcp_servers.omcp_code_intel] should appear once",
   );
   assert.equal(
-    count(toml, /^\[mcp_servers\.omx_trace\]$/gm),
+    count(toml, /^\[mcp_servers\.omcp_trace\]$/gm),
     1,
-    "[mcp_servers.omx_trace] should appear once",
+    "[mcp_servers.omcp_trace] should appear once",
   );
   assert.equal(
-    count(toml, /^\[mcp_servers\.omx_wiki\]$/gm),
+    count(toml, /^\[mcp_servers\.omcp_wiki\]$/gm),
     1,
-    "[mcp_servers.omx_wiki] should appear once",
+    "[mcp_servers.omcp_wiki] should appear once",
   );
   assert.equal(
-    count(toml, /^\[mcp_servers\.omx_team_run\]$/gm),
+    count(toml, /^\[mcp_servers\.omcp_team_run\]$/gm),
     0,
-    "[mcp_servers.omx_team_run] should not be emitted",
+    "[mcp_servers.omcp_team_run] should not be emitted",
   );
   assert.doesNotMatch(
     toml,
@@ -164,12 +164,12 @@ describe("config generator idempotency (#384)", () => {
         "[features]",
         "multi_agent = true",
         "",
-        "[mcp_servers.omx_state]",
+        "[mcp_servers.omcp_state]",
         'command = "node"',
         'args = ["/old/path/state-server.js"]',
         "enabled = true",
         "",
-        "[mcp_servers.omx_memory]",
+        "[mcp_servers.omcp_memory]",
         'command = "node"',
         'args = ["/old/path/memory-server.js"]',
         "enabled = true",
@@ -203,7 +203,7 @@ describe("config generator idempotency (#384)", () => {
         'model = "o3"',
         "",
         "# OMCP State Management MCP Server",
-        "[mcp_servers.omx_state]",
+        "[mcp_servers.omcp_state]",
         'command = "node"',
         'args = ["/orphaned/state-server.js"]',
         "enabled = true",
@@ -216,7 +216,7 @@ describe("config generator idempotency (#384)", () => {
         "# Managed by omcp setup",
         "# ============================================================",
         "",
-        "[mcp_servers.omx_state]",
+        "[mcp_servers.omcp_state]",
         'command = "node"',
         'args = ["/marker-block/state-server.js"]',
         "enabled = true",
@@ -390,7 +390,7 @@ describe("config generator idempotency (#384)", () => {
     });
 
     assert.doesNotMatch(toml, /^\[tui\]$/m);
-    assert.match(toml, /^\[mcp_servers\.omx_state\]$/m);
+    assert.match(toml, /^\[mcp_servers\.omcp_state\]$/m);
     assert.match(toml, /^\[env\]$/m);
     assert.match(toml, /^USE_OMX_EXPLORE_CMD = "1"$/m);
   });
@@ -576,7 +576,7 @@ describe("config generator idempotency (#384)", () => {
         '# Managed by omcp setup - manual edits preserved on next setup',
         '# ============================================================',
         '',
-        '[mcp_servers.omx_state]',
+        '[mcp_servers.omcp_state]',
         'command = "node"',
         `args = ["${join(wd, "dist/mcp/state-server.js")}"]`,
         'enabled = true',
@@ -606,7 +606,7 @@ describe("config generator idempotency (#384)", () => {
     }
   });
 
-  it("mergeConfig removes legacy omx_team_run tables during setup upgrade", async () => {
+  it("mergeConfig removes legacy omcp_team_run tables during setup upgrade", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-idem-"));
     try {
       const configPath = join(wd, "config.toml");
@@ -619,7 +619,7 @@ describe("config generator idempotency (#384)", () => {
         '# Managed by omcp setup - manual edits preserved on next setup',
         '# ============================================================',
         "",
-        '[mcp_servers.omx_team_run]',
+        '[mcp_servers.omcp_team_run]',
         'command = "node"',
         'args = ["/tmp/team-server.js"]',
         'enabled = true',
@@ -637,7 +637,7 @@ describe("config generator idempotency (#384)", () => {
       const toml = await readFile(configPath, "utf-8");
 
       assertSingleOmxBlock(toml);
-      assert.doesNotMatch(toml, /^\[mcp_servers\.omx_team_run\]$/m);
+      assert.doesNotMatch(toml, /^\[mcp_servers\.omcp_team_run\]$/m);
       assert.doesNotMatch(toml, /team-server\.js/);
       assert.match(toml, /^\[user\.before\]$/m);
       assert.match(toml, /^name = "kept-before"$/m);
@@ -648,7 +648,7 @@ describe("config generator idempotency (#384)", () => {
     }
   });
 
-  it("repairConfigIfNeeded removes legacy omx_team_run tables during launch repair", async () => {
+  it("repairConfigIfNeeded removes legacy omcp_team_run tables during launch repair", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-idem-"));
     try {
       const configPath = join(wd, "config.toml");
@@ -656,7 +656,7 @@ describe("config generator idempotency (#384)", () => {
         '[user.before]',
         'name = "kept-before"',
         "",
-        '[mcp_servers.omx_team_run]',
+        '[mcp_servers.omcp_team_run]',
         'command = "node"',
         'args = ["/tmp/team-server.js"]',
         'enabled = true',
@@ -672,7 +672,7 @@ describe("config generator idempotency (#384)", () => {
 
       const toml = await readFile(configPath, "utf-8");
       assertSingleOmxBlock(toml);
-      assert.doesNotMatch(toml, /^\[mcp_servers\.omx_team_run\]$/m);
+      assert.doesNotMatch(toml, /^\[mcp_servers\.omcp_team_run\]$/m);
       assert.doesNotMatch(toml, /team-server\.js/);
       assert.match(toml, /^\[user\.before\]$/m);
       assert.match(toml, /^name = "kept-before"$/m);

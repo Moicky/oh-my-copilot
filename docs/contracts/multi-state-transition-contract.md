@@ -57,12 +57,12 @@ Every denied transition must:
 3. explain how to clear incompatible state before retrying
 4. mention both supported clearing surfaces:
    - `omcp state ...`
-   - `omx_state.*` MCP tools
+   - `omcp_state.*` MCP tools
 
 Example operator guidance shape:
 
 > Cannot activate `<requested>` while `<active-set>` is still active. Clear the
-> incompatible state first via `omcp state ...` or the `omx_state.*` MCP tools,
+> incompatible state first via `omcp state ...` or the `omcp_state.*` MCP tools,
 > then retry the transition.
 
 ### Operator recovery examples
@@ -74,8 +74,8 @@ CLI parity surface:
 
 MCP parity surface:
 
-- `omx_state.state_clear({ mode: "team" })`
-- `omx_state.state_clear({ mode: "ralph", all_sessions: true })`
+- `omcp_state.state_clear({ mode: "team" })`
+- `omcp_state.state_clear({ mode: "ralph", all_sessions: true })`
 
 ## Brownfield consumer expectations
 
@@ -110,6 +110,6 @@ Implementation should be considered complete only when tests prove:
 2. `team + ralph` is allowed in both activation orders
 3. `team + ultrawork` is allowed in both activation orders
 4. unsupported overlaps deny without mutation
-5. denial messages mention both `omcp state` and `omx_state.*`
+5. denial messages mention both `omcp state` and `omcp_state.*`
 6. HUD / overlay / stop-hook consumers honor the combined set consistently
 7. `autopilot` and `autoresearch` still reject overlap attempts

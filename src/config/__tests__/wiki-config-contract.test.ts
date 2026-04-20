@@ -3,12 +3,12 @@ import assert from "node:assert/strict";
 import { loadSurface } from "../../hooks/__tests__/prompt-guidance-test-helpers.js";
 
 describe("project wiki config/generator documentation contract", () => {
-  it("documents the dedicated omx_wiki MCP server block", () => {
+  it("documents the dedicated omcp_wiki MCP server block", () => {
     const doc = loadSurface("docs/reference/project-wiki.md");
-    assert.match(doc, /\[mcp_servers\.omx_wiki\]/);
+    assert.match(doc, /\[mcp_servers\.omcp_wiki\]/);
     assert.match(doc, /dist\/mcp\/wiki-server\.js/);
     assert.match(doc, /`omcp setup` \/ the config generator/i);
-    assert.match(doc, /bootstrap\/config path should treat `omx_wiki` as a first-party OMCP server/i);
+    assert.match(doc, /bootstrap\/config path should treat `omcp_wiki` as a first-party OMCP server/i);
   });
 
   it("documents the OMCP-native storage path instead of legacy OMC storage", () => {

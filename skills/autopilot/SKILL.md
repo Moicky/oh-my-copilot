@@ -103,7 +103,7 @@ Most non-trivial software tasks require coordinated phases: understanding requir
 
 ## State Management
 
-Use `omx_state` MCP tools for autopilot lifecycle state.
+Use `omcp_state` MCP tools for autopilot lifecycle state.
 
 - **On start**:
   `state_write({mode: "autopilot", active: true, current_phase: "expansion", started_at: "<now>", state: {context_snapshot_path: "<snapshot-path>"}})`

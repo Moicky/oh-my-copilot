@@ -57,35 +57,35 @@ function buildOmxConfig(): string {
     '# ============================================================',
     '',
     '# OMCP State Management MCP Server',
-    '[mcp_servers.omx_state]',
+    '[mcp_servers.omcp_state]',
     'command = "node"',
     'args = ["/path/to/state-server.js"]',
     'enabled = true',
     'startup_timeout_sec = 5',
     '',
     '# OMCP Project Memory MCP Server',
-    '[mcp_servers.omx_memory]',
+    '[mcp_servers.omcp_memory]',
     'command = "node"',
     'args = ["/path/to/memory-server.js"]',
     'enabled = true',
     'startup_timeout_sec = 5',
     '',
     '# OMCP Code Intelligence MCP Server',
-    '[mcp_servers.omx_code_intel]',
+    '[mcp_servers.omcp_code_intel]',
     'command = "node"',
     'args = ["/path/to/code-intel-server.js"]',
     'enabled = true',
     'startup_timeout_sec = 10',
     '',
     '# OMCP Trace MCP Server',
-    '[mcp_servers.omx_trace]',
+    '[mcp_servers.omcp_trace]',
     'command = "node"',
     'args = ["/path/to/trace-server.js"]',
     'enabled = true',
     'startup_timeout_sec = 5',
     '',
     '# OMCP Wiki MCP Server',
-    '[mcp_servers.omx_wiki]',
+    '[mcp_servers.omcp_wiki]',
     'command = "node"',
     'args = ["/path/to/wiki-server.js"]',
     'enabled = true',
@@ -127,7 +127,7 @@ function buildConfigWithSeededModelContext(): string {
     '# Managed by omcp setup - manual edits preserved on next setup',
     '# ============================================================',
     '',
-    '[mcp_servers.omx_state]',
+    '[mcp_servers.omcp_state]',
     'command = "node"',
     'args = ["/path/to/state-server.js"]',
     'enabled = true',
@@ -163,27 +163,27 @@ function buildMixedConfig(): string {
     '# Managed by omcp setup - manual edits preserved on next setup',
     '# ============================================================',
     '',
-    '[mcp_servers.omx_state]',
+    '[mcp_servers.omcp_state]',
     'command = "node"',
     'args = ["/path/to/state-server.js"]',
     'enabled = true',
     '',
-    '[mcp_servers.omx_memory]',
+    '[mcp_servers.omcp_memory]',
     'command = "node"',
     'args = ["/path/to/memory-server.js"]',
     'enabled = true',
     '',
-    '[mcp_servers.omx_code_intel]',
+    '[mcp_servers.omcp_code_intel]',
     'command = "node"',
     'args = ["/path/to/code-intel-server.js"]',
     'enabled = true',
     '',
-    '[mcp_servers.omx_trace]',
+    '[mcp_servers.omcp_trace]',
     'command = "node"',
     'args = ["/path/to/trace-server.js"]',
     'enabled = true',
     '',
-    '[mcp_servers.omx_wiki]',
+    '[mcp_servers.omcp_wiki]',
     'command = "node"',
     'args = ["/path/to/wiki-server.js"]',
     'enabled = true',
@@ -220,7 +220,7 @@ describe('omcp uninstall', () => {
       assert.match(res.stdout, /dry-run mode/);
       assert.match(res.stdout, /OMCP configuration block/);
       assert.match(res.stdout, /hooks\.json/);
-      assert.match(res.stdout, /omx_state/);
+      assert.match(res.stdout, /omcp_state/);
 
       // Config should NOT have been modified
       const config = await readFile(join(codexDir, 'config.toml'), 'utf-8');
@@ -250,11 +250,11 @@ describe('omcp uninstall', () => {
 
       const config = await readFile(join(codexDir, 'config.toml'), 'utf-8');
       assert.doesNotMatch(config, /oh-my-copilot \(OMCP\) Configuration/);
-      assert.doesNotMatch(config, /omx_state/);
-      assert.doesNotMatch(config, /omx_memory/);
-      assert.doesNotMatch(config, /omx_code_intel/);
-      assert.doesNotMatch(config, /omx_trace/);
-      assert.doesNotMatch(config, /omx_wiki/);
+      assert.doesNotMatch(config, /omcp_state/);
+      assert.doesNotMatch(config, /omcp_memory/);
+      assert.doesNotMatch(config, /omcp_code_intel/);
+      assert.doesNotMatch(config, /omcp_trace/);
+      assert.doesNotMatch(config, /omcp_wiki/);
       assert.doesNotMatch(config, /\[agents\.executor\]/);
       assert.doesNotMatch(config, /\[tui\]/);
       assert.doesNotMatch(config, /notify\s*=/);
@@ -288,8 +288,8 @@ describe('omcp uninstall', () => {
       assert.match(config, /\[mcp_servers\.user_custom\]/);
       assert.match(config, /web_search = true/);
       // OMCP entries removed
-      assert.doesNotMatch(config, /omx_state/);
-      assert.doesNotMatch(config, /omx_memory/);
+      assert.doesNotMatch(config, /omcp_state/);
+      assert.doesNotMatch(config, /omcp_memory/);
       assert.doesNotMatch(config, /notify\s*=.*node/);
       assert.doesNotMatch(config, /multi_agent/);
       assert.doesNotMatch(config, /child_agents_md/);
@@ -383,7 +383,7 @@ describe('omcp uninstall', () => {
       // Config should NOT have been modified
       const config = await readFile(join(codexDir, 'config.toml'), 'utf-8');
       assert.match(config, /oh-my-copilot \(OMCP\) Configuration/);
-      assert.match(config, /omx_state/);
+      assert.match(config, /omcp_state/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -468,7 +468,7 @@ describe('omcp uninstall', () => {
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(res.stdout, /Uninstall summary/);
-      assert.match(res.stdout, /MCP servers: omx_state, omx_memory, omx_code_intel, omx_trace, omx_wiki/);
+      assert.match(res.stdout, /MCP servers: omcp_state, omcp_memory, omcp_code_intel, omcp_trace, omcp_wiki/);
       assert.match(res.stdout, /Agent entries: 1/);
       assert.match(res.stdout, /TUI status line section/);
       assert.match(res.stdout, /Top-level keys/);

@@ -55,7 +55,7 @@ const DEFAULT_LAUNCHER_MCP_STARTUP_TIMEOUT_SEC = 15;
 const OMCP_TUI_STATUS_LINE =
   'status_line = ["model-with-reasoning", "git-branch", "context-remaining", "total-input-tokens", "total-output-tokens", "five-hour-limit", "weekly-limit"]';
 const LEGACY_OMX_TEAM_RUN_TABLE_PATTERN =
-  /^\s*\[mcp_servers\.(?:"omx_team_run"|omx_team_run)\]\s*$/m;
+  /^\s*\[mcp_servers\.(?:"omcp_team_run"|omcp_team_run)\]\s*$/m;
 
 export function hasLegacyOmxTeamRunTable(config: string): boolean {
   return LEGACY_OMX_TEAM_RUN_TABLE_PATTERN.test(config);
@@ -455,7 +455,7 @@ function isLegacyOmxAgentSection(tableName: string): boolean {
  * This covers legacy configs that were written before markers were added,
  * or configs where the marker was accidentally removed.
  *
- * Targets: [mcp_servers.omx_*], legacy [agents.<name>] entries, [tui]
+ * Targets: [mcp_servers.omcp_*], legacy [agents.<name>] entries, [tui]
  */
 function stripOrphanedOmxSections(config: string): string {
   const lines = config.split(/\r?\n/);
@@ -472,7 +472,7 @@ function stripOrphanedOmxSections(config: string): string {
       // The marker-based stripExistingOmxBlocks already handles [tui]
       // when it lives inside the OMCP marker block.
       const isOmxSection =
-        /^mcp_servers\.omx_/.test(tableName) ||
+        /^mcp_servers\.omcp_/.test(tableName) ||
         isLegacyOmxAgentSection(tableName);
 
       if (isOmxSection) {
@@ -727,7 +727,7 @@ function findLauncherTimeoutRepairTargets(
     const mcpServers = (parsed as { mcp_servers?: Record<string, unknown> })
       .mcp_servers;
     const [name, value] = Object.entries(mcpServers ?? {})[0] ?? [];
-    if (!name || name.startsWith("omx_") || typeof value !== "object" || !value) {
+    if (!name || name.startsWith("omcp_") || typeof value !== "object" || !value) {
       start = end - 1;
       continue;
     }
@@ -856,35 +856,35 @@ function getOmxTablesBlock(pkgRoot: string, includeTui = true): string {
     "# ============================================================",
     "",
     "# OMCP State Management MCP Server",
-    "[mcp_servers.omx_state]",
+    "[mcp_servers.omcp_state]",
     'command = "node"',
     `args = ["${stateServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 5",
     "",
     "# OMCP Project Memory MCP Server",
-    "[mcp_servers.omx_memory]",
+    "[mcp_servers.omcp_memory]",
     'command = "node"',
     `args = ["${memoryServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 5",
     "",
     "# OMCP Code Intelligence MCP Server (LSP diagnostics, AST search)",
-    "[mcp_servers.omx_code_intel]",
+    "[mcp_servers.omcp_code_intel]",
     'command = "node"',
     `args = ["${codeIntelServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 10",
     "",
     "# OMCP Trace MCP Server (agent flow timeline & statistics)",
-    "[mcp_servers.omx_trace]",
+    "[mcp_servers.omcp_trace]",
     'command = "node"',
     `args = ["${traceServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 5",
     "",
     "# OMCP Wiki MCP Server (persistent project knowledge base)",
-    "[mcp_servers.omx_wiki]",
+    "[mcp_servers.omcp_wiki]",
     'command = "node"',
     `args = ["${wikiServerPath}"]`,
     "enabled = true",
@@ -980,7 +980,7 @@ export function buildMergedConfig(
  *
  * After an omcp version upgrade the OLD setup code (still loaded in memory)
  * may leave a config with duplicate [tui] sections or the retired
- * [mcp_servers.omx_team_run] table. Codex rejects duplicate tables and newer
+ * [mcp_servers.omcp_team_run] table. Codex rejects duplicate tables and newer
  * OMCP builds no longer ship the team MCP entrypoint, so we repair both before
  * the CLI is spawned.
  *

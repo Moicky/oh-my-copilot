@@ -278,7 +278,7 @@ describe('config generator', () => {
         '# oh-my-copilot (OMCP) Configuration',
         '# legacy block without top divider',
         'notify = ["node", "/tmp/legacy notify-hook.js"]',
-        '[mcp_servers.omx_state]',
+        '[mcp_servers.omcp_state]',
         'command = "node"',
         'args = ["/tmp/state-server.js"]',
         '# End oh-my-copilot',

@@ -485,7 +485,7 @@ describe('keyword detector skill-active-state lifecycle', () => {
       assert.ok(denied?.transition_error);
       assert.match(String(denied?.transition_error), /Unsupported workflow overlap: team \+ autopilot\./);
       assert.match(String(denied?.transition_error), /`omcp state clear --mode <mode>`/);
-      assert.match(String(denied?.transition_error), /`omx_state\.\*` MCP tools/);
+      assert.match(String(denied?.transition_error), /`omcp_state\.\*` MCP tools/);
 
       const persisted = JSON.parse(
         await readFile(join(stateDir, 'sessions', 'sess-deny', SKILL_ACTIVE_STATE_FILE), 'utf-8'),

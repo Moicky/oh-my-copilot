@@ -67,7 +67,7 @@ function normalizeInputLock(raw) {
 export function normalizeBlockedAutoApprovalInput(text) {
   return safeString(text)
     .toLowerCase()
-    .replace(/\[omx_tmux_inject\]/gi, '')
+    .replace(/\[omcp_tmux_inject\]/gi, '')
     .replace(/[^a-z]+/g, ' ')
     .trim();
 }

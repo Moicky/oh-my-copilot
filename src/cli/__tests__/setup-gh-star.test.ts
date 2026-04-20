@@ -53,7 +53,7 @@ describe('omcp setup (gh star hint)', () => {
       });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
-      assert.match(res.stdout, /gh repo star Yeachan-Heo\/oh-my-copilot/);
+      assert.match(res.stdout, /gh repo star Moicky\/oh-my-copilot/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -68,7 +68,7 @@ describe('omcp setup (gh star hint)', () => {
       const res = runOmx(wd, ['setup', '--dry-run'], { PATH: '', HOME: home });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
-      assert.doesNotMatch(res.stdout, /gh repo star Yeachan-Heo\/oh-my-copilot/);
+      assert.doesNotMatch(res.stdout, /gh repo star Moicky\/oh-my-copilot/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }

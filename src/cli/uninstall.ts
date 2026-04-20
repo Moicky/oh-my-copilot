@@ -47,11 +47,11 @@ interface UninstallSummary {
 }
 
 const OMCP_MCP_SERVERS = [
-  "omx_state",
-  "omx_memory",
-  "omx_code_intel",
-  "omx_trace",
-  "omx_wiki",
+  "omcp_state",
+  "omcp_memory",
+  "omcp_code_intel",
+  "omcp_trace",
+  "omcp_wiki",
 ];
 
 function detectOmxConfigArtifacts(config: string): {

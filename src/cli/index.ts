@@ -1646,13 +1646,13 @@ function buildDetachedSessionLeaderCommand(
   const wrapped = [
     buildTmuxExtendedKeysAcquireShellSnippet(cwd),
     'exec 3<&0;',
-    'omx_codex_pid="";',
-    "omx_detached_session_cleanup() {",
+    'omcp_codex_pid="";',
+    "omcp_detached_session_cleanup() {",
     "status=$?;",
     "trap - 0 INT TERM HUP;",
-    'if [ -n "$omx_codex_pid" ] && kill -0 "$omx_codex_pid" 2>/dev/null; then',
-    'kill -TERM "$omx_codex_pid" 2>/dev/null || true;',
-    'wait "$omx_codex_pid" 2>/dev/null || true;',
+    'if [ -n "$omcp_codex_pid" ] && kill -0 "$omcp_codex_pid" 2>/dev/null; then',
+    'kill -TERM "$omcp_codex_pid" 2>/dev/null || true;',
+    'wait "$omcp_codex_pid" 2>/dev/null || true;',
     "fi;",
     'exec 3<&- 2>/dev/null || true;',
     buildTmuxExtendedKeysReleaseShellSnippet(cwd),
@@ -1661,10 +1661,10 @@ function buildDetachedSessionLeaderCommand(
     "fi;",
     "exit $status;",
     "};",
-    "trap omx_detached_session_cleanup 0 INT TERM HUP;",
+    "trap omcp_detached_session_cleanup 0 INT TERM HUP;",
     `${codexCmd} <&3 &`,
-    "omx_codex_pid=$!;",
-    'wait "$omx_codex_pid";',
+    "omcp_codex_pid=$!;",
+    'wait "$omcp_codex_pid";',
   ].join(" ");
   return `/bin/sh -c ${quoteShellArg(wrapped)}`;
 }

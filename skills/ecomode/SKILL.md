@@ -104,7 +104,7 @@ Set in `~/.codex/.omcp-config.json`:
 
 ## State Management
 
-Use `omx_state` MCP tools for ecomode lifecycle state.
+Use `omcp_state` MCP tools for ecomode lifecycle state.
 
 - **On activation**:
   `state_write({mode: "ecomode", active: true})`

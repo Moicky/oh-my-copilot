@@ -41,7 +41,7 @@ describe('dev merge issue close workflow', () => {
       collectLinkedLocalIssueNumbers({
         title: 'Fixes #1540, #1541',
         body: 'Resolves Moicky/oh-my-copilot#1542 and closes https://github.com/Moicky/oh-my-copilot/issues/1543',
-        owner: 'Yeachan-Heo',
+        owner: 'Moicky',
         repo: 'oh-my-copilot',
       }),
       [1540, 1541, 1542, 1543],
@@ -57,7 +57,7 @@ describe('dev merge issue close workflow', () => {
           'Fixes octo/example#1542',
           'Discussion says maybe close #1543 later.',
         ].join('\n'),
-        owner: 'Yeachan-Heo',
+        owner: 'Moicky',
         repo: 'oh-my-copilot',
       }),
       [],
@@ -69,7 +69,7 @@ describe('dev merge issue close workflow', () => {
       collectLinkedLocalIssueNumbers({
         title: 'Fixes #1540',
         body: 'Closes #1540 and resolves Moicky/oh-my-copilot#1540',
-        owner: 'Yeachan-Heo',
+        owner: 'Moicky',
         repo: 'oh-my-copilot',
       }),
       [1540],

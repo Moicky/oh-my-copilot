@@ -5,7 +5,7 @@ import { loadSurface } from "./prompt-guidance-test-helpers.js";
 describe("project wiki documentation contract", () => {
   it("documents the OMCP-native storage, routing, and tool surface", () => {
     const doc = loadSurface("docs/reference/project-wiki.md");
-    assert.match(doc, /`omx_wiki`/);
+    assert.match(doc, /`omcp_wiki`/);
     assert.match(doc, /`\.omcp\/wiki\/`/);
     assert.match(doc, /prefer `\$wiki`/i);
     assert.match(doc, /avoid implicit bare `wiki` noun activation/i);

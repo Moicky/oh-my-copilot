@@ -617,11 +617,11 @@ async function checkConfig(configPath: string): Promise<Check> {
         name: 'Config',
         status: 'warn',
         message:
-          'retired [mcp_servers.omx_team_run] table still present; run "omcp setup --force" to repair the config',
+          'retired [mcp_servers.omcp_team_run] table still present; run "omcp setup --force" to repair the config',
       };
     }
 
-    const hasOmx = content.includes('omx_') || content.includes('oh-my-copilot');
+    const hasOmx = content.includes('omcp_') || content.includes('oh-my-copilot');
     if (hasOmx) {
       return { name: 'Config', status: 'pass', message: 'config.toml has OMCP entries' };
     }
@@ -694,7 +694,7 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
     if (existsSync(configPath)) {
       try {
         const configContent = await readFile(configPath, 'utf-8');
-        const hasOmx = configContent.includes('omx_') || configContent.includes('oh-my-copilot');
+        const hasOmx = configContent.includes('omcp_') || configContent.includes('oh-my-copilot');
         if (hasOmx) {
           return {
             name: 'Native hooks',
@@ -901,10 +901,10 @@ async function checkMcpServers(configPath: string): Promise<Check> {
         return {
           name: 'MCP Servers',
           status: 'warn',
-          message: `${mcpCount} servers configured, but retired [mcp_servers.omx_team_run] is not supported; run "omcp setup --force" to repair the config`,
+          message: `${mcpCount} servers configured, but retired [mcp_servers.omcp_team_run] is not supported; run "omcp setup --force" to repair the config`,
         };
       }
-      const hasOmx = content.includes('omx_state') || content.includes('omx_memory');
+      const hasOmx = content.includes('omcp_state') || content.includes('omcp_memory');
       if (hasOmx) {
         return { name: 'MCP Servers', status: 'pass', message: `${mcpCount} servers configured (OMCP present)` };
       }

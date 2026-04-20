@@ -461,8 +461,8 @@ function formatMailboxBodyForLeader(body, maxLength = 40) {
 function normalizeVisibleLeaderStateText(text) {
   return safeString(text)
     .toLowerCase()
-    .replace(/\[omx_tmux_inject\]/g, ' ')
-    .replace(/\[omx_intent:[^\]]+\]/g, ' ')
+    .replace(/\[omcp_tmux_inject\]/g, ' ')
+    .replace(/\[omcp_intent:[^\]]+\]/g, ' ')
     .replace(/said\s+"[^"]*"/g, 'said "<content>"')
     .replace(/said\s+'[^']*'/g, 'said "<content>"')
     .replace(/\b\d+[smhd](?:\s+\d+[smhd])*\b/g, '<duration>')

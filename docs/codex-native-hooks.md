@@ -31,7 +31,7 @@ OMCP only owns the wrapper entries that invoke `dist/scripts/codex-native-hook.j
 | `session-start` | `SessionStart` | `session-start` | native | Native adapter refreshes session bookkeeping, restores startup developer context, and ensures `.omcp/` is gitignored at the repo root |
 | wiki startup context | `SessionStart` | `session-start` | native | Wiki session-start context can append a compact `.omcp/wiki/` summary when wiki pages exist; startup writes stay config-gated |
 | `keyword-detector` | `UserPromptSubmit` | `keyword-detector` | native | Persists skill activation state and can add prompt-side developer context; `$ralph` prompt routing seeds workflow state only and does not launch `omcp ralph --prd ...` |
-| `pre-tool-use` | `PreToolUse` (`Bash`) | `pre-tool-use` | native-partial | Current native scope is Bash-only; built-in native behavior cautions on `rm -rf dist` and blocks inspectable inline `git commit` commands until Lore-format structure + the required `Co-authored-by: OmX <omcp@oh-my-copilot.dev>` trailer are present |
+| `pre-tool-use` | `PreToolUse` (`Bash`) | `pre-tool-use` | native-partial | Current native scope is Bash-only; built-in native behavior cautions on `rm -rf dist` and blocks inspectable inline `git commit` commands until Lore-format structure + the required `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>` trailer are present |
 | `post-tool-use` | `PostToolUse` (`Bash`) | `post-tool-use` | native-partial | Current native scope is Bash-only; built-in native behavior covers command-not-found / permission-denied / missing-path guidance and informative non-zero-output review |
 | Ralph/persistence stop handling | `Stop` | `stop` | native-partial | Native adapter uses the documented native Stop continuation contract (`decision: "block"` + `reason`) for active Ralph runs and avoids re-blocking once `stop_hook_active` is set |
 | Autopilot continuation | `Stop` | `stop` | native-partial | Native adapter continues non-terminal autopilot sessions from active session/root mode state |
@@ -71,7 +71,7 @@ For the first-pass multi-state rollout, the approved overlaps are:
 
 Unsupported overlaps should preserve the current state unchanged and direct the
 operator to clear incompatible state explicitly via `omcp state ...` or the
-`omx_state.*` MCP tools before retrying. See
+`omcp_state.*` MCP tools before retrying. See
 `docs/contracts/multi-state-transition-contract.md`.
 
 ## UserPromptSubmit: triage advisory context

@@ -402,7 +402,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
     }
   });
 
-  it("repairs retired omx_team_run config during setup refresh", async () => {
+  it("repairs retired omcp_team_run config during setup refresh", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     try {
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
@@ -410,7 +410,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
       await writeFile(
         join(wd, ".codex", "config.toml"),
         [
-          '[mcp_servers.omx_team_run]',
+          '[mcp_servers.omcp_team_run]',
           'command = "node"',
           'args = ["./dist/cli/team-mcp.js"]',
           "",
@@ -422,9 +422,9 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
       const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
       assert.match(
         output,
-        /Removed retired \[mcp_servers\.omx_team_run\] config during refresh\./,
+        /Removed retired \[mcp_servers\.omcp_team_run\] config during refresh\./,
       );
-      assert.doesNotMatch(config, /^\[mcp_servers\.omx_team_run\]$/m);
+      assert.doesNotMatch(config, /^\[mcp_servers\.omcp_team_run\]$/m);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }

@@ -372,7 +372,7 @@ export function buildResizeHookName(
   hudPaneId: string,
 ): string {
   return [
-    'omx_resize',
+    'omcp_resize',
     normalizeTmuxHookToken(teamName),
     normalizeTmuxHookToken(sessionName),
     normalizeTmuxHookToken(windowIndex),
@@ -461,7 +461,7 @@ export function buildClientAttachedReconcileHookName(
   hudPaneId: string,
 ): string {
   return [
-    'omx_attached',
+    'omcp_attached',
     normalizeTmuxHookToken(teamName),
     normalizeTmuxHookToken(sessionName),
     normalizeTmuxHookToken(windowIndex),

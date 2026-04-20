@@ -3856,11 +3856,11 @@ exec "${realGit}" "$@"
       const manifestPath = join(cwd, '.omcp', 'state', 'team', 'team-resize-meta', 'manifest.v2.json');
       await initTeamState('team-resize-meta', 'shutdown resize metadata', 'executor', 1, cwd);
       const config = JSON.parse(await readFile(configPath, 'utf-8')) as Record<string, unknown>;
-      config.resize_hook_name = 'omx_resize_team_resize_meta_test';
+      config.resize_hook_name = 'omcp_resize_team_resize_meta_test';
       config.resize_hook_target = 'omcp-team-team-resize-meta:0';
       await writeFile(configPath, JSON.stringify(config, null, 2));
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as Record<string, unknown>;
-      manifest.resize_hook_name = 'omx_resize_team_resize_meta_test';
+      manifest.resize_hook_name = 'omcp_resize_team_resize_meta_test';
       manifest.resize_hook_target = 'omcp-team-team-resize-meta:0';
       await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
 
@@ -3918,12 +3918,12 @@ esac
           const manifestPath = teamStateTestPath(cwd, 'team', 'team-shutdown-gate-failed', 'manifest.v2.json');
           const config = JSON.parse(await readFile(configPath, 'utf-8')) as Record<string, unknown>;
           config.tmux_session = 'omcp-team-team-shutdown-gate-failed';
-          config.resize_hook_name = 'omx_resize_team_shutdown_gate_failed_test';
+          config.resize_hook_name = 'omcp_resize_team_shutdown_gate_failed_test';
           config.resize_hook_target = 'omcp-team-team-shutdown-gate-failed:0';
           await writeFile(configPath, JSON.stringify(config, null, 2));
           const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as Record<string, unknown>;
           manifest.tmux_session = 'omcp-team-team-shutdown-gate-failed';
-          manifest.resize_hook_name = 'omx_resize_team_shutdown_gate_failed_test';
+          manifest.resize_hook_name = 'omcp_resize_team_shutdown_gate_failed_test';
           manifest.resize_hook_target = 'omcp-team-team-shutdown-gate-failed:0';
           await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
           process.env.TMUX_TEST_LOG = tmuxLogPath;

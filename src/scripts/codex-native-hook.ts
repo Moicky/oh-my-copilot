@@ -572,7 +572,7 @@ function buildAdditionalContextMessage(prompt: string, skillState?: SkillActiveS
         : null,
       promptPriorityMessage,
       skillState.initialized_mode && skillState.initialized_state_path
-        ? `skill: ${skillState.initialized_mode} activated and initial state initialized at ${skillState.initialized_state_path}; write subsequent updates via omx_state MCP.`
+        ? `skill: ${skillState.initialized_mode} activated and initial state initialized at ${skillState.initialized_state_path}; write subsequent updates via omcp_state MCP.`
         : null,
       teamDetected
         ? "Use the durable OMCP team runtime via `omcp team ...` for coordinated execution; do not replace it with in-process fanout."
@@ -584,7 +584,7 @@ function buildAdditionalContextMessage(prompt: string, skillState?: SkillActiveS
 
   if (teamDetected) {
     const initializedStateMessage = skillState?.initialized_mode && skillState.initialized_state_path
-      ? `skill: ${skillState.initialized_mode} activated and initial state initialized at ${skillState.initialized_state_path}; write subsequent updates via omx_state MCP.`
+      ? `skill: ${skillState.initialized_mode} activated and initial state initialized at ${skillState.initialized_state_path}; write subsequent updates via omcp_state MCP.`
       : null;
     return [
       detectedKeywordMessage,
@@ -609,7 +609,7 @@ function buildAdditionalContextMessage(prompt: string, skillState?: SkillActiveS
         ? `planning preserved over simultaneous execution follow-up; deferred skills: ${deferredSkills.join(", ")}.`
         : null,
       promptPriorityMessage,
-      `skill: ${skillState.initialized_mode} activated and initial state initialized at ${skillState.initialized_state_path}; write subsequent updates via omx_state MCP.`,
+      `skill: ${skillState.initialized_mode} activated and initial state initialized at ${skillState.initialized_state_path}; write subsequent updates via omcp_state MCP.`,
       deepInterviewPromptActivationNote,
       ralphPromptActivationNote,
       "Follow AGENTS.md routing and preserve workflow transition and planning-safety rules.",
@@ -1690,7 +1690,7 @@ export async function dispatchCodexNativeHook(
       baseContext.codex_session_id = nativeSessionId;
     }
     if (canonicalSessionId) {
-      baseContext.omx_session_id = canonicalSessionId;
+      baseContext.omcp_session_id = canonicalSessionId;
     }
     const event: HookEventEnvelope = buildNativeHookEvent(
       omxEventName,
