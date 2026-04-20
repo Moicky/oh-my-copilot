@@ -23,8 +23,8 @@ describe('analyzePaneContent', () => {
     assert.equal(result.hasCodex, true);
   });
 
-  it('detects "oh-my-codex" keyword', () => {
-    const result = analyzePaneContent('oh-my-codex v1.0');
+  it('detects "oh-my-copilot" keyword', () => {
+    const result = analyzePaneContent('oh-my-copilot v1.0');
     assert.equal(result.hasCodex, true);
   });
 

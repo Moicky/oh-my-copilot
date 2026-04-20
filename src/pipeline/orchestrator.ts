@@ -1,5 +1,5 @@
 /**
- * Pipeline Orchestrator for oh-my-codex
+ * Pipeline Orchestrator for oh-my-copilot
  *
  * Sequences configurable stages (RALPLAN -> teams -> ralph verification)
  * and persists state through the ModeState system.

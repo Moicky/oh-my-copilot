@@ -5,9 +5,9 @@ IF BLOCKED, TRY AN ALTERNATIVE APPROACH. ONLY ASK WHEN TRULY AMBIGUOUS OR DESTRU
 USE CODEX NATIVE SUBAGENTS FOR INDEPENDENT PARALLEL SUBTASKS WHEN THAT IMPROVES THROUGHPUT. THIS IS COMPLEMENTARY TO OMX TEAM MODE.
 <!-- END AUTONOMY DIRECTIVE -->
 
-# oh-my-codex - Intelligent Multi-Agent Orchestration
+# oh-my-copilot - Intelligent Multi-Agent Orchestration
 
-You are running with oh-my-codex (OMX), a coordination layer for Codex CLI.
+You are running with oh-my-copilot (OMX), a coordination layer for Codex CLI.
 This AGENTS.md is the top-level operating contract for the workspace.
 Role prompts under `prompts/*.md` are narrower execution surfaces. They must follow this file, not override it.
 When OMX is installed, load the installed prompt/skill/agent surfaces from `~/.codex/prompts`, `~/.codex/skills`, and `~/.codex/agents` (or the project-local `./.codex/...` equivalents when project scope is active).

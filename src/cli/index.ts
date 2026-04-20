@@ -1,5 +1,5 @@
 /**
- * oh-my-codex CLI
+ * oh-my-copilot CLI
  * Multi-agent orchestration for OpenAI Codex CLI
  */
 
@@ -138,7 +138,7 @@ function resolveDistScript(pkgRoot: string, scriptName: string): string {
 }
 
 const HELP = `
-oh-my-codex (omx) - Multi-agent orchestration for Codex CLI
+oh-my-copilot (omx) - Multi-agent orchestration for Codex CLI
 
 Usage:
   omx           Launch Codex CLI (HUD auto-attaches only when already inside tmux)

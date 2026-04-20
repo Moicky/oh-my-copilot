@@ -128,11 +128,11 @@ describe('mcp shared stdio lifecycle contract', () => {
 describe('mcp duplicate sibling detection', () => {
   it('extracts same-entrypoint markers from command lines', () => {
     assert.equal(
-      extractMcpEntrypointMarker('node /tmp/oh-my-codex/dist/mcp/state-server.js'),
+      extractMcpEntrypointMarker('node /tmp/oh-my-copilot/dist/mcp/state-server.js'),
       'state-server.js',
     );
     assert.equal(
-      extractMcpEntrypointMarker('node C:\\\\tmp\\\\oh-my-codex\\\\dist\\\\mcp\\\\trace-server.ts'),
+      extractMcpEntrypointMarker('node C:\\\\tmp\\\\oh-my-copilot\\\\dist\\\\mcp\\\\trace-server.ts'),
       'trace-server.ts',
     );
     assert.equal(extractMcpEntrypointMarker('node something-else.js'), null);

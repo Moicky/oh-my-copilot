@@ -8,11 +8,11 @@ import { installSkills, parseSkillFrontmatter } from '../setup.js';
 
 describe('skill frontmatter validation', () => {
   it('accepts valid SKILL.md frontmatter with quoted values and nested metadata', () => {
-    const content = `---\nname: help\ndescription: "Guide on using oh-my-codex plugin"\nmetadata:\n  short-description: Quick help\n---\n\n# Help\n`;
+    const content = `---\nname: help\ndescription: "Guide on using oh-my-copilot plugin"\nmetadata:\n  short-description: Quick help\n---\n\n# Help\n`;
 
     assert.deepEqual(parseSkillFrontmatter(content), {
       name: 'help',
-      description: 'Guide on using oh-my-codex plugin',
+      description: 'Guide on using oh-my-copilot plugin',
     });
   });
 

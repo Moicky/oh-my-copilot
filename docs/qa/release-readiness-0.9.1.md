@@ -9,7 +9,7 @@ Verdict: **GO (LOCAL RELEASE-CRITICAL GATES PASSED)**
 ## Scope reviewed
 
 - `main` / tag `v0.9.0` baseline
-- PR [#806](https://github.com/Yeachan-Heo/oh-my-codex/pull/806) hotfix (`d86165d`) for smoke hydration asset localization
+- PR [#806](https://github.com/Yeachan-Heo/oh-my-copilot/pull/806) hotfix (`d86165d`) for smoke hydration asset localization
 - version bump and release metadata updates required for `0.9.1`
 
 ## Validation plan
@@ -24,7 +24,7 @@ Verdict: **GO (LOCAL RELEASE-CRITICAL GATES PASSED)**
 | Smoke test coverage | `node --test scripts/__tests__/smoke-packed-install.test.mjs` | PASS (`1` pass / `0` fail) |
 | Release build | `npm run build:full` | PASS |
 | Packed install smoke | `npm run smoke:packed-install` | PASS |
-| Packed tarball dry run | `npm pack --dry-run` | PASS (`oh-my-codex-0.9.1.tgz`) |
+| Packed tarball dry run | `npm pack --dry-run` | PASS (`oh-my-copilot-0.9.1.tgz`) |
 
 ## Historical release note
 
@@ -37,4 +37,4 @@ Verdict: **GO (LOCAL RELEASE-CRITICAL GATES PASSED)**
 - lint passed with `Checked 337 files in 72ms. No fixes applied.`
 - full test suite passed with `2397` passing tests and `0` failures
 - packed install smoke passed with `packed install smoke: PASS`
-- dry-run tarball produced `oh-my-codex-0.9.1.tgz`
+- dry-run tarball produced `oh-my-copilot-0.9.1.tgz`

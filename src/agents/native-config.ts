@@ -263,7 +263,7 @@ export function generateStandaloneAgentToml(
   config: GeneratedNativeAgentConfig,
 ): string {
   const lines = [
-    `# oh-my-codex agent: ${config.name}`,
+    `# oh-my-copilot agent: ${config.name}`,
     `name = "${escapeTomlBasicString(config.name)}"`,
     `description = "${escapeTomlBasicString(config.description)}"`,
   ];

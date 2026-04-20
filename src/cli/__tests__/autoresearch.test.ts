@@ -114,7 +114,7 @@ describe('omx autoresearch hard deprecation', () => {
       assert.match(result.stdout, /\$deep-interview --autoresearch/i);
       assert.match(result.stdout, /\$autoresearch/i);
       assert.match(result.stdout, /prompt-architect-artifact/i);
-      assert.doesNotMatch(result.stdout, /oh-my-codex \(omx\) - Multi-agent orchestration for Codex CLI/i);
+      assert.doesNotMatch(result.stdout, /oh-my-copilot \(omx\) - Multi-agent orchestration for Codex CLI/i);
     } finally {
       await rm(cwd, { recursive: true, force: true });
     }

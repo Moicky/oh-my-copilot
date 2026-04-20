@@ -1,5 +1,5 @@
 
-oh-my-codex (omx) - Multi-agent orchestration for Codex CLI
+oh-my-copilot (omx) - Multi-agent orchestration for Codex CLI
 
 Usage:
   omx           Launch Codex CLI (HUD auto-attaches only when already inside tmux)

@@ -1,4 +1,4 @@
-# oh-my-codex Feature Coverage Matrix
+# oh-my-copilot Feature Coverage Matrix
 
 **Target: >=90% parity with oh-my-claudecode (excluding MCP tools)**
 **Last Updated:** 2026-02-22

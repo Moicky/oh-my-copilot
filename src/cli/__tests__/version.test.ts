@@ -17,6 +17,6 @@ describe('version', () => {
       console.log = originalLog;
     }
 
-    assert.equal(logs[0], `oh-my-codex v${pkg.version}`);
+    assert.equal(logs[0], `oh-my-copilot v${pkg.version}`);
   });
 });

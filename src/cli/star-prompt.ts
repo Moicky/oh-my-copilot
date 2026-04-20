@@ -11,7 +11,7 @@ import { homedir } from 'os';
 import * as childProcess from 'child_process';
 import { createInterface } from 'readline/promises';
 
-const REPO = 'Yeachan-Heo/oh-my-codex';
+const REPO = 'Yeachan-Heo/oh-my-copilot';
 
 interface StarPromptState {
   prompted_at: string;
@@ -108,7 +108,7 @@ export async function maybePromptGithubStar(deps: MaybePromptGithubStarDeps = {}
   await markPromptedImpl();
 
   const askYesNoImpl = deps.askYesNoFn ?? askYesNo;
-  const approved = await askYesNoImpl('[omx] Enjoying oh-my-codex? Star it on GitHub? [Y/n] ');
+  const approved = await askYesNoImpl('[omx] Enjoying oh-my-copilot? Star it on GitHub? [Y/n] ');
   if (!approved) return;
 
   const starRepoImpl = deps.starRepoFn ?? starRepo;

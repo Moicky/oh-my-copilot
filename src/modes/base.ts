@@ -1,5 +1,5 @@
 /**
- * Base mode lifecycle management for oh-my-codex
+ * Base mode lifecycle management for oh-my-copilot
  * All execution modes (autopilot, autoresearch, deep-interview, ralph, ultrawork, team, ultraqa, ralplan) share this base.
  */
 

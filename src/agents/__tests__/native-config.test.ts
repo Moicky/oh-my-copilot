@@ -40,7 +40,7 @@ describe("agents/native-config", () => {
     const prompt = `---\ntitle: demo\n---\n\nInstruction line\n\"\"\"danger\"\"\"`;
     const toml = generateAgentToml(agent, prompt);
 
-    assert.match(toml, /# oh-my-codex agent: executor/);
+    assert.match(toml, /# oh-my-copilot agent: executor/);
     assert.match(toml, /model = "gpt-5\.4"/);
     assert.match(toml, /model_reasoning_effort = "medium"/);
     assert.ok(!toml.includes("title: demo"));

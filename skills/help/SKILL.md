@@ -1,6 +1,6 @@
 ---
 name: help
-description: Guide on using oh-my-codex plugin
+description: Guide on using oh-my-copilot plugin
 ---
 
 # How OMX Works
@@ -69,7 +69,7 @@ But now you don't NEED them - everything is automatic.
 
 ## Usage Analysis
 
-Analyze your oh-my-codex usage and get tailored recommendations to improve your workflow.
+Analyze your oh-my-copilot usage and get tailored recommendations to improve your workflow.
 
 > Note: This replaces the former `/learn-about-omc` skill.
 
@@ -194,8 +194,8 @@ Tip: Run /omx-setup to configure OMX properly.
 
 ## Need More Help?
 
-- **README**: https://github.com/Yeachan-Heo/oh-my-codex
-- **Issues**: https://github.com/Yeachan-Heo/oh-my-codex/issues
+- **README**: https://github.com/Yeachan-Heo/oh-my-copilot
+- **Issues**: https://github.com/Yeachan-Heo/oh-my-copilot/issues
 
 ---
 

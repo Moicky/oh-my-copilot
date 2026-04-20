@@ -1,5 +1,5 @@
 /**
- * Notification system for oh-my-codex
+ * Notification system for oh-my-copilot
  * Supports desktop notifications, Discord webhooks, and Telegram bots
  */
 
@@ -105,7 +105,7 @@ export function _buildDesktopArgs(
       `$text = $xml.GetElementsByTagName('text'); ` +
       `$text[0].AppendChild($xml.CreateTextNode('${safeTitle}')) > $null; ` +
       `$text[1].AppendChild($xml.CreateTextNode('${safeMessage}')) > $null; ` +
-      `[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('oh-my-codex').Show($xml)`;
+      `[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier('oh-my-copilot').Show($xml)`;
     return ['powershell', ['-Command', ps]];
   }
   return null;
@@ -155,7 +155,7 @@ async function sendDiscordNotification(payload: NotificationPayload, webhookUrl:
       title: `[OMX] ${payload.title}`,
       description: payload.message,
       color: colorMap[payload.type],
-      footer: { text: `oh-my-codex | ${payload.mode || 'general'}` },
+      footer: { text: `oh-my-copilot | ${payload.mode || 'general'}` },
       timestamp: new Date().toISOString(),
     }],
   });

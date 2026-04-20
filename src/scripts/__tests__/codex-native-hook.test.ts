@@ -1181,15 +1181,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1286,15 +1286,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1328,15 +1328,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1370,15 +1370,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1412,15 +1412,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1454,15 +1454,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1496,15 +1496,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1538,15 +1538,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1580,15 +1580,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1622,15 +1622,15 @@ esac
             "- Add a blank line after the subject before the narrative body.",
             "- Add a narrative body paragraph explaining the decision context.",
             "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           "- Add a blank line after the subject before the narrative body.",
           "- Add a narrative body paragraph explaining the decision context.",
           "- Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1665,7 +1665,7 @@ esac
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           "- Use inline `git commit -m ...` paragraphs for Lore-format commits in this path; file/editor/reuse/fixup message sources are not inspectable safely from pre-tool-use enforcement.",
         ].join("\n"),
       });
@@ -1705,12 +1705,12 @@ esac
           hookEventName: "PreToolUse",
           additionalContext: [
             "Lore-format git commit enforcement triggered.",
-            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+            "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
           ].join("\n"),
         },
         systemMessage: [
-          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
-          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+          "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
+          "- Add the required co-author trailer: `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
         ].join("\n"),
       });
     } finally {
@@ -1734,7 +1734,7 @@ esac
               '-m "The native pre-tool-use hook now blocks inline git commit messages that skip Lore trailers or the required OmX co-author trailer."',
               '-m "Constraint: Native PreToolUse can only inspect the Bash command text"',
               '-m "Tested: node --test dist/scripts/__tests__/codex-native-hook.test.js"',
-              '-m "Co-authored-by: OmX <omx@oh-my-codex.dev>"',
+              '-m "Co-authored-by: OmX <omx@oh-my-copilot.dev>"',
             ].join(" "),
           },
         },

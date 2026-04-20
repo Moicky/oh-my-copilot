@@ -1,5 +1,5 @@
 /**
- * Path utilities for oh-my-codex
+ * Path utilities for oh-my-copilot
  * Resolves Codex CLI config, skills, prompts, and state directories
  */
 
@@ -271,37 +271,37 @@ async function hashSkillDirectory(
   return hashes;
 }
 
-/** oh-my-codex state directory (.omx/state/) */
+/** oh-my-copilot state directory (.omx/state/) */
 export function omxStateDir(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omx", "state");
 }
 
-/** oh-my-codex project memory file (.omx/project-memory.json) */
+/** oh-my-copilot project memory file (.omx/project-memory.json) */
 export function omxProjectMemoryPath(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omx", "project-memory.json");
 }
 
-/** oh-my-codex notepad file (.omx/notepad.md) */
+/** oh-my-copilot notepad file (.omx/notepad.md) */
 export function omxNotepadPath(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omx", "notepad.md");
 }
 
-/** oh-my-codex wiki directory (.omx/wiki/) */
+/** oh-my-copilot wiki directory (.omx/wiki/) */
 export function omxWikiDir(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omx", "wiki");
 }
 
-/** oh-my-codex plans directory (.omx/plans/) */
+/** oh-my-copilot plans directory (.omx/plans/) */
 export function omxPlansDir(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omx", "plans");
 }
 
-/** oh-my-codex adapters directory (.omx/adapters/) */
+/** oh-my-copilot adapters directory (.omx/adapters/) */
 export function omxAdaptersDir(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omx", "adapters");
 }
 
-/** oh-my-codex logs directory (.omx/logs/) */
+/** oh-my-copilot logs directory (.omx/logs/) */
 export function omxLogsDir(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omx", "logs");
 }

@@ -18,7 +18,7 @@ Verdict: **GO** ✅
 | Full test suite | `npm test` | PASS (`1908` pass / `0` fail) |
 | No-unused type gate | `npm run check:no-unused` | PASS |
 | CLI help smoke | `node bin/omx.js --help` | PASS |
-| Version smoke | `node bin/omx.js version` | PASS (`oh-my-codex v0.8.1`) |
+| Version smoke | `node bin/omx.js version` | PASS (`oh-my-copilot v0.8.1`) |
 | Status smoke | `node bin/omx.js status` | PASS |
 | Doctor smoke | `node bin/omx.js doctor` | PASS (`9 passed, 0 warnings, 0 failed`) |
 | Setup dry-run smoke | `node bin/omx.js setup --dry-run` | PASS |

@@ -368,7 +368,7 @@ describe("omx setup refresh summary and dry-run behavior", () => {
       });
 
       const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
-      assert.match(config, /oh-my-codex \(OMX\) Shared MCP Registry Sync/);
+      assert.match(config, /oh-my-copilot \(OMX\) Shared MCP Registry Sync/);
       assert.match(config, /^\[mcp_servers\.eslint\]$/m);
       assert.match(config, /^command = "npx"$/m);
       assert.match(config, /^startup_timeout_sec = 9$/m);

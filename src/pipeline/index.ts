@@ -1,5 +1,5 @@
 /**
- * Pipeline orchestrator for oh-my-codex
+ * Pipeline orchestrator for oh-my-copilot
  *
  * Configurable pipeline that sequences: RALPLAN -> teams (codex workers) -> ralph verification.
  * Mirrors OMC #1130 pipeline design.

@@ -1,6 +1,6 @@
 ---
 title: README translations
-description: Index and maintenance guidance for localized oh-my-codex README files
+description: Index and maintenance guidance for localized oh-my-copilot README files
 author: GitHub Copilot
 ms.date: 2026-04-04
 ms.topic: reference
@@ -14,7 +14,7 @@ estimated_reading_time: 2
 
 ## Purpose
 
-This folder holds the localized README files for oh-my-codex.
+This folder holds the localized README files for oh-my-copilot.
 
 The repository root keeps only the canonical `README.md` so the top level stays focused on the primary entry point, package metadata, and project-wide documents.
 

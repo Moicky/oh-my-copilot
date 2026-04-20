@@ -1,5 +1,5 @@
 /**
- * Launch-time update checks for oh-my-codex.
+ * Launch-time update checks for oh-my-copilot.
  * Non-fatal and throttled; can be disabled via OMX_AUTO_UPDATE=0.
  */
 
@@ -20,7 +20,7 @@ interface LatestPackageInfo {
   version?: string;
 }
 
-const PACKAGE_NAME = 'oh-my-codex';
+const PACKAGE_NAME = 'oh-my-copilot';
 const CHECK_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12h
 
 function parseSemver(version: string): [number, number, number] | null {
@@ -177,6 +177,6 @@ export async function maybeCheckAndPromptUpdate(
     await updateDependencies.setup();
     console.log(`[omx] Updated to v${latest}. Restart to use new code.`);
   } else {
-    console.log('[omx] Update failed. Run manually: npm install -g oh-my-codex@latest');
+    console.log('[omx] Update failed. Run manually: npm install -g oh-my-copilot@latest');
   }
 }

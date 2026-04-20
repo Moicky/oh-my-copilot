@@ -1,5 +1,5 @@
 /**
- * Session Lifecycle Manager for oh-my-codex
+ * Session Lifecycle Manager for oh-my-copilot
  *
  * Tracks session start/end, detects stale sessions from crashed launches,
  * and provides structured logging for session events.

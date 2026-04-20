@@ -1,5 +1,5 @@
 /**
- * HUD type definitions for oh-my-codex
+ * HUD type definitions for oh-my-copilot
  */
 
 /** Ralph loop state for HUD display */

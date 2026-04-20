@@ -1,19 +1,19 @@
-# oh-my-codex (OMX)
+# oh-my-copilot (OMX)
 
 <p align="center">
-  <img src="https://yeachan-heo.github.io/oh-my-codex-website/omx-character-nobg.png" alt="oh-my-codex character" width="280">
+  <img src="https://yeachan-heo.github.io/oh-my-copilot-website/omx-character-nobg.png" alt="oh-my-copilot character" width="280">
   <br>
   <em>Start Codex stronger, then let OMX add better prompts, workflows, and runtime help when the work grows.</em>
 </p>
 
-[![npm version](https://img.shields.io/npm/v/oh-my-codex)](https://www.npmjs.com/package/oh-my-codex)
+[![npm version](https://img.shields.io/npm/v/oh-my-copilot)](https://www.npmjs.com/package/oh-my-copilot)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 [![Discord](https://img.shields.io/discord/1452487457085063218?color=5865F2&logo=discord&logoColor=white&label=Discord)](https://discord.gg/PUwSMR9XNk)
 
-**Website:** https://yeachan-heo.github.io/oh-my-codex-website/
+**Website:** https://yeachan-heo.github.io/oh-my-copilot-website/
 **Docs:** [Getting Started](./docs/getting-started.html) · [Agents](./docs/agents.html) · [Skills](./docs/skills.html) · [Integrations](./docs/integrations.html) · [Demo](./DEMO.md) · [OpenClaw guide](./docs/openclaw-integration.md)
-**Community:** [Discord](https://discord.gg/PUwSMR9XNk) — shared OMX/community server for oh-my-codex and related tooling.
+**Community:** [Discord](https://discord.gg/PUwSMR9XNk) — shared OMX/community server for oh-my-copilot and related tooling.
 
 OMX is a workflow layer for [OpenAI Codex CLI](https://github.com/openai/codex).
 
@@ -57,7 +57,7 @@ It keeps Codex as the execution engine and makes it easier to:
 If you want the default OMX experience, start here:
 
 ```bash
-npm install -g @openai/codex oh-my-codex
+npm install -g @openai/codex oh-my-copilot
 omx setup
 omx --madmax --high
 ```
@@ -317,7 +317,7 @@ If this happens, try:
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Yeachan-Heo/oh-my-codex&type=date&legend=top-left)](https://www.star-history.com/#Yeachan-Heo/oh-my-codex&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=Yeachan-Heo/oh-my-copilot&type=date&legend=top-left)](https://www.star-history.com/#Yeachan-Heo/oh-my-copilot&type=date&legend=top-left)
 
 ## License
 

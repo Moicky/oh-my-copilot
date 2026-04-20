@@ -17,12 +17,12 @@ const CURRENT_SESSION_PROCESSES: ProcessEntry[] = [
   {
     pid: 710,
     ppid: 700,
-    command: 'node /repo/oh-my-codex/dist/mcp/state-server.js',
+    command: 'node /repo/oh-my-copilot/dist/mcp/state-server.js',
   },
   {
     pid: 800,
     ppid: 1,
-    command: 'node /tmp/oh-my-codex/dist/mcp/memory-server.js',
+    command: 'node /tmp/oh-my-copilot/dist/mcp/memory-server.js',
   },
   {
     pid: 810,
@@ -68,7 +68,7 @@ describe('findCleanupCandidates', () => {
         {
           pid: 800,
           ppid: 1,
-          command: 'node /tmp/oh-my-codex/dist/mcp/memory-server.js',
+          command: 'node /tmp/oh-my-copilot/dist/mcp/memory-server.js',
           reason: 'ppid=1',
         },
         {
@@ -100,7 +100,7 @@ describe('findCleanupCandidates', () => {
         {
           pid: 800,
           ppid: 1,
-          command: 'node /tmp/oh-my-codex/dist/mcp/memory-server.js',
+          command: 'node /tmp/oh-my-copilot/dist/mcp/memory-server.js',
           reason: 'ppid=1',
         },
         {
@@ -155,12 +155,12 @@ describe('listOmxProcesses', () => {
     Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
     try {
       const processes = listOmxProcesses(() => [
-        JSON.stringify({ pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-codex/dist/mcp/state-server.js' }),
-        JSON.stringify({ pid: 810, ppid: 42, command: 'node C:/tmp/oh-my-codex/dist/mcp/trace-server.js' }),
+        JSON.stringify({ pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-copilot/dist/mcp/state-server.js' }),
+        JSON.stringify({ pid: 810, ppid: 42, command: 'node C:/tmp/oh-my-copilot/dist/mcp/trace-server.js' }),
       ].join('\n'));
       assert.deepEqual(processes, [
-        { pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-codex/dist/mcp/state-server.js' },
-        { pid: 810, ppid: 42, command: 'node C:/tmp/oh-my-codex/dist/mcp/trace-server.js' },
+        { pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-copilot/dist/mcp/state-server.js' },
+        { pid: 810, ppid: 42, command: 'node C:/tmp/oh-my-copilot/dist/mcp/trace-server.js' },
       ]);
     } finally {
       if (originalPlatform) Object.defineProperty(process, 'platform', originalPlatform);
@@ -172,14 +172,14 @@ describe('listOmxProcesses', () => {
     Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
     try {
       const processes = listOmxProcesses(() => [
-        JSON.stringify({ pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-codex/dist/mcp/state-server.js' }),
+        JSON.stringify({ pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-copilot/dist/mcp/state-server.js' }),
         JSON.stringify({ pid: 'abc', ppid: 1, command: 'node malformed.js' }),
         JSON.stringify({ pid: 901, ppid: -1, command: 'node malformed.js' }),
         JSON.stringify({ pid: 902, ppid: 20, command: '   ' }),
         '{bad json',
       ].join('\n'));
       assert.deepEqual(processes, [
-        { pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-codex/dist/mcp/state-server.js' },
+        { pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-copilot/dist/mcp/state-server.js' },
       ]);
     } finally {
       if (originalPlatform) Object.defineProperty(process, 'platform', originalPlatform);
@@ -194,7 +194,7 @@ describe('listOmxProcesses', () => {
         JSON.stringify({ pid: 700, ppid: 500, command: 'codex' }),
         JSON.stringify({ pid: 701, ppid: 700, command: 'node C:/repo/bin/omx.js cleanup --dry-run' }),
         JSON.stringify({ pid: 710, ppid: 700, command: 'node C:/repo/dist/mcp/state-server.js' }),
-        JSON.stringify({ pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-codex/dist/mcp/memory-server.js' }),
+        JSON.stringify({ pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-copilot/dist/mcp/memory-server.js' }),
         JSON.stringify({ pid: 810, ppid: 42, command: 'node C:/tmp/worktree/dist/mcp/trace-server.js' }),
         JSON.stringify({ pid: 900, ppid: 1, command: 'node C:/tmp/not-omx/other-server.js' }),
       ].join('\n'));
@@ -203,7 +203,7 @@ describe('listOmxProcesses', () => {
         {
           pid: 800,
           ppid: 1,
-          command: 'node C:/tmp/oh-my-codex/dist/mcp/memory-server.js',
+          command: 'node C:/tmp/oh-my-copilot/dist/mcp/memory-server.js',
           reason: 'ppid=1',
         },
         {
@@ -297,7 +297,7 @@ describe('cleanupOmxMcpProcesses', () => {
       {
         pid: 800,
         ppid: 1,
-        command: 'node /tmp/oh-my-codex/dist/mcp/memory-server.js',
+        command: 'node /tmp/oh-my-copilot/dist/mcp/memory-server.js',
         reason: 'ppid=1',
       },
       {
@@ -321,8 +321,8 @@ describe('cleanupStaleTmpDirectories', () => {
   const tmpEntries = [
     { name: 'omx-stale-a', isDirectory: () => true },
     { name: 'omc-stale-b', isDirectory: () => true },
-    { name: 'oh-my-codex-fresh', isDirectory: () => true },
-    { name: 'oh-my-codex-file', isDirectory: () => false },
+    { name: 'oh-my-copilot-fresh', isDirectory: () => true },
+    { name: 'oh-my-copilot-file', isDirectory: () => false },
     { name: 'other-stale', isDirectory: () => true },
   ];
 
@@ -336,7 +336,7 @@ describe('cleanupStaleTmpDirectories', () => {
       listTmpEntries: async () => tmpEntries,
       statPath: async (path) => ({
         mtimeMs:
-          path === '/tmp/oh-my-codex-fresh'
+          path === '/tmp/oh-my-copilot-fresh'
             ? now - 30 * 60 * 1000
             : now - 2 * 60 * 60 * 1000,
       }),
@@ -355,7 +355,7 @@ describe('cleanupStaleTmpDirectories', () => {
     );
     assert.match(lines.join('\n'), /\/tmp\/omc-stale-b/);
     assert.match(lines.join('\n'), /\/tmp\/omx-stale-a/);
-    assert.doesNotMatch(lines.join('\n'), /oh-my-codex-fresh/);
+    assert.doesNotMatch(lines.join('\n'), /oh-my-copilot-fresh/);
     assert.doesNotMatch(lines.join('\n'), /other-stale/);
   });
 
@@ -369,7 +369,7 @@ describe('cleanupStaleTmpDirectories', () => {
       listTmpEntries: async () => tmpEntries,
       statPath: async (path) => ({
         mtimeMs:
-          path === '/tmp/oh-my-codex-fresh'
+          path === '/tmp/oh-my-copilot-fresh'
             ? now - 30 * 60 * 1000
             : now - 2 * 60 * 60 * 1000,
       }),

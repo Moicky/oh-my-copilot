@@ -39,12 +39,12 @@ describe('omx setup skills overwrite behavior', () => {
 
       assert.ok(
         (await readFile(installedHelpSkill, 'utf-8')).includes(
-          'description: "[OMX] Guide on using oh-my-codex plugin"',
+          'description: "[OMX] Guide on using oh-my-copilot plugin"',
         ),
       );
       assert.ok(
         (await readFile(shippedHelpSkill, 'utf-8')).includes(
-          'description: Guide on using oh-my-codex plugin',
+          'description: Guide on using oh-my-copilot plugin',
         ),
       );
     } finally {
@@ -243,7 +243,7 @@ describe('omx setup skills overwrite behavior', () => {
 
       const installedHelpSkill = join(wd, '.codex', 'skills', 'help', 'SKILL.md');
       const content = await readFile(installedHelpSkill, 'utf-8');
-      const matches = content.match(/\[OMX\] Guide on using oh-my-codex plugin/g) ?? [];
+      const matches = content.match(/\[OMX\] Guide on using oh-my-copilot plugin/g) ?? [];
       assert.equal(matches.length, 1);
       assert.doesNotMatch(content, /\[OMX\] \[OMX\]/);
     } finally {

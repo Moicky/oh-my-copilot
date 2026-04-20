@@ -1,5 +1,5 @@
 /**
- * omx setup - Automated installation of oh-my-codex
+ * omx setup - Automated installation of oh-my-copilot
  * Installs skills, prompts, MCP servers config, and AGENTS.md
  */
 
@@ -695,7 +695,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     resolvedScope.source === "persisted" ? " (from .omx/setup-scope.json)" : "";
   const backupContext = getBackupContext(resolvedScope.scope, projectRoot);
 
-  console.log("oh-my-codex setup");
+  console.log("oh-my-copilot setup");
   console.log("=================\n");
   console.log(
     `Using setup scope: ${resolvedScope.scope}${scopeSourceMessage}\n`,
@@ -1075,7 +1075,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     '  6. "omx explore" and "omx sparkshell" can hydrate native release binaries on first use; source installs still allow repo-local fallbacks and OMX_EXPLORE_BIN / OMX_SPARKSHELL_BIN overrides',
   );
   if (isGitHubCliConfigured()) {
-    console.log("\nSupport the project: gh repo star Yeachan-Heo/oh-my-codex");
+    console.log("\nSupport the project: gh repo star Yeachan-Heo/oh-my-copilot");
   }
 }
 

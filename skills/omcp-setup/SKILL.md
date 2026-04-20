@@ -1,11 +1,11 @@
 ---
 name: omx-setup
-description: Setup and configure oh-my-codex using current CLI behavior
+description: Setup and configure oh-my-copilot using current CLI behavior
 ---
 
 # OMX Setup
 
-Use this skill when users want to install or refresh oh-my-codex for the **current project plus user-level OMX directories**.
+Use this skill when users want to install or refresh oh-my-copilot for the **current project plus user-level OMX directories**.
 
 ## Command
 

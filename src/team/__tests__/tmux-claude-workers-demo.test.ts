@@ -161,7 +161,7 @@ describe('tmux claude workers demo', () => {
     it('creates correct launch specs for all workers in demo', () => {
       const workerCount = 6;
       const teamName = 'tmux-claude-workers-demo';
-      const cwd = '/home/bellman/Workspace/oh-my-codex';
+      const cwd = '/home/bellman/Workspace/oh-my-copilot';
       const launchArgs = ['--model', 'gpt-5.3-codex-spark', '-c', 'model_reasoning_effort="low"'];
 
       // Build CLI map like demo script does

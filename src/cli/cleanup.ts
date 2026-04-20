@@ -18,8 +18,8 @@ const SIGTERM_GRACE_MS = 5_000;
 const STALE_TMP_MAX_AGE_MS = 60 * 60 * 1000;
 const OMX_MCP_SERVER_PATTERN = /(?:^|[\\/])dist[\\/]mcp[\\/](?:state|memory|code-intel|trace|wiki)-server\.(?:[cm]?js|ts)\b/i;
 const CODEX_PROCESS_PATTERN = /(?:^|[\\/\s])codex(?:\.js)?(?:\s|$)|@openai[\\/]codex/i;
-const OMX_LAUNCH_PROCESS_PATTERN = /(?:^|[\\/\s])omx(?:\.js)?(?:\s|$)|(?:^|[\\/])(?:bin|dist[\\/]cli)[\\/]omx\.js(?:\s|$)|oh-my-codex[\\/]dist[\\/]cli[\\/]omx\.js/i;
-const OMX_TMP_DIRECTORY_PATTERN = /^(omc|omx|oh-my-codex)-/;
+const OMX_LAUNCH_PROCESS_PATTERN = /(?:^|[\\/\s])omx(?:\.js)?(?:\s|$)|(?:^|[\\/])(?:bin|dist[\\/]cli)[\\/]omx\.js(?:\s|$)|oh-my-copilot[\\/]dist[\\/]cli[\\/]omx\.js/i;
+const OMX_TMP_DIRECTORY_PATTERN = /^(omc|omx|oh-my-copilot)-/;
 const PROCESS_LIST_COMMAND_OPTIONS: ExecFileSyncOptionsWithStringEncoding = {
   encoding: 'utf-8',
   windowsHide: true,

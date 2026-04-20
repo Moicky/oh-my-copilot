@@ -1,4 +1,4 @@
-# oh-my-codex Demo Guide
+# oh-my-copilot Demo Guide
 
 ## Prerequisites
 
@@ -10,8 +10,8 @@
 
 ```bash
 # Clone and install
-git clone https://github.com/Yeachan-Heo/oh-my-codex.git
-cd oh-my-codex
+git clone https://github.com/Yeachan-Heo/oh-my-copilot.git
+cd oh-my-copilot
 npm install
 npm run build
 npm link
@@ -22,7 +22,7 @@ omx setup
 
 **Expected output:**
 ```
-oh-my-codex setup
+oh-my-copilot setup
 =================
 
 [1/7] Creating directories...
@@ -62,7 +62,7 @@ omx doctor
 
 **Expected output:**
 ```
-oh-my-codex doctor
+oh-my-copilot doctor
 ==================
 
   [OK] Codex CLI: installed
@@ -134,7 +134,7 @@ omx cancel
 
 **Expected output for `omx version`:**
 ```
-oh-my-codex vX.Y.Z
+oh-my-copilot vX.Y.Z
 Node.js v20+
 Platform: linux x64
 ```

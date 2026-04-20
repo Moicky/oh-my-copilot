@@ -1,5 +1,5 @@
 /**
- * omx doctor - Validate oh-my-codex installation
+ * omx doctor - Validate oh-my-copilot installation
  */
 
 import { existsSync } from 'fs';
@@ -120,7 +120,7 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
     ? ' (from .omx/setup-scope.json)'
     : '';
 
-  console.log('oh-my-codex doctor');
+  console.log('oh-my-copilot doctor');
   console.log('==================\n');
   console.log(`Resolved setup scope: ${scopeResolution.scope}${scopeSourceMessage}\n`);
 
@@ -190,7 +190,7 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
   } else if (warnCount > 0) {
     console.log('\nRun "omx setup --force" to refresh all components.');
   } else {
-    console.log('\nAll checks passed! oh-my-codex is ready.');
+    console.log('\nAll checks passed! oh-my-copilot is ready.');
   }
 }
 
@@ -201,7 +201,7 @@ interface TeamDoctorIssue {
 }
 
 async function doctorTeam(): Promise<void> {
-  console.log('oh-my-codex doctor --team');
+  console.log('oh-my-copilot doctor --team');
   console.log('=========================\n');
 
   const issues = await collectTeamDoctorIssues(process.cwd());
@@ -621,7 +621,7 @@ async function checkConfig(configPath: string): Promise<Check> {
       };
     }
 
-    const hasOmx = content.includes('omx_') || content.includes('oh-my-codex');
+    const hasOmx = content.includes('omx_') || content.includes('oh-my-copilot');
     if (hasOmx) {
       return { name: 'Config', status: 'pass', message: 'config.toml has OMX entries' };
     }
@@ -694,7 +694,7 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
     if (existsSync(configPath)) {
       try {
         const configContent = await readFile(configPath, 'utf-8');
-        const hasOmx = configContent.includes('omx_') || configContent.includes('oh-my-codex');
+        const hasOmx = configContent.includes('omx_') || configContent.includes('oh-my-copilot');
         if (hasOmx) {
           return {
             name: 'Native hooks',

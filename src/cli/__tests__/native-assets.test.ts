@@ -121,10 +121,10 @@ describe('native asset helpers', () => {
     try {
       await writeFile(join(wd, 'package.json'), JSON.stringify({
         version: '0.8.15',
-        repository: { url: 'git+https://github.com/Yeachan-Heo/oh-my-codex.git' },
+        repository: { url: 'git+https://github.com/Yeachan-Heo/oh-my-copilot.git' },
       }));
       const base = await resolveNativeReleaseBaseUrl(wd, undefined, {});
-      assert.equal(base, 'https://github.com/Yeachan-Heo/oh-my-codex/releases/download/v0.8.15');
+      assert.equal(base, 'https://github.com/Yeachan-Heo/oh-my-copilot/releases/download/v0.8.15');
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -138,7 +138,7 @@ describe('native asset helpers', () => {
       await mkdir(assetRoot, { recursive: true });
       await writeFile(join(wd, 'package.json'), JSON.stringify({
         version: '0.8.15',
-        repository: { url: 'git+https://github.com/Yeachan-Heo/oh-my-codex.git' },
+        repository: { url: 'git+https://github.com/Yeachan-Heo/oh-my-copilot.git' },
       }));
 
       const stagingDir = join(wd, 'staging');
@@ -206,7 +206,7 @@ describe('native asset helpers', () => {
       await mkdir(assetRoot, { recursive: true });
       await writeFile(join(wd, 'package.json'), JSON.stringify({
         version: '0.8.15',
-        repository: { url: 'git+https://github.com/Yeachan-Heo/oh-my-codex.git' },
+        repository: { url: 'git+https://github.com/Yeachan-Heo/oh-my-copilot.git' },
       }));
 
       const stagingDir = join(wd, 'staging', 'omx-sparkshell-x86_64-unknown-linux-musl');
@@ -271,7 +271,7 @@ describe('native asset helpers', () => {
     try {
       await writeFile(join(wd, 'package.json'), JSON.stringify({
         version: '0.8.15',
-        repository: { url: 'git+https://github.com/Yeachan-Heo/oh-my-codex.git' },
+        repository: { url: 'git+https://github.com/Yeachan-Heo/oh-my-copilot.git' },
       }));
 
       const missingRoot = join(wd, 'missing-assets');

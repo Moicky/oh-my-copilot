@@ -41,10 +41,10 @@ function shouldSkipForSpawnPermissions(err: string): boolean {
 /** Build a realistic OMX config.toml for testing */
 function buildOmxConfig(): string {
   return [
-    '# oh-my-codex top-level settings (must be before any [table])',
+    '# oh-my-copilot top-level settings (must be before any [table])',
     'notify = ["node", "/path/to/notify-hook.js"]',
     'model_reasoning_effort = "high"',
-    'developer_instructions = "You have oh-my-codex installed."',
+    'developer_instructions = "You have oh-my-copilot installed."',
     '',
     '[features]',
     'multi_agent = true',
@@ -52,7 +52,7 @@ function buildOmxConfig(): string {
     'codex_hooks = true',
     '',
     '# ============================================================',
-    '# oh-my-codex (OMX) Configuration',
+    '# oh-my-copilot (OMX) Configuration',
     '# Managed by omx setup - manual edits preserved on next setup',
     '# ============================================================',
     '',
@@ -100,7 +100,7 @@ function buildOmxConfig(): string {
     'status_line = ["model-with-reasoning", "git-branch"]',
     '',
     '# ============================================================',
-    '# End oh-my-codex',
+    '# End oh-my-copilot',
     '',
   ].join('\n');
 }
@@ -109,10 +109,10 @@ function buildOmxConfig(): string {
 
 function buildConfigWithSeededModelContext(): string {
   return [
-    '# oh-my-codex top-level settings (must be before any [table])',
+    '# oh-my-copilot top-level settings (must be before any [table])',
     'notify = ["node", "/path/to/notify-hook.js"]',
     'model_reasoning_effort = "high"',
-    'developer_instructions = "You have oh-my-codex installed."',
+    'developer_instructions = "You have oh-my-copilot installed."',
     'model = "gpt-5.4"',
     'model_context_window = 1000000',
     'model_auto_compact_token_limit = 900000',
@@ -123,7 +123,7 @@ function buildConfigWithSeededModelContext(): string {
     'codex_hooks = true',
     '',
     '# ============================================================',
-    '# oh-my-codex (OMX) Configuration',
+    '# oh-my-copilot (OMX) Configuration',
     '# Managed by omx setup - manual edits preserved on next setup',
     '# ============================================================',
     '',
@@ -133,7 +133,7 @@ function buildConfigWithSeededModelContext(): string {
     'enabled = true',
     '',
     '# ============================================================',
-    '# End oh-my-codex',
+    '# End oh-my-copilot',
     '',
   ].join('\n');
 }
@@ -143,10 +143,10 @@ function buildMixedConfig(): string {
     '# User settings',
     'model = "o4-mini"',
     '',
-    '# oh-my-codex top-level settings (must be before any [table])',
+    '# oh-my-copilot top-level settings (must be before any [table])',
     'notify = ["node", "/path/to/notify-hook.js"]',
     'model_reasoning_effort = "high"',
-    'developer_instructions = "You have oh-my-codex installed."',
+    'developer_instructions = "You have oh-my-copilot installed."',
     '',
     '[features]',
     'multi_agent = true',
@@ -159,7 +159,7 @@ function buildMixedConfig(): string {
     'args = ["--flag"]',
     '',
     '# ============================================================',
-    '# oh-my-codex (OMX) Configuration',
+    '# oh-my-copilot (OMX) Configuration',
     '# Managed by omx setup - manual edits preserved on next setup',
     '# ============================================================',
     '',
@@ -196,7 +196,7 @@ function buildMixedConfig(): string {
     'status_line = ["model-with-reasoning"]',
     '',
     '# ============================================================',
-    '# End oh-my-codex',
+    '# End oh-my-copilot',
     '',
   ].join('\n');
 }
@@ -224,7 +224,7 @@ describe('omx uninstall', () => {
 
       // Config should NOT have been modified
       const config = await readFile(join(codexDir, 'config.toml'), 'utf-8');
-      assert.match(config, /oh-my-codex \(OMX\) Configuration/);
+      assert.match(config, /oh-my-copilot \(OMX\) Configuration/);
       assert.equal(existsSync(join(codexDir, 'hooks.json')), true);
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -249,7 +249,7 @@ describe('omx uninstall', () => {
       assert.match(res.stdout, /Removed OMX configuration block/);
 
       const config = await readFile(join(codexDir, 'config.toml'), 'utf-8');
-      assert.doesNotMatch(config, /oh-my-codex \(OMX\) Configuration/);
+      assert.doesNotMatch(config, /oh-my-copilot \(OMX\) Configuration/);
       assert.doesNotMatch(config, /omx_state/);
       assert.doesNotMatch(config, /omx_memory/);
       assert.doesNotMatch(config, /omx_code_intel/);
@@ -361,7 +361,7 @@ describe('omx uninstall', () => {
       assert.doesNotMatch(config, /notify\s*=/);
       assert.doesNotMatch(config, /model_reasoning_effort\s*=/);
       assert.doesNotMatch(config, /developer_instructions\s*=/);
-      assert.doesNotMatch(config, /oh-my-codex \(OMX\) Configuration/);
+      assert.doesNotMatch(config, /oh-my-copilot \(OMX\) Configuration/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -382,7 +382,7 @@ describe('omx uninstall', () => {
 
       // Config should NOT have been modified
       const config = await readFile(join(codexDir, 'config.toml'), 'utf-8');
-      assert.match(config, /oh-my-codex \(OMX\) Configuration/);
+      assert.match(config, /oh-my-copilot \(OMX\) Configuration/);
       assert.match(config, /omx_state/);
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -435,7 +435,7 @@ describe('omx uninstall', () => {
 
       // Project-local config.toml should be cleaned
       const config = await readFile(join(codexDir, 'config.toml'), 'utf-8');
-      assert.doesNotMatch(config, /oh-my-codex \(OMX\) Configuration/);
+      assert.doesNotMatch(config, /oh-my-copilot \(OMX\) Configuration/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -645,12 +645,12 @@ describe('omx uninstall', () => {
     }
   });
 
-  it('does not delete user AGENTS.md that merely mentions oh-my-codex', async () => {
+  it('does not delete user AGENTS.md that merely mentions oh-my-copilot', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
     try {
       const home = join(wd, 'home');
       await mkdir(home, { recursive: true });
-      const userAgentsMd = '# My Agents\n\nDo not use oh-my-codex for this project.\n';
+      const userAgentsMd = '# My Agents\n\nDo not use oh-my-copilot for this project.\n';
       await writeFile(join(wd, 'AGENTS.md'), userAgentsMd);
 
       const res = runOmx(wd, ['uninstall'], { HOME: home });
@@ -682,7 +682,7 @@ describe('omx uninstall', () => {
           + 'IF BLOCKED, TRY AN ALTERNATIVE APPROACH. ONLY ASK WHEN TRULY AMBIGUOUS OR DESTRUCTIVE.\n'
           + '<!-- END AUTONOMY DIRECTIVE -->\n'
           + '<!-- omx:generated:agents-md -->\n'
-          + '# oh-my-codex - Intelligent Multi-Agent Orchestration\n',
+          + '# oh-my-copilot - Intelligent Multi-Agent Orchestration\n',
       );
 
       const res = runOmx(wd, ['uninstall', '--keep-config'], { HOME: home });

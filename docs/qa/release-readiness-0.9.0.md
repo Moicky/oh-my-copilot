@@ -26,7 +26,7 @@ Verdict: **GO** ✅
 |---|---|---|
 | Full source build | `npm run build:full` | PASS |
 | CLI help smoke | `node bin/omx.js --help` | PASS |
-| Version smoke | `node bin/omx.js version` | PASS (`oh-my-codex v0.9.0`) |
+| Version smoke | `node bin/omx.js version` | PASS (`oh-my-copilot v0.9.0`) |
 | Version sync | `node scripts/check-version-sync.mjs --tag v0.9.0` | PASS |
 | Ask help smoke | `node bin/omx.js ask --help` | PASS |
 | HUD help smoke | `node bin/omx.js hud --help` | PASS |
@@ -41,7 +41,7 @@ Verdict: **GO** ✅
 | Sparkshell summary smoke | `OMX_SPARKSHELL_LINES=1 node bin/omx.js sparkshell git log --oneline -10` | PASS (summary output emitted) |
 | Sparkshell tmux-pane smoke | `node bin/omx.js sparkshell --tmux-pane %2141 --tail-lines 120` | PASS |
 | Full test suite | `npm test` | PASS (`2375` pass / `0` fail) |
-| Packed tarball dry run | `npm pack --dry-run` | PASS (`oh-my-codex-0.9.0.tgz`) |
+| Packed tarball dry run | `npm pack --dry-run` | PASS (`oh-my-copilot-0.9.0.tgz`) |
 | Explore verification lane | `npm run test:explore` | PASS (`39` pass / `0` fail) |
 | Sparkshell verification lane | `npm run test:sparkshell` | PASS (Rust suites passed: `32 + 11 + 5`, `0` fail) |
 

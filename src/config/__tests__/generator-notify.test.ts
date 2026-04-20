@@ -97,7 +97,7 @@ describe('config generator', () => {
       const toml = await readFile(configPath, 'utf-8');
 
       assert.match(toml, /^model_reasoning_effort = "high"$/m);
-      assert.match(toml, /^developer_instructions = "You have oh-my-codex installed/m);
+      assert.match(toml, /^developer_instructions = "You have oh-my-copilot installed/m);
       assert.match(toml, /AGENTS\.md is your orchestration brain and the main orchestration surface/);
       assert.match(toml, /Use skill\/keyword routing like \$name plus spawned role-specialized subagents for specialized work/);
       assert.match(toml, /Codex native subagents are available via \.codex\/agents/);
@@ -142,10 +142,10 @@ describe('config generator', () => {
 
       // OMX block appears exactly once
       assert.equal(
-        (rerun.match(/# oh-my-codex \(OMX\) Configuration/g) ?? []).length,
+        (rerun.match(/# oh-my-copilot \(OMX\) Configuration/g) ?? []).length,
         1
       );
-      assert.equal((rerun.match(/# End oh-my-codex/g) ?? []).length, 1);
+      assert.equal((rerun.match(/# End oh-my-copilot/g) ?? []).length, 1);
 
       // Features correct
       assert.equal((rerun.match(/^\[features\]$/gm) ?? []).length, 1);
@@ -275,13 +275,13 @@ describe('config generator', () => {
         '[user.before]',
         'name = "kept-before"',
         '',
-        '# oh-my-codex (OMX) Configuration',
+        '# oh-my-copilot (OMX) Configuration',
         '# legacy block without top divider',
         'notify = ["node", "/tmp/legacy notify-hook.js"]',
         '[mcp_servers.omx_state]',
         'command = "node"',
         'args = ["/tmp/state-server.js"]',
-        '# End oh-my-codex',
+        '# End oh-my-copilot',
         '',
         '[user.after]',
         'name = "kept-after"',
@@ -293,7 +293,7 @@ describe('config generator', () => {
       const toml = await readFile(configPath, 'utf-8');
 
       assert.equal(
-        (toml.match(/oh-my-codex \(OMX\) Configuration/g) ?? []).length,
+        (toml.match(/oh-my-copilot \(OMX\) Configuration/g) ?? []).length,
         1
       );
       assert.match(toml, /^\[user.before\]$/m);
@@ -339,25 +339,25 @@ describe('config generator', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-config-gen-'));
     try {
       const configPath = join(wd, 'config.toml');
-      const windowsPkgRoot = 'C:\\Users\\alice\\oh-my-codex';
+      const windowsPkgRoot = 'C:\\Users\\alice\\oh-my-copilot';
       await mergeConfig(configPath, windowsPkgRoot);
       const toml = await readFile(configPath, 'utf-8');
 
       assert.match(
         toml,
-        /args = \["C:\\\\Users\\\\alice\\\\oh-my-codex\/dist\/mcp\/state-server\.js"\]/,
+        /args = \["C:\\\\Users\\\\alice\\\\oh-my-copilot\/dist\/mcp\/state-server\.js"\]/,
       );
       assert.match(
         toml,
-        /args = \["C:\\\\Users\\\\alice\\\\oh-my-codex\/dist\/mcp\/memory-server\.js"\]/,
+        /args = \["C:\\\\Users\\\\alice\\\\oh-my-copilot\/dist\/mcp\/memory-server\.js"\]/,
       );
       assert.match(
         toml,
-        /args = \["C:\\\\Users\\\\alice\\\\oh-my-codex\/dist\/mcp\/code-intel-server\.js"\]/,
+        /args = \["C:\\\\Users\\\\alice\\\\oh-my-copilot\/dist\/mcp\/code-intel-server\.js"\]/,
       );
       assert.match(
         toml,
-        /args = \["C:\\\\Users\\\\alice\\\\oh-my-codex\/dist\/mcp\/trace-server\.js"\]/,
+        /args = \["C:\\\\Users\\\\alice\\\\oh-my-copilot\/dist\/mcp\/trace-server\.js"\]/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });

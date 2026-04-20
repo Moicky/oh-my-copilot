@@ -462,7 +462,7 @@ describe("omx setup scope behavior", () => {
       assert.match(overwritten, /^<!-- AUTONOMY DIRECTIVE — DO NOT REMOVE -->/);
       assert.match(
         overwritten,
-        /# oh-my-codex - Intelligent Multi-Agent Orchestration/,
+        /# oh-my-copilot - Intelligent Multi-Agent Orchestration/,
       );
       assert.doesNotMatch(overwritten, /# old custom file/);
       assert.match(

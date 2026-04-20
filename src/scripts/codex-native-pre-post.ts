@@ -200,7 +200,7 @@ const LORE_TRAILER_PREFIXES = [
   "Related:",
 ] as const;
 
-const OMX_COAUTHOR_TRAILER = "Co-authored-by: OmX <omx@oh-my-codex.dev>";
+const OMX_COAUTHOR_TRAILER = "Co-authored-by: OmX <omx@oh-my-copilot.dev>";
 
 function isDoubleQuotedShellEscapeTarget(char: string | undefined): boolean {
   return char === "\"" || char === "\\" || char === "$" || char === "`" || char === "\n";
@@ -556,7 +556,7 @@ function buildGitCommitEnforcementOutput(commandText: string): Record<string, un
       ].join("\n"),
     },
     systemMessage: [
-      "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+      "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
       ...errors.map((error) => `- ${error}`),
     ].join("\n"),
   };

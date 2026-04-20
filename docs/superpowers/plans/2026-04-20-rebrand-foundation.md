@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Rename the forked `oh-my-codex` repository to `oh-my-copilot` (OMCP) end-to-end — packaging, manifests, source identifiers, file/dir names, docs — without yet altering its functional integration with the external `codex` CLI (that lives in sub-projects #2+).
+**Goal:** Rename the forked `oh-my-copilot` repository to `oh-my-copilot` (OMCP) end-to-end — packaging, manifests, source identifiers, file/dir names, docs — without yet altering its functional integration with the external `codex` CLI (that lives in sub-projects #2+).
 
 **Architecture:** Six ordered phases, each landing one or more git commits. Phase A locks in identity manifests; Phase B renames files/dirs with `git mv` to preserve history; Phase C runs scoped mechanical token replacements; Phase D rewrites identity-bearing docs; Phase E deletes upstream-historical content and non-English translations; Phase F verifies builds and audits residual brand tokens. References to the external `codex` CLI binary, `~/.codex/`, `CODEX_HOME`, and `@openai/codex` are intentionally preserved.
 
@@ -29,7 +29,7 @@
 - `.github/workflows/{ci,pr-check,release,dev-merge-issue-close}.yml` — token rename + hard-coded crate path arrays + npm-publish target
 - `.github/ISSUE_TEMPLATE/{bug_report,feature_request,config}.{md,yml}` — token rename + Discord link removal
 - `.github/PULL_REQUEST_TEMPLATE.md` — token rename
-- All TypeScript / Rust source files containing the brand tokens `omx`, `OMX`, `oh-my-codex`, `.omx/`, `omx-` (crate prefix), or `Yeachan-Heo/oh-my-codex`
+- All TypeScript / Rust source files containing the brand tokens `omx`, `OMX`, `oh-my-copilot`, `.omx/`, `omx-` (crate prefix), or `Yeachan-Heo/oh-my-copilot`
 
 ### Files renamed (git mv)
 - `crates/omx-explore/`           → `crates/omcp-explore/`
@@ -53,7 +53,7 @@ This sub-project does **not** add new behavior, so we don't write new functional
 1. `npm run build` succeeds.
 2. `cargo build --workspace` succeeds.
 3. `cargo metadata --format-version=1` lists exactly 5 `omcp-*` packages.
-4. `node dist/cli/omcp.js --help` runs without crashing on identity-only paths and prints **no** `OMX`/`omx`/`oh-my-codex` strings.
+4. `node dist/cli/omcp.js --help` runs without crashing on identity-only paths and prints **no** `OMX`/`omx`/`oh-my-copilot` strings.
 5. Final ripgrep audit returns only the explicitly-allowed brand survivors (fork-attribution line + intentional upstream link).
 
 Existing test suites that exercise Codex integration are expected to fail after this sub-project — we don't run them. We only run the Rust + TypeScript **build** and the explicit audit greps.
@@ -97,9 +97,9 @@ Apply these exact edits in `package.json`:
 
 | Field | Old value | New value |
 | --- | --- | --- |
-| `name` | `"oh-my-codex"` | `"@moicky/oh-my-copilot"` |
+| `name` | `"oh-my-copilot"` | `"@moicky/oh-my-copilot"` |
 | `version` | `"0.14.0"` | `"0.1.0"` |
-| `description` | `"Multi-agent orchestration layer for OpenAI Codex CLI"` | `"Workflow layer for GitHub Copilot CLI (forked from oh-my-codex)"` |
+| `description` | `"Multi-agent orchestration layer for OpenAI Codex CLI"` | `"Workflow layer for GitHub Copilot CLI (forked from oh-my-copilot)"` |
 | `bin.omx` | `"dist/cli/omx.js"` | rename key `omx` → `omcp`, value `"dist/cli/omcp.js"` |
 | `repository` | (whatever value is set) | `{"type":"git","url":"git+https://github.com/Moicky/oh-my-copilot.git"}` (add the field if absent) |
 
@@ -190,9 +190,9 @@ cat dist-workspace.toml
 
 - [ ] **Step 2: Apply edits**
 
-If the file mentions `oh-my-codex`, `Yeachan-Heo`, `omx-`, or `OMX`, update those tokens using the rules:
-- `oh-my-codex` → `oh-my-copilot`
-- `Yeachan-Heo/oh-my-codex` → `Moicky/oh-my-copilot`
+If the file mentions `oh-my-copilot`, `Yeachan-Heo`, `omx-`, or `OMX`, update those tokens using the rules:
+- `oh-my-copilot` → `oh-my-copilot`
+- `Yeachan-Heo/oh-my-copilot` → `Moicky/oh-my-copilot`
 - `omx-` (crate name prefix only) → `omcp-`
 
 If it doesn't mention any of these, skip the edits.
@@ -359,14 +359,14 @@ The `openclaw-integration.md` (English) is **not** excluded — it gets rebrande
 
 > **Note:** `docs/openclaw-integration.md` may contain the literal string `openclaw` (a third-party tool) and references to `omx-*` crates that no longer exist. The token rename will only flip `omx-` → `omcp-` and `OMX`/`omx` brand tokens; it won't touch the third-party tool name.
 
-### Task C2: Rule 1 — `oh-my-codex` → `oh-my-copilot`
+### Task C2: Rule 1 — `oh-my-copilot` → `oh-my-copilot`
 
 - [ ] **Step 1: Apply substitution to all files in the file set**
 
 ```bash
 xargs -a /tmp/omcp-rename-files.txt -I{} sh -c '
-  if grep -lF "oh-my-codex" "$1" >/dev/null 2>&1; then
-    perl -i -pe "s|oh-my-codex|oh-my-copilot|g" "$1"
+  if grep -lF "oh-my-copilot" "$1" >/dev/null 2>&1; then
+    perl -i -pe "s|oh-my-copilot|oh-my-copilot|g" "$1"
   fi
 ' _ {}
 ```
@@ -375,21 +375,21 @@ xargs -a /tmp/omcp-rename-files.txt -I{} sh -c '
 
 ```bash
 git diff --stat | tail -5
-rg "oh-my-codex" $(cat /tmp/omcp-rename-files.txt) | head
+rg "oh-my-copilot" $(cat /tmp/omcp-rename-files.txt) | head
 ```
 
-Expected: many files changed. The `rg` follow-up should print **nothing** (no remaining `oh-my-codex` in the in-scope file set).
+Expected: many files changed. The `rg` follow-up should print **nothing** (no remaining `oh-my-copilot` in the in-scope file set).
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add -u
-git commit -m "chore(rebrand): replace 'oh-my-codex' with 'oh-my-copilot' in source"
+git commit -m "chore(rebrand): replace 'oh-my-copilot' with 'oh-my-copilot' in source"
 ```
 
 ### Task C3: Rule 2 — `Yeachan-Heo/oh-my-copilot` (intermediate) → `Moicky/oh-my-copilot`
 
-After C2, any URL like `Yeachan-Heo/oh-my-codex` is now `Yeachan-Heo/oh-my-copilot`, which is wrong. Fix it.
+After C2, any URL like `Yeachan-Heo/oh-my-copilot` is now `Yeachan-Heo/oh-my-copilot`, which is wrong. Fix it.
 
 - [ ] **Step 1: Apply substitution**
 
@@ -599,14 +599,14 @@ Replace the file with exactly this content:
 
 > **Status:** 🚧 Early fork — runtime is being ported from OpenAI Codex CLI to GitHub Copilot CLI. **Most commands do not work yet.** See `docs/superpowers/specs/` for the porting roadmap.
 
-> Forked from [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) by Yeachan Heo. Re-targeted at GitHub Copilot CLI.
+> Forked from [oh-my-copilot](https://github.com/Yeachan-Heo/oh-my-copilot) by Yeachan Heo. Re-targeted at GitHub Copilot CLI.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
 
 ## What this is
 
-A workflow layer that aims to add prompts, skills, and runtime helpers on top of [GitHub Copilot CLI](https://github.com/github/copilot-cli). The original project (`oh-my-codex`, OMX) wrapped OpenAI's Codex CLI; this fork (`oh-my-copilot`, OMCP) is in the process of being re-targeted at Copilot CLI.
+A workflow layer that aims to add prompts, skills, and runtime helpers on top of [GitHub Copilot CLI](https://github.com/github/copilot-cli). The original project (`oh-my-copilot`, OMX) wrapped OpenAI's Codex CLI; this fork (`oh-my-copilot`, OMCP) is in the process of being re-targeted at Copilot CLI.
 
 ## Current state
 
@@ -668,7 +668,7 @@ Replace the file with exactly:
 
 ## 0.1.0 — 2026-04-20
 
-Initial fork from [oh-my-codex](https://github.com/Yeachan-Heo/oh-my-codex) `0.14.0`. Renamed to `oh-my-copilot` (OMCP).
+Initial fork from [oh-my-copilot](https://github.com/Yeachan-Heo/oh-my-copilot) `0.14.0`. Renamed to `oh-my-copilot` (OMCP).
 
 This release is **identity-only**: rebranding, package rename to `@moicky/oh-my-copilot`, binary rename to `omcp`, Cargo crates renamed to `omcp-*`, state directory renamed to `.omcp/`, and pruning of upstream-historical documentation. The runtime is **not yet** ported to GitHub Copilot CLI — that work is tracked in subsequent sub-projects (see `docs/superpowers/specs/`).
 ```
@@ -690,7 +690,7 @@ git commit -m "docs(rebrand): reset CHANGELOG to v0.1.0 fork entry"
 ```markdown
 oh-my-copilot 0.1.0 — Initial fork
 
-Renamed and rebranded from [oh-my-codex 0.14.0](https://github.com/Yeachan-Heo/oh-my-codex). The runtime port to GitHub Copilot CLI is in progress; this release is identity-only and not functional. See README for status.
+Renamed and rebranded from [oh-my-copilot 0.14.0](https://github.com/Yeachan-Heo/oh-my-copilot). The runtime port to GitHub Copilot CLI is in progress; this release is identity-only and not functional. See README for status.
 ```
 
 - [ ] **Step 2: Commit**
@@ -775,12 +775,12 @@ Phase C already touched these for token renames. This task is for residual ident
 
 - [ ] **Step 1: Update `docs/_config.yml`**
 
-Set the site `title` to `oh-my-copilot` and `description` to `Workflow layer for GitHub Copilot CLI (forked from oh-my-codex)`. Set `repository` to `Moicky/oh-my-copilot` and `url` to whatever GitHub Pages URL applies for the new repo (use `https://moicky.github.io/oh-my-copilot` as default if unsure). Remove any `discord_url` or social keys pointing at upstream community.
+Set the site `title` to `oh-my-copilot` and `description` to `Workflow layer for GitHub Copilot CLI (forked from oh-my-copilot)`. Set `repository` to `Moicky/oh-my-copilot` and `url` to whatever GitHub Pages URL applies for the new repo (use `https://moicky.github.io/oh-my-copilot` as default if unsure). Remove any `discord_url` or social keys pointing at upstream community.
 
 - [ ] **Step 2: Edit each HTML file's `<title>`, hero `<h1>`, and any "About" paragraph**
 
 Replace remaining literal phrases that don't survive a token rename. Example:
-- `"OMX is a workflow layer for OpenAI Codex CLI."` → `"OMCP is a workflow layer for GitHub Copilot CLI (forked from oh-my-codex)."`
+- `"OMX is a workflow layer for OpenAI Codex CLI."` → `"OMCP is a workflow layer for GitHub Copilot CLI (forked from oh-my-copilot)."`
 - "Built and maintained by …" — delete the line.
 
 - [ ] **Step 3: Remove dead links**
@@ -949,7 +949,7 @@ Expected: empty output. If not, edit the file and replace `crates/omx-` with `cr
 Add a top-of-file comment block to all four workflow files:
 
 ```yaml
-# Workflows inherited from oh-my-codex; functional behavior re-validated in
+# Workflows inherited from oh-my-copilot; functional behavior re-validated in
 # subsequent sub-projects (#2 onward). Tag/branch triggers retained as-is;
 # npm publish step targets the @moicky scope only.
 ```
@@ -1023,10 +1023,10 @@ node dist/cli/omcp.js --help 2>&1 | tee /tmp/omcp-help.txt | head -40
 
 If the CLI errors immediately because some sub-command tries to talk to Codex during help rendering, capture the error message but **don't fix it here** — it belongs to sub-project #2. Only require that `--help` itself produces help text.
 
-- [ ] **Step 2: Confirm output contains no `omx`/`OMX`/`oh-my-codex` strings**
+- [ ] **Step 2: Confirm output contains no `omx`/`OMX`/`oh-my-copilot` strings**
 
 ```bash
-grep -E "\\bomx\\b|\\bOMX\\b|oh-my-codex" /tmp/omcp-help.txt && echo "FAIL: stale brand strings in help" || echo "ok"
+grep -E "\\bomx\\b|\\bOMX\\b|oh-my-copilot" /tmp/omcp-help.txt && echo "FAIL: stale brand strings in help" || echo "ok"
 ```
 
 Expected output ends with: `ok`
@@ -1038,7 +1038,7 @@ If it fails, find the source string in the TS sources and fix it (likely a hardc
 - [ ] **Step 1: Run the master audit**
 
 ```bash
-rg -i 'oh-my-codex|\bomx\b|\bOMX\b|yeachan-heo' \
+rg -i 'oh-my-copilot|\bomx\b|\bOMX\b|yeachan-heo' \
    -g '!node_modules' -g '!dist' -g '!target' \
    -g '!Cargo.lock' -g '!package-lock.json' \
    -g '!docs/superpowers/specs/2026-04-20-rebrand-foundation-design.md' \
@@ -1048,7 +1048,7 @@ rg -i 'oh-my-codex|\bomx\b|\bOMX\b|yeachan-heo' \
 - [ ] **Step 2: Verify only allowed survivors remain**
 
 The only acceptable hits are:
-1. `README.md` — the fork-attribution line citing `Yeachan-Heo/oh-my-codex`.
+1. `README.md` — the fork-attribution line citing `Yeachan-Heo/oh-my-copilot`.
 2. `CHANGELOG.md` — the fork attribution line.
 3. `RELEASE_BODY.md` — the fork attribution line.
 4. `LICENSE` — if it still has the original copyright holder name (MIT permits this; do not modify).

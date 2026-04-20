@@ -312,17 +312,17 @@ describe("cleanupLaunchOrphanedMcpProcesses", () => {
       {
         pid: 710,
         ppid: 700,
-        command: "node /repo/oh-my-codex/dist/mcp/state-server.js",
+        command: "node /repo/oh-my-copilot/dist/mcp/state-server.js",
       },
       {
         pid: 800,
         ppid: 1,
-        command: "node /tmp/oh-my-codex/dist/mcp/memory-server.js",
+        command: "node /tmp/oh-my-copilot/dist/mcp/memory-server.js",
       },
       {
         pid: 810,
         ppid: 42,
-        command: "node /tmp/oh-my-codex/dist/mcp/trace-server.js",
+        command: "node /tmp/oh-my-copilot/dist/mcp/trace-server.js",
       },
       {
         pid: 820,

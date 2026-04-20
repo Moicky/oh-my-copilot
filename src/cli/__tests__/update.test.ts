@@ -227,7 +227,7 @@ describe('maybeCheckAndPromptUpdate', () => {
       });
 
       assert.equal(setupCalls, 0);
-      assert.match(logs.join('\n'), /Update failed\. Run manually: npm install -g oh-my-codex@latest/);
+      assert.match(logs.join('\n'), /Update failed\. Run manually: npm install -g oh-my-copilot@latest/);
     } finally {
       console.log = originalLog;
       await rm(cwd, { recursive: true, force: true });

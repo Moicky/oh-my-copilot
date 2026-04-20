@@ -1,5 +1,5 @@
 /**
- * oh-my-codex - Multi-agent orchestration for OpenAI Codex CLI
+ * oh-my-copilot - Multi-agent orchestration for OpenAI Codex CLI
  *
  * This package provides:
  * - 30+ specialized agent prompts as Codex CLI slash commands

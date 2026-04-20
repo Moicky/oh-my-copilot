@@ -1,4 +1,4 @@
-# oh-my-codex v0.14.0
+# oh-my-copilot v0.14.0
 
 ## Summary
 
@@ -46,4 +46,4 @@
 
 Thanks to Yeachan-Heo, Bellman, HaD0Yun, HaDoYun, Oxidane-bot, and LEON for contributing to this release.
 
-**Full Changelog**: [`v0.13.2...v0.14.0`](https://github.com/Yeachan-Heo/oh-my-codex/compare/v0.13.2...v0.14.0)
+**Full Changelog**: [`v0.13.2...v0.14.0`](https://github.com/Yeachan-Heo/oh-my-copilot/compare/v0.13.2...v0.14.0)

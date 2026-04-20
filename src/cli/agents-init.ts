@@ -315,7 +315,7 @@ export async function agentsInit(
     activeSession && !isSessionStale(activeSession),
   );
 
-  console.log("oh-my-codex AGENTS bootstrap");
+  console.log("oh-my-copilot AGENTS bootstrap");
   console.log("===========================\n");
   console.log(`Target: ${requestedTarget}`);
   console.log(

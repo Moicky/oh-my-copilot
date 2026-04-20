@@ -1,5 +1,5 @@
 /**
- * AGENTS.md Runtime Overlay for oh-my-codex
+ * AGENTS.md Runtime Overlay for oh-my-copilot
  *
  * Dynamically injects session-specific context into AGENTS.md before Codex
  * launches, then strips it after session ends. Uses marker-bounded sections

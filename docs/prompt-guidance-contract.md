@@ -4,7 +4,7 @@ Status: contributor-facing contract for OMX prompt and orchestration surfaces.
 
 ## Purpose
 
-This document explains the **behavioral prompt contract** introduced by the GPT-5.4 guidance rollout in [#608](https://github.com/Yeachan-Heo/oh-my-codex/issues/608) and expanded in [#611](https://github.com/Yeachan-Heo/oh-my-codex/pull/611) and [#612](https://github.com/Yeachan-Heo/oh-my-codex/pull/612).
+This document explains the **behavioral prompt contract** introduced by the GPT-5.4 guidance rollout in [#608](https://github.com/Yeachan-Heo/oh-my-copilot/issues/608) and expanded in [#611](https://github.com/Yeachan-Heo/oh-my-copilot/pull/611) and [#612](https://github.com/Yeachan-Heo/oh-my-copilot/pull/612).
 
 Use it when you edit any of these surfaces:
 
@@ -15,7 +15,7 @@ Use it when you edit any of these surfaces:
 
 ## Scope and current source of truth
 
-Issue [#615](https://github.com/Yeachan-Heo/oh-my-codex/issues/615) uses examples like `src/prompts/role-planner.ts`, but the current prompt sources in this repository live in **`prompts/*.md`**, then get installed to `~/.codex/prompts/`.
+Issue [#615](https://github.com/Yeachan-Heo/oh-my-copilot/issues/615) uses examples like `src/prompts/role-planner.ts`, but the current prompt sources in this repository live in **`prompts/*.md`**, then get installed to `~/.codex/prompts/`.
 
 The GPT-5.4 contract is currently distributed across:
 
@@ -242,7 +242,7 @@ npm test
 
 ## References
 
-- Implementation issue: [#608](https://github.com/Yeachan-Heo/oh-my-codex/issues/608)
-- Documentation issue: [#615](https://github.com/Yeachan-Heo/oh-my-codex/issues/615)
+- Implementation issue: [#608](https://github.com/Yeachan-Heo/oh-my-copilot/issues/608)
+- Documentation issue: [#615](https://github.com/Yeachan-Heo/oh-my-copilot/issues/615)
 - Rollout summary: `docs/release-notes-0.8.6.md:24-47`
 - Guidance schema: `docs/guidance-schema.md`
