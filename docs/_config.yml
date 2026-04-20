@@ -1,4 +1,5 @@
 title: oh-my-copilot
-description: Multi-agent orchestration for OpenAI Codex CLI
-url: https://yeachan-heo.github.io
+description: Workflow layer for GitHub Copilot CLI (forked from oh-my-codex)
+repository: Moicky/oh-my-copilot
+url: https://moicky.github.io/oh-my-copilot
 baseurl: /oh-my-copilot
