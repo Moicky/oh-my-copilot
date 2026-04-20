@@ -1,5 +1,7 @@
 # oh-my-copilot Demo Guide
 
+> **NOTE:** This demo describes the upstream Codex-CLI workflow. The runtime port to Copilot CLI is in progress; the steps below will not work yet on this fork. See README for status.
+
 ## Prerequisites
 
 - Node.js >= 20
