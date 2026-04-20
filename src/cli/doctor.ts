@@ -738,7 +738,7 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
     return {
       name: 'Native hooks',
       status: 'pass',
-      message: 'hooks.json includes OMCP-managed coverage for all native hook events',
+      message: 'hooks.json includes OMCP-managed coverage for all native hook events (note: Copilot CLI does not currently consume hooks.json; entries are no-ops until upstream support lands)',
     };
   } catch {
     return {
