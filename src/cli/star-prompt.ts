@@ -11,7 +11,7 @@ import { homedir } from 'os';
 import * as childProcess from 'child_process';
 import { createInterface } from 'readline/promises';
 
-const REPO = 'Yeachan-Heo/oh-my-copilot';
+const REPO = 'Moicky/oh-my-copilot';
 
 interface StarPromptState {
   prompted_at: string;

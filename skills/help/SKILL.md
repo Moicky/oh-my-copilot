@@ -194,8 +194,8 @@ Tip: Run /omx-setup to configure OMX properly.
 
 ## Need More Help?
 
-- **README**: https://github.com/Yeachan-Heo/oh-my-copilot
-- **Issues**: https://github.com/Yeachan-Heo/oh-my-copilot/issues
+- **README**: https://github.com/Moicky/oh-my-copilot
+- **Issues**: https://github.com/Moicky/oh-my-copilot/issues
 
 ---
 

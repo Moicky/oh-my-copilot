@@ -81,7 +81,7 @@ describe('current-task-baseline', () => {
         worktree_path: repo,
         issue_number: 1407,
         pr_number: 1416,
-        pr_url: 'https://github.com/Yeachan-Heo/oh-my-copilot/pull/1416',
+        pr_url: 'https://github.com/Moicky/oh-my-copilot/pull/1416',
         status: 'merged',
       });
 

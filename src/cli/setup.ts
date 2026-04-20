@@ -1075,7 +1075,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     '  6. "omx explore" and "omx sparkshell" can hydrate native release binaries on first use; source installs still allow repo-local fallbacks and OMX_EXPLORE_BIN / OMX_SPARKSHELL_BIN overrides',
   );
   if (isGitHubCliConfigured()) {
-    console.log("\nSupport the project: gh repo star Yeachan-Heo/oh-my-copilot");
+    console.log("\nSupport the project: gh repo star Moicky/oh-my-copilot");
   }
 }
 

@@ -194,7 +194,7 @@ describe('notify-hook/operational-events – buildOperationalContext', () => {
         cwd: repo,
         normalizedEvent: 'pr-merged',
         text: 'Merged issue #1407 via PR #1416',
-        prUrl: 'https://github.com/Yeachan-Heo/oh-my-copilot/pull/1416',
+        prUrl: 'https://github.com/Moicky/oh-my-copilot/pull/1416',
       });
 
       assert.equal(context.branch, 'feature/opctx-pr');

@@ -317,7 +317,7 @@ If this happens, try:
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=Yeachan-Heo/oh-my-copilot&type=date&legend=top-left)](https://www.star-history.com/#Yeachan-Heo/oh-my-copilot&type=date&legend=top-left)
+[![Star History Chart](https://api.star-history.com/svg?repos=Moicky/oh-my-copilot&type=date&legend=top-left)](https://www.star-history.com/#Moicky/oh-my-copilot&type=date&legend=top-left)
 
 ## License
 

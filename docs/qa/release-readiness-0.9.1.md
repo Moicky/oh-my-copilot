@@ -9,7 +9,7 @@ Verdict: **GO (LOCAL RELEASE-CRITICAL GATES PASSED)**
 ## Scope reviewed
 
 - `main` / tag `v0.9.0` baseline
-- PR [#806](https://github.com/Yeachan-Heo/oh-my-copilot/pull/806) hotfix (`d86165d`) for smoke hydration asset localization
+- PR [#806](https://github.com/Moicky/oh-my-copilot/pull/806) hotfix (`d86165d`) for smoke hydration asset localization
 - version bump and release metadata updates required for `0.9.1`
 
 ## Validation plan

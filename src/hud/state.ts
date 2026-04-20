@@ -195,7 +195,7 @@ export type GitRunner = (cwd: string, args: string[]) => string | null;
  * spawning console windows (conhost.exe flicker).  Falls back to execSync
  * for non-Windows platforms or unrecognised arguments.
  *
- * See: https://github.com/Yeachan-Heo/oh-my-copilot/issues/1100
+ * See: https://github.com/Moicky/oh-my-copilot/issues/1100
  */
 function runGit(cwd: string, args: string[]): string | null {
   if (process.platform === 'win32') {

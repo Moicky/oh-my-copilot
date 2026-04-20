@@ -40,7 +40,7 @@ describe('dev merge issue close workflow', () => {
     assert.deepEqual(
       collectLinkedLocalIssueNumbers({
         title: 'Fixes #1540, #1541',
-        body: 'Resolves Yeachan-Heo/oh-my-copilot#1542 and closes https://github.com/Yeachan-Heo/oh-my-copilot/issues/1543',
+        body: 'Resolves Moicky/oh-my-copilot#1542 and closes https://github.com/Moicky/oh-my-copilot/issues/1543',
         owner: 'Yeachan-Heo',
         repo: 'oh-my-copilot',
       }),
@@ -68,7 +68,7 @@ describe('dev merge issue close workflow', () => {
     assert.deepEqual(
       collectLinkedLocalIssueNumbers({
         title: 'Fixes #1540',
-        body: 'Closes #1540 and resolves Yeachan-Heo/oh-my-copilot#1540',
+        body: 'Closes #1540 and resolves Moicky/oh-my-copilot#1540',
         owner: 'Yeachan-Heo',
         repo: 'oh-my-copilot',
       }),

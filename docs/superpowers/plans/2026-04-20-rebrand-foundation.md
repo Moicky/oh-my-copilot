@@ -29,7 +29,7 @@
 - `.github/workflows/{ci,pr-check,release,dev-merge-issue-close}.yml` — token rename + hard-coded crate path arrays + npm-publish target
 - `.github/ISSUE_TEMPLATE/{bug_report,feature_request,config}.{md,yml}` — token rename + Discord link removal
 - `.github/PULL_REQUEST_TEMPLATE.md` — token rename
-- All TypeScript / Rust source files containing the brand tokens `omx`, `OMX`, `oh-my-copilot`, `.omx/`, `omx-` (crate prefix), or `Yeachan-Heo/oh-my-copilot`
+- All TypeScript / Rust source files containing the brand tokens `omx`, `OMX`, `oh-my-copilot`, `.omx/`, `omx-` (crate prefix), or `Moicky/oh-my-copilot`
 
 ### Files renamed (git mv)
 - `crates/omx-explore/`           → `crates/omcp-explore/`
@@ -192,7 +192,7 @@ cat dist-workspace.toml
 
 If the file mentions `oh-my-copilot`, `Yeachan-Heo`, `omx-`, or `OMX`, update those tokens using the rules:
 - `oh-my-copilot` → `oh-my-copilot`
-- `Yeachan-Heo/oh-my-copilot` → `Moicky/oh-my-copilot`
+- `Moicky/oh-my-copilot` → `Moicky/oh-my-copilot`
 - `omx-` (crate name prefix only) → `omcp-`
 
 If it doesn't mention any of these, skip the edits.
@@ -387,16 +387,16 @@ git add -u
 git commit -m "chore(rebrand): replace 'oh-my-copilot' with 'oh-my-copilot' in source"
 ```
 
-### Task C3: Rule 2 — `Yeachan-Heo/oh-my-copilot` (intermediate) → `Moicky/oh-my-copilot`
+### Task C3: Rule 2 — `Moicky/oh-my-copilot` (intermediate) → `Moicky/oh-my-copilot`
 
-After C2, any URL like `Yeachan-Heo/oh-my-copilot` is now `Yeachan-Heo/oh-my-copilot`, which is wrong. Fix it.
+After C2, any URL like `Moicky/oh-my-copilot` is now `Moicky/oh-my-copilot`, which is wrong. Fix it.
 
 - [ ] **Step 1: Apply substitution**
 
 ```bash
 xargs -a /tmp/omcp-rename-files.txt -I{} sh -c '
-  if grep -lF "Yeachan-Heo/oh-my-copilot" "$1" >/dev/null 2>&1; then
-    perl -i -pe "s|Yeachan-Heo/oh-my-copilot|Moicky/oh-my-copilot|g" "$1"
+  if grep -lF "Moicky/oh-my-copilot" "$1" >/dev/null 2>&1; then
+    perl -i -pe "s|Moicky/oh-my-copilot|Moicky/oh-my-copilot|g" "$1"
   fi
 ' _ {}
 ```
@@ -404,7 +404,7 @@ xargs -a /tmp/omcp-rename-files.txt -I{} sh -c '
 - [ ] **Step 2: Verify**
 
 ```bash
-rg "Yeachan-Heo/oh-my-copilot" $(cat /tmp/omcp-rename-files.txt)
+rg "Moicky/oh-my-copilot" $(cat /tmp/omcp-rename-files.txt)
 ```
 
 Expected: empty output.
@@ -599,7 +599,7 @@ Replace the file with exactly this content:
 
 > **Status:** 🚧 Early fork — runtime is being ported from OpenAI Codex CLI to GitHub Copilot CLI. **Most commands do not work yet.** See `docs/superpowers/specs/` for the porting roadmap.
 
-> Forked from [oh-my-copilot](https://github.com/Yeachan-Heo/oh-my-copilot) by Yeachan Heo. Re-targeted at GitHub Copilot CLI.
+> Forked from [oh-my-copilot](https://github.com/Moicky/oh-my-copilot) by Yeachan Heo. Re-targeted at GitHub Copilot CLI.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/node-%3E%3D20-brightgreen)](https://nodejs.org)
@@ -668,7 +668,7 @@ Replace the file with exactly:
 
 ## 0.1.0 — 2026-04-20
 
-Initial fork from [oh-my-copilot](https://github.com/Yeachan-Heo/oh-my-copilot) `0.14.0`. Renamed to `oh-my-copilot` (OMCP).
+Initial fork from [oh-my-copilot](https://github.com/Moicky/oh-my-copilot) `0.14.0`. Renamed to `oh-my-copilot` (OMCP).
 
 This release is **identity-only**: rebranding, package rename to `@moicky/oh-my-copilot`, binary rename to `omcp`, Cargo crates renamed to `omcp-*`, state directory renamed to `.omcp/`, and pruning of upstream-historical documentation. The runtime is **not yet** ported to GitHub Copilot CLI — that work is tracked in subsequent sub-projects (see `docs/superpowers/specs/`).
 ```
@@ -690,7 +690,7 @@ git commit -m "docs(rebrand): reset CHANGELOG to v0.1.0 fork entry"
 ```markdown
 oh-my-copilot 0.1.0 — Initial fork
 
-Renamed and rebranded from [oh-my-copilot 0.14.0](https://github.com/Yeachan-Heo/oh-my-copilot). The runtime port to GitHub Copilot CLI is in progress; this release is identity-only and not functional. See README for status.
+Renamed and rebranded from [oh-my-copilot 0.14.0](https://github.com/Moicky/oh-my-copilot). The runtime port to GitHub Copilot CLI is in progress; this release is identity-only and not functional. See README for status.
 ```
 
 - [ ] **Step 2: Commit**
@@ -1048,7 +1048,7 @@ rg -i 'oh-my-copilot|\bomx\b|\bOMX\b|yeachan-heo' \
 - [ ] **Step 2: Verify only allowed survivors remain**
 
 The only acceptable hits are:
-1. `README.md` — the fork-attribution line citing `Yeachan-Heo/oh-my-copilot`.
+1. `README.md` — the fork-attribution line citing `Moicky/oh-my-copilot`.
 2. `CHANGELOG.md` — the fork attribution line.
 3. `RELEASE_BODY.md` — the fork attribution line.
 4. `LICENSE` — if it still has the original copyright holder name (MIT permits this; do not modify).

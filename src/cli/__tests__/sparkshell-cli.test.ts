@@ -146,7 +146,7 @@ describe('resolveSparkShellBinaryPath', () => {
       await mkdir(stagingDir, { recursive: true });
       await writeFile(join(wd, 'package.json'), JSON.stringify({
         version: '0.8.15',
-        repository: { url: 'git+https://github.com/Yeachan-Heo/oh-my-copilot.git' },
+        repository: { url: 'git+https://github.com/Moicky/oh-my-copilot.git' },
       }));
       const stagedBinary = join(stagingDir, process.platform === 'win32' ? 'omx-sparkshell.exe' : 'omx-sparkshell');
       await writeFile(stagedBinary, process.platform === 'win32' ? '@echo off\r\necho hydrated\r\n' : '#!/bin/sh\necho hydrated\n');
@@ -228,7 +228,7 @@ describe('resolveSparkShellBinaryPath', () => {
       await mkdir(missingRoot, { recursive: true });
       await writeFile(join(wd, 'package.json'), JSON.stringify({
         version: '0.8.15',
-        repository: { url: 'git+https://github.com/Yeachan-Heo/oh-my-copilot.git' },
+        repository: { url: 'git+https://github.com/Moicky/oh-my-copilot.git' },
       }));
 
       const server = await new Promise<{ baseUrl: string; close: () => Promise<void> }>((resolve) => {

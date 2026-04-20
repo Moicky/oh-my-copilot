@@ -10,7 +10,7 @@
 
 ```bash
 # Clone and install
-git clone https://github.com/Yeachan-Heo/oh-my-copilot.git
+git clone https://github.com/Moicky/oh-my-copilot.git
 cd oh-my-copilot
 npm install
 npm run build

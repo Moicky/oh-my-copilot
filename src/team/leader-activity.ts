@@ -58,7 +58,7 @@ function resolveGitOutputPath(cwd: string, gitPath: string | null): string | nul
  * On Windows, read git info from .git/ files directly to avoid spawning
  * console windows (conhost.exe flicker on every poll cycle).
  *
- * See: https://github.com/Yeachan-Heo/oh-my-copilot/issues/1100
+ * See: https://github.com/Moicky/oh-my-copilot/issues/1100
  */
 async function tryReadGitValue(cwd: string, args: string[]): Promise<string | null> {
   if (process.platform === 'win32') {
