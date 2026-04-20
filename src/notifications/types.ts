@@ -203,9 +203,9 @@ export interface FullNotificationPayload {
   tmuxTail?: string;
   /** Whether the tmux tail came from a session/pane proven live at capture time */
   tmuxTailLive?: boolean;
-  /** Agent name (populated by extensibility plugins, not set by core Codex CLI hooks) */
+  /** Agent name (populated by extensibility plugins, not set by core Copilot CLI hooks) */
   agentName?: string;
-  /** Agent type (populated by extensibility plugins, not set by core Codex CLI hooks) */
+  /** Agent type (populated by extensibility plugins, not set by core Copilot CLI hooks) */
   agentType?: string;
 }
 

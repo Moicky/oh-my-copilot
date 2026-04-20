@@ -31,7 +31,7 @@ const DEFAULT_LIST_LIMIT = 12;
 const IGNORE_DIRECTORY_NAMES = new Set([
   ".git",
   ".omcp",
-  ".codex",
+  ".copilot",
   "node_modules",
   "dist",
   "build",
@@ -106,7 +106,7 @@ function wrapManagedContent(body: string, manualBody: string): string {
 export function applyProjectScopePathRewritesToAgentsTemplate(
   content: string,
 ): string {
-  return content.replaceAll("~/.codex", "./.codex");
+  return content.replaceAll("~/.copilot", "./.copilot");
 }
 
 async function readProjectRootTemplate(): Promise<string> {

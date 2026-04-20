@@ -2,7 +2,7 @@
  * tmux Pane Interaction Utilities for Reply Listener
  *
  * Provides functions to capture pane content, analyze whether a pane is running
- * Codex CLI, and inject text into panes. Used by the reply-listener daemon.
+ * Copilot CLI, and inject text into panes. Used by the reply-listener daemon.
  */
 
 import { execFileSync, spawnSync } from 'child_process';
@@ -47,6 +47,7 @@ export function analyzePaneContent(content: string): PaneAnalysis {
   const lower = content.toLowerCase();
 
   const hasCodex =
+    lower.includes('copilot') ||
     lower.includes('codex') ||
     lower.includes('omcp') ||
     lower.includes('oh-my-copilot') ||
@@ -101,7 +102,7 @@ export function buildSendPaneArgvs(
   const argvs: string[][] = [['send-keys', '-t', paneId, '-l', '--', safe]];
 
   if (pressEnter) {
-    // Codex CLI uses raw input mode; send C-m (carriage return) twice
+    // Copilot CLI uses raw input mode; send C-m (carriage return) twice
     // for reliable prompt submission.
     // Each C-m is an isolated send-keys call — never bundled with the text
     // above (issue #107).

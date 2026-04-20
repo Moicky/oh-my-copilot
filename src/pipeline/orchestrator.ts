@@ -5,7 +5,7 @@
  * and persists state through the ModeState system.
  *
  * Mirrors OMC #1130 pipeline design with OMCP-specific adaptations:
- * - Execution backend is always teams (Codex CLI workers)
+ * - Execution backend is always teams (Copilot CLI workers)
  * - Ralph iteration count is configurable
  * - Integrates with existing team mode infrastructure
  */

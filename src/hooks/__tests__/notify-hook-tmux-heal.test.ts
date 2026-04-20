@@ -30,7 +30,7 @@ async function readJson<T>(path: string): Promise<T> {
 function withPatchedEnv<T>(patch: Record<string, string>, run: () => Promise<T>): Promise<T> {
   const managedKeys = new Set([
     ...Object.keys(patch),
-    'CODEX_HOME',
+    'COPILOT_HOME',
     'OMCP_SESSION_ID',
     'OMCP_RUNTIME_BRIDGE',
     'OMCP_NOTIFY_FALLBACK',
@@ -149,7 +149,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%42" ]]; then
@@ -266,11 +266,11 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#{pane_current_path}" && "$target" == "%42" ]]; then
@@ -393,11 +393,11 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_current_path}" && "$target" == "%42" ]]; then
@@ -405,11 +405,11 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%42" ]]; then
@@ -530,11 +530,11 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_current_path}" && "$target" == "%42" ]]; then
@@ -542,11 +542,11 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%42" ]]; then
@@ -632,11 +632,11 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$target" == "%42" && "$format" == "#{pane_start_command}" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$target" == "%42" && "$format" == "#{pane_current_command}" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$target" == "%42" && "$format" == "#{pane_current_path}" ]]; then
@@ -875,7 +875,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%99" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%99" ]]; then
@@ -897,7 +897,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%77\t1\tnode\tnode dist/cli/omcp.js hud --watch\n%%99\t0\tcodex\tcodex\n"
+    printf "%%77\t1\tnode\tnode dist/cli/omcp.js hud --watch\n%%99\t0\tcopilot\tcopilot\n"
     exit 0
   fi
   exit 1
@@ -1229,7 +1229,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%99" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" && "$target" == "%99" ]]; then
@@ -1336,7 +1336,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%42" ]]; then

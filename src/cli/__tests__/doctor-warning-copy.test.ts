@@ -47,7 +47,7 @@ describe('omcp doctor onboarding warning copy', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-doctor-copy-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(
         join(codexDir, 'config.toml'),
@@ -59,7 +59,7 @@ command = "node"
 
       const res = runOmcp(wd, ['doctor'], {
         HOME: home,
-        CODEX_HOME: join(home, '.codex'),
+        COPILOT_HOME: join(home, '.copilot'),
       });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
@@ -80,7 +80,7 @@ command = "node"
     const wd = await mkdtemp(join(tmpdir(), 'omcp-doctor-copy-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(
         join(codexDir, 'config.toml'),
@@ -94,7 +94,7 @@ enabled = true
 
       const res = runOmcp(wd, ['doctor'], {
         HOME: home,
-        CODEX_HOME: join(home, '.codex'),
+        COPILOT_HOME: join(home, '.copilot'),
       });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
@@ -121,16 +121,16 @@ enabled = true
     try {
       await withPackagedExploreHarnessHidden(async () => {
         const home = join(wd, 'home');
-        const codexDir = join(home, '.codex');
+        const codexDir = join(home, '.copilot');
         const fakeBin = join(wd, 'bin');
         await mkdir(codexDir, { recursive: true });
         await mkdir(fakeBin, { recursive: true });
-        await writeFile(join(fakeBin, 'codex'), '#!/bin/sh\necho "codex test"\n');
-        spawnSync('chmod', ['+x', join(fakeBin, 'codex')], { encoding: 'utf-8' });
+        await writeFile(join(fakeBin, 'copilot'), '#!/bin/sh\necho "codex test"\n');
+        spawnSync('chmod', ['+x', join(fakeBin, 'copilot')], { encoding: 'utf-8' });
 
         const res = runOmcp(wd, ['doctor'], {
           HOME: home,
-          CODEX_HOME: join(home, '.codex'),
+          COPILOT_HOME: join(home, '.copilot'),
           PATH: fakeBin,
         });
         if (shouldSkipForSpawnPermissions(res.error)) return;
@@ -150,7 +150,7 @@ enabled = true
       const wd = await mkdtemp(join(tmpdir(), 'omcp-doctor-explore-binary-'));
       try {
         const home = join(wd, 'home');
-        const codexDir = join(home, '.codex');
+        const codexDir = join(home, '.copilot');
         const fakeBin = join(wd, 'bin');
         const packageBinDir = join(process.cwd(), 'bin');
         const packagedBinary = join(packageBinDir, process.platform === 'win32' ? 'omcp-explore-harness.exe' : 'omcp-explore-harness');
@@ -160,8 +160,8 @@ enabled = true
 
         await mkdir(codexDir, { recursive: true });
         await mkdir(fakeBin, { recursive: true });
-        await writeFile(join(fakeBin, 'codex'), '#!/bin/sh\necho "codex test"\n');
-        spawnSync('chmod', ['+x', join(fakeBin, 'codex')], { encoding: 'utf-8' });
+        await writeFile(join(fakeBin, 'copilot'), '#!/bin/sh\necho "codex test"\n');
+        spawnSync('chmod', ['+x', join(fakeBin, 'copilot')], { encoding: 'utf-8' });
         const fsPromises = await import('node:fs/promises');
         const originalBinary = hadExistingBinary ? await fsPromises.readFile(packagedBinary) : null;
         const originalMeta = hadExistingMeta ? await fsPromises.readFile(packagedMeta, 'utf-8') : null;
@@ -173,7 +173,7 @@ enabled = true
         try {
           const res = runOmcp(wd, ['doctor'], {
             HOME: home,
-            CODEX_HOME: join(home, '.codex'),
+            COPILOT_HOME: join(home, '.copilot'),
             PATH: fakeBin,
           });
           if (shouldSkipForSpawnPermissions(res.error)) return;
@@ -205,7 +205,7 @@ enabled = true
     const wd = await mkdtemp(join(tmpdir(), 'omcp-doctor-explore-routing-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(
         join(codexDir, 'config.toml'),
@@ -217,7 +217,7 @@ USE_OMX_EXPLORE_CMD = "off"
 
       const res = runOmcp(wd, ['doctor'], {
         HOME: home,
-        CODEX_HOME: join(home, '.codex'),
+        COPILOT_HOME: join(home, '.copilot'),
       });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
@@ -234,7 +234,7 @@ USE_OMX_EXPLORE_CMD = "off"
     const wd = await mkdtemp(join(tmpdir(), 'omcp-doctor-skill-overlap-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       const canonicalHelp = join(codexDir, 'skills', 'help');
       const canonicalPlan = join(codexDir, 'skills', 'plan');
       const legacyHelp = join(home, '.agents', 'skills', 'help');
@@ -247,13 +247,13 @@ USE_OMX_EXPLORE_CMD = "off"
 
       const res = runOmcp(wd, ['doctor'], {
         HOME: home,
-        CODEX_HOME: codexDir,
+        COPILOT_HOME: codexDir,
       });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Legacy skill roots: 1 overlapping skill names between .*\.codex[\\/]+skills and .*\.agents[\\/]+skills; 1 differ in SKILL\.md content; Codex Enable\/Disable Skills may show duplicates until ~\/\.agents\/skills is cleaned up/,
+        /Legacy skill roots: 1 overlapping skill names between .*\.copilot[\\/]+skills and .*\.agents[\\/]+skills; 1 differ in SKILL\.md content; Codex Enable\/Disable Skills may show duplicates until ~\/\.agents\/skills is cleaned up/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -264,7 +264,7 @@ USE_OMX_EXPLORE_CMD = "off"
     const wd = await mkdtemp(join(tmpdir(), 'omcp-doctor-hooks-coverage-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(
         join(codexDir, 'hooks.json'),
@@ -290,7 +290,7 @@ USE_OMX_EXPLORE_CMD = "off"
 
       const res = runOmcp(wd, ['doctor'], {
         HOME: home,
-        CODEX_HOME: codexDir,
+        COPILOT_HOME: codexDir,
       });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
@@ -307,7 +307,7 @@ USE_OMX_EXPLORE_CMD = "off"
     const wd = await mkdtemp(join(tmpdir(), 'omcp-doctor-hooks-missing-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(
         join(codexDir, 'config.toml'),
@@ -320,7 +320,7 @@ command = "node"
 
       const res = runOmcp(wd, ['doctor'], {
         HOME: home,
-        CODEX_HOME: codexDir,
+        COPILOT_HOME: codexDir,
       });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
@@ -337,13 +337,13 @@ command = "node"
     const wd = await mkdtemp(join(tmpdir(), 'omcp-doctor-hooks-invalid-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
       await writeFile(join(codexDir, 'hooks.json'), '{invalid json\n');
 
       const res = runOmcp(wd, ['doctor'], {
         HOME: home,
-        CODEX_HOME: codexDir,
+        COPILOT_HOME: codexDir,
       });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
@@ -360,7 +360,7 @@ command = "node"
     const wd = await mkdtemp(join(tmpdir(), 'omcp-doctor-skill-link-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       const canonicalSkillsRoot = join(codexDir, 'skills');
       const canonicalHelp = join(canonicalSkillsRoot, 'help');
       const legacyRoot = join(home, '.agents', 'skills');
@@ -375,13 +375,13 @@ command = "node"
 
       const res = runOmcp(wd, ['doctor'], {
         HOME: home,
-        CODEX_HOME: codexDir,
+        COPILOT_HOME: codexDir,
       });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Legacy skill roots: ~\/\.agents\/skills links to canonical .*\.codex[\\/]+skills; treating both paths as one shared skill root/,
+        /Legacy skill roots: ~\/\.agents\/skills links to canonical .*\.copilot[\\/]+skills; treating both paths as one shared skill root/,
       );
       assert.doesNotMatch(res.stdout, /\[!!\] Legacy skill roots:/);
     } finally {

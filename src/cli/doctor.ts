@@ -6,7 +6,7 @@ import { existsSync } from 'fs';
 import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import {
-  codexHome, codexConfigPath, codexPromptsDir,
+  copilotHome, copilotConfigPath, copilotPromptsDir,
   userSkillsDir, projectSkillsDir, omcpStateDir, detectLegacySkillRootOverlap,
 } from '../utils/paths.js';
 import { classifySpawnError, spawnPlatformCommandSync } from '../utils/platform-command.js';
@@ -47,7 +47,7 @@ interface DoctorScopeResolution {
 }
 
 interface DoctorPaths {
-  codexHomeDir: string;
+  copilotHomeDir: string;
   configPath: string;
   hooksPath: string;
   promptsDir: string;
@@ -86,22 +86,22 @@ async function resolveDoctorScope(cwd: string): Promise<DoctorScopeResolution> {
 
 function resolveDoctorPaths(cwd: string, scope: DoctorSetupScope): DoctorPaths {
   if (scope === 'project') {
-    const codexHomeDir = join(cwd, '.codex');
+    const copilotHomeDir = join(cwd, '.copilot');
     return {
-      codexHomeDir,
-      configPath: join(codexHomeDir, 'config.toml'),
-      hooksPath: join(codexHomeDir, 'hooks.json'),
-      promptsDir: join(codexHomeDir, 'prompts'),
+      copilotHomeDir,
+      configPath: join(copilotHomeDir, 'config.toml'),
+      hooksPath: join(copilotHomeDir, 'hooks.json'),
+      promptsDir: join(copilotHomeDir, 'prompts'),
       skillsDir: projectSkillsDir(cwd),
       stateDir: omcpStateDir(cwd),
     };
   }
 
   return {
-    codexHomeDir: codexHome(),
-    configPath: codexConfigPath(),
-    hooksPath: join(codexHome(), 'hooks.json'),
-    promptsDir: codexPromptsDir(),
+    copilotHomeDir: copilotHome(),
+    configPath: copilotConfigPath(),
+    hooksPath: join(copilotHome(), 'hooks.json'),
+    promptsDir: copilotPromptsDir(),
     skillsDir: userSkillsDir(),
     stateDir: omcpStateDir(cwd),
   };
@@ -126,7 +126,7 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
 
   const checks: Check[] = [];
 
-  // Check 1: Codex CLI installed
+  // Check 1: Copilot CLI installed
   checks.push(checkCodexCli());
 
   // Check 2: Node.js version
@@ -135,8 +135,8 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
   // Check 2.5: Explore harness readiness
   checks.push(checkExploreHarness());
 
-  // Check 3: Codex home directory
-  checks.push(checkDirectory('Codex home', paths.codexHomeDir));
+  // Check 3: Copilot home directory
+  checks.push(checkDirectory('Copilot home', paths.copilotHomeDir));
 
   // Check 4: Config file
   checks.push(await checkConfig(paths.configPath));
@@ -159,7 +159,7 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
   }
 
   // Check 7: AGENTS.md in project
-  checks.push(checkAgentsMd(scopeResolution.scope, paths.codexHomeDir));
+  checks.push(checkAgentsMd(scopeResolution.scope, paths.copilotHomeDir));
 
   // Check 8: State directory
   checks.push(checkDirectory('State dir', paths.stateDir));
@@ -438,7 +438,7 @@ function listTeamTmuxSessions(): Set<string> | null {
 }
 
 function checkCodexCli(): Check {
-  const { result } = spawnPlatformCommandSync('codex', ['--version'], {
+  const { result } = spawnPlatformCommandSync('copilot', ['--version'], {
     encoding: 'utf-8',
     stdio: ['pipe', 'pipe', 'pipe'],
   });
@@ -446,28 +446,28 @@ function checkCodexCli(): Check {
     const code = (result.error as NodeJS.ErrnoException).code;
     const kind = classifySpawnError(result.error as NodeJS.ErrnoException);
     if (kind === 'missing') {
-      return { name: 'Codex CLI', status: 'fail', message: 'not found - install from https://github.com/openai/codex' };
+      return { name: 'Copilot CLI', status: 'fail', message: 'not found - install from https://github.com/openai/codex' };
     }
     if (kind === 'blocked') {
       return {
-        name: 'Codex CLI',
+        name: 'Copilot CLI',
         status: 'fail',
         message: `found but could not be executed in this environment (${code || 'blocked'})`,
       };
     }
     return {
-      name: 'Codex CLI',
+      name: 'Copilot CLI',
       status: 'fail',
       message: `probe failed - ${result.error.message}`,
     };
   }
   if (result.status === 0) {
-    const version = (result.stdout || '').trim();
-    return { name: 'Codex CLI', status: 'pass', message: `installed (${version})` };
+    const version = (result.stdout || '').split('\n')[0]?.trim() || '';
+    return { name: 'Copilot CLI', status: 'pass', message: `installed (${version})` };
   }
   const stderr = (result.stderr || '').trim();
   return {
-    name: 'Codex CLI',
+    name: 'Copilot CLI',
     status: 'fail',
     message: stderr !== '' ? `probe failed - ${stderr}` : `probe failed with exit ${result.status}`,
   };
@@ -822,9 +822,9 @@ async function checkSkills(dir: string): Promise<Check> {
   }
 }
 
-function checkAgentsMd(scope: DoctorSetupScope, codexHomeDir: string): Check {
+function checkAgentsMd(scope: DoctorSetupScope, copilotHomeDir: string): Check {
   if (scope === 'user') {
-    const userAgentsMd = join(codexHomeDir, 'AGENTS.md');
+    const userAgentsMd = join(copilotHomeDir, 'AGENTS.md');
     if (existsSync(userAgentsMd)) {
       return { name: 'AGENTS.md', status: 'pass', message: `found in ${userAgentsMd}` };
     }

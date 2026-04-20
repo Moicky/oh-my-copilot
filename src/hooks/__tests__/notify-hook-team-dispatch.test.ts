@@ -70,11 +70,11 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$fmt" == "#{pane_start_command}" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$fmt" == "#{pane_current_command}" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$fmt" == "#S" ]]; then
@@ -574,15 +574,15 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$fmt" == "#{pane_start_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$fmt" == "#{pane_current_command}" && "$target" == "%99" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$fmt" == "#{pane_current_command}" && "$target" == "%42" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   exit 0
@@ -591,7 +591,7 @@ if [[ "$cmd" == "send-keys" ]]; then
   exit 0
 fi
 if [[ "$cmd" == "list-panes" ]]; then
-  printf "%%42\\t1\\tnode\\tcodex\\n%%91\\t0\\tnode\\tnode dist/cli/omcp.js hud --watch\\n"
+  printf "%%42\\t1\\tnode\\tcopilot\\n%%91\\t0\\tnode\\tnode dist/cli/omcp.js hud --watch\\n"
   exit 0
 fi
 exit 0
@@ -675,7 +675,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$fmt" == "#{pane_current_command}" && "$target" == "%77" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$fmt" == "#S" ]]; then
@@ -688,7 +688,7 @@ if [[ "$cmd" == "send-keys" ]]; then
   exit 0
 fi
 if [[ "$cmd" == "list-panes" ]]; then
-  printf "%%77\\t1\\tcodex\\tcodex\\n"
+  printf "%%77\\t1\\tcopilot\\tcopilot\\n"
   exit 0
 fi
 exit 0

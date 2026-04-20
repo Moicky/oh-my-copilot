@@ -434,7 +434,7 @@ fn discover_codex_support_dirs() -> Vec<PathBuf> {
     let mut dirs = Vec::new();
     if let Some(home) = env::var_os("HOME").filter(|value| !value.is_empty()) {
         let home = PathBuf::from(home);
-        for relative in [".omcp", ".codex"] {
+        for relative in [".omcp", ".copilot"] {
             let dir = home.join(relative);
             if dir.is_dir() {
                 dirs.push(dir);
@@ -1390,7 +1390,7 @@ exec node "$basedir/../@openai/codex/bin/codex.js" "$@"
         let root = temp_allowlist_dir().expect("temp root");
         let home_dir = root.path.join("home");
         create_dir_all(home_dir.join(".omcp")).expect("create .omcp");
-        create_dir_all(home_dir.join(".codex")).expect("create .codex");
+        create_dir_all(home_dir.join(".copilot")).expect("create .codex");
         let original_home = env::var_os("HOME");
         unsafe {
             env::set_var("HOME", &home_dir);
@@ -1402,7 +1402,7 @@ exec node "$basedir/../@openai/codex/bin/codex.js" "$@"
             Some(value) => unsafe { env::set_var("HOME", value) },
             None => unsafe { env::remove_var("HOME") },
         }
-        assert_eq!(dirs, vec![home_dir.join(".omcp"), home_dir.join(".codex")]);
+        assert_eq!(dirs, vec![home_dir.join(".omcp"), home_dir.join(".copilot")]);
     }
 
     #[test]

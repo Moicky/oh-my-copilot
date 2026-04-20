@@ -58,7 +58,7 @@ import {
 } from './worker-bootstrap.js';
 import { loadRolePrompt } from './role-router.js';
 import { composeRoleInstructionsForRole } from '../agents/native-config.js';
-import { codexPromptsDir } from '../utils/paths.js';
+import { copilotPromptsDir } from '../utils/paths.js';
 import {
   parseTeamWorkerLaunchArgs,
   resolveTeamWorkerLaunchArgs,
@@ -169,7 +169,7 @@ async function notifyWorkerPaneOutcome(
   workerIndex: number,
   message: string,
   paneId?: string,
-  workerCli?: 'codex' | 'claude' | 'gemini',
+  workerCli?: 'copilot' | 'claude' | 'gemini',
 ): Promise<DispatchOutcome> {
   try {
     await sendToWorker(sessionName, workerIndex, message, paneId, workerCli);
@@ -352,8 +352,8 @@ export async function scaleUp(
       const workerCwd = workerWorkspace ? workerWorkspace.worktreePath : leaderCwd;
 
       // Build startup command and create tmux pane
-      const rawRolePromptContent = await loadRolePrompt(runtimeRole, join(leaderCwd, '.codex', 'prompts'))
-        ?? await loadRolePrompt(runtimeRole, codexPromptsDir());
+      const rawRolePromptContent = await loadRolePrompt(runtimeRole, join(leaderCwd, '.copilot', 'prompts'))
+        ?? await loadRolePrompt(runtimeRole, copilotPromptsDir());
       const preferredReasoning = resolveAgentReasoningEffort(runtimeRole) ?? resolveAgentReasoningEffort(agentType);
       const workerLaunchArgs = resolveWorkerLaunchArgsForScaling(env, runtimeRole, preferredReasoning);
       const resolvedWorkerModel = parseTeamWorkerLaunchArgs(workerLaunchArgs).modelOverride ?? undefined;
@@ -814,7 +814,7 @@ function resolveWorkerLaunchArgsForScaling(
   preferredReasoning?: TeamReasoningEffort,
 ): string[] {
   const inheritedArgs: string[] = [];
-  const fallbackModel = resolveAgentDefaultModel(agentType, env.CODEX_HOME);
+  const fallbackModel = resolveAgentDefaultModel(agentType, env.COPILOT_HOME);
 
   return resolveTeamWorkerLaunchArgs({
     existingRaw: env.OMCP_TEAM_WORKER_LAUNCH_ARGS,

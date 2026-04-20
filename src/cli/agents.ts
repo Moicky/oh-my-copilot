@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 import { createInterface } from 'node:readline/promises';
 import { basename, join } from 'node:path';
 import TOML from '@iarna/toml';
-import { codexAgentsDir, projectCodexAgentsDir } from '../utils/paths.js';
+import { copilotAgentsDir, projectCopilotAgentsDir } from '../utils/paths.js';
 
 export const RESERVED_NATIVE_AGENT_NAMES = new Set(['default', 'worker', 'explorer']);
 const DEFAULT_AGENT_MODEL = 'gpt-5.4';
@@ -16,7 +16,7 @@ const AGENTS_USAGE = [
   '  omcp agents edit <name> [--scope user|project]',
   '  omcp agents remove <name> [--scope user|project] [--force]',
   '',
-  'Manage Codex native agent TOML files under ~/.codex/agents/ or ./.codex/agents/.',
+  'Manage Codex native agent TOML files under ~/.copilot/agents/ or ./.copilot/agents/.',
   '',
   'Notes:',
   '  - list shows project + user agents by default',
@@ -54,7 +54,7 @@ function normalizeAgentName(name: string): string {
 }
 
 function resolveAgentsDir(scope: AgentScope, cwd = process.cwd()): string {
-  return scope === 'project' ? projectCodexAgentsDir(cwd) : codexAgentsDir();
+  return scope === 'project' ? projectCopilotAgentsDir(cwd) : copilotAgentsDir();
 }
 
 function parseScopeArg(args: string[]): AgentScope | undefined {
@@ -82,7 +82,7 @@ function inferMutationScope(cwd = process.cwd()): AgentScope {
       // fall through
     }
   }
-  return existsSync(join(cwd, '.codex')) ? 'project' : 'user';
+  return existsSync(join(cwd, '.copilot')) ? 'project' : 'user';
 }
 
 function getAgentFilePath(name: string, scope: AgentScope, cwd = process.cwd()): string {

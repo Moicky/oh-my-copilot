@@ -1,8 +1,8 @@
 /**
- * oh-my-copilot - Multi-agent orchestration for OpenAI Codex CLI
+ * oh-my-copilot - Multi-agent orchestration for OpenAI Copilot CLI
  *
  * This package provides:
- * - 30+ specialized agent prompts as Codex CLI slash commands
+ * - 30+ specialized agent prompts as Copilot CLI slash commands
  * - 35+ workflow skills as SKILL.md files
  * - AGENTS.md orchestration brain
  * - MCP servers for state management, project memory, and notepad

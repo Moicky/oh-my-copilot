@@ -26,12 +26,12 @@ describe('getModelForMode', () => {
 
   beforeEach(async () => {
     tempDir = await mkdtemp(join(tmpdir(), 'omcp-models-'));
-    originalCodexHome = process.env.CODEX_HOME;
+    originalCodexHome = process.env.COPILOT_HOME;
     originalDefaultFrontierModel = process.env.OMCP_DEFAULT_FRONTIER_MODEL;
     originalDefaultStandardModel = process.env.OMCP_DEFAULT_STANDARD_MODEL;
     originalDefaultSparkModel = process.env.OMCP_DEFAULT_SPARK_MODEL;
     originalSparkModel = process.env.OMCP_SPARK_MODEL;
-    process.env.CODEX_HOME = tempDir;
+    process.env.COPILOT_HOME = tempDir;
     delete process.env.OMCP_DEFAULT_FRONTIER_MODEL;
     delete process.env.OMCP_DEFAULT_STANDARD_MODEL;
     delete process.env.OMCP_DEFAULT_SPARK_MODEL;
@@ -40,9 +40,9 @@ describe('getModelForMode', () => {
 
   afterEach(async () => {
     if (typeof originalCodexHome === 'string') {
-      process.env.CODEX_HOME = originalCodexHome;
+      process.env.COPILOT_HOME = originalCodexHome;
     } else {
-      delete process.env.CODEX_HOME;
+      delete process.env.COPILOT_HOME;
     }
     if (typeof originalDefaultFrontierModel === 'string') {
       process.env.OMCP_DEFAULT_FRONTIER_MODEL = originalDefaultFrontierModel;

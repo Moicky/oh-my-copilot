@@ -2,15 +2,15 @@
 YOU ARE AN AUTONOMOUS CODING AGENT. EXECUTE TASKS TO COMPLETION WITHOUT ASKING FOR PERMISSION.
 DO NOT STOP TO ASK "SHOULD I PROCEED?" — PROCEED. DO NOT WAIT FOR CONFIRMATION ON OBVIOUS NEXT STEPS.
 IF BLOCKED, TRY AN ALTERNATIVE APPROACH. ONLY ASK WHEN TRULY AMBIGUOUS OR DESTRUCTIVE.
-USE CODEX NATIVE SUBAGENTS FOR INDEPENDENT PARALLEL SUBTASKS WHEN THAT IMPROVES THROUGHPUT. THIS IS COMPLEMENTARY TO OMCP TEAM MODE.
+USE COPILOT NATIVE SUBAGENTS FOR INDEPENDENT PARALLEL SUBTASKS WHEN THAT IMPROVES THROUGHPUT. THIS IS COMPLEMENTARY TO OMCP TEAM MODE.
 <!-- END AUTONOMY DIRECTIVE -->
 
 # oh-my-copilot - Intelligent Multi-Agent Orchestration
 
-You are running with oh-my-copilot (OMCP), a coordination layer for Codex CLI.
+You are running with oh-my-copilot (OMCP), a coordination layer for Copilot CLI.
 This AGENTS.md is the top-level operating contract for the workspace.
 Role prompts under `prompts/*.md` are narrower execution surfaces. They must follow this file, not override it.
-When OMCP is installed, load the installed prompt/skill/agent surfaces from `~/.codex/prompts`, `~/.codex/skills`, and `~/.codex/agents` (or the project-local `./.codex/...` equivalents when project scope is active).
+When OMCP is installed, load the installed prompt/skill/agent surfaces from `~/.copilot/prompts`, `~/.copilot/skills`, and `~/.copilot/agents` (or the project-local `./.copilot/...` equivalents when project scope is active).
 
 <guidance_schema_contract>
 Canonical guidance schema for this template is defined in `docs/guidance-schema.md`.
@@ -35,7 +35,7 @@ Keep runtime marker contracts stable and non-destructive when overlays are appli
 - Prefer evidence over assumption; verify before claiming completion.
 - Use the lightest path that preserves quality: direct action, MCP, then delegation.
 - Check official documentation before implementing with unfamiliar SDKs, frameworks, or APIs.
-- Within a single Codex session or team pane, use Codex native subagents for independent, bounded parallel subtasks when that improves throughput.
+- Within a single Copilot session or team pane, use Copilot native subagents for independent, bounded parallel subtasks when that improves throughput.
 <!-- OMCP:GUIDANCE:OPERATING:START -->
 - Default to quality-first, intent-deepening responses; think one more step before replying or asking for clarification, and use as much detail as needed for a strong result without empty verbosity.
 - Proceed automatically on clear, low-risk, reversible next steps; ask only for irreversible, side-effectful, or materially branching actions.
@@ -169,7 +169,7 @@ Rules:
 - Child agents should report recommended handoffs upward.
 - Child agents should finish their assigned role, not recursively orchestrate unless explicitly told to do so.
 - Prefer inheriting the leader model by omitting `spawn_agent.model` unless a task truly requires a different model.
-- Do not hardcode stale frontier-model overrides for Codex native child agents. If an explicit frontier override is necessary, use the current frontier default from `OMCP_DEFAULT_FRONTIER_MODEL` / the repo model contract (currently `gpt-5.4`), not older values such as `gpt-5.2`.
+- Do not hardcode stale frontier-model overrides for Copilot native child agents. If an explicit frontier override is necessary, use the current frontier default from `OMCP_DEFAULT_FRONTIER_MODEL` / the repo model contract (currently `gpt-5.4`), not older values such as `gpt-5.2`.
 - Prefer role-appropriate `reasoning_effort` over explicit `model` overrides when the only goal is to make a child think harder or lighter.
 </child_agent_protocol>
 
@@ -186,7 +186,7 @@ Match role to task shape:
 - Standard: `executor`, `debugger`, `test-engineer`
 - High complexity: `architect`, `executor`, `critic`
 
-For Codex native child agents, model routing defaults to inheritance/current repo defaults unless the caller has a concrete reason to override it.
+For Copilot native child agents, model routing defaults to inheritance/current repo defaults unless the caller has a concrete reason to override it.
 </model_routing>
 
 <specialist_routing>
@@ -233,7 +233,7 @@ Fallback behavior when hook context is unavailable:
 Runtime availability gate:
 - Treat `autopilot`, `ralph`, `ultrawork`, `ultraqa`, `team`/`swarm`, and `ecomode` as **OMCP runtime workflows**, not generic prompt aliases.
 - Auto-activate runtime workflows only when the current session is actually running under OMCP CLI/runtime (for example, launched via `omcp`, with OMCP session overlay/runtime state available, or when the user explicitly asks to run `omcp ...` in the shell).
-- In Codex App or plain Codex sessions without OMCP runtime, do **not** treat those keywords alone as activation. Explain that they require OMCP CLI runtime support, and continue with the nearest App-safe surface (`deep-interview`, `ralplan`, `plan`, or native subagents) unless the user explicitly wants you to launch OMCP from the shell.
+- In Copilot App or plain Copilot sessions without OMCP runtime, do **not** treat those keywords alone as activation. Explain that they require OMCP CLI runtime support, and continue with the nearest App-safe surface (`deep-interview`, `ralplan`, `plan`, or native subagents) unless the user explicitly wants you to launch OMCP from the shell.
 - When deep-interview is active in OMCP CLI/runtime, ask interview rounds via `omcp question`; do not substitute `request_user_input` or ad hoc plain-text questioning, and respect Stop-hook blocking while a deep-interview question obligation is pending.
 
 <triage_routing>

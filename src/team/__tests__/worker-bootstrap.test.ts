@@ -27,11 +27,11 @@ import { composeRoleInstructionsForRole } from "../../agents/native-config.js";
 import type { TeamTask } from "../state.js";
 
 function setMockCodexHome(codexHomePath: string): () => void {
-  const previous = process.env.CODEX_HOME;
-  process.env.CODEX_HOME = codexHomePath;
+  const previous = process.env.COPILOT_HOME;
+  process.env.COPILOT_HOME = codexHomePath;
   return () => {
-    if (typeof previous === "string") process.env.CODEX_HOME = previous;
-    else delete process.env.CODEX_HOME;
+    if (typeof previous === "string") process.env.COPILOT_HOME = previous;
+    else delete process.env.COPILOT_HOME;
   };
 }
 
@@ -47,7 +47,7 @@ describe("worker bootstrap", () => {
     assert.match(workerSkill, /omcp team api release-task-claim/);
     assert.match(
       workerSkill,
-      /\$\{CODEX_HOME:-~\/\.codex\}\/skills\/worker\/SKILL\.md/,
+      /\$\{COPILOT_HOME:-~\/\.copilot\}\/skills\/worker\/SKILL\.md/,
     );
     assert.doesNotMatch(workerSkill, /Write completion to the task file/i);
     assert.doesNotMatch(
@@ -72,9 +72,9 @@ describe("worker bootstrap", () => {
     assert.match(overlay, /team "my-team"/);
     assert.match(
       overlay,
-      /\$\{CODEX_HOME:-~\/\.codex\}\/skills\/worker\/SKILL\.md/,
+      /\$\{COPILOT_HOME:-~\/\.copilot\}\/skills\/worker\/SKILL\.md/,
     );
-    assert.match(overlay, /<leader_cwd>\/\.codex\/skills\/worker\/SKILL\.md/);
+    assert.match(overlay, /<leader_cwd>\/\.copilot\/skills\/worker\/SKILL\.md/);
     assert.match(overlay, /Resolve canonical team state root/i);
     assert.match(overlay, /<team_state_root>\/team\/my-team\/tasks/);
     assert.match(overlay, /tasks\/task-<id>\.json/);
@@ -260,9 +260,9 @@ describe("worker bootstrap", () => {
     assert.match(inbox, /omcp team api release-task-claim/);
     assert.match(
       inbox,
-      /\$\{CODEX_HOME:-~\/\.codex\}\/skills\/worker\/SKILL\.md/,
+      /\$\{COPILOT_HOME:-~\/\.copilot\}\/skills\/worker\/SKILL\.md/,
     );
-    assert.match(inbox, /\/\.codex\/skills\/worker\/SKILL\.md/);
+    assert.match(inbox, /\/\.copilot\/skills\/worker\/SKILL\.md/);
     assert.match(inbox, /ACK: worker-1 initialized/);
     assert.match(inbox, /Mailbox Delivery Protocol \(Required\)/);
     assert.match(inbox, /mailbox-mark-delivered/);
@@ -566,11 +566,11 @@ describe("worker bootstrap", () => {
 
   it("writeTeamWorkerInstructionsFile composes user + project AGENTS.md with overlay", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omcp-worker-bootstrap-"));
-    const restoreCodexHome = setMockCodexHome(join(cwd, "home", ".codex"));
+    const restoreCodexHome = setMockCodexHome(join(cwd, "home", ".copilot"));
     try {
-      await mkdir(join(cwd, "home", ".codex"), { recursive: true });
+      await mkdir(join(cwd, "home", ".copilot"), { recursive: true });
       await writeFile(
-        join(cwd, "home", ".codex", "AGENTS.md"),
+        join(cwd, "home", ".copilot", "AGENTS.md"),
         "# User Instructions\n\nStart globally.\n",
         "utf8",
       );
@@ -609,14 +609,14 @@ describe("worker bootstrap", () => {
 
   it("writeTeamWorkerInstructionsFile deduplicates duplicate skill references in favor of project scope", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omcp-worker-bootstrap-"));
-    const restoreCodexHome = setMockCodexHome(join(cwd, "home", ".codex"));
+    const restoreCodexHome = setMockCodexHome(join(cwd, "home", ".copilot"));
     try {
-      const userAgentsPath = join(cwd, "home", ".codex", "AGENTS.md");
+      const userAgentsPath = join(cwd, "home", ".copilot", "AGENTS.md");
       const projectAgentsPath = join(cwd, "AGENTS.md");
-      const userSkillDir = join(cwd, "home", ".codex", "skills", "help");
-      const projectSkillDir = join(cwd, ".codex", "skills", "help");
+      const userSkillDir = join(cwd, "home", ".copilot", "skills", "help");
+      const projectSkillDir = join(cwd, ".copilot", "skills", "help");
 
-      await mkdir(join(cwd, "home", ".codex"), { recursive: true });
+      await mkdir(join(cwd, "home", ".copilot"), { recursive: true });
       await mkdir(userSkillDir, { recursive: true });
       await mkdir(projectSkillDir, { recursive: true });
       await writeFile(join(userSkillDir, "SKILL.md"), "# user help\n", "utf8");
@@ -627,12 +627,12 @@ describe("worker bootstrap", () => {
       );
       await writeFile(
         userAgentsPath,
-        "- help user (file: /tmp/home/.codex/skills/help/SKILL.md)\n",
+        "- help user (file: /tmp/home/.copilot/skills/help/SKILL.md)\n",
         "utf8",
       );
       await writeFile(
         projectAgentsPath,
-        "- help project (file: /tmp/project/.codex/skills/help/SKILL.md)\n",
+        "- help project (file: /tmp/project/.copilot/skills/help/SKILL.md)\n",
         "utf8",
       );
 

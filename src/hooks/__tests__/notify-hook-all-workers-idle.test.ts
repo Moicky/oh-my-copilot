@@ -349,7 +349,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%182" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   exit 0

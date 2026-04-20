@@ -620,7 +620,7 @@ function resolveWorkerCliForRequest(request, config) {
     const workerCli = safeString(worker?.worker_cli).trim().toLowerCase();
     if (workerCli === 'claude') return 'claude';
   }
-  return 'codex';
+  return 'copilot';
 }
 
 function capturedPaneContainsTrigger(captured, trigger) {

@@ -3,7 +3,7 @@ oh-my-copilot (omcp) - Multi-agent orchestration for Codex CLI
 
 Usage:
   omcp           Launch Codex CLI (HUD auto-attaches only when already inside tmux)
-  omcp exec      Run codex exec non-interactively with OMCP AGENTS/overlay injection
+  omcp exec      Run copilot -p non-interactively with OMCP AGENTS/overlay injection
   omcp setup     Install skills, prompts, MCP servers, and scope-specific AGENTS.md
   omcp uninstall Remove OMCP configuration and clean up installed artifacts
   omcp doctor    Check installation health

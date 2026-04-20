@@ -45,7 +45,7 @@ describe('omcp launch fallback when tmux is unavailable', () => {
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
 
       await mkdir(home, { recursive: true });
@@ -73,7 +73,7 @@ describe('omcp launch fallback when tmux is unavailable', () => {
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);
-      assert.match(result.stdout, /fake-codex:.*--dangerously-bypass-approvals-and-sandbox/);
+      assert.match(result.stdout, /fake-codex:.*--allow-all-tools/);
       assert.match(result.stdout, /fake-codex:.*model_reasoning_effort="xhigh"/);
       assert.doesNotMatch(result.stderr, /spawnSync tmux ENOENT/);
     } finally {
@@ -88,7 +88,7 @@ describe('omcp launcher when tmux is available', () => {
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
       const fakeTmuxPath = join(fakeBin, 'tmux');
       const tmuxLogPath = join(wd, 'tmux.log');
@@ -170,7 +170,7 @@ exit 0
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
       const fakeTmuxPath = join(fakeBin, 'tmux');
       const tmuxLogPath = join(wd, 'tmux.log');
@@ -254,7 +254,7 @@ exit 0
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
       const codexLog = await readFile(codexLogPath, 'utf-8');
-      assert.match(codexLog, /codex:.*--dangerously-bypass-approvals-and-sandbox/);
+      assert.match(codexLog, /codex:.*--allow-all-tools/);
       assert.match(codexLog, new RegExp(`codex-pwd:${wd.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);
     } finally {
@@ -267,7 +267,7 @@ exit 0
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
-      const fakeCodexPath = join(fakeBin, 'codex');
+      const fakeCodexPath = join(fakeBin, 'copilot');
       const fakePsPath = join(fakeBin, 'ps');
       const fakeTmuxPath = join(fakeBin, 'tmux');
       const tmuxLogPath = join(wd, 'tmux.log');
@@ -352,7 +352,7 @@ exit 0
       const codexLog = await readFile(codexLogPath, 'utf-8');
       assert.match(tmuxLog, /\/bin\/sh/);
       assert.doesNotMatch(tmuxLog, /not-a-real-shell/);
-      assert.match(codexLog, /codex:.*--dangerously-bypass-approvals-and-sandbox/);
+      assert.match(codexLog, /codex:.*--allow-all-tools/);
       assert.match(codexLog, new RegExp(`codex-pwd:${wd.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`));
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);
     } finally {

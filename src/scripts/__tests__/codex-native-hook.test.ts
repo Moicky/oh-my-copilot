@@ -4617,15 +4617,15 @@ esac
 // ---------------------------------------------------------------------------
 
 describe("codex native hook triage integration", () => {
-  const priorCodexHome = process.env.CODEX_HOME;
+  const priorCodexHome = process.env.COPILOT_HOME;
 
   beforeEach(() => {
     resetTriageConfigCache();
   });
 
   afterEach(() => {
-    if (typeof priorCodexHome === "string") process.env.CODEX_HOME = priorCodexHome;
-    else delete process.env.CODEX_HOME;
+    if (typeof priorCodexHome === "string") process.env.COPILOT_HOME = priorCodexHome;
+    else delete process.env.COPILOT_HOME;
     resetTriageConfigCache();
   });
 
@@ -5161,11 +5161,11 @@ describe("codex native hook triage integration", () => {
     const tmpHome = await mkdtemp(join(tmpdir(), "omcp-triage-config-disabled-home-"));
     const cwd = await mkdtemp(join(tmpdir(), "omcp-triage-config-disabled-cwd-"));
     try {
-      // Write a .omcp-config.json in the fake CODEX_HOME that disables triage
+      // Write a .omcp-config.json in the fake COPILOT_HOME that disables triage
       await writeJson(join(tmpHome, ".omcp-config.json"), {
         promptRouting: { triage: { enabled: false } },
       });
-      process.env.CODEX_HOME = tmpHome;
+      process.env.COPILOT_HOME = tmpHome;
       resetTriageConfigCache();
 
       await mkdir(join(cwd, ".omcp", "state"), { recursive: true });
@@ -5197,12 +5197,12 @@ describe("codex native hook triage integration", () => {
   it("keeps triage default-enabled when config omits promptRouting.triage.enabled", async () => {
     const tmpHome = await mkdtemp(join(tmpdir(), "omcp-triage-config-omitted-home-"));
     const cwd = await mkdtemp(join(tmpdir(), "omcp-triage-config-omitted-cwd-"));
-    const previousCodexHome = process.env.CODEX_HOME;
+    const previousCodexHome = process.env.COPILOT_HOME;
     try {
       await writeJson(join(tmpHome, ".omcp-config.json"), {
         promptRouting: {},
       });
-      process.env.CODEX_HOME = tmpHome;
+      process.env.COPILOT_HOME = tmpHome;
       resetTriageConfigCache();
 
       await mkdir(join(cwd, ".omcp", "state"), { recursive: true });
@@ -5226,8 +5226,8 @@ describe("codex native hook triage integration", () => {
       const stateFile = join(cwd, ".omcp", "state", "sessions", "triage-defaulted-1", "prompt-routing-state.json");
       assert.equal(existsSync(stateFile), true);
     } finally {
-      if (typeof previousCodexHome === "string") process.env.CODEX_HOME = previousCodexHome;
-      else delete process.env.CODEX_HOME;
+      if (typeof previousCodexHome === "string") process.env.COPILOT_HOME = previousCodexHome;
+      else delete process.env.COPILOT_HOME;
       resetTriageConfigCache();
       await rm(tmpHome, { recursive: true, force: true });
       await rm(cwd, { recursive: true, force: true });

@@ -49,15 +49,15 @@ async function initRepo(): Promise<string> {
 
 describe('normalizeAutoresearchCodexArgs', () => {
   it('adds sandbox bypass by default for autoresearch workers', () => {
-    assert.deepEqual(normalizeAutoresearchCodexArgs(['--model', 'gpt-5']), ['--model', 'gpt-5', '--dangerously-bypass-approvals-and-sandbox']);
+    assert.deepEqual(normalizeAutoresearchCodexArgs(['--model', 'gpt-5']), ['--model', 'gpt-5', '--allow-all-tools']);
   });
 
   it('deduplicates explicit bypass flags', () => {
-    assert.deepEqual(normalizeAutoresearchCodexArgs(['--dangerously-bypass-approvals-and-sandbox']), ['--dangerously-bypass-approvals-and-sandbox']);
+    assert.deepEqual(normalizeAutoresearchCodexArgs(['--allow-all-tools']), ['--allow-all-tools']);
   });
 
   it('normalizes --madmax to the canonical bypass flag', () => {
-    assert.deepEqual(normalizeAutoresearchCodexArgs(['--madmax']), ['--dangerously-bypass-approvals-and-sandbox']);
+    assert.deepEqual(normalizeAutoresearchCodexArgs(['--madmax']), ['--allow-all-tools']);
   });
 });
 
@@ -114,7 +114,7 @@ describe('omcp autoresearch hard deprecation', () => {
       assert.match(result.stdout, /\$deep-interview --autoresearch/i);
       assert.match(result.stdout, /\$autoresearch/i);
       assert.match(result.stdout, /prompt-architect-artifact/i);
-      assert.doesNotMatch(result.stdout, /oh-my-copilot \(omcp\) - Multi-agent orchestration for Codex CLI/i);
+      assert.doesNotMatch(result.stdout, /oh-my-copilot \(omcp\) - Multi-agent orchestration for Copilot CLI/i);
     } finally {
       await rm(cwd, { recursive: true, force: true });
     }
@@ -149,9 +149,9 @@ describe('omcp autoresearch hard deprecation', () => {
     const codexLog = join(cwd, 'codex.log');
     const tmuxLog = join(cwd, 'tmux.log');
     try {
-      await writeFile(join(fakeBin, 'codex'), `#!/bin/sh\necho codex >> ${JSON.stringify(codexLog)}\nexit 99\n`, 'utf-8');
+      await writeFile(join(fakeBin, 'copilot'), `#!/bin/sh\necho codex >> ${JSON.stringify(codexLog)}\nexit 99\n`, 'utf-8');
       await writeFile(join(fakeBin, 'tmux'), `#!/bin/sh\necho tmux >> ${JSON.stringify(tmuxLog)}\nexit 99\n`, 'utf-8');
-      execFileSync('chmod', ['+x', join(fakeBin, 'codex')], { stdio: 'ignore' });
+      execFileSync('chmod', ['+x', join(fakeBin, 'copilot')], { stdio: 'ignore' });
       execFileSync('chmod', ['+x', join(fakeBin, 'tmux')], { stdio: 'ignore' });
 
       const result = runOmcp(cwd, ['autoresearch', 'run', 'missions/demo'], {

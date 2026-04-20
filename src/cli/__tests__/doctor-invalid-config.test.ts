@@ -31,7 +31,7 @@ describe('omcp doctor invalid config detection', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-doctor-invalid-config-'));
     try {
       const home = join(wd, 'home');
-      const codexDir = join(home, '.codex');
+      const codexDir = join(home, '.copilot');
       await mkdir(codexDir, { recursive: true });
 
       await writeFile(
@@ -49,7 +49,7 @@ theme = "base16-ocean-light"
 
       const res = runOmcp(wd, ['doctor'], {
         HOME: home,
-        CODEX_HOME: codexDir,
+        COPILOT_HOME: codexDir,
       });
 
       if (shouldSkipForSpawnPermissions(res.error)) return;

@@ -1,7 +1,7 @@
 /**
  * Team Orchestration for oh-my-copilot
  *
- * Leverages Codex CLI's native multi_agent feature for multi-agent coordination.
+ * Leverages Copilot CLI's native multi_agent feature for multi-agent coordination.
  * Provides the staged pipeline: plan -> prd -> exec -> verify -> fix (loop)
  */
 

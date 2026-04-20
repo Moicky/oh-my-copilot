@@ -154,7 +154,7 @@ shift || true
 if [[ "$cmd" == "display-message" ]]; then
   format="\${@: -1}"
   if [[ "$format" == "#{pane_current_command}" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" ]]; then
@@ -184,7 +184,7 @@ exit 0
       const parsed = JSON.parse(result.stdout);
       assert.equal(parsed.ok, false);
       assert.equal(parsed.reason, 'pane_not_ready');
-      assert.equal(parsed.paneCurrentCommand, 'codex');
+      assert.equal(parsed.paneCurrentCommand, 'copilot');
       assert.match(parsed.paneCapture, /loading workspace state/);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -208,7 +208,7 @@ shift || true
 if [[ "$cmd" == "display-message" ]]; then
   format="\${@: -1}"
   if [[ "$format" == "#{pane_current_command}" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" ]]; then
@@ -239,7 +239,7 @@ exit 0
       const parsed = JSON.parse(result.stdout);
       assert.equal(parsed.ok, true);
       assert.equal(parsed.reason, 'ok');
-      assert.equal(parsed.paneCurrentCommand, 'codex');
+      assert.equal(parsed.paneCurrentCommand, 'copilot');
       assert.equal(parsed.paneCapture, '');
     } finally {
       await rm(cwd, { recursive: true, force: true });

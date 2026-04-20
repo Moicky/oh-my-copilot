@@ -65,22 +65,22 @@ function buildTableRow(
 export function resolveAgentsModelTableContext(
   configTomlContent: string,
   options: {
-    codexHomeOverride?: string;
+    copilotHomeOverride?: string;
     env?: NodeJS.ProcessEnv;
   } = {},
 ): AgentsModelTableContext {
-  const { codexHomeOverride, env = process.env } = options;
+  const { copilotHomeOverride, env = process.env } = options;
   const frontierModel =
     getRootModelName(configTomlContent) ??
-    getEnvConfiguredMainDefaultModel(env, codexHomeOverride) ??
+    getEnvConfiguredMainDefaultModel(env, copilotHomeOverride) ??
     DEFAULT_FRONTIER_MODEL;
   const sparkModel =
-    getEnvConfiguredSparkDefaultModel(env, codexHomeOverride) ??
-    getSparkDefaultModel(codexHomeOverride) ??
+    getEnvConfiguredSparkDefaultModel(env, copilotHomeOverride) ??
+    getSparkDefaultModel(copilotHomeOverride) ??
     DEFAULT_SPARK_MODEL;
   const subagentDefaultModel =
-    getEnvConfiguredStandardDefaultModel(env, codexHomeOverride) ??
-    getStandardDefaultModel(codexHomeOverride) ??
+    getEnvConfiguredStandardDefaultModel(env, copilotHomeOverride) ??
+    getStandardDefaultModel(copilotHomeOverride) ??
     DEFAULT_STANDARD_MODEL;
 
   return {

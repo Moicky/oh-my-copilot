@@ -16,14 +16,14 @@ import { setup } from "../setup.js";
 
 const EXPECTED_PROJECT_GITIGNORE = [
   ".omcp/",
-  ".codex/*",
-  "!.codex/agents/",
-  "!.codex/agents/**",
-  "!.codex/skills/",
-  "!.codex/skills/**",
-  ".codex/skills/.system/**",
-  "!.codex/prompts/",
-  "!.codex/prompts/**",
+  ".copilot/*",
+  "!.copilot/agents/",
+  "!.copilot/agents/**",
+  "!.copilot/skills/",
+  "!.copilot/skills/**",
+  ".copilot/skills/.system/**",
+  "!.copilot/prompts/",
+  "!.copilot/prompts/**",
 ].join("\n") + "\n";
 
 async function runSetupWithCapturedLogs(
@@ -66,7 +66,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
       await runSetupInTempDir(wd, { scope: "project" });
 
-      const skillPath = join(wd, ".codex", "skills", "help", "SKILL.md");
+      const skillPath = join(wd, ".copilot", "skills", "help", "SKILL.md");
       await writeFile(skillPath, "# locally modified help\n");
 
       const output = await runSetupWithCapturedLogs(wd, {
@@ -91,7 +91,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
       await runSetupInTempDir(wd, { scope: "project" });
 
-      const skillPath = join(wd, ".codex", "skills", "help", "SKILL.md");
+      const skillPath = join(wd, ".copilot", "skills", "help", "SKILL.md");
       const customized = "# locally modified help\n";
       await writeFile(skillPath, customized);
 
@@ -134,24 +134,24 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
       const gitignore = await readFile(join(wd, ".gitignore"), "utf-8");
       assert.equal(gitignore, `node_modules/\n${EXPECTED_PROJECT_GITIGNORE}`);
       assert.equal(gitignore.match(/^\.omcp\/$/gm)?.length ?? 0, 1);
-      assert.equal(gitignore.match(/^\.codex\/\*$/gm)?.length ?? 0, 1);
+      assert.equal(gitignore.match(/^\.copilot\/\*$/gm)?.length ?? 0, 1);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
-  it("ignores project-local config while keeping .codex agents, skills, and prompts trackable", async () => {
+  it("ignores project-local config while keeping .copilot agents, skills, and prompts trackable", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     try {
       const initResult = spawnSync("git", ["init", "-q"], { cwd: wd });
       assert.equal(initResult.status, 0);
 
       await runSetupInTempDir(wd, { scope: "project" });
-      await mkdir(join(wd, ".codex", "skills", ".system"), { recursive: true });
-      await writeFile(join(wd, ".codex", "agents", "local.toml"), "# local\n");
-      await writeFile(join(wd, ".codex", "prompts", "local.md"), "# local\n");
+      await mkdir(join(wd, ".copilot", "skills", ".system"), { recursive: true });
+      await writeFile(join(wd, ".copilot", "agents", "local.toml"), "# local\n");
+      await writeFile(join(wd, ".copilot", "prompts", "local.md"), "# local\n");
       await writeFile(
-        join(wd, ".codex", "skills", ".system", "cache.json"),
+        join(wd, ".copilot", "skills", ".system", "cache.json"),
         "{}\n",
       );
 
@@ -161,35 +161,35 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
           "status",
           "--short",
           "--ignored",
-          ".codex/config.toml",
-          ".codex/agents/local.toml",
-          ".codex/prompts/local.md",
-          ".codex/skills/help/SKILL.md",
-          ".codex/skills/.system/cache.json",
+          ".copilot/config.toml",
+          ".copilot/agents/local.toml",
+          ".copilot/prompts/local.md",
+          ".copilot/skills/help/SKILL.md",
+          ".copilot/skills/.system/cache.json",
         ],
         { cwd: wd, encoding: "utf-8" },
       );
       assert.equal(status.status, 0);
-      assert.match(status.stdout, /^!! \.codex\/config\.toml$/m);
-      assert.match(status.stdout, /^\?\? \.codex\/agents\/local\.toml$/m);
-      assert.match(status.stdout, /^\?\? \.codex\/prompts\/local\.md$/m);
-      assert.match(status.stdout, /^\?\? \.codex\/skills\/help\/SKILL\.md$/m);
-      assert.match(status.stdout, /^!! \.codex\/skills\/\.system\/cache\.json$/m);
+      assert.match(status.stdout, /^!! \.copilot\/config\.toml$/m);
+      assert.match(status.stdout, /^\?\? \.copilot\/agents\/local\.toml$/m);
+      assert.match(status.stdout, /^\?\? \.copilot\/prompts\/local\.md$/m);
+      assert.match(status.stdout, /^\?\? \.copilot\/skills\/help\/SKILL\.md$/m);
+      assert.match(status.stdout, /^!! \.copilot\/skills\/\.system\/cache\.json$/m);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
-  it("replaces legacy .codex/ ignores so the project allowlist can take effect", async () => {
+  it("replaces legacy .copilot/ ignores so the project allowlist can take effect", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     try {
-      await writeFile(join(wd, ".gitignore"), ".omcp/\n.codex/\n");
+      await writeFile(join(wd, ".gitignore"), ".omcp/\n.copilot/\n");
 
       await runSetupInTempDir(wd, { scope: "project" });
 
       const gitignore = await readFile(join(wd, ".gitignore"), "utf-8");
       assert.equal(gitignore, EXPECTED_PROJECT_GITIGNORE);
-      assert.equal(gitignore.match(/^\.codex\/$/gm)?.length ?? 0, 0);
+      assert.equal(gitignore.match(/^\.copilot\/$/gm)?.length ?? 0, 0);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -201,7 +201,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
       await runSetupInTempDir(wd, { scope: "project" });
 
-      const promptPath = join(wd, ".codex", "prompts", "executor.md");
+      const promptPath = join(wd, ".copilot", "prompts", "executor.md");
       const oldPrompt = "# local prompt\n";
       await writeFile(promptPath, oldPrompt);
 
@@ -214,7 +214,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
       const latestBackup = join(
         backupsRoot,
         timestamps.sort().at(-1)!,
-        ".codex",
+        ".copilot",
         "prompts",
         "executor.md",
       );
@@ -229,9 +229,9 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     try {
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
-      await mkdir(join(wd, ".codex"), { recursive: true });
+      await mkdir(join(wd, ".copilot"), { recursive: true });
       await writeFile(
-        join(wd, ".codex", "config.toml"),
+        join(wd, ".copilot", "config.toml"),
         'model = \"gpt-5.3-codex\"\n',
       );
 
@@ -246,7 +246,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
         },
       });
 
-      const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
+      const config = await readFile(join(wd, ".copilot", "config.toml"), "utf-8");
       assert.equal(promptCalls, 1);
       assert.match(config, /^model = "gpt-5\.4"$/m);
       assert.doesNotMatch(config, /^model = "gpt-5\.3-codex"$/m);
@@ -261,9 +261,9 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     try {
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
-      await mkdir(join(wd, ".codex"), { recursive: true });
+      await mkdir(join(wd, ".copilot"), { recursive: true });
       await writeFile(
-        join(wd, ".codex", "config.toml"),
+        join(wd, ".copilot", "config.toml"),
         'model = \"gpt-5.3-codex\"\n',
       );
 
@@ -272,7 +272,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
         modelUpgradePrompt: async () => false,
       });
 
-      const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
+      const config = await readFile(join(wd, ".copilot", "config.toml"), "utf-8");
       assert.match(config, /^model = "gpt-5\.3-codex"$/m);
       assert.doesNotMatch(config, /^model = "gpt-5\.4"$/m);
       assert.doesNotMatch(config, /^model_context_window = 1000000$/m);
@@ -286,15 +286,15 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     try {
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
-      await mkdir(join(wd, ".codex"), { recursive: true });
+      await mkdir(join(wd, ".copilot"), { recursive: true });
       await writeFile(
-        join(wd, ".codex", "config.toml"),
+        join(wd, ".copilot", "config.toml"),
         'model = \"gpt-5.3-codex\"\n',
       );
 
       await runSetupInTempDir(wd, { scope: "project" });
 
-      const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
+      const config = await readFile(join(wd, ".copilot", "config.toml"), "utf-8");
       assert.match(config, /^model = "gpt-5\.3-codex"$/m);
       assert.doesNotMatch(config, /^model = "gpt-5\.4"$/m);
       assert.doesNotMatch(config, /^model_context_window = 1000000$/m);
@@ -304,13 +304,13 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
     }
   });
 
-  it("skips OMCP-managed [tui] writes for Codex CLI >= 0.107.0 and preserves an existing [tui] table", async () => {
+  it("skips OMCP-managed [tui] writes for Copilot CLI >= 0.107.0 and preserves an existing [tui] table", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     try {
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
-      await mkdir(join(wd, ".codex"), { recursive: true });
+      await mkdir(join(wd, ".copilot"), { recursive: true });
       await writeFile(
-        join(wd, ".codex", "config.toml"),
+        join(wd, ".copilot", "config.toml"),
         ['model = "gpt-5.4"', "", "[tui]", 'theme = "night"', 'status_line = ["git-branch"]', ""].join("\n"),
       );
 
@@ -319,20 +319,20 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
         codexVersionProbe: () => "codex-cli 0.107.0",
       });
 
-      const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
+      const config = await readFile(join(wd, ".copilot", "config.toml"), "utf-8");
       assert.equal(config.match(/^\[tui\]$/gm)?.length ?? 0, 1);
       assert.match(config, /^theme = "night"$/m);
       assert.match(config, /^status_line = \["git-branch"\]$/m);
       assert.match(
         output,
-        /Codex CLI >= 0\.107\.0 manages \[tui\]; OMCP left that section untouched\./,
+        /Copilot CLI >= 0\.107\.0 manages \[tui\]; OMCP left that section untouched\./,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
-  it("keeps OMCP-managed [tui] writes for older Codex CLI versions", async () => {
+  it("keeps OMCP-managed [tui] writes for older Copilot CLI versions", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     try {
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
@@ -342,7 +342,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
         codexVersionProbe: () => "codex-cli 0.106.0",
       });
 
-      const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
+      const config = await readFile(join(wd, ".copilot", "config.toml"), "utf-8");
       assert.match(config, /^\[tui\]$/m);
       assert.match(output, /StatusLine configured in config\.toml via \[tui\] section\./);
     } finally {
@@ -367,7 +367,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
         mcpRegistryCandidates: [registryPath],
       });
 
-      const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
+      const config = await readFile(join(wd, ".copilot", "config.toml"), "utf-8");
       assert.match(config, /oh-my-copilot \(OMCP\) Shared MCP Registry Sync/);
       assert.match(config, /^\[mcp_servers\.eslint\]$/m);
       assert.match(config, /^command = "npx"$/m);
@@ -381,9 +381,9 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     try {
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
-      await mkdir(join(wd, ".codex"), { recursive: true });
+      await mkdir(join(wd, ".copilot"), { recursive: true });
       await writeFile(
-        join(wd, ".codex", "config.toml"),
+        join(wd, ".copilot", "config.toml"),
         [
           '[mcp_servers.filesystem]',
           'command = "npx"',
@@ -394,7 +394,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
 
       await runSetupInTempDir(wd, { scope: "project" });
 
-      const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
+      const config = await readFile(join(wd, ".copilot", "config.toml"), "utf-8");
       assert.match(config, /^\[mcp_servers\.filesystem\]$/m);
       assert.match(config, /^startup_timeout_sec = 15$/m);
     } finally {
@@ -406,9 +406,9 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     try {
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
-      await mkdir(join(wd, ".codex"), { recursive: true });
+      await mkdir(join(wd, ".copilot"), { recursive: true });
       await writeFile(
-        join(wd, ".codex", "config.toml"),
+        join(wd, ".copilot", "config.toml"),
         [
           '[mcp_servers.omcp_team_run]',
           'command = "node"',
@@ -419,7 +419,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
 
       const output = await runSetupWithCapturedLogs(wd, { scope: "project" });
 
-      const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
+      const config = await readFile(join(wd, ".copilot", "config.toml"), "utf-8");
       assert.match(
         output,
         /Removed retired \[mcp_servers\.omcp_team_run\] config during refresh\./,
@@ -433,10 +433,10 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
   it("syncs shared MCP registry entries into ~/.claude/settings.json for user scope", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     const previousHome = process.env.HOME;
-    const previousCodexHome = process.env.CODEX_HOME;
+    const previousCodexHome = process.env.COPILOT_HOME;
     try {
       process.env.HOME = wd;
-      delete process.env.CODEX_HOME;
+      delete process.env.COPILOT_HOME;
 
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
       await mkdir(join(wd, ".claude"), { recursive: true });
@@ -509,8 +509,8 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
     } finally {
       if (typeof previousHome === "string") process.env.HOME = previousHome;
       else delete process.env.HOME;
-      if (typeof previousCodexHome === "string") process.env.CODEX_HOME = previousCodexHome;
-      else delete process.env.CODEX_HOME;
+      if (typeof previousCodexHome === "string") process.env.COPILOT_HOME = previousCodexHome;
+      else delete process.env.COPILOT_HOME;
       await rm(wd, { recursive: true, force: true });
     }
   });
@@ -518,10 +518,10 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
   it("does not write ~/.claude/settings.json during project-scoped setup", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     const previousHome = process.env.HOME;
-    const previousCodexHome = process.env.CODEX_HOME;
+    const previousCodexHome = process.env.COPILOT_HOME;
     try {
       process.env.HOME = wd;
-      delete process.env.CODEX_HOME;
+      delete process.env.COPILOT_HOME;
 
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
       const registryPath = join(wd, "mcp-registry.json");
@@ -541,8 +541,8 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
     } finally {
       if (typeof previousHome === "string") process.env.HOME = previousHome;
       else delete process.env.HOME;
-      if (typeof previousCodexHome === "string") process.env.CODEX_HOME = previousCodexHome;
-      else delete process.env.CODEX_HOME;
+      if (typeof previousCodexHome === "string") process.env.COPILOT_HOME = previousCodexHome;
+      else delete process.env.COPILOT_HOME;
       await rm(wd, { recursive: true, force: true });
     }
   });
@@ -550,10 +550,10 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
   it("ignores legacy ~/.omc/mcp-registry.json during setup unless candidates are passed explicitly", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-setup-refresh-"));
     const previousHome = process.env.HOME;
-    const previousCodexHome = process.env.CODEX_HOME;
+    const previousCodexHome = process.env.COPILOT_HOME;
     try {
       process.env.HOME = wd;
-      delete process.env.CODEX_HOME;
+      delete process.env.COPILOT_HOME;
 
       await mkdir(join(wd, ".omcp", "state"), { recursive: true });
       await mkdir(join(wd, ".omc"), { recursive: true });
@@ -566,7 +566,7 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
 
       await runSetupInTempDir(wd, { scope: "project" });
 
-      const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
+      const config = await readFile(join(wd, ".copilot", "config.toml"), "utf-8");
       assert.doesNotMatch(config, /^\[mcp_servers\.legacy_helper\]$/m);
       assert.doesNotMatch(config, /Shared MCP Server: legacy_helper/);
 
@@ -576,8 +576,8 @@ describe("omcp setup refresh summary and dry-run behavior", () => {
     } finally {
       if (typeof previousHome === "string") process.env.HOME = previousHome;
       else delete process.env.HOME;
-      if (typeof previousCodexHome === "string") process.env.CODEX_HOME = previousCodexHome;
-      else delete process.env.CODEX_HOME;
+      if (typeof previousCodexHome === "string") process.env.COPILOT_HOME = previousCodexHome;
+      else delete process.env.COPILOT_HOME;
       await rm(wd, { recursive: true, force: true });
     }
   });

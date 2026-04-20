@@ -5,9 +5,9 @@ import { homedir, tmpdir } from "os";
 import { existsSync } from "fs";
 import { mkdtemp, mkdir, rm, symlink, writeFile } from "fs/promises";
 import {
-  codexHome,
-  codexConfigPath,
-  codexPromptsDir,
+  copilotHome,
+  copilotConfigPath,
+  copilotPromptsDir,
   userSkillsDir,
   projectSkillsDir,
   legacyUserSkillsDir,
@@ -27,20 +27,20 @@ import {
   resolveOmcpEntryPath,
 } from "../paths.js";
 
-describe("codexHome", () => {
+describe("copilotHome", () => {
   let originalCodexHome: string | undefined;
   let originalUserProfile: string | undefined;
 
   beforeEach(() => {
-    originalCodexHome = process.env.CODEX_HOME;
+    originalCodexHome = process.env.COPILOT_HOME;
     originalUserProfile = process.env.USERPROFILE;
   });
 
   afterEach(() => {
     if (typeof originalCodexHome === "string") {
-      process.env.CODEX_HOME = originalCodexHome;
+      process.env.COPILOT_HOME = originalCodexHome;
     } else {
-      delete process.env.CODEX_HOME;
+      delete process.env.COPILOT_HOME;
     }
 
     if (typeof originalUserProfile === "string") {
@@ -50,32 +50,32 @@ describe("codexHome", () => {
     }
   });
 
-  it("returns CODEX_HOME env var when set", () => {
-    process.env.CODEX_HOME = "/tmp/custom-codex";
-    assert.equal(codexHome(), "/tmp/custom-codex");
+  it("returns COPILOT_HOME env var when set", () => {
+    process.env.COPILOT_HOME = "/tmp/custom-codex";
+    assert.equal(copilotHome(), "/tmp/custom-codex");
   });
 
-  it("defaults to ~/.codex when CODEX_HOME is not set", () => {
-    delete process.env.CODEX_HOME;
-    assert.equal(codexHome(), join(homedir(), ".codex"));
+  it("defaults to ~/.copilot when COPILOT_HOME is not set", () => {
+    delete process.env.COPILOT_HOME;
+    assert.equal(copilotHome(), join(homedir(), ".copilot"));
   });
 });
 
-describe("codexConfigPath", () => {
+describe("copilotConfigPath", () => {
   let originalCodexHome: string | undefined;
   let originalUserProfile: string | undefined;
 
   beforeEach(() => {
-    originalCodexHome = process.env.CODEX_HOME;
+    originalCodexHome = process.env.COPILOT_HOME;
     originalUserProfile = process.env.USERPROFILE;
-    process.env.CODEX_HOME = "/tmp/test-codex";
+    process.env.COPILOT_HOME = "/tmp/test-codex";
   });
 
   afterEach(() => {
     if (typeof originalCodexHome === "string") {
-      process.env.CODEX_HOME = originalCodexHome;
+      process.env.COPILOT_HOME = originalCodexHome;
     } else {
-      delete process.env.CODEX_HOME;
+      delete process.env.COPILOT_HOME;
     }
 
     if (typeof originalUserProfile === "string") {
@@ -86,25 +86,25 @@ describe("codexConfigPath", () => {
   });
 
   it("returns config.toml under codex home", () => {
-    assert.equal(codexConfigPath(), join("/tmp/test-codex", "config.toml"));
+    assert.equal(copilotConfigPath(), join("/tmp/test-codex", "config.toml"));
   });
 });
 
-describe("codexPromptsDir", () => {
+describe("copilotPromptsDir", () => {
   let originalCodexHome: string | undefined;
   let originalUserProfile: string | undefined;
 
   beforeEach(() => {
-    originalCodexHome = process.env.CODEX_HOME;
+    originalCodexHome = process.env.COPILOT_HOME;
     originalUserProfile = process.env.USERPROFILE;
-    process.env.CODEX_HOME = "/tmp/test-codex";
+    process.env.COPILOT_HOME = "/tmp/test-codex";
   });
 
   afterEach(() => {
     if (typeof originalCodexHome === "string") {
-      process.env.CODEX_HOME = originalCodexHome;
+      process.env.COPILOT_HOME = originalCodexHome;
     } else {
-      delete process.env.CODEX_HOME;
+      delete process.env.COPILOT_HOME;
     }
 
     if (typeof originalUserProfile === "string") {
@@ -115,7 +115,7 @@ describe("codexPromptsDir", () => {
   });
 
   it("returns prompts/ under codex home", () => {
-    assert.equal(codexPromptsDir(), join("/tmp/test-codex", "prompts"));
+    assert.equal(copilotPromptsDir(), join("/tmp/test-codex", "prompts"));
   });
 });
 
@@ -124,16 +124,16 @@ describe("userSkillsDir", () => {
   let originalUserProfile: string | undefined;
 
   beforeEach(() => {
-    originalCodexHome = process.env.CODEX_HOME;
+    originalCodexHome = process.env.COPILOT_HOME;
     originalUserProfile = process.env.USERPROFILE;
-    process.env.CODEX_HOME = "/tmp/test-codex";
+    process.env.COPILOT_HOME = "/tmp/test-codex";
   });
 
   afterEach(() => {
     if (typeof originalCodexHome === "string") {
-      process.env.CODEX_HOME = originalCodexHome;
+      process.env.COPILOT_HOME = originalCodexHome;
     } else {
-      delete process.env.CODEX_HOME;
+      delete process.env.COPILOT_HOME;
     }
 
     if (typeof originalUserProfile === "string") {
@@ -143,18 +143,18 @@ describe("userSkillsDir", () => {
     }
   });
 
-  it("returns CODEX_HOME/skills", () => {
+  it("returns COPILOT_HOME/skills", () => {
     assert.equal(userSkillsDir(), join("/tmp/test-codex", "skills"));
   });
 });
 
 describe("projectSkillsDir", () => {
   it("uses provided projectRoot", () => {
-    assert.equal(projectSkillsDir("/my/project"), join("/my/project", ".codex", "skills"));
+    assert.equal(projectSkillsDir("/my/project"), join("/my/project", ".copilot", "skills"));
   });
 
   it("defaults to cwd when no projectRoot given", () => {
-    assert.equal(projectSkillsDir(), join(process.cwd(), ".codex", "skills"));
+    assert.equal(projectSkillsDir(), join(process.cwd(), ".copilot", "skills"));
   });
 });
 
@@ -200,16 +200,16 @@ describe("listInstalledSkillDirectories", () => {
   let originalUserProfile: string | undefined;
 
   beforeEach(() => {
-    originalCodexHome = process.env.CODEX_HOME;
+    originalCodexHome = process.env.COPILOT_HOME;
     originalHome = process.env.HOME;
     originalUserProfile = process.env.USERPROFILE;
   });
 
   afterEach(() => {
     if (typeof originalCodexHome === "string") {
-      process.env.CODEX_HOME = originalCodexHome;
+      process.env.COPILOT_HOME = originalCodexHome;
     } else {
-      delete process.env.CODEX_HOME;
+      delete process.env.COPILOT_HOME;
     }
 
     if (typeof originalHome === "string") {
@@ -228,13 +228,13 @@ describe("listInstalledSkillDirectories", () => {
   it("deduplicates by skill name and prefers project skills over user skills", async () => {
     const projectRoot = await mkdtemp(join(tmpdir(), "omcp-paths-project-"));
     const codexHomeRoot = await mkdtemp(join(tmpdir(), "omcp-paths-codex-"));
-    process.env.CODEX_HOME = codexHomeRoot;
+    process.env.COPILOT_HOME = codexHomeRoot;
 
     try {
-      const projectHelpDir = join(projectRoot, ".codex", "skills", "help");
+      const projectHelpDir = join(projectRoot, ".copilot", "skills", "help");
       const projectOnlyDir = join(
         projectRoot,
-        ".codex",
+        ".copilot",
         "skills",
         "project-only",
       );
@@ -272,11 +272,11 @@ describe("listInstalledSkillDirectories", () => {
   });
   it("detects overlapping legacy and canonical user skill roots including content mismatches", async () => {
     const homeRoot = await mkdtemp(join(tmpdir(), "omcp-paths-home-"));
-    const codexHomeRoot = join(homeRoot, ".codex");
+    const codexHomeRoot = join(homeRoot, ".copilot");
     const legacyRoot = join(homeRoot, ".agents", "skills");
     process.env.HOME = homeRoot;
     process.env.USERPROFILE = homeRoot;
-    process.env.CODEX_HOME = codexHomeRoot;
+    process.env.COPILOT_HOME = codexHomeRoot;
 
     try {
       const canonicalHelpDir = join(codexHomeRoot, "skills", "help");
@@ -310,13 +310,13 @@ describe("listInstalledSkillDirectories", () => {
 
   it("treats a legacy link to canonical skills as the same resolved target", async () => {
     const homeRoot = await mkdtemp(join(tmpdir(), "omcp-paths-linked-home-"));
-    const codexHomeRoot = join(homeRoot, ".codex");
+    const codexHomeRoot = join(homeRoot, ".copilot");
     const canonicalSkillsRoot = join(codexHomeRoot, "skills");
     const legacyParent = join(homeRoot, ".agents");
     const legacyRoot = join(legacyParent, "skills");
     process.env.HOME = homeRoot;
     process.env.USERPROFILE = homeRoot;
-    process.env.CODEX_HOME = codexHomeRoot;
+    process.env.COPILOT_HOME = codexHomeRoot;
 
     try {
       const canonicalHelpDir = join(canonicalSkillsRoot, "help");

@@ -34,11 +34,11 @@ async function makeTempDir(): Promise<string> {
 }
 
 function setMockCodexHome(codexHomePath: string): () => void {
-  const previous = process.env.CODEX_HOME;
-  process.env.CODEX_HOME = codexHomePath;
+  const previous = process.env.COPILOT_HOME;
+  process.env.COPILOT_HOME = codexHomePath;
   return () => {
-    if (typeof previous === "string") process.env.CODEX_HOME = previous;
-    else delete process.env.CODEX_HOME;
+    if (typeof previous === "string") process.env.COPILOT_HOME = previous;
+    else delete process.env.COPILOT_HOME;
   };
 }
 
@@ -697,7 +697,7 @@ describe("session-scoped model instructions file", () => {
 
   before(async () => {
     tempDir = await makeTempDir();
-    restoreCodexHome = setMockCodexHome(join(tempDir, "home", ".codex"));
+    restoreCodexHome = setMockCodexHome(join(tempDir, "home", ".copilot"));
   });
   after(async () => {
     restoreCodexHome?.();
@@ -705,9 +705,9 @@ describe("session-scoped model instructions file", () => {
   });
 
   it("writes user + project AGENTS.md + runtime overlay into session-scoped file", async () => {
-    const userAgentsMd = join(tempDir, "home", ".codex", "AGENTS.md");
+    const userAgentsMd = join(tempDir, "home", ".copilot", "AGENTS.md");
     const projectAgentsMd = join(tempDir, "AGENTS.md");
-    await mkdir(join(tempDir, "home", ".codex"), { recursive: true });
+    await mkdir(join(tempDir, "home", ".copilot"), { recursive: true });
     await writeFile(userAgentsMd, "# User instructions\n\nStart globally.\n");
     const projectContent = "# Project instructions\n\nStay in scope.\n";
     await writeFile(projectAgentsMd, projectContent);
@@ -736,11 +736,11 @@ describe("session-scoped model instructions file", () => {
   });
 
   it("deduplicates duplicate skill references when project and user scopes both install the same skill", async () => {
-    const userAgentsMd = join(tempDir, "home", ".codex", "AGENTS.md");
+    const userAgentsMd = join(tempDir, "home", ".copilot", "AGENTS.md");
     const projectAgentsMd = join(tempDir, "AGENTS.md");
-    const userSkillDir = join(tempDir, "home", ".codex", "skills", "help");
-    const projectSkillDir = join(tempDir, ".codex", "skills", "help");
-    await mkdir(join(tempDir, "home", ".codex"), { recursive: true });
+    const userSkillDir = join(tempDir, "home", ".copilot", "skills", "help");
+    const projectSkillDir = join(tempDir, ".copilot", "skills", "help");
+    await mkdir(join(tempDir, "home", ".copilot"), { recursive: true });
     await mkdir(userSkillDir, { recursive: true });
     await mkdir(projectSkillDir, { recursive: true });
     await writeFile(join(userSkillDir, "SKILL.md"), "# user help\n");
@@ -750,7 +750,7 @@ describe("session-scoped model instructions file", () => {
       [
         "# User instructions",
         "",
-        "- help: user copy (file: /tmp/home/.codex/skills/help/SKILL.md)",
+        "- help: user copy (file: /tmp/home/.copilot/skills/help/SKILL.md)",
       ].join("\n"),
     );
     await writeFile(
@@ -758,7 +758,7 @@ describe("session-scoped model instructions file", () => {
       [
         "# Project instructions",
         "",
-        "- help: project copy (file: /tmp/project/.codex/skills/help/SKILL.md)",
+        "- help: project copy (file: /tmp/project/.copilot/skills/help/SKILL.md)",
       ].join("\n"),
     );
 

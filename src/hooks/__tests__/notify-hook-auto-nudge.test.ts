@@ -108,7 +108,7 @@ if [[ "\$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "\$format" == "#{pane_start_command}" && "\$target" == "%99" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "\$format" == "#S" ]]; then
@@ -126,7 +126,7 @@ if [[ "\$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ -n "\$target" && "\$target" == "${'${OMCP_TEST_TMUX_SESSION_NAME:-devsess}'}" ]]; then
-    printf '%%99\t1\tnode\tcodex --model gpt-5\n'
+    printf '%%99\t1\tnode\tcopilot --model gpt-5\n'
     exit 0
   fi
   echo "%1 12345"
@@ -139,7 +139,7 @@ exit 0
 function runNotifyHook(
   cwd: string,
   fakeBinDir: string,
-  codexHome: string,
+  copilotHome: string,
   payloadOverrides: Record<string, unknown> = {},
   extraEnv: Record<string, string> = {},
 ): ReturnType<typeof spawnSync> {
@@ -174,7 +174,7 @@ function runNotifyHook(
     env: {
       ...process.env,
       PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-      CODEX_HOME: codexHome,
+      COPILOT_HOME: copilotHome,
       ...(extraEnv.OMCP_TEST_UNMANAGED_SESSION !== '1' && !extraEnv.OMCP_TEAM_WORKER ? { OMCP_SESSION_ID: 'sess-managed' } : {}),
       ...(extraEnv.OMCP_TEST_UNMANAGED_SESSION !== '1' && !extraEnv.OMCP_TEAM_WORKER ? { OMCP_TEST_TMUX_SESSION_NAME: buildTmuxSessionName(cwd, 'sess-managed') } : {}),
       TMUX_PANE: '%99',
@@ -194,16 +194,16 @@ describe('notify-hook auto-nudge', () => {
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0 },
       });
 
@@ -214,7 +214,7 @@ describe('notify-hook auto-nudge', () => {
       const sessionStateDir = join(stateDir, 'sessions', 'sess-managed');
       await mkdir(sessionStateDir, { recursive: true });
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'I analyzed the code. Keep going and finish the focused cleanup.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -234,17 +234,17 @@ describe('notify-hook auto-nudge', () => {
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
       // Config: enabled, delaySec=0 for fast tests
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -252,7 +252,7 @@ describe('notify-hook auto-nudge', () => {
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'I analyzed the code. Keep going and finish the focused cleanup.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -260,7 +260,7 @@ describe('notify-hook auto-nudge', () => {
       assert.ok(existsSync(tmuxLogPath), 'tmux should have been called');
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
       assert.match(tmuxLog, defaultAutoNudgePattern('%99'), 'should send nudge response with injection marker');
-      // Codex CLI needs C-m sent twice with a delay for reliable submission
+      // Copilot CLI needs C-m sent twice with a delay for reliable submission
       const cmMatches = tmuxLog.match(/send-keys -t %99 C-m/g);
       assert.ok(cmMatches && cmMatches.length >= 2, `should send C-m twice, got ${cmMatches?.length ?? 0}`);
     });
@@ -271,16 +271,16 @@ describe('notify-hook auto-nudge', () => {
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -295,7 +295,7 @@ describe('notify-hook auto-nudge', () => {
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'I can continue with the plan from here.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -313,16 +313,16 @@ describe('notify-hook auto-nudge', () => {
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeJson(join(omcpDir, 'tmux-hook.json'), {
@@ -334,7 +334,7 @@ describe('notify-hook auto-nudge', () => {
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'I analyzed the code. If you want me to make these changes, let me know.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -349,16 +349,16 @@ describe('notify-hook auto-nudge', () => {
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
@@ -380,7 +380,7 @@ describe('notify-hook auto-nudge', () => {
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'session-id': 'sess-managed',
         'last-assistant-message': 'I analyzed the code. If you want me to make these changes, let me know.',
       }, {
@@ -399,23 +399,23 @@ describe('notify-hook auto-nudge', () => {
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'I analyzed the code. If you want me to make these changes, let me know.',
       }, {
         OMCP_TEST_UNMANAGED_SESSION: '1',
@@ -433,7 +433,7 @@ describe('notify-hook auto-nudge', () => {
       const stateDir = join(omcpDir, 'state');
       const sessionStateDir = join(stateDir, 'sessions', 'sess-managed');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const managedSessionName = buildTmuxSessionName(cwd, 'sess-managed');
@@ -441,10 +441,10 @@ describe('notify-hook auto-nudge', () => {
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
       await mkdir(sessionStateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
@@ -453,7 +453,7 @@ describe('notify-hook auto-nudge', () => {
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'session-id': 'sess-other',
         'last-assistant-message': 'I analyzed the code. If you want me to make these changes, let me know.',
       }, {
@@ -472,7 +472,7 @@ describe('notify-hook auto-nudge', () => {
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const expectedManagedSessionName = buildTmuxSessionName(cwd, 'sess-managed');
@@ -480,10 +480,10 @@ describe('notify-hook auto-nudge', () => {
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
@@ -492,7 +492,7 @@ describe('notify-hook auto-nudge', () => {
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'session-id': 'sess-managed',
         'last-assistant-message': 'I analyzed the code. If you want me to make these changes, let me know.',
       }, {
@@ -516,17 +516,17 @@ describe('notify-hook auto-nudge', () => {
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const captureFile = join(cwd, 'capture-output.txt');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -537,7 +537,7 @@ describe('notify-hook auto-nudge', () => {
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'clean output with no stall',
       }, {
         OMCP_TEST_CAPTURE_FILE: captureFile,
@@ -555,17 +555,17 @@ describe('notify-hook auto-nudge', () => {
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const captureFile = join(cwd, 'capture-output.txt');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -582,7 +582,7 @@ describe('notify-hook auto-nudge', () => {
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'clean output with no stall',
       }, {
         OMCP_TEST_CAPTURE_FILE: captureFile,
@@ -601,7 +601,7 @@ describe('notify-hook auto-nudge', () => {
       const stateDir = join(omcpDir, 'state');
       const sessionStateDir = join(stateDir, 'sessions', 'sess-managed');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const managedSessionName = buildTmuxSessionName(cwd, 'sess-managed');
@@ -609,10 +609,10 @@ describe('notify-hook auto-nudge', () => {
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
       await mkdir(sessionStateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -646,7 +646,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%100" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" && "$target" == "%100" ]]; then
@@ -668,7 +668,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t0\tsh\tbash\n%%100\t1\tnode\tcodex --model gpt-5\n"
+    printf "%%99\t0\tsh\tbash\n%%100\t1\tnode\tcopilot --model gpt-5\n"
     exit 0
   fi
   echo "%1 12345"
@@ -686,7 +686,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), fakeTmux);
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and finish the cleanup from here.',
       }, {
         TMUX_PANE: '',
@@ -704,7 +704,7 @@ exit 0
       const stateDir = join(omcpDir, 'state');
       const sessionStateDir = join(stateDir, 'sessions', 'sess-managed');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const managedSessionName = buildTmuxSessionName(cwd, 'sess-managed');
@@ -712,10 +712,10 @@ exit 0
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
       await mkdir(sessionStateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -741,11 +741,11 @@ if [[ "$cmd" == "display-message" ]]; then
     esac
   done
   if [[ "$format" == "#{pane_current_command}" && "$target" == "%99" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%99" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" && "$target" == "%99" ]]; then
@@ -767,7 +767,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t0\tcodex\tcodex\\n%%100\t1\tcodex\tcodex\\n"
+    printf "%%99\t0\tcopilot\tcopilot\\n%%100\t1\tcopilot\tcopilot\\n"
     exit 0
   fi
   echo "%1 12345"
@@ -785,7 +785,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), fakeTmux);
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and finish the cleanup from here.',
       }, {
         TMUX_PANE: '',
@@ -804,7 +804,7 @@ exit 0
       const stateDir = join(omcpDir, 'state');
       const sessionStateDir = join(stateDir, 'sessions', 'sess-managed');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const managedSessionName = buildTmuxSessionName(cwd, 'sess-managed');
@@ -812,10 +812,10 @@ exit 0
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
       await mkdir(sessionStateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -867,7 +867,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t0\tnode\tbash\\n%%100\t1\tnode\tcodex --model gpt-5\\n"
+    printf "%%99\t0\tnode\tbash\\n%%100\t1\tnode\tcopilot --model gpt-5\\n"
     exit 0
   fi
   echo "%1 12345"
@@ -885,7 +885,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), fakeTmux);
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and finish the cleanup from here.',
       }, {
         TMUX_PANE: '',
@@ -904,7 +904,7 @@ exit 0
       const stateDir = join(omcpDir, 'state');
       const sessionStateDir = join(stateDir, 'sessions', 'sess-managed');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const managedSessionName = buildTmuxSessionName(cwd, 'sess-managed');
@@ -912,10 +912,10 @@ exit 0
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
       await mkdir(sessionStateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -945,7 +945,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%99" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" && "$target" == "%100" ]]; then
@@ -967,7 +967,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t1\tbash\tcodex --model gpt-5\\n%%100\t0\tnode\tcodex --model gpt-5\\n"
+    printf "%%99\t1\tbash\tcopilot --model gpt-5\\n%%100\t0\tnode\tcopilot --model gpt-5\\n"
     exit 0
   fi
   echo "%1 12345"
@@ -985,7 +985,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), fakeTmux);
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and finish the cleanup from here.',
       }, {
         TMUX_PANE: '',
@@ -1004,7 +1004,7 @@ exit 0
       const stateDir = join(omcpDir, 'state');
       const sessionStateDir = join(stateDir, 'sessions', 'sess-managed');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const managedSessionName = buildTmuxSessionName(cwd, 'sess-managed');
@@ -1012,10 +1012,10 @@ exit 0
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
       await mkdir(sessionStateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -1045,7 +1045,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%99" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%99" ]]; then
@@ -1063,7 +1063,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t1\tbash\tcodex --model gpt-5\\n%%100\t0\tbash\tbash\\n"
+    printf "%%99\t1\tbash\tcopilot --model gpt-5\\n%%100\t0\tbash\tbash\\n"
     exit 0
   fi
   echo "%1 12345"
@@ -1081,7 +1081,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), fakeTmux);
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and finish the cleanup from here.',
       }, {
         TMUX_PANE: '',
@@ -1098,24 +1098,24 @@ exit 0
     await withTempWorkingDir(async (cwd) => {
       const workerStateRoot = join(cwd, 'leader-state-root');
       const logsDir = join(cwd, '.omcp', 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const managedSessionName = buildTmuxSessionName(cwd, 'sess-managed');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(workerStateRoot, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'I can continue with the worker follow-up from here.',
       }, {
         OMCP_TEAM_WORKER: 'auto-nudge/worker-1',
@@ -1135,16 +1135,16 @@ exit 0
     await withTempWorkingDir(async (cwd) => {
       const workerStateRoot = join(cwd, 'leader-state-root');
       const logsDir = join(cwd, '.omcp', 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(workerStateRoot, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeJson(join(workerStateRoot, 'ralph-state.json'), {
@@ -1172,7 +1172,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%99" ]]; then
-    echo "codex --model gpt-5"
+    echo "copilot --model gpt-5"
     exit 0
   fi
   if [[ "$format" == "#{pane_in_mode}" && "$target" == "%99" ]]; then
@@ -1197,7 +1197,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), fakeTmux);
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'I can continue with the worker follow-up from here.',
       }, {
         OMCP_TEAM_WORKER: 'auto-nudge/worker-1',
@@ -1216,16 +1216,16 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -1235,7 +1235,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'I completed the refactoring. All tests pass.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -1252,17 +1252,17 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const managedSessionName = buildTmuxSessionName(cwd, 'sess-managed');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
@@ -1303,7 +1303,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), fakeTmux);
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Would you like me to continue?',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -1319,17 +1319,17 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const managedSessionName = buildTmuxSessionName(cwd, 'sess-managed');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
@@ -1390,7 +1390,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%99\t1\tsh\tbash\\n%%100\t0\tnode\tcodex --model gpt-5\\n"
+    printf "%%99\t1\tsh\tbash\\n%%100\t0\tnode\tcopilot --model gpt-5\\n"
     exit 0
   fi
   echo "%1 12345"
@@ -1401,7 +1401,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), fakeTmux);
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'keep going',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -1418,24 +1418,24 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const managedSessionName = buildTmuxSessionName(cwd, 'sess-managed');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath, '1'));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and finish the cleanup from here.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -1451,17 +1451,17 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const captureFile = join(cwd, 'capture-output.txt');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
@@ -1477,7 +1477,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Would you like me to continue with the next step?',
       }, {
         OMCP_TEST_CAPTURE_FILE: captureFile,
@@ -1496,24 +1496,24 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
       // Explicitly disabled
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: false, delaySec: 0 },
       });
 
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Would you like me to proceed?',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -1530,16 +1530,16 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0, ttlMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -1550,13 +1550,13 @@ exit 0
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
       const sharedTurnId = 'semantic-dedup-turn';
-      const first = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const first = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'turn-id': sharedTurnId,
         'last-assistant-message': 'Keep going and finish the cleanup from here.',
       });
       assert.equal(first.status, 0, `first hook failed: ${first.stderr || first.stdout}`);
 
-      const second = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const second = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'turn-id': sharedTurnId,
         'last-assistant-message': 'Continue with the cleanup from here.',
       });
@@ -1576,16 +1576,16 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0, ttlMs: 5000 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -1595,13 +1595,13 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const first = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const first = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'turn-id': 'cooldown-turn-1',
         'last-assistant-message': 'Continue with the implementation from here.',
       });
       assert.equal(first.status, 0, `first hook failed: ${first.stderr || first.stdout}`);
 
-      const second = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const second = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'turn-id': 'cooldown-turn-2',
         'last-assistant-message': 'I can also move forward with the implementation.',
       });
@@ -1617,7 +1617,7 @@ exit 0
         lastNudgeAt: '2026-03-01T00:00:00.000Z',
       });
 
-      const third = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const third = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'turn-id': 'cooldown-turn-3',
         'last-assistant-message': 'Keep going and finish the focused tests.',
       });
@@ -1637,7 +1637,7 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const lastTurnAt = '2026-03-01T00:00:00.000Z';
@@ -1645,10 +1645,10 @@ exit 0
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0, ttlMs: 5000 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -1663,7 +1663,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const first = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const first = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'turn-id': 'stalled-turn-1',
         'last-assistant-message': lastMessage,
       });
@@ -1676,7 +1676,7 @@ exit 0
         lastNudgeAt: '2026-03-01T00:00:10.000Z',
       });
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'turn-id': 'stalled-turn-1',
         'last-assistant-message': lastMessage,
       });
@@ -1696,17 +1696,17 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const lastMessage = 'Keep going and finish the cleanup from here.';
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0, ttlMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -1715,14 +1715,14 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const first = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const first = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         type: 'agent-turn-complete',
         'turn-id': 'turn-complete-1',
         'last-assistant-message': lastMessage,
       });
       assert.equal(first.status, 0, `first hook failed: ${first.stderr || first.stdout}`);
 
-      const second = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const second = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         type: 'function_call_output',
         'turn-id': 'function-call-output-1',
         'last-assistant-message': lastMessage,
@@ -1746,23 +1746,23 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0, response: 'continue now' },
       });
 
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and implement this feature.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -1777,16 +1777,16 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -1796,7 +1796,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and finish the focused cleanup.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -1814,22 +1814,22 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(join(cwd, 'tmux.log')));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'input-messages': ['please use $autopilot for this task'],
         'last-assistant-message': 'Here is the plan I will follow.',
       });
@@ -1854,16 +1854,16 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeJson(join(stateDir, 'deep-interview-state.json'), {
@@ -1875,7 +1875,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Would you like me to continue?',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -1891,16 +1891,16 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -1927,7 +1927,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Would you like me to continue?',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -1942,23 +1942,23 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const sessionStateDir = join(stateDir, 'sessions', 'sess-managed');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(join(cwd, 'tmux.log')));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'input-messages': ['please run a deep interview first'],
         'last-assistant-message': 'Round 1 | Target: Goal Clarity',
       });
@@ -1991,29 +1991,29 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const sessionStateDir = join(stateDir, 'sessions', 'sess-managed');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(join(cwd, 'tmux.log')));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const activated = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const activated = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'input-messages': ['please run a deep interview first'],
         'last-assistant-message': 'Round 1 | Target: Goal Clarity',
       });
       assert.equal(activated.status, 0, `activation hook failed: ${activated.stderr || activated.stdout}`);
 
-      const completed = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const completed = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'input-messages': ['continue'],
         'last-assistant-message': 'Interview completed. Final summary ready.',
       });
@@ -2051,16 +2051,16 @@ exit 0
         const omcpDir = join(cwd, '.omcp');
         const stateDir = join(omcpDir, 'state');
         const logsDir = join(omcpDir, 'logs');
-        const codexHome = join(cwd, 'codex-home');
+        const copilotHome = join(cwd, 'codex-home');
         const fakeBinDir = join(cwd, 'fake-bin');
         const tmuxLogPath = join(cwd, 'tmux.log');
 
         await mkdir(logsDir, { recursive: true });
         await mkdir(stateDir, { recursive: true });
-        await mkdir(codexHome, { recursive: true });
+        await mkdir(copilotHome, { recursive: true });
         await mkdir(fakeBinDir, { recursive: true });
 
-        await writeJson(join(codexHome, '.omcp-config.json'), {
+        await writeJson(join(copilotHome, '.omcp-config.json'), {
           autoNudge: { enabled: true, delaySec: 0, stallMs: 0, response: blockedResponse },
         });
         await writeJson(join(stateDir, 'skill-active-state.json'), {
@@ -2084,7 +2084,7 @@ exit 0
         await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
         await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-        const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+        const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
           'last-assistant-message': 'Keep going and finish the cleanup.',
         });
         assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -2101,16 +2101,16 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0, response: 'yes' },
       });
       await writeJson(join(stateDir, 'skill-active-state.json'), {
@@ -2134,7 +2134,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and finish the cleanup.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -2149,16 +2149,16 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0, response: NEXT_I_SHOULD_RESPONSE },
       });
       await writeJson(join(stateDir, 'skill-active-state.json'), {
@@ -2182,7 +2182,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Would you like me to continue?',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -2198,7 +2198,7 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const capturePath = join(cwd, 'capture.txt');
@@ -2207,10 +2207,10 @@ exit 0
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0, response: customResponse },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -2237,7 +2237,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and finish the cleanup.',
       }, {
         OMCP_TEST_CAPTURE_FILE: capturePath,
@@ -2258,15 +2258,15 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -2293,7 +2293,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'All tests pass. Completed with summary.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -2314,17 +2314,17 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const specDir = join(cwd, '.omcp', 'specs', 'autoresearch-demo');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
       await mkdir(specDir, { recursive: true });
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -2355,7 +2355,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Completed with final summary after validator pass.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -2376,15 +2376,15 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -2410,7 +2410,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(join(cwd, 'tmux.log')));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Interview completed. Final summary ready.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -2433,15 +2433,15 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -2474,7 +2474,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(join(cwd, 'tmux.log')));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Summary so far: done with the first round of questions.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -2506,15 +2506,15 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -2540,7 +2540,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(join(cwd, 'tmux.log')));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Deep interview failed with error: unable to continue.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -2563,15 +2563,15 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeManagedSessionState(stateDir, cwd);
@@ -2597,7 +2597,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(join(cwd, 'tmux.log')));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'input-messages': ['abort'],
         'last-assistant-message': 'Stopping interview now.',
       });
@@ -2623,17 +2623,17 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
       // Custom patterns that replace defaults
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: {
           enabled: true,
           delaySec: 0,
@@ -2646,7 +2646,7 @@ exit 0
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
       // Default pattern should NOT trigger with custom config
-      const result1 = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result1 = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and finish the focused cleanup.',
       });
       assert.equal(result1.status, 0);
@@ -2662,7 +2662,7 @@ exit 0
       }
 
       // Custom pattern should trigger
-      const result2 = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result2 = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Changes ready. Awaiting approval before applying.',
       });
       assert.equal(result2.status, 0);
@@ -2677,24 +2677,24 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
       // No .omcp-config.json at all — should use defaults (enabled=true, stallMs=5000)
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
 
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'Keep going and fix the remaining issues.',
       });
       assert.equal(result.status, 0, `hook failed: ${result.stderr || result.stdout}`);
@@ -2710,17 +2710,17 @@ exit 0
       const omcpDir = join(cwd, '.omcp');
       const stateDir = join(omcpDir, 'state');
       const logsDir = join(omcpDir, 'logs');
-      const codexHome = join(cwd, 'codex-home');
+      const copilotHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
       const captureFile = join(cwd, 'capture-output.txt');
 
       await mkdir(logsDir, { recursive: true });
       await mkdir(stateDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omcp-config.json'), {
+      await writeJson(join(copilotHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0, stallMs: 0 },
       });
       await writeFile(captureFile, 'Here are the results.\nKeep going and finish the implementation.\n› ');
@@ -2728,7 +2728,7 @@ exit 0
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
 
-      const result = runNotifyHook(cwd, fakeBinDir, codexHome, {
+      const result = runNotifyHook(cwd, fakeBinDir, copilotHome, {
         'last-assistant-message': 'clean output with no stall',
       }, {
         TMUX_PANE: '',  // No pane available

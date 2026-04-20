@@ -7,7 +7,7 @@ import {
 } from '../config/models.js';
 
 const MADMAX_FLAG = '--madmax';
-const CODEX_BYPASS_FLAG = '--dangerously-bypass-approvals-and-sandbox';
+const COPILOT_BYPASS_FLAG = '--allow-all-tools';
 const MODEL_FLAG = '--model';
 const CONFIG_FLAG = '-c';
 const REASONING_KEY = 'model_reasoning_effort';
@@ -76,7 +76,7 @@ export function parseTeamWorkerLaunchArgs(args: string[]): ParsedTeamWorkerLaunc
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    if (arg === CODEX_BYPASS_FLAG || arg === MADMAX_FLAG) {
+    if (arg === COPILOT_BYPASS_FLAG || arg === MADMAX_FLAG) {
       wantsBypass = true;
       continue;
     }
@@ -124,7 +124,7 @@ export function collectInheritableTeamWorkerArgs(codexArgs: string[]): string[] 
   const parsed = parseTeamWorkerLaunchArgs(codexArgs);
 
   const inherited: string[] = [];
-  if (parsed.wantsBypass) inherited.push(CODEX_BYPASS_FLAG);
+  if (parsed.wantsBypass) inherited.push(COPILOT_BYPASS_FLAG);
   if (parsed.reasoningOverride) inherited.push(CONFIG_FLAG, parsed.reasoningOverride);
   if (parsed.modelOverride) inherited.push(MODEL_FLAG, parsed.modelOverride);
   return inherited;
@@ -138,7 +138,7 @@ export function normalizeTeamWorkerLaunchArgs(
   const parsed = parseTeamWorkerLaunchArgs(args);
   const normalized = [...parsed.passthrough];
 
-  if (parsed.wantsBypass) normalized.push(CODEX_BYPASS_FLAG);
+  if (parsed.wantsBypass) normalized.push(COPILOT_BYPASS_FLAG);
 
   const selectedReasoning = parsed.reasoningOverride
     ?? (normalizeOptionalReasoning(preferredReasoning)
@@ -171,21 +171,21 @@ export function resolveAgentReasoningEffort(agentType?: string): TeamReasoningEf
 
 export function resolveAgentDefaultModel(
   agentType?: string,
-  codexHomeOverride?: string,
+  copilotHomeOverride?: string,
 ): string | undefined {
   if (typeof agentType !== 'string' || agentType.trim() === '') return undefined;
   const normalized = agentType.trim().toLowerCase();
   if (normalized === '') return undefined;
-  if (normalized.endsWith('-low')) return resolveTeamLowComplexityDefaultModel(codexHomeOverride);
-  if (normalized === 'executor') return getMainDefaultModel(codexHomeOverride);
+  if (normalized.endsWith('-low')) return resolveTeamLowComplexityDefaultModel(copilotHomeOverride);
+  if (normalized === 'executor') return getMainDefaultModel(copilotHomeOverride);
 
   switch (getAgent(normalized)?.modelClass) {
     case 'fast':
-      return resolveTeamLowComplexityDefaultModel(codexHomeOverride);
+      return resolveTeamLowComplexityDefaultModel(copilotHomeOverride);
     case 'frontier':
-      return getMainDefaultModel(codexHomeOverride);
+      return getMainDefaultModel(copilotHomeOverride);
     case 'standard':
-      return getStandardDefaultModel(codexHomeOverride);
+      return getStandardDefaultModel(copilotHomeOverride);
     default:
       return undefined;
   }
@@ -199,6 +199,6 @@ export function isLowComplexityAgentType(agentType?: string): boolean {
   return LOW_COMPLEXITY_AGENT_TYPES.has(normalized);
 }
 
-export function resolveTeamLowComplexityDefaultModel(codexHomeOverride?: string): string {
-  return getSparkDefaultModel(codexHomeOverride);
+export function resolveTeamLowComplexityDefaultModel(copilotHomeOverride?: string): string {
+  return getSparkDefaultModel(copilotHomeOverride);
 }

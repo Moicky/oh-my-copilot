@@ -169,10 +169,10 @@ printf '# Answer\nHarness completed\n' > "$output_path"
 }
 
 async function writePosixPackageManagerCodexShim(wd: string, capturePath: string): Promise<string> {
-  const packageRoot = join(wd, 'node_modules', '@openai', 'codex');
+  const packageRoot = join(wd, 'node_modules', '@github', 'copilot');
   const binDir = join(wd, 'node_modules', '.bin');
-  const entrypointPath = join(packageRoot, 'bin', 'codex.js');
-  const shimPath = join(binDir, 'codex');
+  const entrypointPath = join(packageRoot, 'bin', 'copilot.js');
+  const shimPath = join(binDir, 'copilot');
   await mkdir(join(packageRoot, 'bin'), { recursive: true });
   await mkdir(binDir, { recursive: true });
   await writeFile(
@@ -209,9 +209,9 @@ fs.writeFileSync(outputPath, '# Answer\\nHarness completed\\n');
     `#!/bin/sh
 basedir=$(dirname "$0")
 if [ -x "$basedir/node" ]; then
-  exec "$basedir/node" "$basedir/../@openai/codex/bin/codex.js" "$@"
+  exec "$basedir/node" "$basedir/../@github/copilot/bin/copilot.js" "$@"
 fi
-exec node "$basedir/../@openai/codex/bin/codex.js" "$@"
+exec node "$basedir/../@github/copilot/bin/copilot.js" "$@"
 `,
   );
   await chmod(shimPath, 0o755);
@@ -882,7 +882,7 @@ describe('exploreCommand', () => {
         assert.equal(result.stdout, '# Answer\nHarness completed\n');
         const captured = await readFile(capturePath, 'utf-8');
         assert.match(captured, /ARGV0=.*\/node$/m);
-        assert.match(captured, /ARGV1=.*node_modules\/@openai\/codex\/bin\/codex\.js$/m);
+        assert.match(captured, /ARGV1=.*node_modules\/@github\/copilot\/bin\/copilot\.js$/m);
         assert.match(captured, /PATH=.*omcp-explore-allowlist-/);
         assert.doesNotMatch(captured, /PATH=.*node_modules\/\.bin/);
       });

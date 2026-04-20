@@ -155,7 +155,7 @@ describe('sanitizeTeamName', () => {
 describe('chooseTeamLeaderPaneId', () => {
   it('keeps preferred pane when it is not HUD', () => {
     const panes = [
-      { paneId: '%1', currentCommand: 'node', startCommand: "'codex'" },
+      { paneId: '%1', currentCommand: 'node', startCommand: "'copilot'" },
       { paneId: '%2', currentCommand: 'node', startCommand: "node omcp hud --watch" },
     ];
     assert.equal(chooseTeamLeaderPaneId(panes, '%1'), '%1');
@@ -164,7 +164,7 @@ describe('chooseTeamLeaderPaneId', () => {
   it('switches away from HUD preferred pane to first non-HUD pane', () => {
     const panes = [
       { paneId: '%2', currentCommand: 'node', startCommand: "node omcp hud --watch" },
-      { paneId: '%1', currentCommand: 'node', startCommand: "'codex'" },
+      { paneId: '%1', currentCommand: 'node', startCommand: "'copilot'" },
     ];
     assert.equal(chooseTeamLeaderPaneId(panes, '%2'), '%1');
   });
@@ -796,9 +796,9 @@ describe('buildWorkerStartupCommand', () => {
     process.env.SHELL = '/bin/bash';
     process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
     try {
-      process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+      process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
       const codexCmd = buildWorkerStartupCommand('alpha', 1, ['--model', 'claude-3-7-sonnet']);
-      assert.match(codexCmd, /exec .*codex/);
+      assert.match(codexCmd, /exec .*copilot/);
 
       process.env.OMCP_TEAM_WORKER_CLI = 'claude';
       const claudeCmd = buildWorkerStartupCommand('alpha', 1, ['--model', 'gpt-5']);
@@ -824,7 +824,7 @@ describe('buildWorkerStartupCommand', () => {
       const cmd = buildWorkerStartupCommand(
         'alpha',
         1,
-        ['--model', 'gpt-5', '--dangerously-bypass-approvals-and-sandbox'],
+        ['--model', 'gpt-5', '--allow-all-tools'],
         process.cwd(),
         {},
         'claude',
@@ -850,7 +850,7 @@ describe('buildWorkerStartupCommand', () => {
     process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
     try {
       const cmd = buildWorkerStartupCommand('alpha', 1, [
-        '--dangerously-bypass-approvals-and-sandbox',
+        '--allow-all-tools',
         '-c', 'model_instructions_file="/tmp/custom.md"',
         '--model', 'claude-3-7-sonnet',
       ]);
@@ -908,7 +908,7 @@ describe('buildWorkerStartupCommand', () => {
       assert.match(cmd, /'\/bin\/zsh' -c/);
       assert.doesNotMatch(cmd, /'\/bin\/zsh' -lc\b/);
       assert.match(cmd, /source ~\/\.zshrc/);
-      assert.match(cmd, /exec .*codex/);
+      assert.match(cmd, /exec .*copilot/);
     } finally {
       if (typeof prevShell === 'string') process.env.SHELL = prevShell;
       else delete process.env.SHELL;
@@ -945,7 +945,7 @@ describe('buildWorkerStartupCommand', () => {
     try {
       const cmd = buildWorkerStartupCommand('alpha', 1, ['--model', 'gpt-5']);
       assert.match(cmd, /source ~\/\.bashrc/);
-      assert.match(cmd, /exec .*codex/);
+      assert.match(cmd, /exec .*copilot/);
       assert.match(cmd, /--model/);
       assert.match(cmd, /gpt-5/);
     } finally {
@@ -1059,7 +1059,7 @@ describe('buildWorkerStartupCommand', () => {
     process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
     try {
       const nodePath = join(fakeBin, 'node');
-      const codexPath = join(fakeBin, 'codex');
+      const codexPath = join(fakeBin, 'copilot');
       await writeFile(nodePath, '#!/bin/sh\n');
       await writeFile(codexPath, '#!/bin/sh\n');
       await chmod(nodePath, 0o755);
@@ -1072,7 +1072,7 @@ describe('buildWorkerStartupCommand', () => {
         ['-c', 'model_reasoning_effort="low"'],
         process.cwd(),
         {},
-        'codex',
+        'copilot',
       );
 
       assert.match(cmd, new RegExp(escapeRegExp(`OMCP_LEADER_NODE_PATH=${nodePath}`)));
@@ -1097,10 +1097,10 @@ describe('buildWorkerStartupCommand', () => {
     process.env.SHELL = '/bin/bash';
     const prevBypass = process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
     process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
-    process.argv = [...prevArgv, '--dangerously-bypass-approvals-and-sandbox'];
+    process.argv = [...prevArgv, '--allow-all-tools'];
     try {
-      const cmd = buildWorkerStartupCommand('alpha', 1, ['--dangerously-bypass-approvals-and-sandbox']);
-      const matches = cmd.match(/--dangerously-bypass-approvals-and-sandbox/g) || [];
+      const cmd = buildWorkerStartupCommand('alpha', 1, ['--allow-all-tools']);
+      const matches = cmd.match(/--allow-all-tools/g) || [];
       assert.equal(matches.length, 1);
     } finally {
       process.argv = prevArgv;
@@ -1120,7 +1120,7 @@ describe('buildWorkerStartupCommand', () => {
     process.argv = [...prevArgv, '--madmax'];
     try {
       const cmd = buildWorkerStartupCommand('alpha', 1);
-      const matches = cmd.match(/--dangerously-bypass-approvals-and-sandbox/g) || [];
+      const matches = cmd.match(/--allow-all-tools/g) || [];
       assert.equal(matches.length, 1);
     } finally {
       process.argv = prevArgv;
@@ -1138,7 +1138,7 @@ describe('buildWorkerStartupCommand', () => {
     process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
     try {
       const cmd = buildWorkerStartupCommand('alpha', 1, ['-c', 'model_reasoning_effort="xhigh"']);
-      assert.match(cmd, /exec .*codex/);
+      assert.match(cmd, /exec .*copilot/);
       assert.match(cmd, /'-c'/);
       assert.match(cmd, /'model_reasoning_effort=\"xhigh\"'/);
     } finally {
@@ -1161,9 +1161,9 @@ describe('buildWorkerStartupCommand', () => {
       ];
 
       for (const launchArgs of profiles) {
-        const cmd = buildWorkerStartupCommand('alpha', 1, launchArgs, process.cwd(), {}, 'codex');
-        assert.match(cmd, /exec .*codex/);
-        assert.equal((cmd.match(/--dangerously-bypass-approvals-and-sandbox/g) || []).length, 1);
+        const cmd = buildWorkerStartupCommand('alpha', 1, launchArgs, process.cwd(), {}, 'copilot');
+        assert.match(cmd, /exec .*copilot/);
+        assert.equal((cmd.match(/--allow-all-tools/g) || []).length, 1);
         assert.match(cmd, /--model/);
         assert.match(cmd, new RegExp(launchArgs[1]!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
         assert.match(cmd, new RegExp(launchArgs[3]!.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
@@ -1182,9 +1182,9 @@ describe('buildWorkerStartupCommand', () => {
     process.env.SHELL = '/bin/bash';
     process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
     try {
-      const codexCmd = buildWorkerStartupCommand('alpha', 1, ['-c', 'model_reasoning_effort="low"'], process.cwd(), {}, 'codex');
+      const codexCmd = buildWorkerStartupCommand('alpha', 1, ['-c', 'model_reasoning_effort="low"'], process.cwd(), {}, 'copilot');
       const claudeCmd = buildWorkerStartupCommand('alpha', 2, ['-c', 'model_reasoning_effort="high"'], process.cwd(), {}, 'claude');
-      assert.match(codexCmd, /exec .*codex/);
+      assert.match(codexCmd, /exec .*copilot/);
       assert.match(codexCmd, /'model_reasoning_effort="low"'/);
       assert.match(claudeCmd, /exec .*claude/);
       assert.equal((claudeCmd.match(/--dangerously-skip-permissions/g) || []).length, 1);
@@ -1232,7 +1232,7 @@ describe('buildWorkerStartupCommand', () => {
         ['-c', 'model_reasoning_effort="low"'],
         '/tmp/project',
         { OMCP_MODEL_INSTRUCTIONS_FILE: '/tmp/project/.omcp/state/team/alpha/workers/worker-1/AGENTS.md' },
-        'codex',
+        'copilot',
       );
       const joined = spec.args.join(' ');
       assert.match(joined, /model_reasoning_effort="low"/);
@@ -1392,7 +1392,7 @@ describe('buildWorkerStartupCommand', () => {
     delete process.env.WSL_INTEROP;
     Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
     try {
-      const codexPs1Path = join(fakeBin, 'codex.ps1');
+      const codexPs1Path = join(fakeBin, 'copilot.ps1');
       await writeFile(codexPs1Path, '');
 
       const cmd = buildWorkerStartupCommand('alpha', 1, ['--model', 'gpt-5'], 'C:\\repo');
@@ -1405,7 +1405,7 @@ describe('buildWorkerStartupCommand', () => {
       assert.match(decoded, /\$env:OMCP_TEAM_WORKER = 'alpha\/worker-1'/);
       assert.match(decoded, new RegExp(escapeRegExp(`'-File' '${codexPs1Path}'`)));
       assert.match(decoded, /'--model' 'gpt-5'/);
-      assert.match(decoded, /'--dangerously-bypass-approvals-and-sandbox'/);
+      assert.match(decoded, /'--allow-all-tools'/);
     } finally {
       if (origPlatform) Object.defineProperty(process, 'platform', origPlatform);
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
@@ -1454,26 +1454,26 @@ describe('buildWorkerStartupCommand', () => {
     delete process.env.WSL_INTEROP;
     Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
     try {
-      const codexCmdPath = join(fakeBin, 'codex.cmd');
-      const codexJsPath = join(fakeRoot, 'node_modules', '@openai', 'codex', 'bin', 'codex.js');
+      const copilotCmdPath = join(fakeBin, 'copilot.cmd');
+      const copilotJsPath = join(fakeRoot, 'node_modules', '@github', 'copilot', 'bin', 'copilot.js');
       await mkdir(fakeBin, { recursive: true });
-      await mkdir(join(fakeRoot, 'node_modules', '@openai', 'codex', 'bin'), { recursive: true });
-      await writeFile(codexCmdPath, '@echo off\r\n');
-      await writeFile(codexJsPath, '');
+      await mkdir(join(fakeRoot, 'node_modules', '@github', 'copilot', 'bin'), { recursive: true });
+      await writeFile(copilotCmdPath, '@echo off\r\n');
+      await writeFile(copilotJsPath, '');
 
       const cmd = buildWorkerStartupCommand('alpha', 1, ['--model', 'gpt-5'], 'C:\\repo');
       const prefix = 'powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass -EncodedCommand ';
       assert.ok(cmd.startsWith(prefix));
 
       const decoded = Buffer.from(cmd.slice(prefix.length), 'base64').toString('utf16le');
-      assert.match(decoded, new RegExp(escapeRegExp(`$env:OMCP_LEADER_CLI_PATH = '${codexJsPath}'`)));
+      assert.match(decoded, new RegExp(escapeRegExp(`$env:OMCP_LEADER_CLI_PATH = '${copilotJsPath}'`)));
       assert.match(
         decoded,
         new RegExp(
-          escapeRegExp(`& '${process.execPath}' '${codexJsPath}' '--model' 'gpt-5' '--dangerously-bypass-approvals-and-sandbox'`),
+          escapeRegExp(`& '${process.execPath}' '${copilotJsPath}' '--model' 'gpt-5' '--allow-all-tools'`),
         ),
       );
-      assert.doesNotMatch(decoded, new RegExp(escapeRegExp(codexCmdPath)));
+      assert.doesNotMatch(decoded, new RegExp(escapeRegExp(copilotCmdPath)));
     } finally {
       if (origPlatform) Object.defineProperty(process, 'platform', origPlatform);
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
@@ -1544,8 +1544,8 @@ describe('team worker CLI helpers', () => {
     assert.equal(resolveTeamWorkerCli(['--model', 'claude-3-7-sonnet'], {}), 'claude');
     assert.equal(resolveTeamWorkerCli(['--model=claude-sonnet-4-6'], {}), 'claude');
     assert.equal(resolveTeamWorkerCli(['--model', 'gemini-2.0-pro'], {}), 'gemini');
-    assert.equal(resolveTeamWorkerCli(['--model', 'gpt-5'], {}), 'codex');
-    assert.equal(resolveTeamWorkerCli([], {}), 'codex');
+    assert.equal(resolveTeamWorkerCli(['--model', 'gpt-5'], {}), 'copilot');
+    assert.equal(resolveTeamWorkerCli([], {}), 'copilot');
   });
 
   it('resolveTeamWorkerCli accepts explicit gemini override', () => {
@@ -1553,13 +1553,13 @@ describe('team worker CLI helpers', () => {
   });
 
   it('resolveTeamWorkerCliPlan accepts gemini in CLI map', () => {
-    const plan = resolveTeamWorkerCliPlan(3, [], { OMCP_TEAM_WORKER_CLI_MAP: 'codex,gemini,claude' });
-    assert.deepEqual(plan, ['codex', 'gemini', 'claude']);
+    const plan = resolveTeamWorkerCliPlan(3, [], { OMCP_TEAM_WORKER_CLI_MAP: 'copilot,gemini,claude' });
+    assert.deepEqual(plan, ['copilot', 'gemini', 'claude']);
   });
 
   it('translateWorkerLaunchArgsForCli preserves args for codex', () => {
     const args = ['--model', 'gpt-5', '-c', 'model_reasoning_effort="xhigh"'];
-    assert.deepEqual(translateWorkerLaunchArgsForCli('codex', args), args);
+    assert.deepEqual(translateWorkerLaunchArgsForCli('copilot', args), args);
   });
 
   it('translateWorkerLaunchArgsForCli returns only skip-permissions for claude', () => {
@@ -1620,9 +1620,9 @@ describe('team worker CLI helpers', () => {
     const plan = resolveTeamWorkerCliPlan(
       4,
       [],
-      { OMCP_TEAM_WORKER_CLI_MAP: 'codex,codex,gemini,claude' },
+      { OMCP_TEAM_WORKER_CLI_MAP: 'copilot,copilot,gemini,claude' },
     );
-    assert.deepEqual(plan, ['codex', 'codex', 'gemini', 'claude']);
+    assert.deepEqual(plan, ['copilot', 'copilot', 'gemini', 'claude']);
   });
 
   it('resolveTeamWorkerCliPlan accepts single-value map and expands to all workers', () => {
@@ -1638,9 +1638,9 @@ describe('team worker CLI helpers', () => {
     const plan = resolveTeamWorkerCliPlan(
       2,
       ['--model', 'claude-3-7-sonnet'],
-      { OMCP_TEAM_WORKER_CLI_MAP: 'auto,codex' },
+      { OMCP_TEAM_WORKER_CLI_MAP: 'auto,copilot' },
     );
-    assert.deepEqual(plan, ['claude', 'codex']);
+    assert.deepEqual(plan, ['claude', 'copilot']);
   });
 
   it('resolveTeamWorkerCliPlan auto entries ignore OMCP_TEAM_WORKER_CLI override', () => {
@@ -1648,7 +1648,7 @@ describe('team worker CLI helpers', () => {
       1,
       ['--model', 'claude-3-7-sonnet'],
       {
-        OMCP_TEAM_WORKER_CLI: 'codex',
+        OMCP_TEAM_WORKER_CLI: 'copilot',
         OMCP_TEAM_WORKER_CLI_MAP: 'auto',
       },
     );
@@ -1657,14 +1657,14 @@ describe('team worker CLI helpers', () => {
 
   it('resolveTeamWorkerCliPlan rejects map lengths that do not match workerCount', () => {
     assert.throws(
-      () => resolveTeamWorkerCliPlan(4, [], { OMCP_TEAM_WORKER_CLI_MAP: 'codex,claude' }),
+      () => resolveTeamWorkerCliPlan(4, [], { OMCP_TEAM_WORKER_CLI_MAP: 'copilot,claude' }),
       /expected 1 or 4/i,
     );
   });
 
   it('resolveTeamWorkerCliPlan rejects empty entries in CLI map', () => {
     assert.throws(
-      () => resolveTeamWorkerCliPlan(2, [], { OMCP_TEAM_WORKER_CLI_MAP: 'codex,' }),
+      () => resolveTeamWorkerCliPlan(2, [], { OMCP_TEAM_WORKER_CLI_MAP: 'copilot,' }),
       /empty entries are not allowed/i,
     );
   });
@@ -1678,14 +1678,14 @@ describe('team worker CLI helpers', () => {
 
   it('resolveWorkerCliForSend prioritizes explicit worker CLI over map/global', () => {
     assert.equal(
-      resolveWorkerCliForSend(2, 'claude', [], { OMCP_TEAM_WORKER_CLI_MAP: 'codex,codex' }),
+      resolveWorkerCliForSend(2, 'claude', [], { OMCP_TEAM_WORKER_CLI_MAP: 'copilot,copilot' }),
       'claude',
     );
   });
 
   it('resolveWorkerCliForSend resolves per-worker map entry by index', () => {
     assert.equal(
-      resolveWorkerCliForSend(2, undefined, [], { OMCP_TEAM_WORKER_CLI_MAP: 'codex,claude' }),
+      resolveWorkerCliForSend(2, undefined, [], { OMCP_TEAM_WORKER_CLI_MAP: 'copilot,claude' }),
       'claude',
     );
   });
@@ -1698,7 +1698,7 @@ describe('team worker CLI helpers', () => {
   });
 
   it('buildWorkerSubmitPlan preserves queue-first behavior for busy codex workers', () => {
-    const plan = buildWorkerSubmitPlan('auto', 'codex', true, true);
+    const plan = buildWorkerSubmitPlan('auto', 'copilot', true, true);
     assert.equal(plan.queueFirstRound, true);
     assert.equal(plan.submitKeyPressesPerRound, 2);
     assert.equal(plan.allowAdaptiveRetry, true);
@@ -1730,12 +1730,12 @@ describe('team worker launch mode helpers', () => {
         ['--model', 'gpt-5.3-codex'],
         '/tmp/workspace',
         { OMCP_TEAM_STATE_ROOT: '/tmp/workspace/.omcp/state' },
-        'codex',
+        'copilot',
       );
       // command is now the resolved absolute path (or bare binary if which fails)
-      assert.equal(spec.workerCli, 'codex');
+      assert.equal(spec.workerCli, 'copilot');
       assert.ok(typeof spec.command === 'string' && spec.command.length > 0, 'command must be a non-empty string');
-      assert.deepEqual(spec.args, ['--model', 'gpt-5.3-codex', '--dangerously-bypass-approvals-and-sandbox']);
+      assert.deepEqual(spec.args, ['--model', 'gpt-5.3-codex', '--allow-all-tools']);
       assert.equal(spec.env.OMCP_TEAM_WORKER, 'alpha-team/worker-2');
       assert.equal(spec.env.OMCP_TEAM_STATE_ROOT, '/tmp/workspace/.omcp/state');
     } finally {
@@ -1754,7 +1754,7 @@ describe('team worker launch mode helpers', () => {
         ['--model', 'gpt-5.3-codex-spark'],
         '/tmp/workspace',
         { OMCP_TEAM_STATE_ROOT: '/tmp/workspace/.omcp/state' },
-        'codex',
+        'copilot',
         undefined,
         'explore',
       );
@@ -1775,7 +1775,7 @@ describe('team worker launch mode helpers', () => {
         [],
         '/tmp/workspace',
         {},
-        'codex',
+        'copilot',
       );
       assert.ok(
         typeof spec.env.OMCP_LEADER_NODE_PATH === 'string' && spec.env.OMCP_LEADER_NODE_PATH.length > 0,
@@ -1812,7 +1812,7 @@ describe('team worker launch mode helpers', () => {
     delete process.env.WSL_INTEROP;
     Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
     try {
-      const codexPs1Path = join(fakeBin, 'codex.ps1');
+      const codexPs1Path = join(fakeBin, 'copilot.ps1');
       await writeFile(codexPs1Path, '');
 
       const spec = buildWorkerProcessLaunchSpec(
@@ -1821,13 +1821,13 @@ describe('team worker launch mode helpers', () => {
         ['--model', 'gpt-5'],
         'C:\\workspace',
         {},
-        'codex',
+        'copilot',
       );
 
       assert.match(spec.command, /powershell(?:\.exe)?$/i);
       assert.deepEqual(spec.args.slice(0, 5), ['-NoLogo', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File']);
       assert.equal(spec.args[5], codexPs1Path);
-      assert.deepEqual(spec.args.slice(6), ['--model', 'gpt-5', '--dangerously-bypass-approvals-and-sandbox']);
+      assert.deepEqual(spec.args.slice(6), ['--model', 'gpt-5', '--allow-all-tools']);
       assert.equal(spec.env.OMCP_LEADER_CLI_PATH, codexPs1Path);
       assert.notEqual(spec.command, codexPs1Path);
     } finally {
@@ -1870,12 +1870,12 @@ describe('team worker launch mode helpers', () => {
     delete process.env.WSL_INTEROP;
     Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
     try {
-      const codexCmdPath = join(fakeBin, 'codex.cmd');
-      const codexJsPath = join(fakeRoot, 'node_modules', '@openai', 'codex', 'bin', 'codex.js');
+      const copilotCmdPath = join(fakeBin, 'copilot.cmd');
+      const copilotJsPath = join(fakeRoot, 'node_modules', '@github', 'copilot', 'bin', 'copilot.js');
       await mkdir(fakeBin, { recursive: true });
-      await mkdir(join(fakeRoot, 'node_modules', '@openai', 'codex', 'bin'), { recursive: true });
-      await writeFile(codexCmdPath, '@echo off\r\n');
-      await writeFile(codexJsPath, '');
+      await mkdir(join(fakeRoot, 'node_modules', '@github', 'copilot', 'bin'), { recursive: true });
+      await writeFile(copilotCmdPath, '@echo off\r\n');
+      await writeFile(copilotJsPath, '');
 
       const spec = buildWorkerProcessLaunchSpec(
         'beta-team',
@@ -1883,13 +1883,13 @@ describe('team worker launch mode helpers', () => {
         ['--model', 'gpt-5'],
         'C:\\workspace',
         {},
-        'codex',
+        'copilot',
       );
 
       assert.equal(spec.command, process.execPath);
-      assert.deepEqual(spec.args, [codexJsPath, '--model', 'gpt-5', '--dangerously-bypass-approvals-and-sandbox']);
-      assert.equal(spec.env.OMCP_LEADER_CLI_PATH, codexJsPath);
-      assert.notEqual(spec.env.OMCP_LEADER_CLI_PATH, codexCmdPath);
+      assert.deepEqual(spec.args, [copilotJsPath, '--model', 'gpt-5', '--allow-all-tools']);
+      assert.equal(spec.env.OMCP_LEADER_CLI_PATH, copilotJsPath);
+      assert.notEqual(spec.env.OMCP_LEADER_CLI_PATH, copilotCmdPath);
     } finally {
       if (origPlatform) Object.defineProperty(process, 'platform', origPlatform);
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
@@ -1910,17 +1910,17 @@ describe('team worker launch mode helpers', () => {
     }
   });
 
-  it('buildWorkerProcessLaunchSpec injects the active provider env_key from CODEX_HOME config.toml', async () => {
+  it('buildWorkerProcessLaunchSpec injects the active provider env_key from COPILOT_HOME config.toml', async () => {
     const prevBypass = process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
-    const prevCodexHome = process.env.CODEX_HOME;
+    const prevCodexHome = process.env.COPILOT_HOME;
     const prevProviderEnv = process.env.CUSTOM_PROVIDER_API_KEY;
-    const codexHome = await mkdtemp(join(tmpdir(), 'omcp-team-provider-env-'));
+    const copilotHome = await mkdtemp(join(tmpdir(), 'omcp-team-provider-env-'));
     process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
-    process.env.CODEX_HOME = codexHome;
+    process.env.COPILOT_HOME = copilotHome;
     process.env.CUSTOM_PROVIDER_API_KEY = 'test-secret';
 
     try {
-      await writeFile(join(codexHome, 'config.toml'), [
+      await writeFile(join(copilotHome, 'config.toml'), [
         'model_provider = "custom_provider"',
         '',
         '[model_providers.custom_provider]',
@@ -1938,32 +1938,32 @@ describe('team worker launch mode helpers', () => {
         [],
         '/tmp/workspace',
         {},
-        'codex',
+        'copilot',
       );
 
       assert.equal(spec.env.CUSTOM_PROVIDER_API_KEY, 'test-secret');
     } finally {
       if (typeof prevBypass === 'string') process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = prevBypass;
       else delete process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
-      if (typeof prevCodexHome === 'string') process.env.CODEX_HOME = prevCodexHome;
-      else delete process.env.CODEX_HOME;
+      if (typeof prevCodexHome === 'string') process.env.COPILOT_HOME = prevCodexHome;
+      else delete process.env.COPILOT_HOME;
       if (typeof prevProviderEnv === 'string') process.env.CUSTOM_PROVIDER_API_KEY = prevProviderEnv;
       else delete process.env.CUSTOM_PROVIDER_API_KEY;
-      await rm(codexHome, { recursive: true, force: true });
+      await rm(copilotHome, { recursive: true, force: true });
     }
   });
 
   it('buildWorkerProcessLaunchSpec does not inject the active provider env_key for non-codex workers', async () => {
     const prevBypass = process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
-    const prevCodexHome = process.env.CODEX_HOME;
+    const prevCodexHome = process.env.COPILOT_HOME;
     const prevProviderEnv = process.env.CUSTOM_PROVIDER_API_KEY;
-    const codexHome = await mkdtemp(join(tmpdir(), 'omcp-team-provider-env-'));
+    const copilotHome = await mkdtemp(join(tmpdir(), 'omcp-team-provider-env-'));
     process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
-    process.env.CODEX_HOME = codexHome;
+    process.env.COPILOT_HOME = copilotHome;
     process.env.CUSTOM_PROVIDER_API_KEY = 'test-secret';
 
     try {
-      await writeFile(join(codexHome, 'config.toml'), [
+      await writeFile(join(copilotHome, 'config.toml'), [
         'model_provider = "custom_provider"',
         '',
         '[model_providers.custom_provider]',
@@ -1989,23 +1989,23 @@ describe('team worker launch mode helpers', () => {
     } finally {
       if (typeof prevBypass === 'string') process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = prevBypass;
       else delete process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
-      if (typeof prevCodexHome === 'string') process.env.CODEX_HOME = prevCodexHome;
-      else delete process.env.CODEX_HOME;
+      if (typeof prevCodexHome === 'string') process.env.COPILOT_HOME = prevCodexHome;
+      else delete process.env.COPILOT_HOME;
       if (typeof prevProviderEnv === 'string') process.env.CUSTOM_PROVIDER_API_KEY = prevProviderEnv;
       else delete process.env.CUSTOM_PROVIDER_API_KEY;
-      await rm(codexHome, { recursive: true, force: true });
+      await rm(copilotHome, { recursive: true, force: true });
     }
   });
 
-  it('buildWorkerProcessLaunchSpec reads provider env from worker CODEX_HOME override', async () => {
+  it('buildWorkerProcessLaunchSpec reads provider env from worker COPILOT_HOME override', async () => {
     const prevBypass = process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
-    const prevCodexHome = process.env.CODEX_HOME;
+    const prevCodexHome = process.env.COPILOT_HOME;
     const prevPrimaryProviderEnv = process.env.PRIMARY_PROVIDER_API_KEY;
     const prevWorkerProviderEnv = process.env.WORKER_PROVIDER_API_KEY;
     const leaderCodexHome = await mkdtemp(join(tmpdir(), 'omcp-team-provider-env-leader-'));
     const workerCodexHome = await mkdtemp(join(tmpdir(), 'omcp-team-provider-env-worker-'));
     process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
-    process.env.CODEX_HOME = leaderCodexHome;
+    process.env.COPILOT_HOME = leaderCodexHome;
     process.env.PRIMARY_PROVIDER_API_KEY = 'leader-secret';
     process.env.WORKER_PROVIDER_API_KEY = 'worker-secret';
 
@@ -2039,18 +2039,18 @@ describe('team worker launch mode helpers', () => {
         1,
         [],
         '/tmp/workspace',
-        { CODEX_HOME: workerCodexHome },
-        'codex',
+        { COPILOT_HOME: workerCodexHome },
+        'copilot',
       );
 
-      assert.equal(spec.env.CODEX_HOME, workerCodexHome);
+      assert.equal(spec.env.COPILOT_HOME, workerCodexHome);
       assert.equal(spec.env.WORKER_PROVIDER_API_KEY, 'worker-secret');
       assert.equal(spec.env.PRIMARY_PROVIDER_API_KEY, undefined);
     } finally {
       if (typeof prevBypass === 'string') process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = prevBypass;
       else delete process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
-      if (typeof prevCodexHome === 'string') process.env.CODEX_HOME = prevCodexHome;
-      else delete process.env.CODEX_HOME;
+      if (typeof prevCodexHome === 'string') process.env.COPILOT_HOME = prevCodexHome;
+      else delete process.env.COPILOT_HOME;
       if (typeof prevPrimaryProviderEnv === 'string') process.env.PRIMARY_PROVIDER_API_KEY = prevPrimaryProviderEnv;
       else delete process.env.PRIMARY_PROVIDER_API_KEY;
       if (typeof prevWorkerProviderEnv === 'string') process.env.WORKER_PROVIDER_API_KEY = prevWorkerProviderEnv;
@@ -2072,7 +2072,7 @@ describe('team worker launch mode helpers', () => {
         [],
         '/tmp/workspace',
         {},
-        'codex',
+        'copilot',
       );
       assert.equal(spec.env.HTTPS_PROXY, undefined);
     } finally {
@@ -2083,18 +2083,18 @@ describe('team worker launch mode helpers', () => {
     }
   });
 
-  it('buildWorkerProcessLaunchSpec resolves relative worker CODEX_HOME against the worker cwd', async () => {
+  it('buildWorkerProcessLaunchSpec resolves relative worker COPILOT_HOME against the worker cwd', async () => {
     const prevBypass = process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
-    const prevCodexHome = process.env.CODEX_HOME;
+    const prevCodexHome = process.env.COPILOT_HOME;
     const prevLeaderProviderEnv = process.env.LEADER_PROVIDER_API_KEY;
     const prevWorkerProviderEnv = process.env.WORKER_PROVIDER_API_KEY;
     const originalCwd = process.cwd();
     const leaderCwd = await mkdtemp(join(tmpdir(), 'omcp-team-provider-relative-leader-'));
     const workerCwd = await mkdtemp(join(tmpdir(), 'omcp-team-provider-relative-worker-'));
-    const leaderCodexHome = join(leaderCwd, '.codex');
-    const workerCodexHome = join(workerCwd, '.codex');
+    const leaderCodexHome = join(leaderCwd, '.copilot');
+    const workerCodexHome = join(workerCwd, '.copilot');
     process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
-    process.env.CODEX_HOME = leaderCodexHome;
+    process.env.COPILOT_HOME = leaderCodexHome;
     process.env.LEADER_PROVIDER_API_KEY = 'leader-secret';
     process.env.WORKER_PROVIDER_API_KEY = 'worker-secret';
 
@@ -2133,19 +2133,19 @@ describe('team worker launch mode helpers', () => {
         1,
         [],
         workerCwd,
-        { CODEX_HOME: '.codex' },
-        'codex',
+        { COPILOT_HOME: '.copilot' },
+        'copilot',
       );
 
-      assert.equal(spec.env.CODEX_HOME, '.codex');
+      assert.equal(spec.env.COPILOT_HOME, '.copilot');
       assert.equal(spec.env.WORKER_PROVIDER_API_KEY, 'worker-secret');
       assert.equal(spec.env.LEADER_PROVIDER_API_KEY, undefined);
     } finally {
       process.chdir(originalCwd);
       if (typeof prevBypass === 'string') process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = prevBypass;
       else delete process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
-      if (typeof prevCodexHome === 'string') process.env.CODEX_HOME = prevCodexHome;
-      else delete process.env.CODEX_HOME;
+      if (typeof prevCodexHome === 'string') process.env.COPILOT_HOME = prevCodexHome;
+      else delete process.env.COPILOT_HOME;
       if (typeof prevLeaderProviderEnv === 'string') process.env.LEADER_PROVIDER_API_KEY = prevLeaderProviderEnv;
       else delete process.env.LEADER_PROVIDER_API_KEY;
       if (typeof prevWorkerProviderEnv === 'string') process.env.WORKER_PROVIDER_API_KEY = prevWorkerProviderEnv;
@@ -2431,7 +2431,7 @@ case "\${1:-}" in
     exit 0
     ;;
   list-panes)
-    printf "%%1\\tnode\\t'codex'\\n"
+    printf "%%1\\tnode\\t'copilot'\\n"
     exit 0
     ;;
   split-window)
@@ -2534,7 +2534,7 @@ case "\${1:-}" in
     exit 0
     ;;
   list-panes)
-    printf "%%1\\tnode\\t'codex'\\n"
+    printf "%%1\\tnode\\t'copilot'\\n"
     exit 0
     ;;
   split-window)
@@ -2842,7 +2842,7 @@ describe('dismissTrustPromptIfPresent', () => {
 });
 
 describe('isWorkerAlive', () => {
-  it('does not require pane_current_command to match "codex"', () => {
+  it('does not require pane_current_command to match "copilot"', () => {
     // This was a real failure mode: tmux reports pane_current_command=node for the Codex TUI,
     // which caused workers to be treated as dead and the leader to clean up state too early.
     withEmptyPath(() => {

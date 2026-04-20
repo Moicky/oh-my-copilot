@@ -37,8 +37,8 @@ describe('omcp agents', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-agents-cli-'));
     const home = join(wd, 'home');
     try {
-      const projectAgentsDir = join(wd, '.codex', 'agents');
-      const userAgentsDir = join(home, '.codex', 'agents');
+      const projectAgentsDir = join(wd, '.copilot', 'agents');
+      const userAgentsDir = join(home, '.copilot', 'agents');
       await mkdir(projectAgentsDir, { recursive: true });
       await mkdir(userAgentsDir, { recursive: true });
 
@@ -53,7 +53,7 @@ describe('omcp agents', () => {
 
       const result = runOmcp(wd, ['agents', 'list'], {
         HOME: home,
-        CODEX_HOME: join(home, '.codex'),
+        COPILOT_HOME: join(home, '.copilot'),
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
@@ -74,12 +74,12 @@ describe('omcp agents', () => {
 
       const result = runOmcp(wd, ['agents', 'add', 'my-helper', '--scope', 'project'], {
         HOME: home,
-        CODEX_HOME: join(home, '.codex'),
+        COPILOT_HOME: join(home, '.copilot'),
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
       assert.equal(result.status, 0, result.stderr || result.stdout);
-      const agentPath = join(wd, '.codex', 'agents', 'my-helper.toml');
+      const agentPath = join(wd, '.copilot', 'agents', 'my-helper.toml');
       assert.equal(existsSync(agentPath), true);
 
       const content = await readFile(agentPath, 'utf-8');
@@ -97,7 +97,7 @@ describe('omcp agents', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-agents-cli-'));
     const home = join(wd, 'home');
     try {
-      const projectAgentsDir = join(wd, '.codex', 'agents');
+      const projectAgentsDir = join(wd, '.copilot', 'agents');
       await mkdir(projectAgentsDir, { recursive: true });
       await mkdir(home, { recursive: true });
       const agentPath = join(projectAgentsDir, 'editor-test.toml');
@@ -115,7 +115,7 @@ describe('omcp agents', () => {
 
       const editResult = runOmcp(wd, ['agents', 'edit', 'editor-test', '--scope', 'project'], {
         HOME: home,
-        CODEX_HOME: join(home, '.codex'),
+        COPILOT_HOME: join(home, '.copilot'),
         EDITOR: editorScript,
       });
       if (shouldSkipForSpawnPermissions(editResult.error)) return;
@@ -125,7 +125,7 @@ describe('omcp agents', () => {
 
       const removeResult = runOmcp(wd, ['agents', 'remove', 'editor-test', '--scope', 'project', '--force'], {
         HOME: home,
-        CODEX_HOME: join(home, '.codex'),
+        COPILOT_HOME: join(home, '.copilot'),
       });
       if (shouldSkipForSpawnPermissions(removeResult.error)) return;
 
@@ -140,7 +140,7 @@ describe('omcp agents', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-agents-cli-'));
     const home = join(wd, 'home');
     try {
-      const projectAgentsDir = join(wd, '.codex', 'agents');
+      const projectAgentsDir = join(wd, '.copilot', 'agents');
       await mkdir(projectAgentsDir, { recursive: true });
       await mkdir(home, { recursive: true });
       const agentPath = join(projectAgentsDir, 'non-interactive.toml');
@@ -151,7 +151,7 @@ describe('omcp agents', () => {
 
       const result = runOmcp(wd, ['agents', 'remove', 'non-interactive', '--scope', 'project'], {
         HOME: home,
-        CODEX_HOME: join(home, '.codex'),
+        COPILOT_HOME: join(home, '.copilot'),
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;
 

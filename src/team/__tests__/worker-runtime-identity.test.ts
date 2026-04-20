@@ -19,8 +19,8 @@ import {
 import { scaleUp } from '../scaling.js';
 import { resolveTeamLowComplexityDefaultModel } from '../model-contract.js';
 
-function expectedLowComplexityModel(codexHomeOverride?: string): string {
-  return resolveTeamLowComplexityDefaultModel(codexHomeOverride);
+function expectedLowComplexityModel(copilotHomeOverride?: string): string {
+  return resolveTeamLowComplexityDefaultModel(copilotHomeOverride);
 }
 
 function withoutTeamWorkerEnv<T>(fn: () => T): T {
@@ -77,9 +77,9 @@ describe('worker runtime identity contract', () => {
   it('startTeam preserves low-complexity assigned roles as outer runtime identities', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-identity-start-'));
     const binDir = join(cwd, 'bin');
-    const fakeCodexPath = join(binDir, 'codex');
+    const fakeCodexPath = join(binDir, 'copilot');
     const captureDir = join(cwd, 'captures');
-    const promptsDir = join(cwd, '.codex', 'prompts');
+    const promptsDir = join(cwd, '.copilot', 'prompts');
     await mkdir(binDir, { recursive: true });
     await mkdir(captureDir, { recursive: true });
     await mkdir(promptsDir, { recursive: true });
@@ -110,7 +110,7 @@ process.on('SIGTERM', () => process.exit(0));
     process.env.PATH = `${binDir}:${prevPath ?? ''}`;
     delete process.env.TMUX;
     process.env.OMCP_TEAM_WORKER_LAUNCH_MODE = 'prompt';
-    process.env.OMCP_TEAM_WORKER_CLI = 'codex';
+    process.env.OMCP_TEAM_WORKER_CLI = 'copilot';
     process.env.OMCP_ARGV_CAPTURE_DIR = captureDir;
 
     let runtime: TeamRuntime | null = null;
@@ -219,9 +219,9 @@ process.on('SIGTERM', () => process.exit(0));
       await chmod(tmuxStubPath, 0o755);
       process.env.PATH = `${fakeBinDir}:${previousPath ?? ''}`;
 
-      await mkdir(join(cwd, '.codex', 'prompts'), { recursive: true });
-      await writeFile(join(cwd, '.codex', 'prompts', 'explore.md'), '<identity>You are Explorer.</identity>');
-      await writeFile(join(cwd, '.codex', 'prompts', 'sisyphus-lite.md'), '<identity>You are Sisyphus-lite.</identity>');
+      await mkdir(join(cwd, '.copilot', 'prompts'), { recursive: true });
+      await writeFile(join(cwd, '.copilot', 'prompts', 'explore.md'), '<identity>You are Explorer.</identity>');
+      await writeFile(join(cwd, '.copilot', 'prompts', 'sisyphus-lite.md'), '<identity>You are Sisyphus-lite.</identity>');
       await mkdir(join(cwd, '.omcp', 'state', 'team', 'low-role-scale'), { recursive: true });
       await writeFile(join(cwd, '.omcp', 'state', 'team', 'low-role-scale', 'worker-agents.md'), '# Base worker instructions\n');
 

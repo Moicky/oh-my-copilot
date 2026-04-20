@@ -52,7 +52,7 @@ describe("adaptCommand", () => {
 		const cwd = await mkdtemp(join(tmpdir(), "omcp-adapt-cli-openclaw-"));
 		const out: string[] = [];
 		try {
-			process.env.CODEX_HOME = join(cwd, ".codex-home");
+			process.env.COPILOT_HOME = join(cwd, ".codex-home");
 			process.env.OMCP_OPENCLAW = "1";
 			await adaptCommand(["openclaw", "status", "--json"], {
 				cwd,
@@ -65,7 +65,7 @@ describe("adaptCommand", () => {
 			assert.equal(parsed.target, "openclaw");
 			assert.equal(parsed.openclaw?.observedState, "missing-config");
 		} finally {
-			delete process.env.CODEX_HOME;
+			delete process.env.COPILOT_HOME;
 			delete process.env.OMCP_OPENCLAW;
 			await rm(cwd, { recursive: true, force: true });
 		}

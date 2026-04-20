@@ -16,7 +16,7 @@ describe('omcp setup skills overwrite behavior', () => {
 
       await setup({ scope: 'project' });
 
-      const wikiSkill = join(wd, '.codex', 'skills', 'wiki', 'SKILL.md');
+      const wikiSkill = join(wd, '.copilot', 'skills', 'wiki', 'SKILL.md');
       assert.equal(existsSync(wikiSkill), true);
       assert.ok((await readFile(wikiSkill, 'utf-8')).includes('description: "[OMCP] '));
     } finally {
@@ -34,7 +34,7 @@ describe('omcp setup skills overwrite behavior', () => {
 
       await setup({ scope: 'project' });
 
-      const installedHelpSkill = join(wd, '.codex', 'skills', 'help', 'SKILL.md');
+      const installedHelpSkill = join(wd, '.copilot', 'skills', 'help', 'SKILL.md');
       const shippedHelpSkill = join(previousCwd, 'skills', 'help', 'SKILL.md');
 
       assert.ok(
@@ -62,7 +62,7 @@ describe('omcp setup skills overwrite behavior', () => {
 
       await setup({ scope: 'project' });
 
-      const skillsDir = join(wd, '.codex', 'skills');
+      const skillsDir = join(wd, '.copilot', 'skills');
       const installed = new Set(await readdir(skillsDir));
 
       assert.equal(installed.has('analyze'), true);
@@ -106,7 +106,7 @@ describe('omcp setup skills overwrite behavior', () => {
 
       const staleSkills = ['swarm', 'ecomode', 'configure-discord', 'configure-telegram', 'configure-slack', 'configure-openclaw'];
       for (const staleSkill of staleSkills) {
-        const staleDir = join(wd, '.codex', 'skills', staleSkill);
+        const staleDir = join(wd, '.copilot', 'skills', staleSkill);
         await mkdir(staleDir, { recursive: true });
         await writeFile(join(staleDir, 'SKILL.md'), `# stale ${staleSkill}\n`);
         assert.equal(existsSync(staleDir), true);
@@ -115,9 +115,9 @@ describe('omcp setup skills overwrite behavior', () => {
       await setup({ scope: 'project', force: true });
 
       for (const staleSkill of staleSkills) {
-        assert.equal(existsSync(join(wd, '.codex', 'skills', staleSkill)), false);
+        assert.equal(existsSync(join(wd, '.copilot', 'skills', staleSkill)), false);
       }
-      assert.equal(existsSync(join(wd, '.codex', 'skills', 'team')), true);
+      assert.equal(existsSync(join(wd, '.copilot', 'skills', 'team')), true);
     } finally {
       process.chdir(previousCwd);
       await rm(wd, { recursive: true, force: true });
@@ -134,15 +134,15 @@ describe('omcp setup skills overwrite behavior', () => {
       await setup({ scope: 'project' });
 
       const staleSkill = 'pipeline';
-      const staleDir = join(wd, '.codex', 'skills', staleSkill);
+      const staleDir = join(wd, '.copilot', 'skills', staleSkill);
       await mkdir(staleDir, { recursive: true });
       await writeFile(join(staleDir, 'SKILL.md'), `# stale ${staleSkill}\n`);
       assert.equal(existsSync(staleDir), true);
 
       await setup({ scope: 'project', force: true });
 
-      assert.equal(existsSync(join(wd, '.codex', 'skills', staleSkill)), false);
-      assert.equal(existsSync(join(wd, '.codex', 'skills', 'team')), true);
+      assert.equal(existsSync(join(wd, '.copilot', 'skills', staleSkill)), false);
+      assert.equal(existsSync(join(wd, '.copilot', 'skills', 'team')), true);
     } finally {
       process.chdir(previousCwd);
       await rm(wd, { recursive: true, force: true });
@@ -158,8 +158,8 @@ describe('omcp setup skills overwrite behavior', () => {
 
       await setup({ scope: 'project' });
 
-      const wikiDir = join(wd, '.codex', 'skills', 'wiki');
-      const stalePipelineDir = join(wd, '.codex', 'skills', 'pipeline');
+      const wikiDir = join(wd, '.copilot', 'skills', 'wiki');
+      const stalePipelineDir = join(wd, '.copilot', 'skills', 'pipeline');
       assert.equal(existsSync(wikiDir), true);
 
       await mkdir(stalePipelineDir, { recursive: true });
@@ -185,7 +185,7 @@ describe('omcp setup skills overwrite behavior', () => {
 
       await setup({ scope: 'project' });
 
-      const skillPath = join(wd, '.codex', 'skills', 'help', 'SKILL.md');
+      const skillPath = join(wd, '.copilot', 'skills', 'help', 'SKILL.md');
       assert.equal(existsSync(skillPath), true);
 
       const installed = await readFile(skillPath, 'utf-8');
@@ -215,7 +215,7 @@ describe('omcp setup skills overwrite behavior', () => {
 
       await setup({ scope: 'project' });
 
-      const customSkillDir = join(wd, '.codex', 'skills', 'my-custom-skill');
+      const customSkillDir = join(wd, '.copilot', 'skills', 'my-custom-skill');
       const customSkillPath = join(customSkillDir, 'SKILL.md');
       await mkdir(customSkillDir, { recursive: true });
       await writeFile(customSkillPath, '---\nname: my-custom-skill\ndescription: local custom skill\n---\n');
@@ -241,7 +241,7 @@ describe('omcp setup skills overwrite behavior', () => {
       await setup({ scope: 'project' });
       await setup({ scope: 'project' });
 
-      const installedHelpSkill = join(wd, '.codex', 'skills', 'help', 'SKILL.md');
+      const installedHelpSkill = join(wd, '.copilot', 'skills', 'help', 'SKILL.md');
       const content = await readFile(installedHelpSkill, 'utf-8');
       const matches = content.match(/\[OMCP\] Guide on using oh-my-copilot plugin/g) ?? [];
       assert.equal(matches.length, 1);
@@ -265,8 +265,8 @@ describe('omcp setup skills overwrite behavior', () => {
       };
 
       await setup({ scope: 'project', verbose: true });
-      await mkdir(join(wd, '.codex', 'skills', 'swarm'), { recursive: true });
-      await writeFile(join(wd, '.codex', 'skills', 'swarm', 'SKILL.md'), '# stale swarm\n');
+      await mkdir(join(wd, '.copilot', 'skills', 'swarm'), { recursive: true });
+      await writeFile(join(wd, '.copilot', 'skills', 'swarm', 'SKILL.md'), '# stale swarm\n');
       await setup({ scope: 'project', force: true, verbose: true });
 
       const output = logs.join('\n');
@@ -284,14 +284,14 @@ describe('omcp setup skills overwrite behavior', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-setup-skills-'));
     const previousCwd = process.cwd();
     const previousHome = process.env.HOME;
-    const previousCodexHome = process.env.CODEX_HOME;
+    const previousCodexHome = process.env.COPILOT_HOME;
     const logs: string[] = [];
     const originalLog = console.log;
     try {
       const home = join(wd, 'home');
-      const codexHome = join(home, '.codex');
+      const copilotHome = join(home, '.copilot');
       process.env.HOME = home;
-      process.env.CODEX_HOME = codexHome;
+      process.env.COPILOT_HOME = copilotHome;
       await mkdir(join(wd, '.omcp', 'state'), { recursive: true });
       await mkdir(join(home, '.agents', 'skills', 'help'), { recursive: true });
       await writeFile(join(home, '.agents', 'skills', 'help', 'SKILL.md'), '# legacy help\n');
@@ -303,13 +303,13 @@ describe('omcp setup skills overwrite behavior', () => {
       await setup({ scope: 'user' });
 
       const output = logs.join('\n');
-      assert.match(output, /Migration hint: Detected 1 overlapping skill names between canonical .*\.codex\/skills and legacy .*\.agents\/skills\./);
-      assert.match(output, /Remove or archive ~\/\.agents\/skills after confirming .*\.codex\/skills is the version you want Codex to load\./);
+      assert.match(output, /Migration hint: Detected 1 overlapping skill names between canonical .*\.copilot\/skills and legacy .*\.agents\/skills\./);
+      assert.match(output, /Remove or archive ~\/\.agents\/skills after confirming .*\.copilot\/skills is the version you want Codex to load\./);
     } finally {
       console.log = originalLog;
       process.chdir(previousCwd);
       if (typeof previousHome === 'string') process.env.HOME = previousHome; else delete process.env.HOME;
-      if (typeof previousCodexHome === 'string') process.env.CODEX_HOME = previousCodexHome; else delete process.env.CODEX_HOME;
+      if (typeof previousCodexHome === 'string') process.env.COPILOT_HOME = previousCodexHome; else delete process.env.COPILOT_HOME;
       await rm(wd, { recursive: true, force: true });
     }
   });

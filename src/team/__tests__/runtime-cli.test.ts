@@ -16,16 +16,16 @@ describe('runtime-cli helpers', () => {
     const runtimeCli = await loadRuntimeCliModule();
 
     assert.deepEqual(
-      runtimeCli.normalizeAgentTypes(['codex', 'gemini'], 2),
-      ['codex', 'gemini'],
+      runtimeCli.normalizeAgentTypes(['copilot', 'gemini'], 2),
+      ['copilot', 'gemini'],
     );
     assert.deepEqual(
       runtimeCli.normalizeAgentTypes(['gemini'], 3),
       ['gemini'],
     );
     assert.throws(
-      () => runtimeCli.normalizeAgentTypes(['codex', 'invalid'], 2),
-      /Expected codex\\|claude\\|gemini/,
+      () => runtimeCli.normalizeAgentTypes(['copilot', 'invalid'], 2),
+      /Expected copilot\\|claude\\|gemini/,
     );
   });
 

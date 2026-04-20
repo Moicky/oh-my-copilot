@@ -4,7 +4,7 @@ import { readFile, readdir } from 'fs/promises';
 import { isAbsolute, join } from 'path';
 import { constants as osConstants } from 'os';
 import { getPackageRoot } from '../utils/package.js';
-import { codexPromptsDir } from '../utils/paths.js';
+import { copilotPromptsDir } from '../utils/paths.js';
 
 export const ASK_USAGE = [
   'Usage: omcp ask <claude|gemini> <question or task>',
@@ -34,9 +34,9 @@ function askUsageError(reason: string): Error {
 }
 
 function resolveAskPromptsDir(cwd: string, env: NodeJS.ProcessEnv = process.env): string {
-  const codexHomeOverride = env.CODEX_HOME?.trim();
-  if (codexHomeOverride) {
-    return join(codexHomeOverride, 'prompts');
+  const copilotHomeOverride = env.COPILOT_HOME?.trim();
+  if (copilotHomeOverride) {
+    return join(copilotHomeOverride, 'prompts');
   }
 
   try {
@@ -44,14 +44,14 @@ function resolveAskPromptsDir(cwd: string, env: NodeJS.ProcessEnv = process.env)
     if (existsSync(scopePath)) {
       const parsed = JSON.parse(readFileSync(scopePath, 'utf-8')) as Partial<{ scope: string }>;
       if (parsed.scope === 'project' || parsed.scope === 'project-local') {
-        return join(cwd, '.codex', 'prompts');
+        return join(cwd, '.copilot', 'prompts');
       }
     }
   } catch {
     // Ignore malformed persisted scope and fall back to user prompts.
   }
 
-  return codexPromptsDir();
+  return copilotPromptsDir();
 }
 
 async function resolveAgentPromptContent(

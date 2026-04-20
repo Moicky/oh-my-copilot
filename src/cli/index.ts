@@ -1,6 +1,6 @@
 /**
  * oh-my-copilot CLI
- * Multi-agent orchestration for OpenAI Codex CLI
+ * Multi-agent orchestration for OpenAI Copilot CLI
  */
 
 import { execFileSync, spawn } from "child_process";
@@ -35,7 +35,7 @@ import { mcpParityCommand } from "./mcp-parity.js";
 import { adaptCommand } from "./adapt.js";
 import {
   MADMAX_FLAG,
-  CODEX_BYPASS_FLAG,
+  COPILOT_BYPASS_FLAG,
   HIGH_REASONING_FLAG,
   XHIGH_REASONING_FLAG,
   SPARK_FLAG,
@@ -82,7 +82,7 @@ import {
   mitigateCopyModeUnderlineArtifacts,
 } from "../team/tmux-session.js";
 import { getPackageRoot } from "../utils/package.js";
-import { codexConfigPath, rememberOmcpLaunchContext, resolveOmcpEntryPath } from "../utils/paths.js";
+import { copilotConfigPath, rememberOmcpLaunchContext, resolveOmcpEntryPath } from "../utils/paths.js";
 import { repairConfigIfNeeded } from "../config/generator.js";
 import { HUD_TMUX_HEIGHT_LINES } from "../hud/constants.js";
 import {
@@ -138,11 +138,11 @@ function resolveDistScript(pkgRoot: string, scriptName: string): string {
 }
 
 const HELP = `
-oh-my-copilot (omcp) - Multi-agent orchestration for Codex CLI
+oh-my-copilot (omcp) - Multi-agent orchestration for Copilot CLI
 
 Usage:
-  omcp           Launch Codex CLI (HUD auto-attaches only when already inside tmux)
-  omcp exec      Run codex exec non-interactively with OMCP AGENTS/overlay injection
+  omcp           Launch Copilot CLI (HUD auto-attaches only when already inside tmux)
+  omcp exec      Run copilot -p non-interactively with OMCP AGENTS/overlay injection
   omcp setup     Install skills, prompts, MCP servers, and scope-specific AGENTS.md
   omcp uninstall Remove OMCP configuration and clean up installed artifacts
   omcp doctor    Check installation health
@@ -184,14 +184,15 @@ Usage:
   omcp reasoning Show or set model reasoning effort (low|medium|high|xhigh)
 
 Options:
-  --yolo        Launch Codex in yolo mode (shorthand for: omcp launch --yolo)
-  --high        Launch Codex with high reasoning effort
+  --yolo        Launch Copilot in yolo mode (shorthand for: omcp launch --yolo)
+  --high        Launch Copilot with high reasoning effort
                 (shorthand for: -c model_reasoning_effort="high")
-  --xhigh       Launch Codex with xhigh reasoning effort
+  --xhigh       Launch Copilot with xhigh reasoning effort
                 (shorthand for: -c model_reasoning_effort="xhigh")
-  --madmax      DANGEROUS: bypass Codex approvals and sandbox
-                (alias for --dangerously-bypass-approvals-and-sandbox)
-  --spark       Use the Codex spark model (~1.3x faster) for team workers only
+  --madmax      DANGEROUS: bypass Copilot approvals and sandbox
+                (alias for --allow-all-tools)
+  --spark       Use the Copilot spark model (~1.3x faster) for team workers only
+                Workers get the configured low-complexity team model; leader model unchanged
                 Workers get the configured low-complexity team model; leader model unchanged
   --madmax-spark  spark model for workers + bypass approvals for leader and workers
                 (shorthand for: --spark --madmax)
@@ -354,10 +355,10 @@ export function resolveCodexHomeForLaunch(
   cwd: string,
   env: NodeJS.ProcessEnv = process.env,
 ): string | undefined {
-  if (env.CODEX_HOME && env.CODEX_HOME.trim() !== "") return env.CODEX_HOME;
+  if (env.COPILOT_HOME && env.COPILOT_HOME.trim() !== "") return env.COPILOT_HOME;
   const persistedScope = readPersistedSetupScope(cwd);
   if (persistedScope === "project") {
-    return join(cwd, ".codex");
+    return join(cwd, ".copilot");
   }
   return undefined;
 }
@@ -366,10 +367,10 @@ export function resolveCodexConfigPathForLaunch(
   cwd: string,
   env: NodeJS.ProcessEnv = process.env,
 ): string {
-  const codexHomeOverride = resolveCodexHomeForLaunch(cwd, env);
-  return codexHomeOverride
-    ? join(codexHomeOverride, "config.toml")
-    : codexConfigPath();
+  const copilotHomeOverride = resolveCodexHomeForLaunch(cwd, env);
+  return copilotHomeOverride
+    ? join(copilotHomeOverride, "config.toml")
+    : copilotConfigPath();
 }
 
 export function resolveSetupScopeArg(args: string[]): SetupScope | undefined {
@@ -581,7 +582,7 @@ function runCodexBlocking(
   launchArgs: string[],
   codexEnv: NodeJS.ProcessEnv,
 ): void {
-  const { result } = spawnPlatformCommandSync("codex", launchArgs, {
+  const { result } = spawnPlatformCommandSync("copilot", launchArgs, {
     cwd,
     stdio: "inherit",
     env: codexEnv,
@@ -593,14 +594,14 @@ function runCodexBlocking(
     const kind = classifySpawnError(errno);
     if (kind === "missing") {
       console.error(
-        "[omcp] failed to launch codex: executable not found in PATH",
+        "[omcp] failed to launch copilot: executable not found in PATH",
       );
     } else if (kind === "blocked") {
       console.error(
-        `[omcp] failed to launch codex: executable is present but blocked in the current environment (${errno.code || "blocked"})`,
+        `[omcp] failed to launch copilot: executable is present but blocked in the current environment (${errno.code || "blocked"})`,
       );
     } else {
-      console.error(`[omcp] failed to launch codex: ${errno.message}`);
+      console.error(`[omcp] failed to launch copilot: ${errno.message}`);
     }
     throw result.error;
   }
@@ -853,7 +854,7 @@ async function showStatus(): Promise<void> {
 
 async function reasoningCommand(args: string[]): Promise<void> {
   const mode = args[0];
-  const configPath = codexConfigPath();
+  const configPath = copilotConfigPath();
 
   if (!mode) {
     if (!existsSync(configPath)) {
@@ -932,7 +933,7 @@ export async function launchWithHud(args: string[]): Promise<void> {
   const explicitLaunchPolicy = resolveLeaderLaunchPolicyOverride(
     notifyTempResult.passthroughArgs,
   );
-  const codexHomeOverride = resolveCodexHomeForLaunch(launchCwd, process.env);
+  const copilotHomeOverride = resolveCodexHomeForLaunch(launchCwd, process.env);
   const launchPolicy = resolveCodexLaunchPolicy(
     process.env,
     process.platform,
@@ -945,7 +946,7 @@ export async function launchWithHud(args: string[]): Promise<void> {
   const enableNotifyFallbackAuthority = launchPolicy === "direct";
   const workerSparkModel = resolveWorkerSparkModel(
     notifyTempResult.passthroughArgs,
-    codexHomeOverride,
+    copilotHomeOverride,
   );
   const normalizedArgs = normalizeCodexLaunchArgs(
     notifyTempResult.passthroughArgs,
@@ -994,7 +995,7 @@ export async function launchWithHud(args: string[]): Promise<void> {
 
   // ── Phase 0.5: config repair ────────────────────────────────────────────
   // After an omcp version upgrade the OLD setup code (still in memory) may
-  // have written a config.toml with duplicate [tui] sections.  Codex CLI's
+  // have written a config.toml with duplicate [tui] sections.  Copilot CLI's
   // TOML parser rejects duplicates, so we repair before spawning the CLI.
   try {
     const repaired = await repairConfigIfNeeded(
@@ -1010,7 +1011,7 @@ export async function launchWithHud(args: string[]): Promise<void> {
 
   // ── Phase 1: preLaunch ──────────────────────────────────────────────────
   try {
-    await preLaunch(cwd, sessionId, notifyTempResult.contract, codexHomeOverride, enableNotifyFallbackAuthority, worktreeDirty);
+    await preLaunch(cwd, sessionId, notifyTempResult.contract, copilotHomeOverride, enableNotifyFallbackAuthority, worktreeDirty);
   } catch (err) {
     // preLaunch errors must NOT prevent Codex from starting
     console.error(
@@ -1028,13 +1029,13 @@ export async function launchWithHud(args: string[]): Promise<void> {
       normalizedArgs,
       sessionId,
       workerSparkModel,
-      codexHomeOverride,
+      copilotHomeOverride,
       notifyTempContractRaw,
       explicitLaunchPolicy,
     );
   } finally {
     // ── Phase 3: postLaunch ─────────────────────────────────────────────
-    await postLaunch(cwd, sessionId, codexHomeOverride, enableNotifyFallbackAuthority);
+    await postLaunch(cwd, sessionId, copilotHomeOverride, enableNotifyFallbackAuthority);
   }
 }
 
@@ -1045,7 +1046,7 @@ export async function execWithOverlay(args: string[]): Promise<void> {
     parsedWorktree.remainingArgs,
     process.env,
   );
-  const codexHomeOverride = resolveCodexHomeForLaunch(launchCwd, process.env);
+  const copilotHomeOverride = resolveCodexHomeForLaunch(launchCwd, process.env);
   const normalizedArgs = normalizeCodexLaunchArgs(
     notifyTempResult.passthroughArgs,
   );
@@ -1104,7 +1105,7 @@ export async function execWithOverlay(args: string[]): Promise<void> {
   }
 
   try {
-    await preLaunch(cwd, sessionId, notifyTempResult.contract, codexHomeOverride, true, worktreeDirty);
+    await preLaunch(cwd, sessionId, notifyTempResult.contract, copilotHomeOverride, true, worktreeDirty);
   } catch (err) {
     console.error(
       `[omcp] preLaunch warning: ${err instanceof Error ? err.message : err}`,
@@ -1121,8 +1122,8 @@ export async function execWithOverlay(args: string[]): Promise<void> {
       process.env,
       sessionModelInstructionsPath(cwd, sessionId),
     );
-    const codexEnvBase = codexHomeOverride
-      ? { ...process.env, CODEX_HOME: codexHomeOverride }
+    const codexEnvBase = copilotHomeOverride
+      ? { ...process.env, COPILOT_HOME: copilotHomeOverride }
       : process.env;
     const codexEnv = notifyTempContractRaw
       ? {
@@ -1132,7 +1133,7 @@ export async function execWithOverlay(args: string[]): Promise<void> {
       : codexEnvBase;
     runCodexBlocking(cwd, codexArgs, codexEnv);
   } finally {
-    await postLaunch(cwd, sessionId, codexHomeOverride, true);
+    await postLaunch(cwd, sessionId, copilotHomeOverride, true);
   }
 }
 
@@ -1150,7 +1151,7 @@ export function normalizeCodexLaunchArgs(args: string[]): string[] {
       continue;
     }
 
-    if (arg === CODEX_BYPASS_FLAG) {
+    if (arg === COPILOT_BYPASS_FLAG) {
       wantsBypass = true;
       if (!hasBypass) {
         normalized.push(arg);
@@ -1184,7 +1185,7 @@ export function normalizeCodexLaunchArgs(args: string[]): string[] {
   }
 
   if (wantsBypass && !hasBypass) {
-    normalized.push(CODEX_BYPASS_FLAG);
+    normalized.push(COPILOT_BYPASS_FLAG);
   }
 
   if (reasoningMode) {
@@ -1201,11 +1202,11 @@ export function normalizeCodexLaunchArgs(args: string[]): string[] {
  */
 export function resolveWorkerSparkModel(
   args: string[],
-  codexHomeOverride?: string,
+  copilotHomeOverride?: string,
 ): string | undefined {
   for (const arg of args) {
     if (arg === SPARK_FLAG || arg === MADMAX_SPARK_FLAG) {
-      return resolveTeamLowComplexityDefaultModel(codexHomeOverride);
+      return resolveTeamLowComplexityDefaultModel(copilotHomeOverride);
     }
   }
   return undefined;
@@ -1808,7 +1809,7 @@ export function buildDetachedSessionBootstrapSteps(
   codexCmd: string,
   hudCmd: string,
   workerLaunchArgs: string | null,
-  codexHomeOverride?: string,
+  copilotHomeOverride?: string,
   notifyTempContractRaw?: string | null,
   nativeWindows = false,
   sessionId?: string,
@@ -1830,7 +1831,7 @@ export function buildDetachedSessionBootstrapSteps(
       ? ["-e", `${TEAM_WORKER_LAUNCH_ARGS_ENV}=${workerLaunchArgs}`]
       : []),
     ...(sessionId ? ["-e", `OMCP_SESSION_ID=${sessionId}`] : []),
-    ...(codexHomeOverride ? ["-e", `CODEX_HOME=${codexHomeOverride}`] : []),
+    ...(copilotHomeOverride ? ["-e", `COPILOT_HOME=${copilotHomeOverride}`] : []),
     ...(notifyTempContractRaw
       ? ["-e", `${OMCP_NOTIFY_TEMP_CONTRACT_ENV}=${notifyTempContractRaw}`]
       : []),
@@ -1996,7 +1997,7 @@ export function buildNotifyTempStartupMessages(
 export function buildNotifyFallbackWatcherEnv(
   env: NodeJS.ProcessEnv = process.env,
   options: {
-    codexHomeOverride?: string;
+    copilotHomeOverride?: string;
     enableAuthority?: boolean;
     sessionId?: string;
   } = {},
@@ -2006,7 +2007,7 @@ export function buildNotifyFallbackWatcherEnv(
   delete nextEnv.TMUX_PANE;
   return {
     ...nextEnv,
-    ...(options.codexHomeOverride ? { CODEX_HOME: options.codexHomeOverride } : {}),
+    ...(options.copilotHomeOverride ? { COPILOT_HOME: options.copilotHomeOverride } : {}),
     ...(options.sessionId ? { OMCP_SESSION_ID: options.sessionId } : {}),
     OMCP_HUD_AUTHORITY: options.enableAuthority ? "1" : "0",
   };
@@ -2290,7 +2291,7 @@ async function preLaunch(
   cwd: string,
   sessionId: string,
   notifyTempContract?: NotifyTempContract,
-  codexHomeOverride?: string,
+  copilotHomeOverride?: string,
   enableNotifyFallbackAuthority: boolean = false,
   worktreeDirty: boolean = false,
 ): Promise<void> {
@@ -2336,7 +2337,7 @@ ${launchAppendix}${dirtyWorktreeGuidance}`
 
   // 4. Start notify fallback watcher (best effort)
   try {
-    await startNotifyFallbackWatcher(cwd, { codexHomeOverride, enableAuthority: enableNotifyFallbackAuthority, sessionId });
+    await startNotifyFallbackWatcher(cwd, { copilotHomeOverride, enableAuthority: enableNotifyFallbackAuthority, sessionId });
   } catch (err) {
     process.stderr.write(`[cli/index] operation failed: ${err}\n`);
     // Non-fatal
@@ -2399,7 +2400,7 @@ ${launchAppendix}${dirtyWorktreeGuidance}`
 }
 
 /**
- * runCodex: Launch Codex CLI (blocks until exit).
+ * runCodex: Launch Copilot CLI (blocks until exit).
  * All 3 paths (new tmux, existing tmux, no tmux) block via execSync/execFileSync.
  */
 function runCodex(
@@ -2407,7 +2408,7 @@ function runCodex(
   args: string[],
   sessionId: string,
   workerDefaultModel?: string,
-  codexHomeOverride?: string,
+  copilotHomeOverride?: string,
   notifyTempContractRaw?: string | null,
   explicitLaunchPolicy?: CodexLaunchPolicy,
 ): void {
@@ -2432,8 +2433,8 @@ function runCodex(
     inheritLeaderFlags,
     workerDefaultModel,
   );
-  const codexBaseEnv = codexHomeOverride
-    ? { ...process.env, CODEX_HOME: codexHomeOverride }
+  const codexBaseEnv = copilotHomeOverride
+    ? { ...process.env, COPILOT_HOME: copilotHomeOverride }
     : process.env;
   const codexEnvWithSession = { ...codexBaseEnv, OMCP_SESSION_ID: sessionId };
   const codexEnv = workerLaunchArgs
@@ -2522,9 +2523,9 @@ function runCodex(
     runCodexBlocking(cwd, launchArgs, codexEnvWithNotify);
   } else {
     // Not in tmux: create a new tmux session with codex + HUD pane
-    const codexCmd = buildTmuxPaneCommand("codex", launchArgs);
+    const codexCmd = buildTmuxPaneCommand("copilot", launchArgs);
     const detachedWindowsCodexCmd = nativeWindows
-      ? buildWindowsPromptCommand("codex", launchArgs)
+      ? buildWindowsPromptCommand("copilot", launchArgs)
       : null;
     const sessionName = buildDetachedTmuxSessionName(cwd, sessionId);
     let createdDetachedSession = false;
@@ -2538,7 +2539,7 @@ function runCodex(
         codexCmd,
         hudCmd,
         workerLaunchArgs,
-        codexHomeOverride,
+        copilotHomeOverride,
         notifyTempContractRaw,
         nativeWindows,
         sessionId,
@@ -2783,7 +2784,7 @@ function scheduleDetachedWindowsCodexLaunch(
 async function postLaunch(
   cwd: string,
   sessionId: string,
-  codexHomeOverride?: string,
+  copilotHomeOverride?: string,
   enableNotifyFallbackAuthority: boolean = false,
 ): Promise<void> {
   // Capture session start time before cleanup (writeSessionEnd deletes session.json)
@@ -2801,7 +2802,7 @@ async function postLaunch(
 
   // 0. Flush fallback watcher once to reduce race with fast codex exit.
   try {
-    await flushNotifyFallbackOnce(cwd, { codexHomeOverride, enableAuthority: enableNotifyFallbackAuthority, sessionId });
+    await flushNotifyFallbackOnce(cwd, { copilotHomeOverride, enableAuthority: enableNotifyFallbackAuthority, sessionId });
   } catch (err) {
     process.stderr.write(`[cli/index] operation failed: ${err}\n`);
     // Non-fatal
@@ -3177,7 +3178,7 @@ function tryKillPid(pid: number, signal: NodeJS.Signals = "SIGTERM"): boolean {
 
 async function startNotifyFallbackWatcher(
   cwd: string,
-  options: { codexHomeOverride?: string; enableAuthority?: boolean; sessionId?: string } = {},
+  options: { copilotHomeOverride?: string; enableAuthority?: boolean; sessionId?: string } = {},
 ): Promise<void> {
   const { mkdir, writeFile } = await import("fs/promises");
   const pidPath = notifyFallbackPidPath(cwd);
@@ -3202,7 +3203,7 @@ async function startNotifyFallbackWatcher(
     },
   );
   const watcherEnv = buildNotifyFallbackWatcherEnv(process.env, {
-    codexHomeOverride: options.codexHomeOverride,
+    copilotHomeOverride: options.copilotHomeOverride,
     enableAuthority: options.enableAuthority === true,
     sessionId: options.sessionId,
   });
@@ -3394,7 +3395,7 @@ async function stopHookDerivedWatcher(cwd: string): Promise<void> {
 
 async function flushNotifyFallbackOnce(
   cwd: string,
-  options: { codexHomeOverride?: string; enableAuthority?: boolean; sessionId?: string } = {},
+  options: { copilotHomeOverride?: string; enableAuthority?: boolean; sessionId?: string } = {},
 ): Promise<void> {
   if (!shouldEnableNotifyFallbackWatcher(process.env, process.platform)) return;
   const { spawnSync } = await import("child_process");
@@ -3411,7 +3412,7 @@ async function flushNotifyFallbackOnce(
       timeout: 3000,
       windowsHide: true,
       env: buildNotifyFallbackWatcherEnv(process.env, {
-        codexHomeOverride: options.codexHomeOverride,
+        copilotHomeOverride: options.copilotHomeOverride,
         enableAuthority: options.enableAuthority === true,
         sessionId: options.sessionId,
       }),

@@ -4,7 +4,7 @@
  * Prevents flooding users with session-idle notifications by enforcing a
  * minimum interval between dispatches. Ported from OMC persistent-mode hook.
  *
- * Config key : notifications.idleCooldownSeconds in ~/.codex/.omcp-config.json
+ * Config key : notifications.idleCooldownSeconds in ~/.copilot/.omcp-config.json
  * Env var    : OMCP_IDLE_COOLDOWN_SECONDS  (overrides config)
  * State file : .omcp/state/idle-notif-cooldown.json
  *              (session-scoped when sessionId is available)
@@ -14,7 +14,7 @@
 
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
-import { codexHome } from '../utils/paths.js';
+import { copilotHome } from '../utils/paths.js';
 
 const DEFAULT_COOLDOWN_SECONDS = 60;
 const SESSION_ID_SAFE_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,255}$/;
@@ -33,7 +33,7 @@ interface IdleNotificationState {
  *
  * Resolution order:
  *   1. OMCP_IDLE_COOLDOWN_SECONDS env var
- *   2. notifications.idleCooldownSeconds in ~/.codex/.omcp-config.json
+ *   2. notifications.idleCooldownSeconds in ~/.copilot/.omcp-config.json
  *   3. Default: 60 seconds
  */
 export function getIdleNotificationCooldownSeconds(): number {
@@ -48,7 +48,7 @@ export function getIdleNotificationCooldownSeconds(): number {
 
   // 2. Config file
   try {
-    const configPath = join(codexHome(), '.omcp-config.json');
+    const configPath = join(copilotHome(), '.omcp-config.json');
     if (existsSync(configPath)) {
       const raw = JSON.parse(readFileSync(configPath, 'utf-8')) as Record<string, unknown>;
       const notifications = raw?.notifications as Record<string, unknown> | undefined;

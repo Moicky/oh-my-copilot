@@ -8,13 +8,13 @@ import { fileURLToPath } from 'node:url';
 import { parseSessionSearchArgs } from '../session-search.js';
 
 async function writeRollout(
-  codexHomeDir: string,
+  copilotHomeDir: string,
   isoDate: string,
   fileName: string,
   lines: Array<Record<string, unknown>>,
 ): Promise<void> {
   const [year, month, day] = isoDate.slice(0, 10).split('-');
-  const dir = join(codexHomeDir, 'sessions', year, month, day);
+  const dir = join(copilotHomeDir, 'sessions', year, month, day);
   await mkdir(dir, { recursive: true });
   await writeFile(join(dir, fileName), `${lines.map((line) => JSON.stringify(line)).join('\n')}\n`, 'utf-8');
 }
@@ -48,9 +48,9 @@ describe('parseSessionSearchArgs', () => {
 describe('omcp session search', () => {
   it('prints structured JSON results for matching transcripts', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-session-search-cli-'));
-    const codexHomeDir = join(cwd, '.codex-home');
+    const copilotHomeDir = join(cwd, '.codex-home');
     try {
-      await writeRollout(codexHomeDir, '2026-03-10T12:00:00.000Z', 'rollout-2026-03-10T12-00-00-session-a.jsonl', [
+      await writeRollout(copilotHomeDir, '2026-03-10T12:00:00.000Z', 'rollout-2026-03-10T12-00-00-session-a.jsonl', [
         {
           type: 'session_meta',
           payload: {
@@ -69,7 +69,7 @@ describe('omcp session search', () => {
       ]);
 
       const result = runOmcp(cwd, ['session', 'search', 'team api', '--project', 'current', '--json'], {
-        CODEX_HOME: codexHomeDir,
+        COPILOT_HOME: copilotHomeDir,
       });
 
       assert.equal(result.status, 0, result.stderr || result.stdout);

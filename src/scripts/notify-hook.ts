@@ -2,7 +2,7 @@
 
 /**
  * oh-my-copilot Notification Hook
- * Codex CLI fires this after each agent turn via the `notify` config.
+ * Copilot CLI fires this after each agent turn via the `notify` config.
  * Receives JSON payload as the last argv argument.
  *
  * Responsibilities are split into sub-modules under scripts/notify-hook/:

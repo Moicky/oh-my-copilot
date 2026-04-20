@@ -5,7 +5,7 @@ description: Team worker protocol (ACK, mailbox, task lifecycle) for tmux-based 
 
 # Worker Skill
 
-This skill is for a Codex session that was started as an OMCP Team worker (a tmux pane spawned by `$team`).
+This skill is for a Copilot session that was started as an OMCP Team worker (a tmux pane spawned by `$team`).
 
 ## Identity
 
@@ -15,13 +15,13 @@ You MUST be running with `OMCP_TEAM_WORKER` set. It looks like:
 
 Example: `alpha/worker-2`
 
-## Load Worker Skill Path (Claude/Codex)
+## Load Worker Skill Path (Claude/Copilot)
 
 When a worker inbox tells you to load this skill, resolve the first existing path:
 
-1. `${CODEX_HOME:-~/.codex}/skills/worker/SKILL.md`
-2. `~/.codex/skills/worker/SKILL.md`
-3. `<leader_cwd>/.codex/skills/worker/SKILL.md`
+1. `${COPILOT_HOME:-~/.copilot}/skills/worker/SKILL.md`
+2. `~/.copilot/skills/worker/SKILL.md`
+3. `<leader_cwd>/.copilot/skills/worker/SKILL.md`
 4. `<leader_cwd>/skills/worker/SKILL.md` (repo fallback)
 
 ## Startup Protocol (ACK)
@@ -103,4 +103,4 @@ Worker sessions should treat team state + CLI interop as the source of truth.
 
 ## Shutdown
 
-If the lead sends a shutdown request, follow the shutdown inbox instructions exactly, write your shutdown ack file, then exit the Codex session.
+If the lead sends a shutdown request, follow the shutdown inbox instructions exactly, write your shutdown ack file, then exit the Copilot session.

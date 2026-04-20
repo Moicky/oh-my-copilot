@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
 const ENV_KEYS = [
-  'CODEX_HOME',
+  'COPILOT_HOME',
   'OMCP_NOTIFY_TEMP',
   'OMCP_NOTIFY_TEMP_CONTRACT',
   'OMCP_NOTIFY_PROFILE',
@@ -27,7 +27,7 @@ describe('session-idle tmux tail dedupe integration', () => {
   beforeEach(async () => {
     clearEnv();
     const root = await mkdtemp(join(tmpdir(), 'omcp-session-idle-tail-'));
-    tempCodexHome = join(root, '.codex');
+    tempCodexHome = join(root, '.copilot');
     projectPath = join(root, 'project');
     await mkdir(tempCodexHome, { recursive: true });
     await mkdir(projectPath, { recursive: true });
@@ -43,7 +43,7 @@ describe('session-idle tmux tail dedupe integration', () => {
         webhook: { enabled: true, url: 'https://example.com/webhook' },
       },
     }, null, 2));
-    process.env.CODEX_HOME = tempCodexHome;
+    process.env.COPILOT_HOME = tempCodexHome;
     ({ notifyLifecycle } = await import(`../index.js?session-idle-tail-dedupe=${Date.now()}`));
     originalFetch = globalThis.fetch;
     capturedBodies.length = 0;

@@ -2,7 +2,7 @@ use crate::error::SparkshellError;
 use crate::exec::CommandOutput;
 use crate::prompt::build_summary_prompt;
 use std::env;
-use std::io::{Read, Write};
+use std::io::Read;
 use std::process::{Command, Stdio};
 use std::thread;
 use std::time::{Duration, Instant};
@@ -64,34 +64,34 @@ pub fn summarize_output(
                 run_codex_exec(&prompt, &fallback_model, timeout_ms)?;
             if !fallback_ok {
                 let primary_message = if stderr.trim().is_empty() {
-                    "codex exec exited unsuccessfully".to_string()
+                    "copilot -p exited unsuccessfully".to_string()
                 } else {
                     stderr.trim().to_string()
                 };
                 let fallback_message = if fallback_stderr.trim().is_empty() {
-                    "codex exec exited unsuccessfully".to_string()
+                    "copilot -p exited unsuccessfully".to_string()
                 } else {
                     fallback_stderr.trim().to_string()
                 };
                 return Err(SparkshellError::SummaryBridge(format!(
-                    "codex exec failed for primary model `{model}` ({primary_message}) and fallback model `{fallback_model}` ({fallback_message})"
+                    "copilot -p failed for primary model `{model}` ({primary_message}) and fallback model `{fallback_model}` ({fallback_message})"
                 )));
             }
             return normalize_summary(&fallback_stdout).ok_or_else(|| {
                 SparkshellError::SummaryBridge(
-                    "codex exec fallback returned no valid summary sections".to_string(),
+                    "copilot -p fallback returned no valid summary sections".to_string(),
                 )
             });
         }
         let message = if stderr.trim().is_empty() {
-            "codex exec exited unsuccessfully".to_string()
+            "copilot -p exited unsuccessfully".to_string()
         } else {
-            format!("codex exec exited unsuccessfully: {}", stderr.trim())
+            format!("copilot -p exited unsuccessfully: {}", stderr.trim())
         };
         return Err(SparkshellError::SummaryBridge(message));
     }
     normalize_summary(&stdout).ok_or_else(|| {
-        SparkshellError::SummaryBridge("codex exec returned no valid summary sections".to_string())
+        SparkshellError::SummaryBridge("copilot -p returned no valid summary sections".to_string())
     })
 }
 
@@ -117,38 +117,39 @@ fn run_codex_exec(
     model: &str,
     timeout_ms: u64,
 ) -> Result<(String, String, bool), SparkshellError> {
-    let mut child = Command::new("codex")
-        .arg("exec")
+    // Allow integration tests / power users to override the runtime binary.
+    let runtime_bin = env::var("OMCP_RUNTIME_BINARY")
+        .ok()
+        .filter(|value| !value.trim().is_empty())
+        .unwrap_or_else(|| "copilot".to_string());
+
+    let mut child = Command::new(&runtime_bin)
+        .arg("-p")
+        .arg(prompt)
         .arg("--model")
         .arg(model)
-        .arg("--sandbox")
-        .arg("read-only")
-        .arg("-c")
-        .arg("model_reasoning_effort=\"low\"")
-        .arg("--skip-git-repo-check")
-        .arg("--color")
-        .arg("never")
-        .arg("-")
-        .stdin(Stdio::piped())
+        .arg("--reasoning-effort")
+        .arg("low")
+        .arg("--no-color")
+        .arg("--allow-all-tools")
+        .arg("--no-ask-user")
+        .arg("--silent")
+        .stdin(Stdio::null())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()?;
 
-    let mut stdin = child
-        .stdin
-        .take()
-        .ok_or_else(|| SparkshellError::SummaryBridge("failed to open codex stdin".to_string()))?;
     let mut stdout = child
         .stdout
         .take()
-        .ok_or_else(|| SparkshellError::SummaryBridge("failed to open codex stdout".to_string()))?;
+        .ok_or_else(|| SparkshellError::SummaryBridge("failed to open copilot stdout".to_string()))?;
     let mut stderr = child
         .stderr
         .take()
-        .ok_or_else(|| SparkshellError::SummaryBridge("failed to open codex stderr".to_string()))?;
+        .ok_or_else(|| SparkshellError::SummaryBridge("failed to open copilot stderr".to_string()))?;
 
-    let prompt_owned = prompt.to_string();
-    let stdin_writer = thread::spawn(move || stdin.write_all(prompt_owned.as_bytes()));
+    // Prompt is passed as -p argument; no stdin writer needed for Copilot CLI.
+    let stdin_writer: thread::JoinHandle<std::io::Result<()>> = thread::spawn(|| Ok(()));
     let stdout_reader = thread::spawn(move || {
         let mut buffer = Vec::new();
         let _ = stdout.read_to_end(&mut buffer);

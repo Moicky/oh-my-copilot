@@ -22,7 +22,7 @@ function todaySessionDir(baseHome: string): string {
   const now = new Date();
   return join(
     baseHome,
-    '.codex',
+    '.copilot',
     'sessions',
     String(now.getUTCFullYear()),
     String(now.getUTCMonth() + 1).padStart(2, '0'),
@@ -228,7 +228,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$fmt" == "#{pane_current_command}" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$fmt" == "#S" ]]; then
@@ -261,7 +261,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     shift || true
   done
   if [[ -n "$target" ]]; then
-    printf "%%42\tcodex\tcodex\n"
+    printf "%%42\tcopilot\tcopilot\n"
     exit 0
   fi
   echo "%42 1"
@@ -285,20 +285,20 @@ function buildManagedRalphTmux(
   const { cwd, managedSessionName, anchorPane, livePane, codexPanes, missingAnchor = false } = options;
   const panes = (codexPanes && codexPanes.length > 0)
     ? codexPanes
-    : [{ paneId: livePane, active: true, currentCommand: 'codex', startCommand: 'codex' }];
+    : [{ paneId: livePane, active: true, currentCommand: 'copilot', startCommand: 'copilot' }];
   const listPaneOutput = panes
     .map((pane) => {
       const paneId = pane.paneId;
       const active = pane.active ? '1' : '0';
-      const currentCommand = pane.currentCommand || 'codex';
-      const startCommand = pane.startCommand || 'codex';
+      const currentCommand = pane.currentCommand || 'copilot';
+      const startCommand = pane.startCommand || 'copilot';
       return `${paneId}\t${active}\t${currentCommand}\t${startCommand}`;
     })
     .join('\n');
   const paneCommandBranches = panes
     .map((pane) => {
-      const currentCommand = (pane.currentCommand || 'codex').replace(/"/g, '\\"');
-      const startCommand = (pane.startCommand || 'codex').replace(/"/g, '\\"');
+      const currentCommand = (pane.currentCommand || 'copilot').replace(/"/g, '\\"');
+      const startCommand = (pane.startCommand || 'copilot').replace(/"/g, '\\"');
       return `  if [[ "$format" == "#{pane_current_command}" && "$target" == "${pane.paneId}" ]]; then
     echo "${currentCommand}"
     exit 0
@@ -813,15 +813,15 @@ describe('notify-fallback watcher', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-fallback-authority-backed-off-'));
     const fakeBinDir = join(wd, 'fake-bin');
     const tmuxLogPath = join(wd, 'tmux.log');
-    const codexHome = join(wd, 'codex-home');
+    const copilotHome = join(wd, 'codex-home');
     try {
       await mkdir(join(wd, '.omcp', 'logs'), { recursive: true });
       await mkdir(join(wd, '.omcp', 'state'), { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
-      await writeFile(join(codexHome, '.omcp-config.json'), JSON.stringify({
+      await writeFile(join(copilotHome, '.omcp-config.json'), JSON.stringify({
         autoNudge: { enabled: true, delaySec: 0, ttlMs: 30_000 },
       }, null, 2));
       await writeSessionStart(wd, 'sess-managed-fallback');
@@ -853,7 +853,7 @@ describe('notify-fallback watcher', () => {
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            CODEX_HOME: codexHome,
+            COPILOT_HOME: copilotHome,
             OMCP_SESSION_ID: 'sess-managed-fallback',
             TMUX: '1',
             TMUX_PANE: '%42',
@@ -1331,7 +1331,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$fmt" == "#{pane_current_command}" ]]; then
-    echo "codex"
+    echo "copilot"
     exit 0
   fi
   if [[ "$fmt" == "#S" ]]; then
@@ -1475,15 +1475,15 @@ exit 0
     const wd = await mkdtemp(join(tmpdir(), 'omcp-fallback-auto-nudge-stalled-'));
     const fakeBinDir = join(wd, 'fake-bin');
     const tmuxLogPath = join(wd, 'tmux.log');
-    const codexHome = join(wd, 'codex-home');
+    const copilotHome = join(wd, 'codex-home');
     try {
       await mkdir(join(wd, '.omcp', 'logs'), { recursive: true });
       await mkdir(join(wd, '.omcp', 'state'), { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
-      await writeFile(join(codexHome, '.omcp-config.json'), JSON.stringify({
+      await writeFile(join(copilotHome, '.omcp-config.json'), JSON.stringify({
         autoNudge: { enabled: true, delaySec: 0, ttlMs: 30_000 },
       }, null, 2));
       await writeSessionStart(wd, 'sess-managed-fallback');
@@ -1503,7 +1503,7 @@ exit 0
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            CODEX_HOME: codexHome,
+            COPILOT_HOME: copilotHome,
             OMCP_SESSION_ID: 'sess-managed-fallback',
             OMCP_TEST_TMUX_SESSION_NAME: 'omcp-fallback-auto-nudge-stalled-managed',
             TMUX: '1',
@@ -1531,15 +1531,15 @@ exit 0
     const wd = await mkdtemp(join(tmpdir(), 'omcp-fallback-auto-nudge-disabled-'));
     const fakeBinDir = join(wd, 'fake-bin');
     const tmuxLogPath = join(wd, 'tmux.log');
-    const codexHome = join(wd, 'codex-home');
+    const copilotHome = join(wd, 'codex-home');
     try {
       await mkdir(join(wd, '.omcp', 'logs'), { recursive: true });
       await mkdir(join(wd, '.omcp', 'state'), { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
-      await writeFile(join(codexHome, '.omcp-config.json'), JSON.stringify({
+      await writeFile(join(copilotHome, '.omcp-config.json'), JSON.stringify({
         autoNudge: { enabled: true, delaySec: 0, ttlMs: 30_000 },
       }, null, 2));
       await writeFile(join(wd, '.omcp', 'tmux-hook.json'), JSON.stringify({
@@ -1563,7 +1563,7 @@ exit 0
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            CODEX_HOME: codexHome,
+            COPILOT_HOME: copilotHome,
             OMCP_SESSION_ID: 'sess-managed-fallback',
             TMUX: '1',
             TMUX_PANE: '%42',
@@ -1584,15 +1584,15 @@ exit 0
     const wd = await mkdtemp(join(tmpdir(), 'omcp-fallback-auto-nudge-unmanaged-'));
     const fakeBinDir = join(wd, 'fake-bin');
     const tmuxLogPath = join(wd, 'tmux.log');
-    const codexHome = join(wd, 'codex-home');
+    const copilotHome = join(wd, 'codex-home');
     try {
       await mkdir(join(wd, '.omcp', 'logs'), { recursive: true });
       await mkdir(join(wd, '.omcp', 'state'), { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
-      await writeFile(join(codexHome, '.omcp-config.json'), JSON.stringify({
+      await writeFile(join(copilotHome, '.omcp-config.json'), JSON.stringify({
         autoNudge: { enabled: true, delaySec: 0, ttlMs: 30_000 },
       }, null, 2));
       await writeFile(join(wd, '.omcp', 'state', 'hud-state.json'), JSON.stringify({
@@ -1610,7 +1610,7 @@ exit 0
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            CODEX_HOME: codexHome,
+            COPILOT_HOME: copilotHome,
             TMUX: '1',
             TMUX_PANE: '%42',
             OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
@@ -1638,15 +1638,15 @@ exit 0
     const wd = await mkdtemp(join(tmpdir(), 'omcp-fallback-auto-nudge-fresh-'));
     const fakeBinDir = join(wd, 'fake-bin');
     const tmuxLogPath = join(wd, 'tmux.log');
-    const codexHome = join(wd, 'codex-home');
+    const copilotHome = join(wd, 'codex-home');
     try {
       await mkdir(join(wd, '.omcp', 'logs'), { recursive: true });
       await mkdir(join(wd, '.omcp', 'state'), { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
-      await writeFile(join(codexHome, '.omcp-config.json'), JSON.stringify({
+      await writeFile(join(copilotHome, '.omcp-config.json'), JSON.stringify({
         autoNudge: { enabled: true, delaySec: 0 },
       }, null, 2));
       await writeFile(join(wd, '.omcp', 'state', 'hud-state.json'), JSON.stringify({
@@ -1664,7 +1664,7 @@ exit 0
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            CODEX_HOME: codexHome,
+            COPILOT_HOME: copilotHome,
             TMUX: '1',
             TMUX_PANE: '%42',
             OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
@@ -1689,17 +1689,17 @@ exit 0
     const wd = await mkdtemp(join(tmpdir(), 'omcp-fallback-auto-nudge-dedup-'));
     const fakeBinDir = join(wd, 'fake-bin');
     const tmuxLogPath = join(wd, 'tmux.log');
-    const codexHome = join(wd, 'codex-home');
+    const copilotHome = join(wd, 'codex-home');
     const lastTurnAt = new Date(Date.now() - 6_000).toISOString();
     const lastMessage = 'Keep going and finish the cleanup from here.';
     try {
       await mkdir(join(wd, '.omcp', 'logs'), { recursive: true });
       await mkdir(join(wd, '.omcp', 'state'), { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
-      await writeFile(join(codexHome, '.omcp-config.json'), JSON.stringify({
+      await writeFile(join(copilotHome, '.omcp-config.json'), JSON.stringify({
         autoNudge: { enabled: true, delaySec: 0 },
       }, null, 2));
       await writeFile(join(wd, '.omcp', 'state', 'hud-state.json'), JSON.stringify({
@@ -1723,7 +1723,7 @@ exit 0
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            CODEX_HOME: codexHome,
+            COPILOT_HOME: copilotHome,
             TMUX: '1',
             TMUX_PANE: '%42',
             OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
@@ -1748,17 +1748,17 @@ exit 0
     const wd = await mkdtemp(join(tmpdir(), 'omcp-fallback-auto-nudge-exact-dedup-'));
     const fakeBinDir = join(wd, 'fake-bin');
     const tmuxLogPath = join(wd, 'tmux.log');
-    const codexHome = join(wd, 'codex-home');
+    const copilotHome = join(wd, 'codex-home');
     const lastTurnAt = '2026-03-01T00:00:00.000Z';
     const lastMessage = 'Keep going and finish the cleanup from here.';
     try {
       await mkdir(join(wd, '.omcp', 'logs'), { recursive: true });
       await mkdir(join(wd, '.omcp', 'state'), { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
-      await mkdir(codexHome, { recursive: true });
+      await mkdir(copilotHome, { recursive: true });
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
-      await writeFile(join(codexHome, '.omcp-config.json'), JSON.stringify({
+      await writeFile(join(copilotHome, '.omcp-config.json'), JSON.stringify({
         autoNudge: { enabled: true, delaySec: 0, ttlMs: 5000 },
       }, null, 2));
       await writeFile(join(wd, '.omcp', 'state', 'hud-state.json'), JSON.stringify({
@@ -1782,7 +1782,7 @@ exit 0
           encoding: 'utf-8',
           env: buildCleanNotifyEnv({
             PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-            CODEX_HOME: codexHome,
+            COPILOT_HOME: copilotHome,
             TMUX: '1',
             TMUX_PANE: '%42',
             OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS: '5000',
@@ -2393,8 +2393,8 @@ exit 0
         livePane,
         codexPanes: [
           { paneId: anchorPane, active: false, currentCommand: 'sh', startCommand: 'bash' },
-          { paneId: '%41', active: false, currentCommand: 'codex', startCommand: 'codex' },
-          { paneId: livePane, active: true, currentCommand: 'codex', startCommand: 'codex' },
+          { paneId: '%41', active: false, currentCommand: 'copilot', startCommand: 'copilot' },
+          { paneId: livePane, active: true, currentCommand: 'copilot', startCommand: 'copilot' },
         ],
       }));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
@@ -2518,7 +2518,7 @@ if [[ "$cmd" == "list-panes" ]]; then
   "tmux_pane_id": "%99"
 }
 JSON
-    printf "%%99\t0\tsh\tbash\n%%42\t1\tcodex\tcodex\n"
+    printf "%%99\t0\tsh\tbash\n%%42\t1\tcopilot\tcopilot\n"
     exit 0
   fi
   echo "can't find session" >&2
@@ -2597,8 +2597,8 @@ exit 0
         anchorPane,
         livePane,
         codexPanes: [
-          { paneId: anchorPane, active: false, currentCommand: 'codex', startCommand: 'codex' },
-          { paneId: livePane, active: true, currentCommand: 'codex', startCommand: 'codex' },
+          { paneId: anchorPane, active: false, currentCommand: 'copilot', startCommand: 'copilot' },
+          { paneId: livePane, active: true, currentCommand: 'copilot', startCommand: 'copilot' },
         ],
       }));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
@@ -2668,8 +2668,8 @@ exit 0
         anchorPane,
         livePane,
         codexPanes: [
-          { paneId: anchorPane, active: true, currentCommand: 'bash', startCommand: 'codex --model gpt-5' },
-          { paneId: livePane, active: false, currentCommand: 'codex', startCommand: 'codex' },
+          { paneId: anchorPane, active: true, currentCommand: 'bash', startCommand: 'copilot --model gpt-5' },
+          { paneId: livePane, active: false, currentCommand: 'copilot', startCommand: 'copilot' },
         ],
       }));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
@@ -2739,8 +2739,8 @@ exit 0
         anchorPane,
         livePane,
         codexPanes: [
-          { paneId: '%41', active: false, currentCommand: 'codex', startCommand: 'codex' },
-          { paneId: livePane, active: true, currentCommand: 'codex', startCommand: 'codex' },
+          { paneId: '%41', active: false, currentCommand: 'copilot', startCommand: 'copilot' },
+          { paneId: livePane, active: true, currentCommand: 'copilot', startCommand: 'copilot' },
         ],
         missingAnchor: true,
       }));

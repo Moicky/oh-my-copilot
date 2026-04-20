@@ -80,7 +80,7 @@ describe('omcp agents-init', () => {
       assert.match(rootAgents, /<!-- AUTONOMY DIRECTIVE — DO NOT REMOVE -->/);
       assert.match(rootAgents, /<!-- END AUTONOMY DIRECTIVE -->\n\n# oh-my-copilot - Intelligent Multi-Agent Orchestration/);
       assert.match(rootAgents, /# oh-my-copilot - Intelligent Multi-Agent Orchestration/);
-      assert.match(rootAgents, /\.\/\.codex/);
+      assert.match(rootAgents, /\.\/\.copilot/);
       assert.match(srcAgents, /<!-- Parent: ..\/AGENTS\.md -->/);
       assert.match(srcAgents, /`index\.ts`/);
       assert.match(docsAgents, /`guide\.md`/);

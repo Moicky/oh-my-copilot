@@ -188,7 +188,7 @@ export function runSparkShellBinary(
     spawnImpl = spawnSync,
   } = options;
 
-  const configEnvOverrides = readConfiguredEnvOverrides(env.CODEX_HOME);
+  const configEnvOverrides = readConfiguredEnvOverrides(env.COPILOT_HOME);
   const spawnOptions: SpawnSyncOptionsWithStringEncoding = {
     cwd,
     env: { ...configEnvOverrides, ...env },

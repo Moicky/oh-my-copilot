@@ -69,7 +69,7 @@ case "$cmd" in
     fi
     case "$format" in
       '#{pane_current_command}') echo "node" ;;
-      '#{pane_start_command}') echo "codex" ;;
+      '#{pane_start_command}') echo "copilot" ;;
       '#S') echo "${sessionName}" ;;
       '#{pane_in_mode}') echo "0" ;;
       '#{pane_current_path}') echo "${cwd}" ;;
@@ -77,7 +77,7 @@ case "$cmd" in
     esac
     ;;
   list-panes)
-    echo "${currentPaneId}\t1\tcodex\tcodex"
+    echo "${currentPaneId}\t1\tcopilot\tcopilot"
     ;;
   capture-pane)
     printf "› ready\\n"
