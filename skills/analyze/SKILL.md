@@ -83,7 +83,7 @@ Parallel exploration is allowed when it improves quality, but it must stay runti
 - When parallelism helps, prefer **native subagents by default** or equivalent in-session parallel exploration when available.
 - Keep parallel lanes bounded: each lane should answer a concrete sub-question or inspect a specific subsystem.
 - Use **`$team` only when OMCP runtime is active** and durable tmux-based coordination is actually needed.
-- Do not imply that `$team` is available in plain Codex/App sessions.
+- Do not imply that `$team` is available in plain Copilot/App sessions.
 
 A good default split for complex analysis is:
 - one lane for primary code path / contracts

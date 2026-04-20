@@ -94,11 +94,11 @@ Most non-trivial software tasks require coordinated phases: understanding requir
 
 <Tool_Usage>
 - Before first MCP tool use, call `ToolSearch("mcp")` to discover deferred MCP tools
-- Use `ask_codex` with `agent_role: "architect"` for Phase 4 architecture validation
-- Use `ask_codex` with `agent_role: "security-reviewer"` for Phase 4 security review
-- Use `ask_codex` with `agent_role: "code-reviewer"` for Phase 4 quality review
-- Agents form their own analysis first, then consult Codex for cross-validation
-- If ToolSearch finds no MCP tools or Codex is unavailable, proceed without it -- never block on external tools
+- Use `ask_copilot` with `agent_role: "architect"` for Phase 4 architecture validation
+- Use `ask_copilot` with `agent_role: "security-reviewer"` for Phase 4 security review
+- Use `ask_copilot` with `agent_role: "code-reviewer"` for Phase 4 quality review
+- Agents form their own analysis first, then consult Copilot for cross-validation
+- If ToolSearch finds no MCP tools or Copilot is unavailable, proceed without it -- never block on external tools
 </Tool_Usage>
 
 ## State Management
@@ -167,7 +167,7 @@ Why bad: This is an exploration/brainstorming request. Respond conversationally 
 <Advanced>
 ## Configuration
 
-Optional settings in `~/.codex/config.toml`:
+Optional settings in `~/.copilot/config.toml`:
 
 ```toml
 [omcp.autopilot]
@@ -209,7 +209,7 @@ Autopilot can be driven by the configurable pipeline orchestrator (`src/pipeline
 sequences stages through a uniform `PipelineStage` interface:
 
 ```
-RALPLAN (consensus planning) -> team-exec (Codex CLI workers) -> ralph-verify (architect verification)
+RALPLAN (consensus planning) -> team-exec (Copilot CLI workers) -> ralph-verify (architect verification)
 ```
 
 Pipeline configuration options:
@@ -217,7 +217,7 @@ Pipeline configuration options:
 ```toml
 [omcp.autopilot.pipeline]
 maxRalphIterations = 10    # Ralph verification iteration ceiling
-workerCount = 2            # Number of Codex CLI team workers
+workerCount = 2            # Number of Copilot CLI team workers
 agentType = "executor"     # Agent type for team workers
 ```
 

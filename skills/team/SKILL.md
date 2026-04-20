@@ -5,13 +5,13 @@ description: N coordinated agents on shared task list using tmux-based orchestra
 
 # Team Skill
 
-`$team` is the tmux-based parallel execution mode for OMCP. It starts real worker Codex and/or Claude CLI sessions in split panes and coordinates them through `.omcp/state/team/...` files plus CLI team interop (`omcp team api ...`) and state files.
+`$team` is the tmux-based parallel execution mode for OMCP. It starts real worker Copilot and/or Claude CLI sessions in split panes and coordinates them through `.omcp/state/team/...` files plus CLI team interop (`omcp team api ...`) and state files.
 
 This skill is operationally sensitive. Treat it as an operator workflow, not a generic prompt pattern.
 
 ## Team vs Native Subagents
 
-- Use **Codex native subagents** for bounded, in-session parallelism where one leader thread can fan out a few independent subtasks and wait for them directly.
+- Use **Copilot native subagents** for bounded, in-session parallelism where one leader thread can fan out a few independent subtasks and wait for them directly.
 - Use **`omcp team`** when you need durable tmux workers, shared task state, mailbox/dispatch coordination, worktrees, explicit lifecycle control, or long-running parallel execution that must survive beyond one local reasoning burst.
 - Native subagents can complement team/ralph execution, but they do **not** replace the tmux team runtime's stateful coordination contract.
 
@@ -62,7 +62,7 @@ requiring a separate linked Ralph launch up front.
 
 ### Claude teammates (v0.6.0+)
 
-Important: `N:agent-type` (for example `2:executor`) selects the **worker role prompt**, not the worker CLI (`codex` vs `claude`).
+Important: `N:agent-type` (for example `2:executor`) selects the **worker role prompt**, not the worker CLI (`copilot` vs `claude`).
 
 To launch Claude teammates, use the team worker CLI env vars:
 
@@ -70,8 +70,8 @@ To launch Claude teammates, use the team worker CLI env vars:
 # Force all teammates to Claude CLI
 OMCP_TEAM_WORKER_CLI=claude omcp team 2:executor "update docs and report"
 
-# Mixed team (worker 1 = Codex, worker 2 = Claude)
-OMCP_TEAM_WORKER_CLI_MAP=codex,claude omcp team 2:executor "split doc/code tasks"
+# Mixed team (worker 1 = Copilot, worker 2 = Claude)
+OMCP_TEAM_WORKER_CLI_MAP=copilot,claude omcp team 2:executor "split doc/code tasks"
 
 # Auto mode: Claude is selected when worker launch args/model contains 'claude'
 OMCP_TEAM_WORKER_CLI=auto OMCP_TEAM_WORKER_LAUNCH_ARGS="--model claude-..." omcp team 2:executor "run mixed validation"
@@ -145,7 +145,7 @@ When `$team` is used as a follow-up mode from ralplan, carry forward the approve
    - `OMCP_TEAM_WORKER=<team>/worker-<n>`
    - `OMCP_TEAM_STATE_ROOT=<leader-cwd>/.omcp/state`
    - `OMCP_TEAM_LEADER_CWD=<leader-cwd>`
-   - worker CLI selected by `OMCP_TEAM_WORKER_CLI` / `OMCP_TEAM_WORKER_CLI_MAP` (`codex` or `claude`)
+   - worker CLI selected by `OMCP_TEAM_WORKER_CLI` / `OMCP_TEAM_WORKER_CLI_MAP` (`copilot` or `claude`)
    - optional worktree metadata envs when `--worktree` is used
 7. Wait for worker readiness (`capture-pane` polling)
 8. Write per-worker `inbox.md` and trigger via `tmux send-keys`
@@ -156,7 +156,7 @@ If coarse active team mode state is missing while canonical team runtime state e
 Important:
 
 - Leader remains in existing pane
-- Worker panes are independent full Codex/Claude CLI sessions
+- Worker panes are independent full Copilot/Claude CLI sessions
 - Workers may run in separate git worktrees (`omcp team --worktree[=<name>]`) while sharing one team state root
 - Worker ACKs go to `mailbox/leader-fixed.json`
 - Notify hook updates worker heartbeat and nudges leader during active team mode
@@ -166,7 +166,7 @@ Important:
   3) fallback `OMCP_TEAM_WORKER_CLI` / auto detection.
 - Mixed CLI-map teams are supported for both startup and trigger submit behavior.
 - Trigger submit differs by CLI:
-  - Codex may use queue-first `Tab` on busy panes (strategy-dependent).
+  - Copilot may use queue-first `Tab` on busy panes (strategy-dependent).
   - Claude always uses direct Enter-only (`C-m`) rounds (never queue-first `Tab`).
 
 ### Team worker model + thinking resolution (current contract)
@@ -348,14 +348,14 @@ Useful runtime env vars:
 - `OMCP_TEAM_WORKER_LAUNCH_ARGS`
   - Extra args passed to worker launch command
 - `OMCP_TEAM_WORKER_CLI`
-  - Worker CLI selector: `auto|codex|claude` (default: `auto`)
-  - `auto` chooses `claude` when worker `--model` contains `claude`, otherwise `codex`
+  - Worker CLI selector: `auto|copilot|claude` (default: `auto`)
+  - `auto` chooses `claude` when worker `--model` contains `claude`, otherwise `copilot`
   - In `claude` mode, workers launch with exactly one `--dangerously-skip-permissions`
     and ignore explicit model/config/effort launch overrides (uses default `settings.json`)
 - `OMCP_TEAM_WORKER_CLI_MAP`
-  - Per-worker CLI selector (comma-separated `auto|codex|claude`)
+  - Per-worker CLI selector (comma-separated `auto|copilot|claude`)
   - Length must be `1` (broadcast) or exactly the team worker count
-  - Example: `OMCP_TEAM_WORKER_CLI_MAP=codex,codex,claude,claude`
+  - Example: `OMCP_TEAM_WORKER_CLI_MAP=copilot,copilot,claude,claude`
   - When present, overrides `OMCP_TEAM_WORKER_CLI`
 - `OMCP_TEAM_AUTO_INTERRUPT_RETRY`
   - Trigger submit fallback (default: enabled)

@@ -49,7 +49,7 @@ Playwright MCP server must be available for browser automation.
 2. If no browser tools are found, instruct the user:
    ```
    Playwright MCP is required. Configure it:
-   codex mcp add playwright npx "@playwright/mcp@latest"
+   copilot mcp add playwright npx "@playwright/mcp@latest"
    ```
 3. Required tools: `browser_navigate`, `browser_snapshot`, `browser_take_screenshot`, `browser_evaluate`, `browser_wait_for`. Optional: `browser_click`, `browser_network_requests`.
 </Prerequisites>
@@ -67,7 +67,7 @@ Playwright MCP server must be available for browser automation.
 - Use `browser_take_screenshot` only when visual verification is needed (Pass 1 baseline, Pass 4 comparison).
 - Use `browser_evaluate` for DOM/style extraction — pass the scripts from this skill EXACTLY as written (do not modify them).
 - If running within ralph, use `state_write` / `state_read` for web-clone state persistence between iterations.
-- Skip Codex consultation for straightforward extraction; use it only if verification repeatedly fails on the same issue.
+- Skip Copilot consultation for straightforward extraction; use it only if verification repeatedly fails on the same issue.
 </Tool_Usage>
 
 <State_Management>

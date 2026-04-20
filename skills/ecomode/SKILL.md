@@ -93,7 +93,7 @@ Long-running commands (install, build, test) run in background. Maximum 20 concu
 
 Ecomode can be completely disabled via config. When disabled, all ecomode keywords are ignored.
 
-Set in `~/.codex/.omcp-config.json`:
+Set in `~/.copilot/.omcp-config.json`:
 ```json
 {
   "ecomode": {

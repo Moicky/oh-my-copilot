@@ -9,7 +9,7 @@ scope: ".omcp/**"
 
 The OMCP HUD uses a two-layer architecture:
 
-1. **Layer 1 - Codex built-in statusLine**: Real-time TUI footer showing model, git branch, and context usage. Configured via `[tui] status_line` in `~/.codex/config.toml`. Zero code required.
+1. **Layer 1 - Copilot built-in statusLine**: Real-time TUI footer showing model, git branch, and context usage. Configured via `[tui] status_line` in `~/.copilot/config.toml`. Zero code required.
 
 2. **Layer 2 - `omcp hud` CLI command**: Shows OMCP-specific orchestration state (ralph, ultrawork, autopilot, team, pipeline, ecomode, turns). Reads `.omcp/state/` files.
 
@@ -44,20 +44,20 @@ The OMCP HUD uses a two-layer architecture:
 ## Setup
 
 `omcp setup` automatically configures both layers:
-- Adds `[tui] status_line` to `~/.codex/config.toml` (Layer 1)
+- Adds `[tui] status_line` to `~/.copilot/config.toml` (Layer 1)
 - Writes `.omcp/hud-config.json` with default preset (Layer 2)
-- Default preset is `focused`; if HUD/statusline changes do not appear, restart Codex CLI once.
+- Default preset is `focused`; if HUD/statusline changes do not appear, restart Copilot CLI once.
 
-## Layer 1: Codex Built-in StatusLine
+## Layer 1: Copilot Built-in StatusLine
 
-Configured in `~/.codex/config.toml`:
+Configured in `~/.copilot/config.toml`:
 ```toml
 [tui]
 status_line = ["model-with-reasoning", "git-branch", "context-remaining"]
 ```
 
-Available built-in items (Codex CLI v0.101.0+):
-`model-name`, `model-with-reasoning`, `current-dir`, `project-root`, `git-branch`, `context-remaining`, `context-used`, `five-hour-limit`, `weekly-limit`, `codex-version`, `context-window-size`, `used-tokens`, `total-input-tokens`, `total-output-tokens`, `session-id`
+Available built-in items (Copilot CLI v0.101.0+):
+`model-name`, `model-with-reasoning`, `current-dir`, `project-root`, `git-branch`, `context-remaining`, `context-used`, `five-hour-limit`, `weekly-limit`, `copilot-version`, `context-window-size`, `used-tokens`, `total-input-tokens`, `total-output-tokens`, `session-id`
 
 ## Layer 2: OMCP Orchestration HUD
 
@@ -89,9 +89,9 @@ HUD config stored at `.omcp/hud-config.json`:
 ## Troubleshooting
 
 If the TUI statusline is not showing:
-1. Ensure Codex CLI v0.101.0+ is installed
+1. Ensure Copilot CLI v0.101.0+ is installed
 2. Run `omcp setup` to configure `[tui]` section
-3. Restart Codex CLI
+3. Restart Copilot CLI
 
 If `omcp hud` shows "No active modes":
 - This is expected when no workflows are running

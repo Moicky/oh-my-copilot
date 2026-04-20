@@ -5,18 +5,18 @@ description: Diagnose and fix oh-my-copilot installation issues
 
 # Doctor Skill
 
-Note: All `~/.codex/...` paths in this guide respect `CODEX_HOME` when that environment variable is set.
+Note: All `~/.copilot/...` paths in this guide respect `CODEX_HOME` when that environment variable is set.
 
 ## Canonical skill root
 
-OMCP installs skills to `${CODEX_HOME:-~/.codex}/skills/` — this is the path current Codex CLI natively loads as its skill root.
+OMCP installs skills to `${CODEX_HOME:-~/.copilot}/skills/` — this is the path current Copilot CLI natively loads as its skill root.
 
-`~/.agents/skills/` is a **historical legacy path** from an older Codex CLI release, before Codex settled on `~/.codex` as its home directory. Current Codex CLI and OMCP no longer write there.
+`~/.agents/skills/` is a **historical legacy path** from an older Copilot CLI release, before Copilot settled on `~/.copilot` as its home directory. Current Copilot CLI and OMCP no longer write there.
 
-**In a mixed OMCP + plain Codex environment:**
-- **Use**: `${CODEX_HOME:-~/.codex}/skills/` (user scope) or `.codex/skills/` (project scope)
-- **Clean up if present**: `~/.agents/skills/` — if this still exists alongside the canonical root, Codex's Enable/Disable Skills UI will show duplicate entries for any skill present in both trees
-- **Interop rule**: OMCP writes only to the canonical path; archive or remove `~/.agents/skills/` once you have confirmed `${CODEX_HOME:-~/.codex}/skills/` is your active root
+**In a mixed OMCP + plain Copilot environment:**
+- **Use**: `${CODEX_HOME:-~/.copilot}/skills/` (user scope) or `.copilot/skills/` (project scope)
+- **Clean up if present**: `~/.agents/skills/` — if this still exists alongside the canonical root, Copilot's Enable/Disable Skills UI will show duplicate entries for any skill present in both trees
+- **Interop rule**: OMCP writes only to the canonical path; archive or remove `~/.agents/skills/` once you have confirmed `${CODEX_HOME:-~/.copilot}/skills/` is your active root
 
 ## Task: Run Installation Diagnostics
 
@@ -26,7 +26,7 @@ You are the OMCP Doctor - diagnose and fix installation issues.
 
 ```bash
 # Get installed version
-INSTALLED=$(ls ~/.codex/plugins/cache/omc/oh-my-copilot/ 2>/dev/null | sort -V | tail -1)
+INSTALLED=$(ls ~/.copilot/plugins/cache/omc/oh-my-copilot/ 2>/dev/null | sort -V | tail -1)
 echo "Installed: $INSTALLED"
 
 # Get latest from npm
@@ -41,12 +41,12 @@ echo "Latest: $LATEST"
 
 ### Step 2: Check Hook Configuration (config.toml + legacy settings.json)
 
-Check `~/.codex/config.toml` first (current Codex config), then check legacy `~/.codex/settings.json` only if it exists.
+Check `~/.copilot/config.toml` first (current Copilot config), then check legacy `~/.copilot/settings.json` only if it exists.
 
 Look for hook entries pointing to removed scripts like:
-- `bash $HOME/.codex/hooks/keyword-detector.sh`
-- `bash $HOME/.codex/hooks/persistent-mode.sh`
-- `bash $HOME/.codex/hooks/session-start.sh`
+- `bash $HOME/.copilot/hooks/keyword-detector.sh`
+- `bash $HOME/.copilot/hooks/persistent-mode.sh`
+- `bash $HOME/.copilot/hooks/session-start.sh`
 
 **Diagnosis**:
 - If found: CRITICAL - legacy hooks causing duplicates
@@ -54,7 +54,7 @@ Look for hook entries pointing to removed scripts like:
 ### Step 3: Check for Legacy Bash Hook Scripts
 
 ```bash
-ls -la ~/.codex/hooks/*.sh 2>/dev/null
+ls -la ~/.copilot/hooks/*.sh 2>/dev/null
 ```
 
 **Diagnosis**:
@@ -64,10 +64,10 @@ ls -la ~/.codex/hooks/*.sh 2>/dev/null
 
 ```bash
 # Check if AGENTS.md exists
-ls -la ~/.codex/AGENTS.md 2>/dev/null
+ls -la ~/.copilot/AGENTS.md 2>/dev/null
 
 # Check for OMCP marker
-grep -q "oh-my-copilot Multi-Agent System" ~/.codex/AGENTS.md 2>/dev/null && echo "Has OMCP config" || echo "Missing OMCP config"
+grep -q "oh-my-copilot Multi-Agent System" ~/.copilot/AGENTS.md 2>/dev/null && echo "Has OMCP config" || echo "Missing OMCP config"
 ```
 
 **Diagnosis**:
@@ -78,7 +78,7 @@ grep -q "oh-my-copilot Multi-Agent System" ~/.codex/AGENTS.md 2>/dev/null && ech
 
 ```bash
 # Count versions in cache
-ls ~/.codex/plugins/cache/omc/oh-my-copilot/ 2>/dev/null | wc -l
+ls ~/.copilot/plugins/cache/omc/oh-my-copilot/ 2>/dev/null | wc -l
 ```
 
 **Diagnosis**:
@@ -90,23 +90,23 @@ Check for legacy agents, commands, and historical legacy skill roots from older 
 
 ```bash
 # Check for legacy agents directory
-ls -la ~/.codex/agents/ 2>/dev/null
+ls -la ~/.copilot/agents/ 2>/dev/null
 
 # Check for legacy commands directory
-ls -la ~/.codex/commands/ 2>/dev/null
+ls -la ~/.copilot/commands/ 2>/dev/null
 
 # Check canonical current skills directory
-ls -la ${CODEX_HOME:-~/.codex}/skills/ 2>/dev/null
+ls -la ${CODEX_HOME:-~/.copilot}/skills/ 2>/dev/null
 
 # Check historical legacy skill directory
 ls -la ~/.agents/skills/ 2>/dev/null
 ```
 
 **Diagnosis**:
-- If `~/.codex/agents/` exists with oh-my-copilot-related files: WARN - legacy agents (now provided by plugin)
-- If `~/.codex/commands/` exists with oh-my-copilot-related files: WARN - legacy commands (now provided by plugin)
-- If `${CODEX_HOME:-~/.codex}/skills/` exists with OMCP skills: OK - canonical current user skill root
-- If `~/.agents/skills/` exists: WARN - historical legacy skill root that can overlap with `${CODEX_HOME:-~/.codex}/skills/` and cause duplicate Enable/Disable Skills entries
+- If `~/.copilot/agents/` exists with oh-my-copilot-related files: WARN - legacy agents (now provided by plugin)
+- If `~/.copilot/commands/` exists with oh-my-copilot-related files: WARN - legacy commands (now provided by plugin)
+- If `${CODEX_HOME:-~/.copilot}/skills/` exists with OMCP skills: OK - canonical current user skill root
+- If `~/.agents/skills/` exists: WARN - historical legacy skill root that can overlap with `${CODEX_HOME:-~/.copilot}/skills/` and cause duplicate Enable/Disable Skills entries
 
 Look for files like:
 - `architect.md`, `researcher.md`, `explore.md`, `executor.md`, etc. in agents/
@@ -131,12 +131,12 @@ After running all checks, output a report:
 |-------|--------|---------|
 | Plugin Version | OK/WARN/CRITICAL | ... |
 | Hook Config (config.toml / legacy settings.json) | OK/CRITICAL | ... |
-| Legacy Scripts (~/.codex/hooks/) | OK/WARN | ... |
+| Legacy Scripts (~/.copilot/hooks/) | OK/WARN | ... |
 | AGENTS.md | OK/WARN/CRITICAL | ... |
 | Plugin Cache | OK/WARN | ... |
-| Legacy Agents (~/.codex/agents/) | OK/WARN | ... |
-| Legacy Commands (~/.codex/commands/) | OK/WARN | ... |
-| Skills (${CODEX_HOME:-~/.codex}/skills) | OK/WARN | ... |
+| Legacy Agents (~/.copilot/agents/) | OK/WARN | ... |
+| Legacy Commands (~/.copilot/commands/) | OK/WARN | ... |
+| Skills (${CODEX_HOME:-~/.copilot}/skills) | OK/WARN | ... |
 | Legacy Skill Root (~/.agents/skills) | OK/WARN | ... |
 
 ### Issues Found
@@ -156,48 +156,48 @@ If issues found, ask user: "Would you like me to fix these issues automatically?
 If yes, apply fixes:
 
 ### Fix: Legacy Hooks in legacy settings.json
-If `~/.codex/settings.json` exists, remove the legacy `"hooks"` section (keep other settings intact).
+If `~/.copilot/settings.json` exists, remove the legacy `"hooks"` section (keep other settings intact).
 
 ### Fix: Legacy Bash Scripts
 ```bash
-rm -f ~/.codex/hooks/keyword-detector.sh
-rm -f ~/.codex/hooks/persistent-mode.sh
-rm -f ~/.codex/hooks/session-start.sh
-rm -f ~/.codex/hooks/stop-continuation.sh
+rm -f ~/.copilot/hooks/keyword-detector.sh
+rm -f ~/.copilot/hooks/persistent-mode.sh
+rm -f ~/.copilot/hooks/session-start.sh
+rm -f ~/.copilot/hooks/stop-continuation.sh
 ```
 
 ### Fix: Outdated Plugin
 ```bash
-rm -rf ~/.codex/plugins/cache/omc/oh-my-copilot
-echo "Plugin cache cleared. Restart Codex CLI to fetch latest version."
+rm -rf ~/.copilot/plugins/cache/omc/oh-my-copilot
+echo "Plugin cache cleared. Restart Copilot CLI to fetch latest version."
 ```
 
 ### Fix: Stale Cache (multiple versions)
 ```bash
 # Keep only latest version
-cd ~/.codex/plugins/cache/omc/oh-my-copilot/
+cd ~/.copilot/plugins/cache/omc/oh-my-copilot/
 ls | sort -V | head -n -1 | xargs rm -rf
 ```
 
 ### Fix: Missing/Outdated AGENTS.md
-Fetch latest from GitHub and write to `~/.codex/AGENTS.md`:
+Fetch latest from GitHub and write to `~/.copilot/AGENTS.md`:
 ```
 WebFetch(url: "https://raw.githubusercontent.com/Moicky/oh-my-copilot/main/docs/AGENTS.md", prompt: "Return the complete raw markdown content exactly as-is")
 ```
 
 ### Fix: Legacy Curl-Installed Content
 
-Remove legacy agents/commands plus the historical `~/.agents/skills` tree if it overlaps with the canonical `${CODEX_HOME:-~/.codex}/skills` install:
+Remove legacy agents/commands plus the historical `~/.agents/skills` tree if it overlaps with the canonical `${CODEX_HOME:-~/.copilot}/skills` install:
 
 ```bash
 # Backup first (optional - ask user)
-# mv ~/.codex/agents ~/.codex/agents.bak
-# mv ~/.codex/commands ~/.codex/commands.bak
+# mv ~/.copilot/agents ~/.copilot/agents.bak
+# mv ~/.copilot/commands ~/.copilot/commands.bak
 # mv ~/.agents/skills ~/.agents/skills.bak
 
 # Or remove directly
-rm -rf ~/.codex/agents
-rm -rf ~/.codex/commands
+rm -rf ~/.copilot/agents
+rm -rf ~/.copilot/commands
 rm -rf ~/.agents/skills
 ```
 
@@ -208,4 +208,4 @@ rm -rf ~/.agents/skills
 ## Post-Fix
 
 After applying fixes, inform user:
-> Fixes applied. **Restart Codex CLI** for changes to take effect.
+> Fixes applied. **Restart Copilot CLI** for changes to take effect.
