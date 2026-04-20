@@ -253,7 +253,7 @@ USE_OMX_EXPLORE_CMD = "off"
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Legacy skill roots: 1 overlapping skill names between .*\.copilot[\\/]+skills and .*\.agents[\\/]+skills; 1 differ in SKILL\.md content; Codex Enable\/Disable Skills may show duplicates until ~\/\.agents\/skills is cleaned up/,
+        /Legacy skill roots: 1 overlapping skill names between .*\.copilot[\\/]+skills and .*\.agents[\\/]+skills; 1 differ in SKILL\.md content; Copilot Enable\/Disable Skills may show duplicates until ~\/\.agents\/skills is cleaned up/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -349,7 +349,7 @@ command = "node"
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /\[XX\] Native hooks: invalid hooks\.json; Codex may skip OMCP hook coverage until "omcp setup --force" repairs it/,
+        /\[XX\] Native hooks: invalid hooks\.json; Copilot may skip OMCP hook coverage until "omcp setup --force" repairs it/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });

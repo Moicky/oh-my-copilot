@@ -380,7 +380,7 @@ async function buildLegacySkillOverlapNotice(
     return {
       shouldWarn: true,
       message:
-        `Legacy ~/.agents/skills still exists (${overlap.legacySkillCount} skills) alongside canonical ${overlap.canonicalDir}. Codex may still discover both roots; archive or remove ~/.agents/skills if Enable/Disable Skills shows duplicates.`,
+        `Legacy ~/.agents/skills still exists (${overlap.legacySkillCount} skills) alongside canonical ${overlap.canonicalDir}. Copilot may still discover both roots; archive or remove ~/.agents/skills if Enable/Disable Skills shows duplicates.`,
     };
   }
 
@@ -390,7 +390,7 @@ async function buildLegacySkillOverlapNotice(
   return {
     shouldWarn: true,
     message:
-      `Detected ${overlap.overlappingSkillNames.length} overlapping skill names between canonical ${overlap.canonicalDir} and legacy ${overlap.legacyDir}.${mismatchSuffix} Remove or archive ~/.agents/skills after confirming ${overlap.canonicalDir} is the version you want Codex to load.`,
+      `Detected ${overlap.overlappingSkillNames.length} overlapping skill names between canonical ${overlap.canonicalDir} and legacy ${overlap.legacyDir}.${mismatchSuffix} Remove or archive ~/.agents/skills after confirming ${overlap.canonicalDir} is the version you want Copilot to load.`,
   };
 }
 
@@ -887,7 +887,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     `native hooks ${scopeDirs.codexHooksFile}`,
   );
   console.log(
-    `  Native Codex hooks refresh complete (${scopeDirs.codexHooksFile}).\n`,
+    `  Native Copilot hooks refresh complete (${scopeDirs.codexHooksFile}).\n`,
   );
 
   // Step 5.5: Verify team CLI interop surface is available.
@@ -1064,7 +1064,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   console.log("\nNext steps:");
   console.log("  1. Start Copilot CLI in your project directory");
   console.log(
-    "  2. Use role/workflow keywords like $architect, $executor, and $plan in Codex",
+    "  2. Use role/workflow keywords like $architect, $executor, and $plan in Copilot",
   );
   console.log("  3. Browse skills with /skills; AGENTS keyword routing can also activate them implicitly");
   console.log("  4. The AGENTS.md orchestration brain is loaded automatically");

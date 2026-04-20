@@ -353,7 +353,7 @@ async function detectLegacySkillRootWarning(
     return (
       `legacy ~/.agents/skills still exists (${overlap.legacySkillCount} skills). ` +
       "omcp uninstall does not remove that historical root automatically; " +
-      "archive or remove ~/.agents/skills if Codex still shows stale or duplicate skills"
+      "archive or remove ~/.agents/skills if Copilot still shows stale or duplicate skills"
     );
   }
 
@@ -365,7 +365,7 @@ async function detectLegacySkillRootWarning(
     `${overlap.overlappingSkillNames.length} overlapping skill names remain between ` +
     `${overlap.canonicalDir} and ${overlap.legacyDir}${mismatchMessage}. ` +
     "omcp uninstall only removes the active canonical skill root; " +
-    "archive or remove ~/.agents/skills if Codex still shows duplicates"
+    "archive or remove ~/.agents/skills if Copilot still shows duplicates"
   );
 }
 
