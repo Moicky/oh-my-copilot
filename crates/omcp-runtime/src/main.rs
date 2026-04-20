@@ -1,5 +1,5 @@
-use omx_mux::{canonical_contract_summary, MuxAdapter, MuxOperation, MuxTarget, TmuxAdapter};
-use omx_runtime_core::{runtime_contract_summary, RuntimeCommand, RuntimeEngine};
+use omcp_mux::{canonical_contract_summary, MuxAdapter, MuxOperation, MuxTarget, TmuxAdapter};
+use omcp_runtime_core::{runtime_contract_summary, RuntimeCommand, RuntimeEngine};
 use std::env;
 use std::process;
 
@@ -23,9 +23,9 @@ fn run() -> Result<(), String> {
         Some("schema") => {
             if second == Some("--json") {
                 let summary = serde_json::json!({
-                    "schema_version": omx_runtime_core::RUNTIME_SCHEMA_VERSION,
-                    "commands": omx_runtime_core::RUNTIME_COMMAND_NAMES,
-                    "events": omx_runtime_core::RUNTIME_EVENT_NAMES,
+                    "schema_version": omcp_runtime_core::RUNTIME_SCHEMA_VERSION,
+                    "commands": omcp_runtime_core::RUNTIME_COMMAND_NAMES,
+                    "events": omcp_runtime_core::RUNTIME_EVENT_NAMES,
                     "transport": "tmux",
                 });
                 println!(

@@ -1,13 +1,13 @@
 [package]
-name = "omx-sparkshell"
+name = "omcp-sparkshell"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 
 [[bin]]
-name = "omx-sparkshell"
+name = "omcp-sparkshell"
 path = "src/main.rs"
 
 [dependencies]
-omx-mux = { path = "../omx-mux" }
+omcp-mux = { path = "../omcp-mux" }

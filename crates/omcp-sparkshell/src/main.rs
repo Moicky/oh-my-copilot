@@ -10,7 +10,7 @@ use crate::codex_bridge::summarize_output;
 use crate::error::SparkshellError;
 use crate::exec::execute_command;
 use crate::threshold::{combined_visible_lines, read_line_threshold};
-use omx_mux::build_capture_pane_args;
+use omcp_mux::build_capture_pane_args;
 use std::io::{self, Write};
 use std::process;
 
