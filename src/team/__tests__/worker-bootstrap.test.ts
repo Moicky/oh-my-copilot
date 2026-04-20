@@ -88,7 +88,7 @@ describe("worker bootstrap", () => {
     );
     assert.match(
       overlay,
-      /You may spawn Codex native subagents when parallel execution improves throughput/,
+      /You may spawn Copilot native subagents when parallel execution improves throughput/,
     );
     assert.match(
       overlay,

@@ -332,7 +332,7 @@ When calling \`omcp team api send-message\`, you MUST always include:
 
 ## Startup Handshake (Required)
 Before doing any task work, send exactly one startup ACK to the leader.
-Keep the body short and deterministic so all worker CLIs (Codex/Claude) behave consistently.
+Keep the body short and deterministic so all worker CLIs (Copilot/Claude) behave consistently.
 
 Example:
 omcp team api send-message --input "{\"team_name\":\"${teamName}\",\"from_worker\":\"<your-worker-name>\",\"to_worker\":\"leader-fixed\",\"body\":\"ACK: <your-worker-name> initialized\"}" --json
@@ -349,7 +349,7 @@ When your mailbox receives a message, process delivery explicitly:
 - If you need to modify a shared file, report to the lead by writing to your status file with state "blocked"
 - Do NOT write lifecycle fields (\`status\`, \`owner\`, \`result\`, \`error\`) directly in task files; use claim-safe lifecycle APIs
 - If blocked, write {"state": "blocked", "reason": "..."} to your status file
-- You may spawn Codex native subagents when parallel execution improves throughput.
+- You may spawn Copilot native subagents when parallel execution improves throughput.
 - Use subagents only for independent, bounded subtasks that can run safely within this worker pane.
 </team_worker_protocol>
 ${TEAM_OVERLAY_END}`;
@@ -716,7 +716,7 @@ When you are notified about mailbox messages, always follow this exact flow:
 2. For each undelivered message, mark delivery:
    \`omcp team api mailbox-mark-delivered --input "{\"team_name\":\"${teamName}\",\"worker\":\"${workerName}\",\"message_id\":\"<MESSAGE_ID>\"}" --json\`
 
-Use terse ACK bodies (single line) for consistent parsing across Codex and Claude workers.
+Use terse ACK bodies (single line) for consistent parsing across Copilot and Claude workers.
 After any mailbox reply, continue executing your assigned work or the next feasible task; do not stop after sending the reply.
 
 ## Message Protocol
@@ -732,7 +732,7 @@ ${buildVerificationSection("each assigned task")}
 - Only edit files described in your task descriptions
 - Do NOT edit files that belong to other workers
 - If you need to modify a shared/common file, write \`{"state": "blocked", "reason": "need to edit shared file X"}\` to your status file and wait
-- You may spawn Codex native subagents when parallel execution improves throughput.
+- You may spawn Copilot native subagents when parallel execution improves throughput.
 - Use subagents only for independent, bounded subtasks that can run safely within this worker pane.
 ${specializationSection}`;
 }
@@ -792,9 +792,9 @@ All tasks are complete. Please wrap up any remaining work and respond with a shu
      \`{\"status\":\"accept\",\"reason\":\"ok\",\"updated_at\":\"<iso>\"}\`
    - Reject:
      \`{\"status\":\"reject\",\"reason\":\"still working\",\"updated_at\":\"<iso>\"}\`
-3. After writing the ack, exit your Codex session.
+3. After writing the ack, exit your Copilot session.
 
-Type \`exit\` or press Ctrl+C to end your Codex session.
+Type \`exit\` or press Ctrl+C to end your Copilot session.
 `;
 }
 

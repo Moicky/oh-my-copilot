@@ -696,7 +696,7 @@ export function translateWorkerLaunchArgsForCli(
   }
 
   // Claude workers must launch with exactly one permissions bypass flag.
-  // All other launch args are dropped to avoid Codex-only flags and model/config overrides.
+  // All other launch args are dropped to avoid Copilot-only flags and model/config overrides.
   void args;
   return shouldGrantExecutionBypassForRole(workerRole) ? [CLAUDE_SKIP_PERMISSIONS_FLAG] : [];
 }
@@ -1420,7 +1420,7 @@ async function attemptSubmitRounds(
   return false;
 }
 
-// Poll tmux capture-pane for a worker-ready Codex/Claude prompt or welcome screen.
+// Poll tmux capture-pane for a worker-ready Copilot/Claude prompt or welcome screen.
 // Start with short waits so we notice the first ready frame quickly, then back off.
 // Returns true if ready, false on timeout.
 export function waitForWorkerReady(
@@ -1437,7 +1437,7 @@ export function waitForWorkerReady(
 
   const sendRobustEnter = (): void => {
     const target = paneTarget(sessionName, workerIndex, workerPaneId);
-    // Trust + follow-up splash can require two submits in Codex TUI.
+    // Trust + follow-up splash can require two submits in Copilot TUI.
     // Use C-m (carriage return) for raw-mode compatibility.
     runTmux(['send-keys', '-t', target, 'C-m']);
     sleepFractionalSeconds(0.12);
@@ -1497,7 +1497,7 @@ export function waitForWorkerReady(
 }
 
 /**
- * Detect and auto-dismiss a Codex "Trust this directory?" prompt in a worker pane.
+ * Detect and auto-dismiss a Copilot "Trust this directory?" prompt in a worker pane.
  * Returns true if a trust prompt was found and dismissed, false otherwise.
  * Opt-out: set OMCP_TEAM_AUTO_TRUST=0 to disable auto-dismissal.
  */
@@ -1588,7 +1588,7 @@ export async function sendToWorker(
   }
 
   // Submit deterministically using CLI-specific plan:
-  // - Codex: queue-first Tab+C-m when configured/busy, then double C-m rounds.
+  // - Copilot: queue-first Tab+C-m when configured/busy, then double C-m rounds.
   // - Claude: direct C-m rounds only (never queue-first Tab).
   if (await attemptSubmitRounds(
     target,
@@ -1610,7 +1610,7 @@ export async function sendToWorker(
     if (await attemptSubmitRounds(target, text, 4, false, submitPlan.submitKeyPressesPerRound)) return;
   }
 
-  // Fail-open by default: Codex may keep the last submitted line visible even after executing it.
+  // Fail-open by default: Copilot may keep the last submitted line visible even after executing it.
   // If you need strictness for debugging, set OMCP_TEAM_STRICT_SUBMIT=1.
   const strict = process.env.OMCP_TEAM_STRICT_SUBMIT === '1';
   if (strict) {
