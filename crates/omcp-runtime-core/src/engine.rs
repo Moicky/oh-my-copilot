@@ -519,7 +519,7 @@ mod tests {
 
     #[test]
     fn persist_and_load_round_trip() {
-        let dir = std::env::temp_dir().join("omx-runtime-test-persist");
+        let dir = std::env::temp_dir().join("omcp-runtime-test-persist");
         let _ = std::fs::remove_dir_all(&dir);
 
         let mut engine = RuntimeEngine::new().with_state_dir(&dir);
@@ -551,7 +551,7 @@ mod tests {
 
     #[test]
     fn persist_and_load_round_trip_preserves_mailbox_body() {
-        let dir = std::env::temp_dir().join("omx-runtime-test-mailbox-body");
+        let dir = std::env::temp_dir().join("omcp-runtime-test-mailbox-body");
         let _ = std::fs::remove_dir_all(&dir);
 
         let mut engine = RuntimeEngine::new().with_state_dir(&dir);
@@ -580,7 +580,7 @@ mod tests {
 
     #[test]
     fn load_backfills_legacy_mailbox_event_body_from_mailbox_json() {
-        let dir = std::env::temp_dir().join("omx-runtime-test-mailbox-backfill");
+        let dir = std::env::temp_dir().join("omcp-runtime-test-mailbox-backfill");
         let _ = std::fs::remove_dir_all(&dir);
         std::fs::create_dir_all(&dir).unwrap();
 
@@ -688,7 +688,7 @@ mod tests {
 
     #[test]
     fn compatibility_view_writes_section_files() {
-        let dir = std::env::temp_dir().join("omx-runtime-test-compat");
+        let dir = std::env::temp_dir().join("omcp-runtime-test-compat");
         let _ = std::fs::remove_dir_all(&dir);
 
         let mut engine = RuntimeEngine::new().with_state_dir(&dir);
@@ -762,7 +762,7 @@ mod tests {
 
     #[test]
     fn queue_dispatch_with_metadata_persists_and_round_trips() {
-        let dir = std::env::temp_dir().join("omx-runtime-test-metadata");
+        let dir = std::env::temp_dir().join("omcp-runtime-test-metadata");
         let _ = std::fs::remove_dir_all(&dir);
 
         let mut engine = RuntimeEngine::new().with_state_dir(&dir);

@@ -29,7 +29,7 @@ impl CommandOutput {
 pub fn execute_command(argv: &[String]) -> Result<CommandOutput, SparkshellError> {
     if argv.is_empty() {
         return Err(SparkshellError::InvalidArgs(
-            "usage: omx-sparkshell <command> [args...]".to_string(),
+            "usage: omcp-sparkshell <command> [args...]".to_string(),
         ));
     }
 
@@ -109,7 +109,7 @@ mod tests {
         let error = execute_command(&[]).unwrap_err();
         assert_eq!(
             error.to_string(),
-            "usage: omx-sparkshell <command> [args...]"
+            "usage: omcp-sparkshell <command> [args...]"
         );
     }
 }

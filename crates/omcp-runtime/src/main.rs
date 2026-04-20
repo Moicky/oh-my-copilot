@@ -5,7 +5,7 @@ use std::process;
 
 fn main() {
     if let Err(error) = run() {
-        eprintln!("omx-runtime: {error}");
+        eprintln!("omcp-runtime: {error}");
         process::exit(1);
     }
 }
@@ -113,7 +113,7 @@ fn run() -> Result<(), String> {
 
 fn print_usage() {
     println!(concat!(
-        "usage: omx-runtime <command> [options]\n",
+        "usage: omcp-runtime <command> [options]\n",
         "\n",
         "commands:\n",
         "  schema [--json]                     print the runtime contract summary\n",

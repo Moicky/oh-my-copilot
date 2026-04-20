@@ -34,7 +34,7 @@ fn main() {
         return;
     }
     if let Err(error) = run(args) {
-        eprintln!("omx sparkshell: {error}");
+        eprintln!("omcp sparkshell: {error}");
         process::exit(error.raw_exit_code());
     }
 }
@@ -72,7 +72,7 @@ fn run(args: Vec<String>) -> Result<(), SparkshellError> {
         }
         Err(error) => {
             write_raw_output(&output.stdout, &output.stderr)?;
-            eprintln!("omx sparkshell: summary unavailable ({error})");
+            eprintln!("omcp sparkshell: summary unavailable ({error})");
         }
     }
 
@@ -93,8 +93,8 @@ fn write_raw_output(stdout_bytes: &[u8], stderr_bytes: &[u8]) -> Result<(), Spar
 fn usage_text() -> String {
     format!(
         concat!(
-            "usage: omx-sparkshell <command> [args...]\n",
-            "   or: omx-sparkshell --tmux-pane <pane-id> [--tail-lines <{min}-{max}>]\n",
+            "usage: omcp-sparkshell <command> [args...]\n",
+            "   or: omcp-sparkshell --tmux-pane <pane-id> [--tail-lines <{min}-{max}>]\n",
             "\n",
             "Direct command mode executes argv without shell metacharacter parsing.\n",
             "Tmux pane mode captures a larger pane tail and applies the same raw-vs-summary behavior.\n"

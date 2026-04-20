@@ -5,7 +5,7 @@ fn schema_subcommand_prints_contract_summary() {
     let output = Command::new(env!("CARGO_BIN_EXE_omx-runtime"))
         .arg("schema")
         .output()
-        .expect("ran omx-runtime");
+        .expect("ran omcp-runtime");
 
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).expect("utf8 stdout");
@@ -21,7 +21,7 @@ fn schema_json_subcommand_prints_valid_json() {
     let output = Command::new(env!("CARGO_BIN_EXE_omx-runtime"))
         .args(["schema", "--json"])
         .output()
-        .expect("ran omx-runtime");
+        .expect("ran omcp-runtime");
 
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).expect("utf8 stdout");
@@ -36,7 +36,7 @@ fn snapshot_subcommand_prints_runtime_snapshot() {
     let output = Command::new(env!("CARGO_BIN_EXE_omx-runtime"))
         .arg("snapshot")
         .output()
-        .expect("ran omx-runtime");
+        .expect("ran omcp-runtime");
 
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).expect("utf8 stdout");
@@ -49,7 +49,7 @@ fn snapshot_json_subcommand_prints_valid_json() {
     let output = Command::new(env!("CARGO_BIN_EXE_omx-runtime"))
         .args(["snapshot", "--json"])
         .output()
-        .expect("ran omx-runtime");
+        .expect("ran omcp-runtime");
 
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).expect("utf8 stdout");
@@ -67,7 +67,7 @@ fn mux_contract_subcommand_reports_adapter_status() {
     let output = Command::new(env!("CARGO_BIN_EXE_omx-runtime"))
         .arg("mux-contract")
         .output()
-        .expect("ran omx-runtime");
+        .expect("ran omcp-runtime");
 
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).expect("utf8 stdout");
@@ -83,7 +83,7 @@ fn exec_subcommand_processes_json_command() {
     let output = Command::new(env!("CARGO_BIN_EXE_omx-runtime"))
         .args(["exec", cmd_json])
         .output()
-        .expect("ran omx-runtime");
+        .expect("ran omcp-runtime");
 
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).expect("utf8 stdout");
@@ -97,7 +97,7 @@ fn exec_acquire_authority_returns_event() {
     let output = Command::new(env!("CARGO_BIN_EXE_omx-runtime"))
         .args(["exec", cmd_json])
         .output()
-        .expect("ran omx-runtime");
+        .expect("ran omcp-runtime");
 
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).expect("utf8 stdout");
@@ -111,7 +111,7 @@ fn exec_invalid_json_fails() {
     let output = Command::new(env!("CARGO_BIN_EXE_omx-runtime"))
         .args(["exec", "not-json"])
         .output()
-        .expect("ran omx-runtime");
+        .expect("ran omcp-runtime");
 
     assert!(!output.status.success());
     let stderr = String::from_utf8(output.stderr).expect("utf8 stderr");
@@ -120,13 +120,13 @@ fn exec_invalid_json_fails() {
 
 #[test]
 fn init_creates_state_directory() {
-    let dir = std::env::temp_dir().join("omx-runtime-test-init");
+    let dir = std::env::temp_dir().join("omcp-runtime-test-init");
     let _ = std::fs::remove_dir_all(&dir);
 
     let output = Command::new(env!("CARGO_BIN_EXE_omx-runtime"))
         .args(["init", dir.to_str().unwrap()])
         .output()
-        .expect("ran omx-runtime");
+        .expect("ran omcp-runtime");
 
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).expect("utf8 stdout");
@@ -148,7 +148,7 @@ fn init_creates_state_directory() {
 
 #[test]
 fn exec_with_state_dir_persists() {
-    let dir = std::env::temp_dir().join("omx-runtime-test-exec-persist");
+    let dir = std::env::temp_dir().join("omcp-runtime-test-exec-persist");
     let _ = std::fs::remove_dir_all(&dir);
 
     let cmd_json = r#"{"command":"AcquireAuthority","owner":"w1","lease_id":"l1","leased_until":"2026-03-19T02:00:00Z"}"#;
@@ -157,7 +157,7 @@ fn exec_with_state_dir_persists() {
     let output = Command::new(env!("CARGO_BIN_EXE_omx-runtime"))
         .args(["exec", cmd_json, &state_arg])
         .output()
-        .expect("ran omx-runtime");
+        .expect("ran omcp-runtime");
 
     assert!(output.status.success());
 
@@ -180,7 +180,7 @@ fn exec_with_state_dir_persists() {
 
 #[test]
 fn snapshot_from_state_dir_reads_persisted_state() {
-    let dir = std::env::temp_dir().join("omx-runtime-test-snapshot-statedir");
+    let dir = std::env::temp_dir().join("omcp-runtime-test-snapshot-statedir");
     let _ = std::fs::remove_dir_all(&dir);
 
     // First: init and exec to create state
@@ -200,7 +200,7 @@ fn snapshot_from_state_dir_reads_persisted_state() {
     let output = Command::new(env!("CARGO_BIN_EXE_omx-runtime"))
         .args(["snapshot", "--json", &state_arg])
         .output()
-        .expect("ran omx-runtime");
+        .expect("ran omcp-runtime");
 
     assert!(output.status.success());
     let stdout = String::from_utf8(output.stdout).expect("utf8 stdout");

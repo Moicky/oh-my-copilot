@@ -14,7 +14,7 @@ fn unique_temp_dir(name: &str) -> PathBuf {
         .expect("time")
         .as_nanos();
     let path = env::temp_dir().join(format!(
-        "omx-sparkshell-{name}-{nanos}-{}",
+        "omcp-sparkshell-{name}-{nanos}-{}",
         std::process::id()
     ));
     fs::create_dir_all(&path).expect("temp dir");

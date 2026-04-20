@@ -12,10 +12,10 @@ const CODEX_BIN_ENV: &str = "OMX_EXPLORE_CODEX_BIN";
 const HARNESS_ROOT_ENV: &str = "OMX_EXPLORE_ROOT";
 const INTERNAL_DIRECT_WRAPPER_FLAG: &str = "--internal-allowlist-direct";
 const INTERNAL_SHELL_WRAPPER_FLAG: &str = "--internal-allowlist-shell";
-const TEMP_ALLOWLIST_DIR_PREFIX: &str = "omx-explore-allowlist-";
+const TEMP_ALLOWLIST_DIR_PREFIX: &str = "omcp-explore-allowlist-";
 const SHELL_STARTUP_ENV_VARS: &[&str] = &["BASH_ENV", "ENV", "PROMPT_COMMAND"];
 const WINDOWS_UNSUPPORTED_ALLOWLIST_MESSAGE: &str =
-    "omx explore built-in harness is not ready on Windows because its allowlist runtime relies on POSIX sh/bash wrappers. Set OMX_EXPLORE_BIN to a compatible custom harness, prefer `omx sparkshell` for shell-native read-only lookups, or run `omx doctor` for readiness details.";
+    "omcp explore built-in harness is not ready on Windows because its allowlist runtime relies on POSIX sh/bash wrappers. Set OMX_EXPLORE_BIN to a compatible custom harness, prefer `omcp sparkshell` for shell-native read-only lookups, or run `omcp doctor` for readiness details.";
 
 const ALLOWED_DIRECT_COMMANDS: &[&str] = &[
     "rg", "grep", "ls", "find", "wc", "cat", "head", "tail", "pwd", "printf",
@@ -57,7 +57,7 @@ impl Drop for TempDirGuard {
 
 fn main() {
     if let Err(error) = dispatch_main() {
-        eprintln!("[omx explore] {}", error);
+        eprintln!("[omcp explore] {}", error);
         std::process::exit(1);
     }
 }
@@ -110,12 +110,12 @@ where
     }
 
     eprintln!(
-        "[omx explore] spark model `{}` unavailable or failed (exit {}). Falling back to `{}`.",
+        "[omcp explore] spark model `{}` unavailable or failed (exit {}). Falling back to `{}`.",
         args.spark_model, spark_attempt.status_code, args.fallback_model
     );
     if !spark_attempt.stderr.trim().is_empty() {
         eprintln!(
-            "[omx explore] spark stderr: {}",
+            "[omcp explore] spark stderr: {}",
             spark_attempt.stderr.trim()
         );
     }
@@ -198,7 +198,7 @@ where
 }
 
 fn usage() -> &'static str {
-    "Usage: omx-explore --cwd <dir> --prompt <text> --prompt-file <explore-prompt.md> --model-spark <model> --model-fallback <model>"
+    "Usage: omcp-explore --cwd <dir> --prompt <text> --prompt-file <explore-prompt.md> --model-spark <model> --model-fallback <model>"
 }
 
 fn invoke_codex(args: &Args, model: &str, prompt_contract: &str) -> io::Result<AttemptResult> {
@@ -434,7 +434,7 @@ fn discover_codex_support_dirs() -> Vec<PathBuf> {
     let mut dirs = Vec::new();
     if let Some(home) = env::var_os("HOME").filter(|value| !value.is_empty()) {
         let home = PathBuf::from(home);
-        for relative in [".omx", ".codex"] {
+        for relative in [".omcp", ".codex"] {
             let dir = home.join(relative);
             if dir.is_dir() {
                 dirs.push(dir);
@@ -449,7 +449,7 @@ fn temp_output_path() -> PathBuf {
         .duration_since(UNIX_EPOCH)
         .unwrap_or_default()
         .as_nanos();
-    env::temp_dir().join(format!("omx-explore-{}-{}.md", std::process::id(), nanos))
+    env::temp_dir().join(format!("omcp-explore-{}-{}.md", std::process::id(), nanos))
 }
 
 fn compose_exec_prompt(user_prompt: &str, prompt_contract: &str) -> String {
@@ -528,7 +528,7 @@ fn allowlist_platform_diagnostic(os: &str) -> Option<&'static str> {
 
 fn temp_allowlist_dir() -> Result<TempDirGuard, String> {
     let dir = env::temp_dir().join(format!(
-        "omx-explore-allowlist-{}-{}",
+        "omcp-explore-allowlist-{}-{}",
         std::process::id(),
         SystemTime::now()
             .duration_since(UNIX_EPOCH)
@@ -576,7 +576,7 @@ fn build_direct_wrapper(self_exe: &Path, command: &str) -> Result<String, String
     Ok(format!(
         "#!/bin/sh\nprintf '%s\\n' {} >&2\nexit 127\n",
         shell_quote(&format!(
-            "omx explore allowlisted host command `{command}` is unavailable on this host"
+            "omcp explore allowlisted host command `{command}` is unavailable on this host"
         )),
     ))
 }
@@ -745,7 +745,7 @@ fn validate_shell_invocation(args: &[String]) -> Result<String, String> {
 fn validate_direct_command(command_name: &str, args: &[String]) -> Result<(), String> {
     if !ALLOWED_DIRECT_COMMANDS.contains(&command_name) {
         return Err(format!(
-            "command `{command_name}` is not on the omx explore allowlist"
+            "command `{command_name}` is not on the omcp explore allowlist"
         ));
     }
 
@@ -755,19 +755,19 @@ fn validate_direct_command(command_name: &str, args: &[String]) -> Result<(), St
                 .iter()
                 .any(|arg| arg == "--pre" || arg.starts_with("--pre="))
             {
-                return Err("ripgrep `--pre` is not allowed in omx explore".to_string());
+                return Err("ripgrep `--pre` is not allowed in omcp explore".to_string());
             }
             if args.iter().any(|arg| arg == "-") {
-                return Err("ripgrep stdin (`-`) is not allowed in omx explore".to_string());
+                return Err("ripgrep stdin (`-`) is not allowed in omcp explore".to_string());
             }
         }
         "grep" => {
             if args.iter().any(|arg| arg == "-") {
-                return Err("grep stdin (`-`) is not allowed in omx explore".to_string());
+                return Err("grep stdin (`-`) is not allowed in omcp explore".to_string());
             }
             if non_option_operands(args).len() < 2 {
                 return Err(
-                    "grep requires a pattern and at least one file/path in omx explore".to_string(),
+                    "grep requires a pattern and at least one file/path in omcp explore".to_string(),
                 );
             }
         }
@@ -788,7 +788,7 @@ fn validate_direct_command(command_name: &str, args: &[String]) -> Result<(), St
             }) =>
         {
             return Err(
-                "find actions that execute, delete, or write files are not allowed in omx explore"
+                "find actions that execute, delete, or write files are not allowed in omcp explore"
                     .to_string(),
             );
         }
@@ -796,37 +796,37 @@ fn validate_direct_command(command_name: &str, args: &[String]) -> Result<(), St
         "cat" => {
             let operands = non_option_operands(args);
             if operands.is_empty() {
-                return Err("cat requires at least one file/path in omx explore".to_string());
+                return Err("cat requires at least one file/path in omcp explore".to_string());
             }
             if operands.contains(&"-") {
-                return Err("cat stdin (`-`) is not allowed in omx explore".to_string());
+                return Err("cat stdin (`-`) is not allowed in omcp explore".to_string());
             }
         }
         "head" | "wc" => {
             let operands = non_option_operands(args);
             if operands.is_empty() {
                 return Err(format!(
-                    "{command_name} requires at least one file/path in omx explore"
+                    "{command_name} requires at least one file/path in omcp explore"
                 ));
             }
             if operands.contains(&"-") {
                 return Err(format!(
-                    "{command_name} stdin (`-`) is not allowed in omx explore"
+                    "{command_name} stdin (`-`) is not allowed in omcp explore"
                 ));
             }
         }
         "tail" => {
             let operands = non_option_operands(args);
             if operands.is_empty() {
-                return Err("tail requires at least one file/path in omx explore".to_string());
+                return Err("tail requires at least one file/path in omcp explore".to_string());
             }
             if operands.contains(&"-") {
-                return Err("tail stdin (`-`) is not allowed in omx explore".to_string());
+                return Err("tail stdin (`-`) is not allowed in omcp explore".to_string());
             }
             if args.iter().any(|arg| {
                 matches!(arg.as_str(), "-f" | "-F" | "--retry") || arg.starts_with("--follow")
             }) {
-                return Err("tail follow/retry modes are not allowed in omx explore".to_string());
+                return Err("tail follow/retry modes are not allowed in omcp explore".to_string());
             }
         }
         _ => {}
@@ -867,7 +867,7 @@ fn validate_repo_paths(command_name: &str, args: &[String]) -> Result<(), String
         let normalized = normalize_candidate_path(&repo_root, operand);
         if !normalized.starts_with(&repo_root) {
             return Err(format!(
-                "path `{operand}` escapes the omx explore repository root {}",
+                "path `{operand}` escapes the omcp explore repository root {}",
                 repo_root.display()
             ));
         }
@@ -875,7 +875,7 @@ fn validate_repo_paths(command_name: &str, args: &[String]) -> Result<(), String
             if let Some(canonical_repo_root) = &canonical_repo_root {
                 if !canonical_candidate.starts_with(canonical_repo_root) {
                     return Err(format!(
-                        "path `{operand}` resolves outside the omx explore repository root {}",
+                        "path `{operand}` resolves outside the omcp explore repository root {}",
                         canonical_repo_root.display()
                     ));
                 }
@@ -1026,7 +1026,7 @@ mod tests {
         let _guard = env_lock();
         let root = TempDirGuard {
             path: env::temp_dir().join(format!(
-                "omx-explore-resolve-codex-binary-{}-{}",
+                "omcp-explore-resolve-codex-binary-{}-{}",
                 std::process::id(),
                 SystemTime::now()
                     .duration_since(UNIX_EPOCH)
@@ -1325,7 +1325,7 @@ exec node "$basedir/../@openai/codex/bin/codex.js" "$@"
         let allowlist_root = temp_allowlist_dir().expect("allowlist root");
         let real_root = TempDirGuard {
             path: env::temp_dir().join(format!(
-                "omx-explore-host-resolution-{}-{}",
+                "omcp-explore-host-resolution-{}-{}",
                 std::process::id(),
                 SystemTime::now()
                     .duration_since(UNIX_EPOCH)
@@ -1389,7 +1389,7 @@ exec node "$basedir/../@openai/codex/bin/codex.js" "$@"
         let _guard = env_lock();
         let root = temp_allowlist_dir().expect("temp root");
         let home_dir = root.path.join("home");
-        create_dir_all(home_dir.join(".omx")).expect("create .omx");
+        create_dir_all(home_dir.join(".omcp")).expect("create .omcp");
         create_dir_all(home_dir.join(".codex")).expect("create .codex");
         let original_home = env::var_os("HOME");
         unsafe {
@@ -1402,7 +1402,7 @@ exec node "$basedir/../@openai/codex/bin/codex.js" "$@"
             Some(value) => unsafe { env::set_var("HOME", value) },
             None => unsafe { env::remove_var("HOME") },
         }
-        assert_eq!(dirs, vec![home_dir.join(".omx"), home_dir.join(".codex")]);
+        assert_eq!(dirs, vec![home_dir.join(".omcp"), home_dir.join(".codex")]);
     }
 
     #[test]
