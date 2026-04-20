@@ -15,7 +15,7 @@ const ROOT_TEMPLATE_PATTERNS = [
   rx('ASK only.*destructive.*irreversible.*credential-gated.*external-production.*materially scope-changing'),
   rx('AUTO-CONTINUE branches.*permission-handoff phrasing'),
   rx('do not ask or instruct humans.*ordinary non-destructive.*reversible actions'),
-  rx('OMX runtime manipulation.*agent responsibilities'),
+  rx('OMCP runtime manipulation.*agent responsibilities'),
   rx('Keep going unless blocked'),
   rx('Ask only when blocked|Ask only when progress is impossible'),
   rx('local overrides?.*non-conflicting instructions'),

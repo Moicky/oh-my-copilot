@@ -1,20 +1,20 @@
 [workspace]
 members = [
-  "crates/omx-explore",
-  "crates/omx-mux",
-  "crates/omx-runtime-core",
-  "crates/omx-runtime",
-  "crates/omx-sparkshell",
+  "crates/omcp-explore",
+  "crates/omcp-mux",
+  "crates/omcp-runtime-core",
+  "crates/omcp-runtime",
+  "crates/omcp-sparkshell",
 ]
 resolver = "2"
 
 [workspace.package]
 
-version = "0.14.0"
+version = "0.1.0"
 
 edition = "2021"
 license = "MIT"
-repository = "https://github.com/Yeachan-Heo/oh-my-codex"
+repository = "https://github.com/Moicky/oh-my-copilot"
 
 # The profile that 'dist' will build with
 [profile.dist]

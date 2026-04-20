@@ -1,7 +1,7 @@
 /**
  * Wiki Storage
  *
- * File I/O layer for the OMX wiki knowledge base.
+ * File I/O layer for the OMCP wiki knowledge base.
  */
 
 import {
@@ -15,7 +15,7 @@ import {
   writeFileSync,
 } from 'fs';
 import { dirname, join, resolve, sep } from 'path';
-import { omxWikiDir } from '../utils/paths.js';
+import { omcpWikiDir } from '../utils/paths.js';
 import {
   type WikiLogEntry,
   type WikiPage,
@@ -74,15 +74,15 @@ function withFileLockSync<T>(
 }
 
 export function getWikiDir(root: string): string {
-  return omxWikiDir(root);
+  return omcpWikiDir(root);
 }
 
 export function ensureWikiDir(root: string): string {
   const wikiDir = getWikiDir(root);
   mkdirSync(wikiDir, { recursive: true });
-  const omxRoot = join(root, '.omx');
-  mkdirSync(omxRoot, { recursive: true });
-  const gitignorePath = join(omxRoot, '.gitignore');
+  const omcpRoot = join(root, '.omcp');
+  mkdirSync(omcpRoot, { recursive: true });
+  const gitignorePath = join(omcpRoot, '.gitignore');
   if (existsSync(gitignorePath)) {
     const content = readFileSync(gitignorePath, 'utf8');
     if (!content.includes('wiki/')) {

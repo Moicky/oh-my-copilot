@@ -75,7 +75,7 @@ function readPersistedTeamFollowupState(cwd: string): {
   agent_types?: string;
   linkedRalph?: boolean;
 } | null {
-  const path = join(cwd, '.omx', 'state', 'team-state.json');
+  const path = join(cwd, '.omcp', 'state', 'team-state.json');
   if (!existsSync(path)) return null;
   try {
     return JSON.parse(readFileSync(path, 'utf-8')) as {
@@ -142,37 +142,37 @@ function isTerminalModePhase(phase: string): boolean {
 }
 
 const TEAM_HELP = `
-Usage: omx team [N:agent-type] "<task description>"
-       omx team status <team-name> [--json] [--tail-lines <100-1000>]
-       omx team await <team-name> [--timeout-ms <ms>] [--after-event-id <id>] [--json]
-       omx team resume <team-name>
-       omx team shutdown <team-name> [--force] [--confirm-issues]
-       omx team api <operation> [--input <json>] [--json]
-       omx team api --help
+Usage: omcp team [N:agent-type] "<task description>"
+       omcp team status <team-name> [--json] [--tail-lines <100-1000>]
+       omcp team await <team-name> [--timeout-ms <ms>] [--after-event-id <id>] [--json]
+       omcp team resume <team-name>
+       omcp team shutdown <team-name> [--force] [--confirm-issues]
+       omcp team api <operation> [--input <json>] [--json]
+       omcp team api --help
 
 Notes:
   team workers use dedicated worktrees automatically by default.
-  --worktree is deprecated for omx team and is now only a backward-compatible no-op override.
-  use native Codex subagents for small in-session fanout; use omx team for durable tmux/state/worktree coordination.
+  --worktree is deprecated for omcp team and is now only a backward-compatible no-op override.
+  use native Codex subagents for small in-session fanout; use omcp team for durable tmux/state/worktree coordination.
 
 Examples:
-  omx team 3:executor "fix failing tests"
-  omx team status my-team
-  omx team status my-team --json
-  omx team status my-team --tail-lines 600
-  omx team api send-message --input '{"team_name":"my-team","from_worker":"worker-1","to_worker":"leader-fixed","body":"ACK"}' --json
+  omcp team 3:executor "fix failing tests"
+  omcp team status my-team
+  omcp team status my-team --json
+  omcp team status my-team --tail-lines 600
+  omcp team api send-message --input '{"team_name":"my-team","from_worker":"worker-1","to_worker":"leader-fixed","body":"ACK"}' --json
 `;
 
 const TEAM_API_HELP = `
-Usage: omx team api <operation> [--input <json>] [--json]
-       omx team api <operation> --help
+Usage: omcp team api <operation> [--input <json>] [--json]
+       omcp team api <operation> --help
 
 Supported operations:
   ${TEAM_API_OPERATIONS.join('\n  ')}
 
 Examples:
-  omx team api list-tasks --input '{"team_name":"my-team"}' --json
-  omx team api claim-task --input '{"team_name":"my-team","task_id":"1","worker":"worker-1","expected_version":1}' --json
+  omcp team api list-tasks --input '{"team_name":"my-team"}' --json
+  omcp team api claim-task --input '{"team_name":"my-team","task_id":"1","worker":"worker-1","expected_version":1}' --json
 `;
 
 const HELP_TOKENS = new Set(['--help', '-h', 'help']);
@@ -236,8 +236,8 @@ const TEAM_API_OPERATION_NOTES: Partial<Record<TeamApiOperation, string>> = {
   'transition-task-status': 'Lifecycle flow is claim-safe and typically transitions in_progress -> completed|failed.',
   'cleanup': 'Uses the runtime shutdown contract; add confirm_issues=true when failed tasks are acknowledged and shutdown should still proceed.',
   'orphan-cleanup': 'Destructive escape hatch for known orphan recovery. Bypasses shutdown orchestration.',
-  'read-events': 'Events are returned in canonical form; worker_idle log entries normalize to type worker_state_changed with source_type worker_idle. wakeable_only defaults to false; set wakeable_only=true to mirror omx team await semantics (wakeable events now include merge conflicts and per-signal stale alerts).',
-  'await-event': 'Waits for the next matching event and returns status=timeout when no matching event arrives before timeout_ms. wakeable_only defaults to false; set wakeable_only=true to mirror omx team await semantics (wakeable events now include merge conflicts and per-signal stale alerts).',
+  'read-events': 'Events are returned in canonical form; worker_idle log entries normalize to type worker_state_changed with source_type worker_idle. wakeable_only defaults to false; set wakeable_only=true to mirror omcp team await semantics (wakeable events now include merge conflicts and per-signal stale alerts).',
+  'await-event': 'Waits for the next matching event and returns status=timeout when no matching event arrives before timeout_ms. wakeable_only defaults to false; set wakeable_only=true to mirror omcp team await semantics (wakeable events now include merge conflicts and per-signal stale alerts).',
   'read-idle-state': 'Builds a structured idle summary from the existing monitor snapshot, team summary, and recent events.',
   'read-stall-state': 'Builds a structured stall summary from the existing monitor snapshot, team summary, and recent events.',
 };
@@ -271,7 +271,7 @@ function sampleValueForTeamApiField(field: string): unknown {
       return {
         summary: 'worker diff report',
         worktree_path: '/tmp/team/worktrees/worker-1',
-        diff_path: '/tmp/team/worktrees/worker-1/.omx/diff.md',
+        diff_path: '/tmp/team/worktrees/worker-1/.omcp/diff.md',
         full_diff_available: true,
       };
     case 'requested_by': return 'leader-fixed';
@@ -318,11 +318,11 @@ function buildTeamApiOperationHelp(operation: TeamApiOperation): string {
     : '';
 
   return `
-Usage: omx team api ${operation} --input <json> [--json]
+Usage: omcp team api ${operation} --input <json> [--json]
 
 Required input fields:
 ${required}${optional}${note}Example:
-  omx team api ${operation} --input '${sampleInputJson}' --json
+  omcp team api ${operation} --input '${sampleInputJson}' --json
 `.trim();
 }
 
@@ -340,14 +340,14 @@ function parseStatusTailLines(args: string[]): number {
       const next = args[index + 1];
       const parsed = Number.parseInt(next || '', 10);
       if (!Number.isFinite(parsed) || parsed < MIN_SPARKSHELL_TAIL_LINES || parsed > MAX_SPARKSHELL_TAIL_LINES) {
-        throw new Error(`Usage: omx team status <team-name> [--json] [--tail-lines <${MIN_SPARKSHELL_TAIL_LINES}-${MAX_SPARKSHELL_TAIL_LINES}>]`);
+        throw new Error(`Usage: omcp team status <team-name> [--json] [--tail-lines <${MIN_SPARKSHELL_TAIL_LINES}-${MAX_SPARKSHELL_TAIL_LINES}>]`);
       }
       return parsed;
     }
     if (token.startsWith('--tail-lines=')) {
       const parsed = Number.parseInt(token.slice('--tail-lines='.length), 10);
       if (!Number.isFinite(parsed) || parsed < MIN_SPARKSHELL_TAIL_LINES || parsed > MAX_SPARKSHELL_TAIL_LINES) {
-        throw new Error(`Usage: omx team status <team-name> [--json] [--tail-lines <${MIN_SPARKSHELL_TAIL_LINES}-${MAX_SPARKSHELL_TAIL_LINES}>]`);
+        throw new Error(`Usage: omcp team status <team-name> [--json] [--tail-lines <${MIN_SPARKSHELL_TAIL_LINES}-${MAX_SPARKSHELL_TAIL_LINES}>]`);
       }
       return parsed;
     }
@@ -372,7 +372,7 @@ function parseTeamApiArgs(args: string[]): {
 } {
   const operation = resolveTeamApiOperation(args[0] || '');
   if (!operation) {
-    throw new Error(`Usage: omx team api <operation> [--input <json>] [--json]\nSupported operations: ${TEAM_API_OPERATIONS.join(', ')}`);
+    throw new Error(`Usage: omcp team api <operation> [--input <json>] [--json]\nSupported operations: ${TEAM_API_OPERATIONS.join(', ')}`);
   }
   let input: Record<string, unknown> = {};
   let json = false;
@@ -410,7 +410,7 @@ function parseTeamApiArgs(args: string[]): {
       }
       continue;
     }
-    throw new Error(`Unknown argument for "omx team api": ${token}`);
+    throw new Error(`Unknown argument for "omcp team api": ${token}`);
   }
   return { operation, input, json };
 }
@@ -458,7 +458,7 @@ function renderTeamPaneStatus(
   }
 
   if (paneStatus.sparkshell_hint) {
-    console.log('sparkshell_hint: omx sparkshell --tmux-pane <pane-id> --tail-lines 400');
+    console.log('sparkshell_hint: omcp sparkshell --tmux-pane <pane-id> --tail-lines 400');
   }
 
   if (paneStatus.recommended_inspect_targets.length > 0) {
@@ -883,7 +883,7 @@ function parseTeamArgs(args: string[], cwd: string = process.cwd()): ParsedTeamA
   let explicitWorkerCount = false;
 
   if (tokens[0]?.toLowerCase() === 'ralph') {
-    throw new Error('Deprecated usage: `omx team ralph ...` has been removed. Use `omx team ...` or run `omx ralph ...` separately.');
+    throw new Error('Deprecated usage: `omcp team ralph ...` has been removed. Use `omcp team ...` or run `omcp ralph ...` separately.');
   }
 
   const first = tokens[0] || '';
@@ -904,7 +904,7 @@ function parseTeamArgs(args: string[], cwd: string = process.cwd()): ParsedTeamA
 
   const task = tokens.join(' ').trim();
   if (!task) {
-    throw new Error('Usage: omx team [N:agent-type] "<task description>"');
+    throw new Error('Usage: omcp team [N:agent-type] "<task description>"');
   }
 
   const followupContext = resolveApprovedTeamFollowupContext(cwd, task);
@@ -1260,7 +1260,7 @@ async function persistTeamShutdownModeState(
     agentType: string;
   } | null,
 ): Promise<void> {
-  const sessionStatePath = join(cwd, '.omx', 'state', 'session.json');
+  const sessionStatePath = join(cwd, '.omcp', 'state', 'session.json');
   let scopedSessionId: string | undefined;
   if (existsSync(sessionStatePath)) {
     try {
@@ -1353,8 +1353,8 @@ async function renderStartSummary(runtime: TeamRuntime, staffingPlan?: FollowupS
 export function buildLeaderMonitoringHints(teamName: string): string[] {
   const sanitized = sanitizeTeamName(teamName);
   return [
-    `leader_check: omx team status ${sanitized}`,
-    `leader_loop_hint: while ON, keep checking state (example: sleep 30 && omx team status ${sanitized})`,
+    `leader_check: omcp team status ${sanitized}`,
+    `leader_loop_hint: while ON, keep checking state (example: sleep 30 && omcp team status ${sanitized})`,
   ];
 }
 
@@ -1400,7 +1400,7 @@ export async function teamCommand(args: string[], _options: TeamCliOptions = {})
         console.log(JSON.stringify({
           ...jsonBase,
           ok: false,
-          command: 'omx team api',
+          command: 'omcp team api',
           operation: 'unknown',
           error: {
             code: 'invalid_input',
@@ -1416,7 +1416,7 @@ export async function teamCommand(args: string[], _options: TeamCliOptions = {})
     if (parsedApi.json) {
       console.log(JSON.stringify({
         ...jsonBase,
-        command: `omx team api ${parsedApi.operation}`,
+        command: `omcp team api ${parsedApi.operation}`,
         ...envelope,
       }));
       if (!envelope.ok) process.exitCode = 1;
@@ -1435,14 +1435,14 @@ export async function teamCommand(args: string[], _options: TeamCliOptions = {})
   if (subcommand === 'status') {
     const name = teamArgs[1];
     const wantsJson = teamArgs.includes('--json');
-    if (!name) throw new Error('Usage: omx team status <team-name> [--json]');
+    if (!name) throw new Error('Usage: omcp team status <team-name> [--json]');
     await recordLeaderRuntimeActivity(cwd, 'team_status', name);
     const snapshot = await monitorTeam(name, cwd);
     if (!snapshot) {
       if (wantsJson) {
         console.log(JSON.stringify({
           ...buildJsonBase(),
-          command: 'omx team status',
+          command: 'omcp team status',
           team_name: name,
           status: 'missing',
         }));
@@ -1457,7 +1457,7 @@ export async function teamCommand(args: string[], _options: TeamCliOptions = {})
     if (wantsJson) {
       console.log(JSON.stringify({
         ...buildJsonBase(),
-        command: 'omx team status',
+        command: 'omcp team status',
         team_name: snapshot.teamName,
         status: 'ok',
         tail_lines: tailLines,
@@ -1506,7 +1506,7 @@ export async function teamCommand(args: string[], _options: TeamCliOptions = {})
 
   if (subcommand === 'await') {
     const name = teamArgs[1];
-    if (!name) throw new Error('Usage: omx team await <team-name> [--timeout-ms <ms>] [--after-event-id <id>] [--json]');
+    if (!name) throw new Error('Usage: omcp team await <team-name> [--timeout-ms <ms>] [--after-event-id <id>] [--json]');
     const wantsJson = teamArgs.includes('--json');
     const timeoutIdx = teamArgs.indexOf('--timeout-ms');
     const afterIdx = teamArgs.indexOf('--after-event-id');
@@ -1587,7 +1587,7 @@ export async function teamCommand(args: string[], _options: TeamCliOptions = {})
 
   if (subcommand === 'resume') {
     const name = teamArgs[1];
-    if (!name) throw new Error('Usage: omx team resume <team-name>');
+    if (!name) throw new Error('Usage: omcp team resume <team-name>');
     const runtime = await resumeTeam(name, cwd);
     if (!runtime) {
       console.log(`No resumable team found for ${name}`);
@@ -1612,7 +1612,7 @@ export async function teamCommand(args: string[], _options: TeamCliOptions = {})
 
   if (subcommand === 'shutdown') {
     const name = teamArgs[1];
-    if (!name) throw new Error('Usage: omx team shutdown <team-name> [--force] [--confirm-issues]');
+    if (!name) throw new Error('Usage: omcp team shutdown <team-name> [--force] [--confirm-issues]');
     const force = teamArgs.includes('--force');
     const confirmIssues = teamArgs.includes('--confirm-issues');
     const configBeforeShutdown = await readTeamConfig(name, cwd);
@@ -1628,7 +1628,7 @@ export async function teamCommand(args: string[], _options: TeamCliOptions = {})
         }
         : null,
     ).catch((error: unknown) => {
-      console.warn('[omx] warning: failed to persist team mode shutdown state', {
+      console.warn('[omcp] warning: failed to persist team mode shutdown state', {
         team: name,
         error: error instanceof Error ? error.message : String(error),
       });

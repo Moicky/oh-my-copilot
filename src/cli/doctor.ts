@@ -1,5 +1,5 @@
 /**
- * omx doctor - Validate oh-my-codex installation
+ * omcp doctor - Validate oh-my-copilot installation
  */
 
 import { existsSync } from 'fs';
@@ -7,7 +7,7 @@ import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import {
   codexHome, codexConfigPath, codexPromptsDir,
-  userSkillsDir, projectSkillsDir, omxStateDir, detectLegacySkillRootOverlap,
+  userSkillsDir, projectSkillsDir, omcpStateDir, detectLegacySkillRootOverlap,
 } from '../utils/paths.js';
 import { classifySpawnError, spawnPlatformCommandSync } from '../utils/platform-command.js';
 import { getCatalogExpectations } from './catalog-contract.js';
@@ -18,10 +18,10 @@ import {
   EXPLORE_BIN_ENV,
 } from './explore.js';
 import { getPackageRoot } from '../utils/package.js';
-import { hasLegacyOmxTeamRunTable } from '../config/generator.js';
+import { hasLegacyOmcpTeamRunTable } from '../config/generator.js';
 import { getMissingManagedCodexHookEvents } from '../config/codex-hooks.js';
 import { getDefaultBridge, isBridgeEnabled } from '../runtime/bridge.js';
-import { OMX_EXPLORE_CMD_ENV, isExploreCommandRoutingEnabled } from '../hooks/explore-routing.js';
+import { OMCP_EXPLORE_CMD_ENV, isExploreCommandRoutingEnabled } from '../hooks/explore-routing.js';
 import { isLeaderRuntimeStale } from '../team/leader-activity.js';
 import { triagePrompt } from '../hooks/triage-heuristic.js';
 import { readTriageConfig } from '../hooks/triage-config.js';
@@ -60,7 +60,7 @@ const LEGACY_SCOPE_MIGRATION: Record<string, DoctorSetupScope> = {
 };
 
 async function resolveDoctorScope(cwd: string): Promise<DoctorScopeResolution> {
-  const scopePath = join(cwd, '.omx', 'setup-scope.json');
+  const scopePath = join(cwd, '.omcp', 'setup-scope.json');
   if (!existsSync(scopePath)) {
     return { scope: 'user', source: 'default' };
   }
@@ -93,7 +93,7 @@ function resolveDoctorPaths(cwd: string, scope: DoctorSetupScope): DoctorPaths {
       hooksPath: join(codexHomeDir, 'hooks.json'),
       promptsDir: join(codexHomeDir, 'prompts'),
       skillsDir: projectSkillsDir(cwd),
-      stateDir: omxStateDir(cwd),
+      stateDir: omcpStateDir(cwd),
     };
   }
 
@@ -103,7 +103,7 @@ function resolveDoctorPaths(cwd: string, scope: DoctorSetupScope): DoctorPaths {
     hooksPath: join(codexHome(), 'hooks.json'),
     promptsDir: codexPromptsDir(),
     skillsDir: userSkillsDir(),
-    stateDir: omxStateDir(cwd),
+    stateDir: omcpStateDir(cwd),
   };
 }
 
@@ -117,10 +117,10 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
   const scopeResolution = await resolveDoctorScope(cwd);
   const paths = resolveDoctorPaths(cwd, scopeResolution.scope);
   const scopeSourceMessage = scopeResolution.source === 'persisted'
-    ? ' (from .omx/setup-scope.json)'
+    ? ' (from .omcp/setup-scope.json)'
     : '';
 
-  console.log('oh-my-codex doctor');
+  console.log('oh-my-copilot doctor');
   console.log('==================\n');
   console.log(`Resolved setup scope: ${scopeResolution.scope}${scopeSourceMessage}\n`);
 
@@ -186,11 +186,11 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
   console.log(`\nResults: ${passCount} passed, ${warnCount} warnings, ${failCount} failed`);
 
   if (failCount > 0) {
-    console.log('\nRun "omx setup" to fix installation issues.');
+    console.log('\nRun "omcp setup" to fix installation issues.');
   } else if (warnCount > 0) {
-    console.log('\nRun "omx setup --force" to refresh all components.');
+    console.log('\nRun "omcp setup --force" to refresh all components.');
   } else {
-    console.log('\nAll checks passed! oh-my-codex is ready.');
+    console.log('\nAll checks passed! oh-my-copilot is ready.');
   }
 }
 
@@ -201,7 +201,7 @@ interface TeamDoctorIssue {
 }
 
 async function doctorTeam(): Promise<void> {
-  console.log('oh-my-codex doctor --team');
+  console.log('oh-my-copilot doctor --team');
   console.log('=========================\n');
 
   const issues = await collectTeamDoctorIssues(process.cwd());
@@ -220,13 +220,13 @@ async function doctorTeam(): Promise<void> {
   }
 
   console.log(`\nResults: ${warningCount} warnings, ${failureCount} failed`);
-  // Ensure non-zero exit for `omx doctor --team` failures.
+  // Ensure non-zero exit for `omcp doctor --team` failures.
   if (failureCount > 0) process.exitCode = 1;
 }
 
 async function collectTeamDoctorIssues(cwd: string): Promise<TeamDoctorIssue[]> {
   const issues: TeamDoctorIssue[] = [];
-  const stateDir = omxStateDir(cwd);
+  const stateDir = omcpStateDir(cwd);
   const teamsRoot = join(stateDir, 'team');
   const nowMs = Date.now();
   const lagThresholdMs = 60_000;
@@ -274,7 +274,7 @@ async function collectTeamDoctorIssues(cwd: string): Promise<TeamDoctorIssue[]> 
     const manifestPath = join(teamDir, 'manifest.v2.json');
     const configPath = join(teamDir, 'config.json');
 
-    let tmuxSession = `omx-team-${teamName}`;
+    let tmuxSession = `omcp-team-${teamName}`;
     if (existsSync(manifestPath)) {
       try {
         const raw = await readFile(manifestPath, 'utf-8');
@@ -370,8 +370,8 @@ async function collectTeamDoctorIssues(cwd: string): Promise<TeamDoctorIssue[]> 
       if (leaderIsStale && !tmuxUnavailable) {
         // Check if any team tmux session has live worker panes
         for (const teamName of teamDirs) {
-          const session = knownTeamSessions.has(`omx-team-${teamName}`)
-            ? `omx-team-${teamName}`
+          const session = knownTeamSessions.has(`omcp-team-${teamName}`)
+            ? `omcp-team-${teamName}`
             : [...knownTeamSessions].find(s => s.includes(teamName));
           if (!session || !tmuxSessions.has(session)) continue;
           issues.push({
@@ -433,7 +433,7 @@ function listTeamTmuxSessions(): Set<string> | null {
   const sessions = (res.stdout || '')
     .split('\n')
     .map((s) => s.trim())
-    .filter((s) => s.startsWith('omx-team-'));
+    .filter((s) => s.startsWith('omcp-team-'));
   return new Set(sessions);
 }
 
@@ -489,12 +489,12 @@ export function checkExploreHarness(
   env: NodeJS.ProcessEnv = process.env,
 ): Check {
   const packageRoot = getPackageRoot();
-  const manifestPath = join(packageRoot, 'crates', 'omx-explore', 'Cargo.toml');
+  const manifestPath = join(packageRoot, 'crates', 'omcp-explore', 'Cargo.toml');
   if (!existsSync(manifestPath)) {
     return {
       name: 'Explore Harness',
       status: 'warn',
-      message: 'Rust harness sources not found in this install (omx explore unavailable until packaged or OMX_EXPLORE_BIN is set)',
+      message: 'Rust harness sources not found in this install (omcp explore unavailable until packaged or OMCP_EXPLORE_BIN is set)',
     };
   }
 
@@ -511,7 +511,7 @@ export function checkExploreHarness(
     return {
       name: 'Explore Harness',
       status: 'warn',
-      message: `OMX_EXPLORE_BIN is set but path was not found (${override})`,
+      message: `OMCP_EXPLORE_BIN is set but path was not found (${override})`,
     };
   }
 
@@ -543,7 +543,7 @@ export function checkExploreHarness(
       return {
         name: 'Explore Harness',
         status: 'warn',
-        message: `Rust harness sources are packaged, but no compatible packaged prebuilt or cargo was found (install Rust or set ${EXPLORE_BIN_ENV} for omx explore)`,
+        message: `Rust harness sources are packaged, but no compatible packaged prebuilt or cargo was found (install Rust or set ${EXPLORE_BIN_ENV} for omcp explore)`,
       };
     }
     return {
@@ -612,24 +612,24 @@ async function checkConfig(configPath: string): Promise<Check> {
       };
     }
 
-    if (hasLegacyOmxTeamRunTable(content)) {
+    if (hasLegacyOmcpTeamRunTable(content)) {
       return {
         name: 'Config',
         status: 'warn',
         message:
-          'retired [mcp_servers.omx_team_run] table still present; run "omx setup --force" to repair the config',
+          'retired [mcp_servers.omcp_team_run] table still present; run "omcp setup --force" to repair the config',
       };
     }
 
-    const hasOmx = content.includes('omx_') || content.includes('oh-my-codex');
-    if (hasOmx) {
-      return { name: 'Config', status: 'pass', message: 'config.toml has OMX entries' };
+    const hasOmcp = content.includes('omcp_') || content.includes('oh-my-copilot');
+    if (hasOmcp) {
+      return { name: 'Config', status: 'pass', message: 'config.toml has OMCP entries' };
     }
 
     return {
       name: 'Config',
       status: 'warn',
-      message: 'config.toml exists but no OMX entries yet (expected before first setup; run "omx setup --force" once)',
+      message: 'config.toml exists but no OMCP entries yet (expected before first setup; run "omcp setup --force" once)',
     };
   } catch {
     return { name: 'Config', status: 'fail', message: 'cannot read config.toml' };
@@ -638,7 +638,7 @@ async function checkConfig(configPath: string): Promise<Check> {
 
 
 async function checkExploreRouting(configPath: string): Promise<Check> {
-  const envValue = process.env[OMX_EXPLORE_CMD_ENV];
+  const envValue = process.env[OMCP_EXPLORE_CMD_ENV];
   if (typeof envValue === 'string' && !isExploreCommandRoutingEnabled(process.env)) {
     return {
       name: 'Explore routing',
@@ -694,12 +694,12 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
     if (existsSync(configPath)) {
       try {
         const configContent = await readFile(configPath, 'utf-8');
-        const hasOmx = configContent.includes('omx_') || configContent.includes('oh-my-codex');
-        if (hasOmx) {
+        const hasOmcp = configContent.includes('omcp_') || configContent.includes('oh-my-copilot');
+        if (hasOmcp) {
           return {
             name: 'Native hooks',
             status: 'warn',
-            message: 'hooks.json not found even though config.toml has OMX entries; run "omx setup --force" to restore native hook coverage',
+            message: 'hooks.json not found even though config.toml has OMCP entries; run "omcp setup --force" to restore native hook coverage',
           };
         }
       } catch {
@@ -722,7 +722,7 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
       return {
         name: 'Native hooks',
         status: 'fail',
-        message: 'invalid hooks.json; Codex may skip OMX hook coverage until "omx setup --force" repairs it',
+        message: 'invalid hooks.json; Codex may skip OMCP hook coverage until "omcp setup --force" repairs it',
       };
     }
 
@@ -731,14 +731,14 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
         name: 'Native hooks',
         status: 'warn',
         message:
-          `hooks.json is missing OMX-managed coverage for ${missingEvents.join(', ')}; run "omx setup --force" to restore native hooks`,
+          `hooks.json is missing OMCP-managed coverage for ${missingEvents.join(', ')}; run "omcp setup --force" to restore native hooks`,
       };
     }
 
     return {
       name: 'Native hooks',
       status: 'pass',
-      message: 'hooks.json includes OMX-managed coverage for all native hook events',
+      message: 'hooks.json includes OMCP-managed coverage for all native hook events',
     };
   } catch {
     return {
@@ -831,7 +831,7 @@ function checkAgentsMd(scope: DoctorSetupScope, codexHomeDir: string): Check {
     return {
       name: 'AGENTS.md',
       status: 'warn',
-      message: `not found in ${userAgentsMd} (run omx setup --scope user)`,
+      message: `not found in ${userAgentsMd} (run omcp setup --scope user)`,
     };
   }
 
@@ -842,7 +842,7 @@ function checkAgentsMd(scope: DoctorSetupScope, codexHomeDir: string): Check {
   return {
     name: 'AGENTS.md',
     status: 'warn',
-    message: 'not found in project root (run omx agents-init . or omx setup --scope project)',
+    message: 'not found in project root (run omcp agents-init . or omcp setup --scope project)',
   };
 }
 
@@ -897,21 +897,21 @@ async function checkMcpServers(configPath: string): Promise<Check> {
     const content = await readFile(configPath, 'utf-8');
     const mcpCount = (content.match(/\[mcp_servers\./g) || []).length;
     if (mcpCount > 0) {
-      if (hasLegacyOmxTeamRunTable(content)) {
+      if (hasLegacyOmcpTeamRunTable(content)) {
         return {
           name: 'MCP Servers',
           status: 'warn',
-          message: `${mcpCount} servers configured, but retired [mcp_servers.omx_team_run] is not supported; run "omx setup --force" to repair the config`,
+          message: `${mcpCount} servers configured, but retired [mcp_servers.omcp_team_run] is not supported; run "omcp setup --force" to repair the config`,
         };
       }
-      const hasOmx = content.includes('omx_state') || content.includes('omx_memory');
-      if (hasOmx) {
-        return { name: 'MCP Servers', status: 'pass', message: `${mcpCount} servers configured (OMX present)` };
+      const hasOmcp = content.includes('omcp_state') || content.includes('omcp_memory');
+      if (hasOmcp) {
+        return { name: 'MCP Servers', status: 'pass', message: `${mcpCount} servers configured (OMCP present)` };
       }
       return {
         name: 'MCP Servers',
         status: 'warn',
-        message: `${mcpCount} servers but no OMX servers yet (expected before first setup; run "omx setup --force" once)`,
+        message: `${mcpCount} servers but no OMCP servers yet (expected before first setup; run "omcp setup --force" once)`,
       };
     }
     return { name: 'MCP Servers', status: 'warn', message: 'no MCP servers configured' };

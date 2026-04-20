@@ -1,3 +1,6 @@
+# Workflows inherited from oh-my-codex; functional behavior re-validated in
+# subsequent sub-projects (#2 onward). Tag/branch triggers retained as-is;
+# npm publish step targets the @moicky scope only.
 name: Release
 
 on:
@@ -41,18 +44,18 @@ jobs:
           const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf-8'));
           const workspace = TOML.parse(fs.readFileSync(path.join(root, 'Cargo.toml'), 'utf-8'));
           const expectedMembers = [
-            'crates/omx-explore',
-            'crates/omx-mux',
-            'crates/omx-runtime-core',
-            'crates/omx-runtime',
-            'crates/omx-sparkshell',
+            'crates/omcp-explore',
+            'crates/omcp-mux',
+            'crates/omcp-runtime-core',
+            'crates/omcp-runtime',
+            'crates/omcp-sparkshell',
           ];
           const manifests = [
-            'crates/omx-explore/Cargo.toml',
-            'crates/omx-runtime-core/Cargo.toml',
-            'crates/omx-mux/Cargo.toml',
-            'crates/omx-runtime/Cargo.toml',
-            'crates/omx-sparkshell/Cargo.toml',
+            'crates/omcp-explore/Cargo.toml',
+            'crates/omcp-runtime-core/Cargo.toml',
+            'crates/omcp-mux/Cargo.toml',
+            'crates/omcp-runtime/Cargo.toml',
+            'crates/omcp-sparkshell/Cargo.toml',
           ];
           const problems = [];
 
@@ -178,7 +181,7 @@ jobs:
             --artifacts-dir release-assets \
             --out release-assets/native-release-manifest.json \
             --release-base-url "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}" \
-            --require-products "omx-explore-harness,omx-sparkshell"
+            --require-products "omcp-explore-harness,omcp-sparkshell"
       - name: Upload release asset bundle for follow-up jobs
         uses: actions/upload-artifact@v4
         with:
@@ -265,18 +268,18 @@ jobs:
           const pkg = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf-8'));
           const workspace = TOML.parse(fs.readFileSync(path.join(root, 'Cargo.toml'), 'utf-8'));
           const expectedMembers = [
-            'crates/omx-explore',
-            'crates/omx-mux',
-            'crates/omx-runtime-core',
-            'crates/omx-runtime',
-            'crates/omx-sparkshell',
+            'crates/omcp-explore',
+            'crates/omcp-mux',
+            'crates/omcp-runtime-core',
+            'crates/omcp-runtime',
+            'crates/omcp-sparkshell',
           ];
           const manifests = [
-            'crates/omx-explore/Cargo.toml',
-            'crates/omx-runtime-core/Cargo.toml',
-            'crates/omx-mux/Cargo.toml',
-            'crates/omx-runtime/Cargo.toml',
-            'crates/omx-sparkshell/Cargo.toml',
+            'crates/omcp-explore/Cargo.toml',
+            'crates/omcp-runtime-core/Cargo.toml',
+            'crates/omcp-mux/Cargo.toml',
+            'crates/omcp-runtime/Cargo.toml',
+            'crates/omcp-sparkshell/Cargo.toml',
           ];
           const problems = [];
 
@@ -308,6 +311,5 @@ jobs:
           console.log(`[version-sync] OK package=${pkg.version} workspace=${workspace.workspace?.package?.version} tag=${tag ?? ''}`.trim());
           EOF
       - run: npm pack --dry-run
-      - run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: Skip npm publish (rebrand-only release)
+        run: echo "npm publish disabled until runtime port (sub-project #2+) lands"

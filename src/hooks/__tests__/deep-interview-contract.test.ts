@@ -149,19 +149,19 @@ describe("deep-interview Ouroboros contract", () => {
 		assert.match(deepInterviewSkill, /Do NOT implement directly/i);
 	});
 
-	it("documents omx question as the required structured questioning path with no fallback", () => {
-		assert.match(deepInterviewSkill, /omx question/i);
+	it("documents omcp question as the required structured questioning path with no fallback", () => {
+		assert.match(deepInterviewSkill, /omcp question/i);
 		assert.match(
 			deepInterviewSkill,
 			/required `AskUserQuestion` equivalent/i,
 		);
 		assert.match(
 			deepInterviewSkill,
-			/requires the OMX question tool rather than falling back to another questioning path/i,
+			/requires the OMCP question tool rather than falling back to another questioning path/i,
 		);
 		assert.doesNotMatch(
 			deepInterviewSkill,
-			/prefer `omx question` when available/i,
+			/prefer `omcp question` when available/i,
 		);
 		assert.doesNotMatch(
 			deepInterviewSkill,
@@ -182,9 +182,9 @@ describe("deep-interview Ouroboros contract", () => {
 		assert.match(deepInterviewSkill, /team verification path/i);
 	});
 
-	it("uses OMX-native output paths", () => {
-		assert.match(deepInterviewSkill, /\.omx\/interviews\//);
-		assert.match(deepInterviewSkill, /\.omx\/specs\//);
+	it("uses OMCP-native output paths", () => {
+		assert.match(deepInterviewSkill, /\.omcp\/interviews\//);
+		assert.match(deepInterviewSkill, /\.omcp\/specs\//);
 	});
 
 	it("requires preflight context intake before interview rounds", () => {
@@ -195,7 +195,7 @@ describe("deep-interview Ouroboros contract", () => {
 		);
 		assert.match(
 			deepInterviewSkill,
-			/\.omx\/context\/\{slug\}-\{timestamp\}\.md/,
+			/\.omcp\/context\/\{slug\}-\{timestamp\}\.md/,
 		);
 		assert.match(deepInterviewSkill, /context_snapshot_path/i);
 	});
@@ -211,7 +211,7 @@ describe("deep-interview Ouroboros contract", () => {
 		assert.match(deepInterviewSkill, /evaluator readiness/i);
 		assert.match(
 			deepInterviewSkill,
-			/\.omx\/specs\/deep-interview-autoresearch-\{slug\}\.md/i,
+			/\.omcp\/specs\/deep-interview-autoresearch-\{slug\}\.md/i,
 		);
 		assert.match(deepInterviewSkill, /Mission Draft/i);
 		assert.match(deepInterviewSkill, /Evaluator Draft/i);
@@ -248,8 +248,8 @@ describe("cross-skill and AGENTS coherence for deep-interview", () => {
 		assert.match(templateAgents, /Socratic deep interview/i);
 	});
 
-	it("makes template AGENTS explicit about omx question for deep-interview", () => {
-		assert.match(templateAgents, /deep-interview is active.*`omx question`/i);
+	it("makes template AGENTS explicit about omcp question for deep-interview", () => {
+		assert.match(templateAgents, /deep-interview is active.*`omcp question`/i);
 		assert.match(templateAgents, /do not substitute `request_user_input` or ad hoc plain-text questioning/i);
 	});
 });

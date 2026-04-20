@@ -9,15 +9,15 @@ import { HUD_TMUX_HEIGHT_LINES } from '../../hud/constants.js';
 
 const CLI_SPAWN_TIMEOUT_MS = 15_000;
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omx.js');
-  const result = spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const result = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     timeout: CLI_SPAWN_TIMEOUT_MS,
@@ -39,9 +39,9 @@ function shouldSkipForSpawnPermissions(err: string): boolean {
   return typeof err === 'string' && /(EPERM|EACCES)/i.test(err);
 }
 
-describe('omx launch fallback when tmux is unavailable', () => {
+describe('omcp launch fallback when tmux is unavailable', () => {
   it('launches codex directly without tmux ENOENT noise', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-launch-fallback-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-launch-fallback-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
@@ -58,15 +58,15 @@ describe('omx launch fallback when tmux is unavailable', () => {
       await writeFile(fakePsPath, '#!/bin/sh\nexit 0\n');
       await chmod(fakePsPath, 0o755);
 
-      const result = runOmx(
+      const result = runOmcp(
         wd,
         ['--xhigh', '--madmax'],
         {
           HOME: home,
           PATH: `${fakeBin}:/usr/bin:/bin`,
-          OMX_AUTO_UPDATE: '0',
-          OMX_NOTIFY_FALLBACK: '0',
-          OMX_HOOK_DERIVED_SIGNALS: '0',
+          OMCP_AUTO_UPDATE: '0',
+          OMCP_NOTIFY_FALLBACK: '0',
+          OMCP_HOOK_DERIVED_SIGNALS: '0',
         },
       );
 
@@ -82,9 +82,9 @@ describe('omx launch fallback when tmux is unavailable', () => {
   });
 });
 
-describe('omx launcher when tmux is available', () => {
+describe('omcp launcher when tmux is available', () => {
   it('launches --madmax through explicitly requested detached tmux so HUD bootstrap can run', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-launch-tmux-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-launch-tmux-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
@@ -140,15 +140,15 @@ exit 0
       );
       await chmod(fakeTmuxPath, 0o755);
 
-      const result = runOmx(
+      const result = runOmcp(
         wd,
         ['--madmax', '--tmux'],
         {
           HOME: home,
           PATH: `${fakeBin}:/usr/bin:/bin`,
-          OMX_AUTO_UPDATE: '0',
-          OMX_NOTIFY_FALLBACK: '0',
-          OMX_HOOK_DERIVED_SIGNALS: '0',
+          OMCP_AUTO_UPDATE: '0',
+          OMCP_NOTIFY_FALLBACK: '0',
+          OMCP_HOOK_DERIVED_SIGNALS: '0',
           TMUX: '',
           TMUX_PANE: '',
         },
@@ -166,7 +166,7 @@ exit 0
   });
 
   it('preserves the requested cwd through detached tmux launch when an unsupported SHELL value falls back away from rc-driven cwd drift', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-launch-tmux-cwd-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-launch-tmux-cwd-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
@@ -236,16 +236,16 @@ exit 0
       );
       await chmod(fakeTmuxPath, 0o755);
 
-      const result = runOmx(
+      const result = runOmcp(
         wd,
         ['--madmax', '--tmux'],
         {
           HOME: home,
           SHELL: '/definitely/missing-shell',
           PATH: `${fakeBin}:/usr/bin:/bin`,
-          OMX_AUTO_UPDATE: '0',
-          OMX_NOTIFY_FALLBACK: '0',
-          OMX_HOOK_DERIVED_SIGNALS: '0',
+          OMCP_AUTO_UPDATE: '0',
+          OMCP_NOTIFY_FALLBACK: '0',
+          OMCP_HOOK_DERIVED_SIGNALS: '0',
           TMUX: '',
           TMUX_PANE: '',
         },
@@ -263,7 +263,7 @@ exit 0
   });
 
   it('falls back to /bin/sh for detached tmux launch when SHELL drifts to an unsupported path', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-launch-tmux-shell-fallback-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-launch-tmux-shell-fallback-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
@@ -331,16 +331,16 @@ exit 0
       );
       await chmod(fakeTmuxPath, 0o755);
 
-      const result = runOmx(
+      const result = runOmcp(
         wd,
         ['--madmax', '--tmux'],
         {
           HOME: home,
           SHELL: '/bin/not-a-real-shell',
           PATH: `${fakeBin}:/usr/bin:/bin`,
-          OMX_AUTO_UPDATE: '0',
-          OMX_NOTIFY_FALLBACK: '0',
-          OMX_HOOK_DERIVED_SIGNALS: '0',
+          OMCP_AUTO_UPDATE: '0',
+          OMCP_NOTIFY_FALLBACK: '0',
+          OMCP_HOOK_DERIVED_SIGNALS: '0',
           TMUX: '',
           TMUX_PANE: '',
         },

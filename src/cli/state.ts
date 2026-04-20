@@ -1,6 +1,6 @@
 import { executeStateOperation, type StateOperationName } from '../state/operations.js';
 
-const STATE_HELP = `Usage: omx state <read|write|clear|list-active|get-status> [--input <json>] [--json]\n\nExamples:\n  omx state read --input '{"mode":"ralph"}' --json\n  omx state write --input '{"mode":"ralph","active":true,"current_phase":"executing"}' --json\n  omx state clear --input '{"mode":"ralph","all_sessions":true}' --json\n  omx state list-active --json\n  omx state get-status --input '{"mode":"ralph"}' --json`;
+const STATE_HELP = `Usage: omcp state <read|write|clear|list-active|get-status> [--input <json>] [--json]\n\nExamples:\n  omcp state read --input '{"mode":"ralph"}' --json\n  omcp state write --input '{"mode":"ralph","active":true,"current_phase":"executing"}' --json\n  omcp state clear --input '{"mode":"ralph","all_sessions":true}' --json\n  omcp state list-active --json\n  omcp state get-status --input '{"mode":"ralph"}' --json`;
 
 const STATE_OPERATION_MAP: Record<string, StateOperationName> = {
   read: 'state_read',

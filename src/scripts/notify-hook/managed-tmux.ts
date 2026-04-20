@@ -20,9 +20,9 @@ export function buildExpectedManagedTmuxSessionName(cwd: string, sessionId: stri
   const dirName = basename(cwd);
   const grandparentPath = dirname(parentPath);
   const grandparentDir = basename(grandparentPath);
-  const repoDir = parentDir.endsWith('.omx-worktrees')
-    ? parentDir.slice(0, -'.omx-worktrees'.length)
-    : parentDir === 'worktrees' && grandparentDir === '.omx'
+  const repoDir = parentDir.endsWith('.omcp-worktrees')
+    ? parentDir.slice(0, -'.omcp-worktrees'.length)
+    : parentDir === 'worktrees' && grandparentDir === '.omcp'
       ? basename(dirname(grandparentPath))
       : null;
   const dirToken = repoDir
@@ -41,8 +41,8 @@ export function buildExpectedManagedTmuxSessionName(cwd: string, sessionId: stri
   } catch {
     // best effort only
   }
-  const sessionToken = sanitizeTmuxToken(sessionId.replace(/^omx-/, ''));
-  const name = `omx-${dirToken}-${branchToken}-${sessionToken}`;
+  const sessionToken = sanitizeTmuxToken(sessionId.replace(/^omcp-/, ''));
+  const name = `omcp-${dirToken}-${branchToken}-${sessionToken}`;
   return name.length > 120 ? name.slice(0, 120) : name;
 }
 
@@ -50,7 +50,7 @@ export function resolveInvocationSessionId(payload: any): string {
   return safeString(
     payload?.session_id
     || payload?.['session-id']
-    || process.env.OMX_SESSION_ID
+    || process.env.OMCP_SESSION_ID
     || process.env.CODEX_SESSION_ID
     || process.env.SESSION_ID
     || '',
@@ -112,7 +112,7 @@ function processHasAncestorPid(targetPid: number, currentPid = process.pid): boo
 }
 
 export async function resolveManagedSessionContext(cwd: string, payload: any, { allowTeamWorker = true } = {}): Promise<any> {
-  if (allowTeamWorker && safeString(process.env.OMX_TEAM_WORKER || '').trim() !== '') {
+  if (allowTeamWorker && safeString(process.env.OMCP_TEAM_WORKER || '').trim() !== '') {
     return {
       managed: true,
       reason: 'team_worker',
@@ -207,7 +207,7 @@ export async function resolveManagedSessionContext(cwd: string, payload: any, { 
   }
 }
 
-export async function isManagedOmxSession(cwd: string, payload: any, options: { allowTeamWorker?: boolean } = {}): Promise<boolean> {
+export async function isManagedOmcpSession(cwd: string, payload: any, options: { allowTeamWorker?: boolean } = {}): Promise<boolean> {
   const context = await resolveManagedSessionContext(cwd, payload, options);
   return context.managed === true;
 }
@@ -265,20 +265,20 @@ async function readManagedPaneCommandState(paneTarget: string): Promise<{ curren
 }
 
 function paneLooksLikeManagedAgent({ currentCommand, startCommand }: { currentCommand: string; startCommand: string }): boolean {
-  if (/\bomx\b.*\bhud\b.*--watch/i.test(startCommand)) return false;
+  if (/\bomcp\b.*\bhud\b.*--watch/i.test(startCommand)) return false;
   if (startCommand.includes('codex')) return true;
   return currentCommand === 'codex' || currentCommand === 'node' || currentCommand === 'npx';
 }
 
 function paneLooksLikeRetainableManagedAnchor({ currentCommand, startCommand }: { currentCommand: string; startCommand: string }): boolean {
-  if (/\bomx\b.*\bhud\b.*--watch/i.test(startCommand)) return false;
+  if (/\bomcp\b.*\bhud\b.*--watch/i.test(startCommand)) return false;
   if (currentCommand === 'codex') return true;
   if ((currentCommand === 'node' || currentCommand === 'npx') && startCommand.includes('codex')) return true;
   return false;
 }
 
 function paneLooksLikeDetachedManagedWrapperFallback({ currentCommand, startCommand }: { currentCommand: string; startCommand: string }): boolean {
-  if (/\bomx\b.*\bhud\b.*--watch/i.test(startCommand)) return false;
+  if (/\bomcp\b.*\bhud\b.*--watch/i.test(startCommand)) return false;
   return currentCommand === 'node' || currentCommand === 'npx';
 }
 
@@ -310,7 +310,7 @@ function selectManagedSessionPane(
   rows: ManagedSessionPaneRow[],
   { allowWrapperFallback = false }: { allowWrapperFallback?: boolean } = {},
 ): string {
-  const nonHudRows = rows.filter((row) => !/\bomx\b.*\bhud\b.*--watch/i.test(row.startCommand));
+  const nonHudRows = rows.filter((row) => !/\bomcp\b.*\bhud\b.*--watch/i.test(row.startCommand));
   const canonicalRows = nonHudRows.filter((row) => paneLooksLikeRetainableManagedAnchor(row));
   const activeCanonical = canonicalRows.find((row) => row.active);
   if (activeCanonical) return activeCanonical.paneId;

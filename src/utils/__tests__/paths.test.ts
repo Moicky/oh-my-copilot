@@ -13,18 +13,18 @@ import {
   legacyUserSkillsDir,
   listInstalledSkillDirectories,
   detectLegacySkillRootOverlap,
-  omxStateDir,
-  omxProjectMemoryPath,
-  omxNotepadPath,
-  omxPlansDir,
-  omxAdaptersDir,
-  omxLogsDir,
+  omcpStateDir,
+  omcpProjectMemoryPath,
+  omcpNotepadPath,
+  omcpPlansDir,
+  omcpAdaptersDir,
+  omcpLogsDir,
   packageRoot,
-  OMX_ENTRY_PATH_ENV,
-  OMX_STARTUP_CWD_ENV,
-  rememberOmxLaunchContext,
-  resolveOmxCliEntryPath,
-  resolveOmxEntryPath,
+  OMCP_ENTRY_PATH_ENV,
+  OMCP_STARTUP_CWD_ENV,
+  rememberOmcpLaunchContext,
+  resolveOmcpCliEntryPath,
+  resolveOmcpEntryPath,
 } from "../paths.js";
 
 describe("codexHome", () => {
@@ -188,9 +188,9 @@ describe("legacyUserSkillsDir", () => {
   });
 });
 
-describe("omxAdaptersDir", () => {
-  it("returns .omx/adapters under the project root", () => {
-    assert.equal(omxAdaptersDir("/my/project"), join("/my/project", ".omx", "adapters"));
+describe("omcpAdaptersDir", () => {
+  it("returns .omcp/adapters under the project root", () => {
+    assert.equal(omcpAdaptersDir("/my/project"), join("/my/project", ".omcp", "adapters"));
   });
 });
 
@@ -226,8 +226,8 @@ describe("listInstalledSkillDirectories", () => {
   });
 
   it("deduplicates by skill name and prefers project skills over user skills", async () => {
-    const projectRoot = await mkdtemp(join(tmpdir(), "omx-paths-project-"));
-    const codexHomeRoot = await mkdtemp(join(tmpdir(), "omx-paths-codex-"));
+    const projectRoot = await mkdtemp(join(tmpdir(), "omcp-paths-project-"));
+    const codexHomeRoot = await mkdtemp(join(tmpdir(), "omcp-paths-codex-"));
     process.env.CODEX_HOME = codexHomeRoot;
 
     try {
@@ -271,7 +271,7 @@ describe("listInstalledSkillDirectories", () => {
     }
   });
   it("detects overlapping legacy and canonical user skill roots including content mismatches", async () => {
-    const homeRoot = await mkdtemp(join(tmpdir(), "omx-paths-home-"));
+    const homeRoot = await mkdtemp(join(tmpdir(), "omcp-paths-home-"));
     const codexHomeRoot = join(homeRoot, ".codex");
     const legacyRoot = join(homeRoot, ".agents", "skills");
     process.env.HOME = homeRoot;
@@ -309,7 +309,7 @@ describe("listInstalledSkillDirectories", () => {
   });
 
   it("treats a legacy link to canonical skills as the same resolved target", async () => {
-    const homeRoot = await mkdtemp(join(tmpdir(), "omx-paths-linked-home-"));
+    const homeRoot = await mkdtemp(join(tmpdir(), "omcp-paths-linked-home-"));
     const codexHomeRoot = join(homeRoot, ".codex");
     const canonicalSkillsRoot = join(codexHomeRoot, "skills");
     const legacyParent = join(homeRoot, ".agents");
@@ -344,59 +344,59 @@ describe("listInstalledSkillDirectories", () => {
   });
 });
 
-describe("omxStateDir", () => {
+describe("omcpStateDir", () => {
   it("uses provided projectRoot", () => {
-    assert.equal(omxStateDir("/my/project"), join("/my/project", ".omx", "state"));
+    assert.equal(omcpStateDir("/my/project"), join("/my/project", ".omcp", "state"));
   });
 
   it("defaults to cwd when no projectRoot given", () => {
-    assert.equal(omxStateDir(), join(process.cwd(), ".omx", "state"));
+    assert.equal(omcpStateDir(), join(process.cwd(), ".omcp", "state"));
   });
 });
 
-describe("omxProjectMemoryPath", () => {
+describe("omcpProjectMemoryPath", () => {
   it("uses provided projectRoot", () => {
     assert.equal(
-      omxProjectMemoryPath("/my/project"),
-      join("/my/project", ".omx", "project-memory.json"),
+      omcpProjectMemoryPath("/my/project"),
+      join("/my/project", ".omcp", "project-memory.json"),
     );
   });
 
   it("defaults to cwd when no projectRoot given", () => {
     assert.equal(
-      omxProjectMemoryPath(),
-      join(process.cwd(), ".omx", "project-memory.json"),
+      omcpProjectMemoryPath(),
+      join(process.cwd(), ".omcp", "project-memory.json"),
     );
   });
 });
 
-describe("omxNotepadPath", () => {
+describe("omcpNotepadPath", () => {
   it("uses provided projectRoot", () => {
-    assert.equal(omxNotepadPath("/my/project"), join("/my/project", ".omx", "notepad.md"));
+    assert.equal(omcpNotepadPath("/my/project"), join("/my/project", ".omcp", "notepad.md"));
   });
 
   it("defaults to cwd when no projectRoot given", () => {
-    assert.equal(omxNotepadPath(), join(process.cwd(), ".omx", "notepad.md"));
+    assert.equal(omcpNotepadPath(), join(process.cwd(), ".omcp", "notepad.md"));
   });
 });
 
-describe("omxPlansDir", () => {
+describe("omcpPlansDir", () => {
   it("uses provided projectRoot", () => {
-    assert.equal(omxPlansDir("/my/project"), join("/my/project", ".omx", "plans"));
+    assert.equal(omcpPlansDir("/my/project"), join("/my/project", ".omcp", "plans"));
   });
 
   it("defaults to cwd when no projectRoot given", () => {
-    assert.equal(omxPlansDir(), join(process.cwd(), ".omx", "plans"));
+    assert.equal(omcpPlansDir(), join(process.cwd(), ".omcp", "plans"));
   });
 });
 
-describe("omxLogsDir", () => {
+describe("omcpLogsDir", () => {
   it("uses provided projectRoot", () => {
-    assert.equal(omxLogsDir("/my/project"), join("/my/project", ".omx", "logs"));
+    assert.equal(omcpLogsDir("/my/project"), join("/my/project", ".omcp", "logs"));
   });
 
   it("defaults to cwd when no projectRoot given", () => {
-    assert.equal(omxLogsDir(), join(process.cwd(), ".omx", "logs"));
+    assert.equal(omcpLogsDir(), join(process.cwd(), ".omcp", "logs"));
   });
 });
 
@@ -407,38 +407,38 @@ describe("packageRoot", () => {
   });
 });
 
-describe("OMX launcher path resolution", () => {
-  const originalEntryPath = process.env[OMX_ENTRY_PATH_ENV];
-  const originalStartupCwd = process.env[OMX_STARTUP_CWD_ENV];
+describe("OMCP launcher path resolution", () => {
+  const originalEntryPath = process.env[OMCP_ENTRY_PATH_ENV];
+  const originalStartupCwd = process.env[OMCP_STARTUP_CWD_ENV];
 
   afterEach(() => {
     if (typeof originalEntryPath === "string") {
-      process.env[OMX_ENTRY_PATH_ENV] = originalEntryPath;
+      process.env[OMCP_ENTRY_PATH_ENV] = originalEntryPath;
     } else {
-      delete process.env[OMX_ENTRY_PATH_ENV];
+      delete process.env[OMCP_ENTRY_PATH_ENV];
     }
     if (typeof originalStartupCwd === "string") {
-      process.env[OMX_STARTUP_CWD_ENV] = originalStartupCwd;
+      process.env[OMCP_STARTUP_CWD_ENV] = originalStartupCwd;
     } else {
-      delete process.env[OMX_STARTUP_CWD_ENV];
+      delete process.env[OMCP_STARTUP_CWD_ENV];
     }
   });
 
   it("resolves relative launcher paths against the recorded startup cwd", async () => {
-    const startupCwd = await mkdtemp(join(tmpdir(), "omx-launcher-start-"));
-    const laterCwd = await mkdtemp(join(tmpdir(), "omx-launcher-later-"));
+    const startupCwd = await mkdtemp(join(tmpdir(), "omcp-launcher-start-"));
+    const laterCwd = await mkdtemp(join(tmpdir(), "omcp-launcher-later-"));
     try {
       const launcherDir = join(startupCwd, "dist", "cli");
-      const launcherPath = join(launcherDir, "omx.js");
+      const launcherPath = join(launcherDir, "omcp.js");
       await mkdir(launcherDir, { recursive: true });
       await writeFile(launcherPath, "#!/usr/bin/env node\n", "utf-8");
 
-      const resolved = resolveOmxEntryPath({
-        argv1: "dist/cli/omx.js",
+      const resolved = resolveOmcpEntryPath({
+        argv1: "dist/cli/omcp.js",
         cwd: laterCwd,
         env: {
           ...process.env,
-          [OMX_STARTUP_CWD_ENV]: startupCwd,
+          [OMCP_STARTUP_CWD_ENV]: startupCwd,
         },
       });
 
@@ -450,47 +450,47 @@ describe("OMX launcher path resolution", () => {
   });
 
   it("records launcher context once so later cwd changes keep the absolute entry path", async () => {
-    const startupCwd = await mkdtemp(join(tmpdir(), "omx-launcher-record-"));
+    const startupCwd = await mkdtemp(join(tmpdir(), "omcp-launcher-record-"));
     try {
       const launcherDir = join(startupCwd, "dist", "cli");
-      const launcherPath = join(launcherDir, "omx.js");
+      const launcherPath = join(launcherDir, "omcp.js");
       await mkdir(launcherDir, { recursive: true });
       await writeFile(launcherPath, "#!/usr/bin/env node\n", "utf-8");
 
-      delete process.env[OMX_ENTRY_PATH_ENV];
-      delete process.env[OMX_STARTUP_CWD_ENV];
-      rememberOmxLaunchContext({
-        argv1: "dist/cli/omx.js",
+      delete process.env[OMCP_ENTRY_PATH_ENV];
+      delete process.env[OMCP_STARTUP_CWD_ENV];
+      rememberOmcpLaunchContext({
+        argv1: "dist/cli/omcp.js",
         cwd: startupCwd,
         env: process.env,
       });
 
-      assert.equal(process.env[OMX_STARTUP_CWD_ENV], startupCwd);
-      assert.equal(process.env[OMX_ENTRY_PATH_ENV], launcherPath);
+      assert.equal(process.env[OMCP_STARTUP_CWD_ENV], startupCwd);
+      assert.equal(process.env[OMCP_ENTRY_PATH_ENV], launcherPath);
     } finally {
       await rm(startupCwd, { recursive: true, force: true });
     }
   });
 
   it("falls back to the packaged CLI entry when argv1 points at a non-CLI script", async () => {
-    const startupCwd = await mkdtemp(join(tmpdir(), "omx-launcher-cli-fallback-start-"));
-    const packageRootDir = await mkdtemp(join(tmpdir(), "omx-launcher-cli-fallback-root-"));
+    const startupCwd = await mkdtemp(join(tmpdir(), "omcp-launcher-cli-fallback-start-"));
+    const packageRootDir = await mkdtemp(join(tmpdir(), "omcp-launcher-cli-fallback-root-"));
     try {
       const hookDir = join(startupCwd, "dist", "scripts");
       const hookPath = join(hookDir, "codex-native-hook.js");
       const cliDir = join(packageRootDir, "dist", "cli");
-      const cliPath = join(cliDir, "omx.js");
+      const cliPath = join(cliDir, "omcp.js");
       await mkdir(hookDir, { recursive: true });
       await mkdir(cliDir, { recursive: true });
       await writeFile(hookPath, "#!/usr/bin/env node\n", "utf-8");
       await writeFile(cliPath, "#!/usr/bin/env node\n", "utf-8");
 
-      const resolved = resolveOmxCliEntryPath({
+      const resolved = resolveOmcpCliEntryPath({
         argv1: "dist/scripts/codex-native-hook.js",
         cwd: startupCwd,
         env: {
           ...process.env,
-          [OMX_STARTUP_CWD_ENV]: startupCwd,
+          [OMCP_STARTUP_CWD_ENV]: startupCwd,
         },
         packageRootDir,
       });
@@ -503,19 +503,19 @@ describe("OMX launcher path resolution", () => {
   });
 
   it("keeps the resolved path when argv1 already points at the CLI entry", async () => {
-    const startupCwd = await mkdtemp(join(tmpdir(), "omx-launcher-cli-direct-start-"));
+    const startupCwd = await mkdtemp(join(tmpdir(), "omcp-launcher-cli-direct-start-"));
     try {
       const cliDir = join(startupCwd, "dist", "cli");
-      const cliPath = join(cliDir, "omx.js");
+      const cliPath = join(cliDir, "omcp.js");
       await mkdir(cliDir, { recursive: true });
       await writeFile(cliPath, "#!/usr/bin/env node\n", "utf-8");
 
-      const resolved = resolveOmxCliEntryPath({
-        argv1: "dist/cli/omx.js",
+      const resolved = resolveOmcpCliEntryPath({
+        argv1: "dist/cli/omcp.js",
         cwd: startupCwd,
         env: {
           ...process.env,
-          [OMX_STARTUP_CWD_ENV]: startupCwd,
+          [OMCP_STARTUP_CWD_ENV]: startupCwd,
         },
       });
 
@@ -525,23 +525,23 @@ describe("OMX launcher path resolution", () => {
     }
   });
 
-  it("falls back from a non-OMX host binary to the packaged CLI entry", async () => {
-    const startupCwd = await mkdtemp(join(tmpdir(), "omx-launcher-cli-host-start-"));
-    const packageRootDir = await mkdtemp(join(tmpdir(), "omx-launcher-cli-host-root-"));
+  it("falls back from a non-OMCP host binary to the packaged CLI entry", async () => {
+    const startupCwd = await mkdtemp(join(tmpdir(), "omcp-launcher-cli-host-start-"));
+    const packageRootDir = await mkdtemp(join(tmpdir(), "omcp-launcher-cli-host-root-"));
     try {
       const hostPath = join(startupCwd, "codex-host");
       const cliDir = join(packageRootDir, "dist", "cli");
-      const cliPath = join(cliDir, "omx.js");
+      const cliPath = join(cliDir, "omcp.js");
       await writeFile(hostPath, "#!/usr/bin/env node\n", "utf-8");
       await mkdir(cliDir, { recursive: true });
       await writeFile(cliPath, "#!/usr/bin/env node\n", "utf-8");
 
-      const resolved = resolveOmxCliEntryPath({
+      const resolved = resolveOmcpCliEntryPath({
         argv1: hostPath,
         cwd: startupCwd,
         env: {
           ...process.env,
-          [OMX_STARTUP_CWD_ENV]: startupCwd,
+          [OMCP_STARTUP_CWD_ENV]: startupCwd,
         },
         packageRootDir,
       });

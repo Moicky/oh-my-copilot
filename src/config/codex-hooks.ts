@@ -71,17 +71,17 @@ export function buildManagedCodexHooksConfig(
       PreToolUse: [
         buildCommandHook(command, {
           matcher: "Bash",
-          statusMessage: "Running OMX Bash preflight",
+          statusMessage: "Running OMCP Bash preflight",
         }),
       ],
       PostToolUse: [
         buildCommandHook(command, {
-          statusMessage: "Running OMX tool review",
+          statusMessage: "Running OMCP tool review",
         }),
       ],
       UserPromptSubmit: [
         buildCommandHook(command, {
-          statusMessage: "Applying OMX prompt routing",
+          statusMessage: "Applying OMCP prompt routing",
         }),
       ],
       Stop: [
@@ -109,7 +109,7 @@ export function parseCodexHooksConfig(
   }
 }
 
-function isOmxManagedHookCommand(command: string): boolean {
+function isOmcpManagedHookCommand(command: string): boolean {
   return /(?:^|[\\/])codex-native-hook\.js(?:["'\s]|$)/.test(command);
 }
 
@@ -122,7 +122,7 @@ function countManagedHooksInEntry(entry: unknown): number {
     return isPlainObject(hook)
       && hook.type === "command"
       && typeof hook.command === "string"
-      && isOmxManagedHookCommand(hook.command);
+      && isOmcpManagedHookCommand(hook.command);
   }).length;
 }
 
@@ -153,7 +153,7 @@ function stripManagedHooksFromEntry(entry: unknown): {
     return !(
       hook.type === "command" &&
       typeof hook.command === "string" &&
-      isOmxManagedHookCommand(hook.command)
+      isOmcpManagedHookCommand(hook.command)
     );
   });
 

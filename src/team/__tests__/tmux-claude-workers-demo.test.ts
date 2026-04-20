@@ -29,7 +29,7 @@ describe('tmux claude workers demo', () => {
 
       // Verify via resolveTeamWorkerCliPlan
       const plan = resolveTeamWorkerCliPlan(workerCount, [], {
-        OMX_TEAM_WORKER_CLI_MAP: entries.join(','),
+        OMCP_TEAM_WORKER_CLI_MAP: entries.join(','),
       });
 
       assert.deepEqual(plan, ['codex', 'codex', 'codex', 'claude', 'claude', 'claude']);
@@ -48,7 +48,7 @@ describe('tmux claude workers demo', () => {
       assert.deepEqual(entries, ['codex', 'codex', 'codex', 'claude', 'claude']);
 
       const plan = resolveTeamWorkerCliPlan(workerCount, [], {
-        OMX_TEAM_WORKER_CLI_MAP: entries.join(','),
+        OMCP_TEAM_WORKER_CLI_MAP: entries.join(','),
       });
 
       assert.deepEqual(plan, ['codex', 'codex', 'codex', 'claude', 'claude']);
@@ -161,7 +161,7 @@ describe('tmux claude workers demo', () => {
     it('creates correct launch specs for all workers in demo', () => {
       const workerCount = 6;
       const teamName = 'tmux-claude-workers-demo';
-      const cwd = '/home/bellman/Workspace/oh-my-codex';
+      const cwd = '/home/bellman/Workspace/oh-my-copilot';
       const launchArgs = ['--model', 'gpt-5.3-codex-spark', '-c', 'model_reasoning_effort="low"'];
 
       // Build CLI map like demo script does
@@ -171,7 +171,7 @@ describe('tmux claude workers demo', () => {
       ).join(',');
 
       const plan = resolveTeamWorkerCliPlan(workerCount, launchArgs, {
-        OMX_TEAM_WORKER_CLI_MAP: cliMap,
+        OMCP_TEAM_WORKER_CLI_MAP: cliMap,
       });
 
       // Verify plan matches expected distribution
@@ -186,16 +186,16 @@ describe('tmux claude workers demo', () => {
           i,
           launchArgs,
           cwd,
-          { OMX_TEAM_STATE_ROOT: `${cwd}/.omx/state` },
+          { OMCP_TEAM_STATE_ROOT: `${cwd}/.omcp/state` },
           workerCli,
         );
 
         // Common assertions for all workers
         assert.equal(spec.workerCli, workerCli);
-        assert.equal(spec.env.OMX_TEAM_WORKER, `${teamName}/worker-${i}`);
-        assert.ok(spec.env.OMX_LEADER_NODE_PATH, 'OMX_LEADER_NODE_PATH must be set');
-        assert.ok(spec.env.OMX_LEADER_CLI_PATH, 'OMX_LEADER_CLI_PATH must be set');
-        assert.equal(spec.env.OMX_TEAM_STATE_ROOT, `${cwd}/.omx/state`);
+        assert.equal(spec.env.OMCP_TEAM_WORKER, `${teamName}/worker-${i}`);
+        assert.ok(spec.env.OMCP_LEADER_NODE_PATH, 'OMCP_LEADER_NODE_PATH must be set');
+        assert.ok(spec.env.OMCP_LEADER_CLI_PATH, 'OMCP_LEADER_CLI_PATH must be set');
+        assert.equal(spec.env.OMCP_TEAM_STATE_ROOT, `${cwd}/.omcp/state`);
 
         // CLI-specific assertions
         if (workerCli === 'claude') {
@@ -233,7 +233,7 @@ describe('tmux claude workers demo', () => {
   describe('edge cases for mixed worker teams', () => {
     it('handles single worker with claude', () => {
       const plan = resolveTeamWorkerCliPlan(1, [], {
-        OMX_TEAM_WORKER_CLI_MAP: 'claude',
+        OMCP_TEAM_WORKER_CLI_MAP: 'claude',
       });
 
       assert.deepEqual(plan, ['claude']);
@@ -245,7 +245,7 @@ describe('tmux claude workers demo', () => {
 
     it('handles single worker with codex', () => {
       const plan = resolveTeamWorkerCliPlan(1, [], {
-        OMX_TEAM_WORKER_CLI_MAP: 'codex',
+        OMCP_TEAM_WORKER_CLI_MAP: 'codex',
       });
 
       assert.deepEqual(plan, ['codex']);
@@ -253,7 +253,7 @@ describe('tmux claude workers demo', () => {
 
     it('handles single worker with gemini', () => {
       const plan = resolveTeamWorkerCliPlan(1, [], {
-        OMX_TEAM_WORKER_CLI_MAP: 'gemini',
+        OMCP_TEAM_WORKER_CLI_MAP: 'gemini',
       });
       assert.deepEqual(plan, ['gemini']);
 
@@ -264,21 +264,21 @@ describe('tmux claude workers demo', () => {
 
     it('rejects invalid CLI map with empty entries', () => {
       assert.throws(
-        () => resolveTeamWorkerCliPlan(3, [], { OMX_TEAM_WORKER_CLI_MAP: 'codex,,claude' }),
+        () => resolveTeamWorkerCliPlan(3, [], { OMCP_TEAM_WORKER_CLI_MAP: 'codex,,claude' }),
         /Empty entries are not allowed/,
       );
     });
 
     it('rejects CLI map with wrong length', () => {
       assert.throws(
-        () => resolveTeamWorkerCliPlan(3, [], { OMX_TEAM_WORKER_CLI_MAP: 'codex,claude' }),
+        () => resolveTeamWorkerCliPlan(3, [], { OMCP_TEAM_WORKER_CLI_MAP: 'codex,claude' }),
         /expected 1 or 3/,
       );
     });
 
     it('auto entries in CLI map resolve from launch args', () => {
       const plan = resolveTeamWorkerCliPlan(2, ['--model', 'claude-sonnet'], {
-        OMX_TEAM_WORKER_CLI_MAP: 'auto,auto',
+        OMCP_TEAM_WORKER_CLI_MAP: 'auto,auto',
       });
 
       // Both should resolve to claude based on launch args

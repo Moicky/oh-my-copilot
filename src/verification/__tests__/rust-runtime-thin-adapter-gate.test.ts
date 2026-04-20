@@ -12,8 +12,8 @@ describe('rust runtime thin-adapter gate artifacts', () => {
     const contract = readFileSync(contractPath, 'utf-8');
     assert.match(contract, /Rust core is the single semantic owner/);
     assert.match(contract, /Compatibility artifacts/);
-    assert.match(contract, /omx team status/);
-    assert.match(contract, /omx doctor --team/);
+    assert.match(contract, /omcp team status/);
+    assert.match(contract, /omcp doctor --team/);
     assert.match(contract, /HUD readers/);
   });
 

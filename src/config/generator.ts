@@ -1,6 +1,6 @@
 /**
- * Config.toml generator/merger for oh-my-codex
- * Merges OMX MCP server entries and feature flags into existing config.toml
+ * Config.toml generator/merger for oh-my-copilot
+ * Merges OMCP MCP server entries and feature flags into existing config.toml
  *
  * TOML structure reminder: bare key=value pairs after a [table] header belong
  * to that table.  Top-level (root-table) keys MUST appear before the first
@@ -31,11 +31,11 @@ function escapeTomlString(value: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Top-level OMX keys (must live before any [table] header)
+// Top-level OMCP keys (must live before any [table] header)
 // ---------------------------------------------------------------------------
 
 /** Keys we own at the TOML root level. Used for upsert + strip. */
-const OMX_TOP_LEVEL_KEYS = [
+const OMCP_TOP_LEVEL_KEYS = [
   "notify",
   "model_reasoning_effort",
   "developer_instructions",
@@ -44,20 +44,20 @@ const OMX_TOP_LEVEL_KEYS = [
 const DEFAULT_SETUP_MODEL = DEFAULT_FRONTIER_MODEL;
 const DEFAULT_SETUP_MODEL_CONTEXT_WINDOW = 1000000;
 const DEFAULT_SETUP_MODEL_AUTO_COMPACT_TOKEN_LIMIT = 900000;
-const SHARED_MCP_REGISTRY_MARKER = "oh-my-codex (OMX) Shared MCP Registry Sync";
+const SHARED_MCP_REGISTRY_MARKER = "oh-my-copilot (OMCP) Shared MCP Registry Sync";
 const SHARED_MCP_REGISTRY_END_MARKER =
-  "# End oh-my-codex shared MCP registry sync";
-const OMX_AGENTS_MAX_THREADS = 6;
-const OMX_AGENTS_MAX_DEPTH = 2;
-const OMX_EXPLORE_ROUTING_DEFAULT = '1';
-const OMX_EXPLORE_CMD_ENV = 'USE_OMX_EXPLORE_CMD';
+  "# End oh-my-copilot shared MCP registry sync";
+const OMCP_AGENTS_MAX_THREADS = 6;
+const OMCP_AGENTS_MAX_DEPTH = 2;
+const OMCP_EXPLORE_ROUTING_DEFAULT = '1';
+const OMCP_EXPLORE_CMD_ENV = 'USE_OMX_EXPLORE_CMD';
 const DEFAULT_LAUNCHER_MCP_STARTUP_TIMEOUT_SEC = 15;
-const OMX_TUI_STATUS_LINE =
+const OMCP_TUI_STATUS_LINE =
   'status_line = ["model-with-reasoning", "git-branch", "context-remaining", "total-input-tokens", "total-output-tokens", "five-hour-limit", "weekly-limit"]';
 const LEGACY_OMX_TEAM_RUN_TABLE_PATTERN =
-  /^\s*\[mcp_servers\.(?:"omx_team_run"|omx_team_run)\]\s*$/m;
+  /^\s*\[mcp_servers\.(?:"omcp_team_run"|omcp_team_run)\]\s*$/m;
 
-export function hasLegacyOmxTeamRunTable(config: string): boolean {
+export function hasLegacyOmcpTeamRunTable(config: string): boolean {
   return LEGACY_OMX_TEAM_RUN_TABLE_PATTERN.test(config);
 }
 
@@ -81,7 +81,7 @@ function parseRootKeyValues(config: string): Map<string, string> {
   return values;
 }
 
-function getOmxTopLevelLines(
+function getOmcpTopLevelLines(
   pkgRoot: string,
   existingConfig = "",
   modelOverride?: string,
@@ -91,10 +91,10 @@ function getOmxTopLevelLines(
   const rootValues = parseRootKeyValues(existingConfig);
 
   const lines = [
-    "# oh-my-codex top-level settings (must be before any [table])",
+    "# oh-my-copilot top-level settings (must be before any [table])",
     `notify = ["node", "${escapedPath}"]`,
     'model_reasoning_effort = "high"',
-    `developer_instructions = "You have oh-my-codex installed. AGENTS.md is your orchestration brain and the main orchestration surface. Use skill/keyword routing like $name plus spawned role-specialized subagents for specialized work. Codex native subagents are available via .codex/agents and may be used for independent parallel subtasks within a single session or team pane. Skills are loaded from installed SKILL.md files under .codex/skills, not from native agent TOMLs. Use workflow skills via $name when explicitly invoked or clearly routed by AGENTS.md. Treat installed prompts as narrower internal execution surfaces under AGENTS.md authority, even when user-facing docs prefer $name keywords."`,
+    `developer_instructions = "You have oh-my-copilot installed. AGENTS.md is your orchestration brain and the main orchestration surface. Use skill/keyword routing like $name plus spawned role-specialized subagents for specialized work. Codex native subagents are available via .codex/agents and may be used for independent parallel subtasks within a single session or team pane. Skills are loaded from installed SKILL.md files under .codex/skills, not from native agent TOMLs. Use workflow skills via $name when explicitly invoked or clearly routed by AGENTS.md. Treat installed prompts as narrower internal execution surfaces under AGENTS.md authority, even when user-facing docs prefer $name keywords."`,
   ];
 
   const existingModel = rootValues.get("model");
@@ -126,13 +126,13 @@ function stripRootLevelKeys(config: string, keys: readonly string[]): string {
 
   if (
     keys.some((key) =>
-      OMX_TOP_LEVEL_KEYS.includes(key as (typeof OMX_TOP_LEVEL_KEYS)[number]),
+      OMCP_TOP_LEVEL_KEYS.includes(key as (typeof OMCP_TOP_LEVEL_KEYS)[number]),
     )
   ) {
     lines = lines.filter(
       (l) =>
         l.trim() !==
-        "# oh-my-codex top-level settings (must be before any [table])",
+        "# oh-my-copilot top-level settings (must be before any [table])",
     );
   }
 
@@ -166,11 +166,11 @@ function stripOrphanedManagedNotify(config: string): string {
 }
 
 /**
- * Remove any existing OMX-owned top-level keys so we can re-insert them
+ * Remove any existing OMCP-owned top-level keys so we can re-insert them
  * cleanly. Also removes the comment line that precedes them.
  */
-export function stripOmxTopLevelKeys(config: string): string {
-  return stripRootLevelKeys(config, OMX_TOP_LEVEL_KEYS);
+export function stripOmcpTopLevelKeys(config: string): string {
+  return stripRootLevelKeys(config, OMCP_TOP_LEVEL_KEYS);
 }
 
 // ---------------------------------------------------------------------------
@@ -258,7 +258,7 @@ function upsertEnvSettings(config: string): string {
     const base = config.trimEnd();
     const envBlock = [
       "[env]",
-      `${OMX_EXPLORE_CMD_ENV} = "${OMX_EXPLORE_ROUTING_DEFAULT}"`,
+      `${OMCP_EXPLORE_CMD_ENV} = "${OMCP_EXPLORE_ROUTING_DEFAULT}"`,
       "",
     ].join("\n");
     if (base.length === 0) return envBlock;
@@ -275,7 +275,7 @@ function upsertEnvSettings(config: string): string {
 
   let exploreRoutingIdx = -1;
   for (let i = envStart + 1; i < sectionEnd; i++) {
-    if (new RegExp(`^\\s*${OMX_EXPLORE_CMD_ENV}\\s*=`).test(lines[i])) {
+    if (new RegExp(`^\\s*${OMCP_EXPLORE_CMD_ENV}\\s*=`).test(lines[i])) {
       exploreRoutingIdx = i;
       break;
     }
@@ -285,7 +285,7 @@ function upsertEnvSettings(config: string): string {
     lines.splice(
       sectionEnd,
       0,
-      `${OMX_EXPLORE_CMD_ENV} = "${OMX_EXPLORE_ROUTING_DEFAULT}"`,
+      `${OMCP_EXPLORE_CMD_ENV} = "${OMCP_EXPLORE_ROUTING_DEFAULT}"`,
     );
   }
 
@@ -302,8 +302,8 @@ function upsertAgentsSettings(config: string): string {
     const base = config.trimEnd();
     const agentsBlock = [
       "[agents]",
-      `max_threads = ${OMX_AGENTS_MAX_THREADS}`,
-      `max_depth = ${OMX_AGENTS_MAX_DEPTH}`,
+      `max_threads = ${OMCP_AGENTS_MAX_THREADS}`,
+      `max_depth = ${OMCP_AGENTS_MAX_DEPTH}`,
       "",
     ].join("\n");
     if (base.length === 0) return agentsBlock;
@@ -329,21 +329,21 @@ function upsertAgentsSettings(config: string): string {
   }
 
   if (maxThreadsIdx < 0) {
-    lines.splice(sectionEnd, 0, `max_threads = ${OMX_AGENTS_MAX_THREADS}`);
+    lines.splice(sectionEnd, 0, `max_threads = ${OMCP_AGENTS_MAX_THREADS}`);
     sectionEnd += 1;
   }
   if (maxDepthIdx < 0) {
-    lines.splice(sectionEnd, 0, `max_depth = ${OMX_AGENTS_MAX_DEPTH}`);
+    lines.splice(sectionEnd, 0, `max_depth = ${OMCP_AGENTS_MAX_DEPTH}`);
   }
 
   return lines.join("\n");
 }
 
 /**
- * Remove OMX-owned feature flags from the [features] section.
+ * Remove OMCP-owned feature flags from the [features] section.
  * If the section becomes empty after removal, remove the section header too.
  */
-export function stripOmxFeatureFlags(config: string): string {
+export function stripOmcpFeatureFlags(config: string): string {
   const lines = config.split(/\r?\n/);
   const featuresStart = lines.findIndex((line) =>
     /^\s*\[features\]\s*$/.test(line),
@@ -359,14 +359,14 @@ export function stripOmxFeatureFlags(config: string): string {
     }
   }
 
-  const omxFlags = ["multi_agent", "child_agents_md", "codex_hooks", "collab"];
+  const omcpFlags = ["multi_agent", "child_agents_md", "codex_hooks", "collab"];
   const filtered: string[] = [];
   for (let i = 0; i < lines.length; i++) {
     if (i > featuresStart && i < sectionEnd) {
-      const isOmxFlag = omxFlags.some((f) =>
+      const isOmcpFlag = omcpFlags.some((f) =>
         new RegExp(`^\\s*${f}\\s*=`).test(lines[i]),
       );
-      if (isOmxFlag) continue;
+      if (isOmcpFlag) continue;
     }
     filtered.push(lines[i]);
   }
@@ -392,7 +392,7 @@ export function stripOmxFeatureFlags(config: string): string {
   return filtered.join("\n");
 }
 
-export function stripOmxEnvSettings(config: string): string {
+export function stripOmcpEnvSettings(config: string): string {
   const lines = config.split(/\r?\n/);
   const envStart = lines.findIndex((line) => /^\s*\[env\]\s*$/.test(line));
 
@@ -409,10 +409,10 @@ export function stripOmxEnvSettings(config: string): string {
   const filtered: string[] = [];
   for (let i = 0; i < lines.length; i++) {
     if (i > envStart && i < sectionEnd) {
-      const isOmxEnvKey = new RegExp(
-        `^\\s*${OMX_EXPLORE_CMD_ENV}\\s*=`,
+      const isOmcpEnvKey = new RegExp(
+        `^\\s*${OMCP_EXPLORE_CMD_ENV}\\s*=`,
       ).test(lines[i]);
-      if (isOmxEnvKey) continue;
+      if (isOmcpEnvKey) continue;
     }
     filtered.push(lines[i]);
   }
@@ -436,14 +436,14 @@ export function stripOmxEnvSettings(config: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Orphaned OMX table sections (no marker block)
+// Orphaned OMCP table sections (no marker block)
 // ---------------------------------------------------------------------------
 
 /**
- * Check whether a TOML table name belongs to a legacy OMX-managed agent entry.
+ * Check whether a TOML table name belongs to a legacy OMCP-managed agent entry.
  * Handles both `agents.name` and `agents."name"` forms.
  */
-function isLegacyOmxAgentSection(tableName: string): boolean {
+function isLegacyOmcpAgentSection(tableName: string): boolean {
   const m = tableName.match(/^agents\.(?:"([^"]+)"|(\w[\w-]*))$/);
   if (!m) return false;
   const name = m[1] || m[2] || "";
@@ -451,13 +451,13 @@ function isLegacyOmxAgentSection(tableName: string): boolean {
 }
 
 /**
- * Strip OMX-owned table sections that exist outside the marker block.
+ * Strip OMCP-owned table sections that exist outside the marker block.
  * This covers legacy configs that were written before markers were added,
  * or configs where the marker was accidentally removed.
  *
- * Targets: [mcp_servers.omx_*], legacy [agents.<name>] entries, [tui]
+ * Targets: [mcp_servers.omcp_*], legacy [agents.<name>] entries, [tui]
  */
-function stripOrphanedOmxSections(config: string): string {
+function stripOrphanedOmcpSections(config: string): string {
   const lines = config.split(/\r?\n/);
   const result: string[] = [];
 
@@ -469,17 +469,17 @@ function stripOrphanedOmxSections(config: string): string {
     if (tableMatch) {
       const tableName = tableMatch[1];
       // Note: [tui] is NOT stripped here because it could be user-owned.
-      // The marker-based stripExistingOmxBlocks already handles [tui]
-      // when it lives inside the OMX marker block.
-      const isOmxSection =
-        /^mcp_servers\.omx_/.test(tableName) ||
-        isLegacyOmxAgentSection(tableName);
+      // The marker-based stripExistingOmcpBlocks already handles [tui]
+      // when it lives inside the OMCP marker block.
+      const isOmcpSection =
+        /^mcp_servers\.omcp_/.test(tableName) ||
+        isLegacyOmcpAgentSection(tableName);
 
-      if (isOmxSection) {
-        // Remove preceding OMX comment lines and blank lines
+      if (isOmcpSection) {
+        // Remove preceding OMCP comment lines and blank lines
         while (result.length > 0) {
           const last = result[result.length - 1];
-          if (last.trim() === "" || /^#\s*(OMX|oh-my-codex)/i.test(last)) {
+          if (last.trim() === "" || /^#\s*(OMCP|oh-my-copilot)/i.test(last)) {
             result.pop();
           } else {
             break;
@@ -546,7 +546,7 @@ function upsertTuiStatusLine(config: string): {
     }
   }
 
-  const mergedSection = ["[tui]", ...preservedKeyLines, OMX_TUI_STATUS_LINE];
+  const mergedSection = ["[tui]", ...preservedKeyLines, OMCP_TUI_STATUS_LINE];
   const firstStart = sections[0].start;
   const rebuilt: string[] = [];
 
@@ -574,15 +574,15 @@ function upsertTuiStatusLine(config: string): {
 }
 
 // ---------------------------------------------------------------------------
-// OMX [table] sections block (appended at end of file)
+// OMCP [table] sections block (appended at end of file)
 // ---------------------------------------------------------------------------
 
-export function stripExistingOmxBlocks(config: string): {
+export function stripExistingOmcpBlocks(config: string): {
   cleaned: string;
   removed: number;
 } {
-  const marker = "oh-my-codex (OMX) Configuration";
-  const endMarker = "# End oh-my-codex";
+  const marker = "oh-my-copilot (OMCP) Configuration";
+  const endMarker = "# End oh-my-copilot";
   let cleaned = config;
   let removed = 0;
 
@@ -727,7 +727,7 @@ function findLauncherTimeoutRepairTargets(
     const mcpServers = (parsed as { mcp_servers?: Record<string, unknown> })
       .mcp_servers;
     const [name, value] = Object.entries(mcpServers ?? {})[0] ?? [];
-    if (!name || name.startsWith("omx_") || typeof value !== "object" || !value) {
+    if (!name || name.startsWith("omcp_") || typeof value !== "object" || !value) {
       start = end - 1;
       continue;
     }
@@ -796,7 +796,7 @@ function getSharedMcpRegistryBlock(
   const lines = [
     "# ============================================================",
     `# ${SHARED_MCP_REGISTRY_MARKER}`,
-    "# Managed by omx setup - edit the registry file instead",
+    "# Managed by omcp setup - edit the registry file instead",
   ];
   if (sourcePath) {
     lines.push(`# Source: ${sourcePath}`);
@@ -828,10 +828,10 @@ function getSharedMcpRegistryBlock(
 }
 
 /**
- * OMX table-section block (MCP servers, TUI).
+ * OMCP table-section block (MCP servers, TUI).
  * Contains ONLY [table] sections — no bare keys.
  */
-function getOmxTablesBlock(pkgRoot: string, includeTui = true): string {
+function getOmcpTablesBlock(pkgRoot: string, includeTui = true): string {
   const stateServerPath = escapeTomlString(
     join(pkgRoot, "dist", "mcp", "state-server.js"),
   );
@@ -851,40 +851,40 @@ function getOmxTablesBlock(pkgRoot: string, includeTui = true): string {
   return [
     "",
     "# ============================================================",
-    "# oh-my-codex (OMX) Configuration",
-    "# Managed by omx setup - manual edits preserved on next setup",
+    "# oh-my-copilot (OMCP) Configuration",
+    "# Managed by omcp setup - manual edits preserved on next setup",
     "# ============================================================",
     "",
-    "# OMX State Management MCP Server",
-    "[mcp_servers.omx_state]",
+    "# OMCP State Management MCP Server",
+    "[mcp_servers.omcp_state]",
     'command = "node"',
     `args = ["${stateServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 5",
     "",
-    "# OMX Project Memory MCP Server",
-    "[mcp_servers.omx_memory]",
+    "# OMCP Project Memory MCP Server",
+    "[mcp_servers.omcp_memory]",
     'command = "node"',
     `args = ["${memoryServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 5",
     "",
-    "# OMX Code Intelligence MCP Server (LSP diagnostics, AST search)",
-    "[mcp_servers.omx_code_intel]",
+    "# OMCP Code Intelligence MCP Server (LSP diagnostics, AST search)",
+    "[mcp_servers.omcp_code_intel]",
     'command = "node"',
     `args = ["${codeIntelServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 10",
     "",
-    "# OMX Trace MCP Server (agent flow timeline & statistics)",
-    "[mcp_servers.omx_trace]",
+    "# OMCP Trace MCP Server (agent flow timeline & statistics)",
+    "[mcp_servers.omcp_trace]",
     'command = "node"',
     `args = ["${traceServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 5",
     "",
-    "# OMX Wiki MCP Server (persistent project knowledge base)",
-    "[mcp_servers.omx_wiki]",
+    "# OMCP Wiki MCP Server (persistent project knowledge base)",
+    "[mcp_servers.omcp_wiki]",
     'command = "node"',
     `args = ["${wikiServerPath}"]`,
     "enabled = true",
@@ -892,14 +892,14 @@ function getOmxTablesBlock(pkgRoot: string, includeTui = true): string {
     ...(includeTui
       ? [
           "",
-          "# OMX TUI StatusLine (Codex CLI v0.101.0+)",
+          "# OMCP TUI StatusLine (Codex CLI v0.101.0+)",
           "[tui]",
-          OMX_TUI_STATUS_LINE,
+          OMCP_TUI_STATUS_LINE,
           "",
         ]
       : []),
     "# ============================================================",
-    "# End oh-my-codex",
+    "# End oh-my-copilot",
     "",
   ].join("\n");
 }
@@ -909,15 +909,15 @@ function getOmxTablesBlock(pkgRoot: string, includeTui = true): string {
 // ---------------------------------------------------------------------------
 
 /**
- * Merge OMX config into existing config.toml
- * Preserves existing user settings, appends OMX block if not present.
+ * Merge OMCP config into existing config.toml
+ * Preserves existing user settings, appends OMCP block if not present.
  *
  * Layout:
- *   1. OMX top-level keys (notify, model_reasoning_effort, developer_instructions)
+ *   1. OMCP top-level keys (notify, model_reasoning_effort, developer_instructions)
  *   2. [features] with multi_agent + child_agents_md
  *   3. [env] with defaulted explore-routing opt-in
  *   4. … user sections …
- *   5. OMX [table] sections (mcp_servers, tui)
+ *   5. OMCP [table] sections (mcp_servers, tui)
  */
 export function buildMergedConfig(
   existingConfig: string,
@@ -927,8 +927,8 @@ export function buildMergedConfig(
   let existing = existingConfig;
   const includeTui = options.includeTui !== false;
 
-  if (existing.includes("oh-my-codex (OMX) Configuration")) {
-    const stripped = stripExistingOmxBlocks(existing);
+  if (existing.includes("oh-my-copilot (OMCP) Configuration")) {
+    const stripped = stripExistingOmcpBlocks(existing);
     existing = stripped.cleaned;
   }
   if (existing.includes(SHARED_MCP_REGISTRY_MARKER)) {
@@ -936,12 +936,12 @@ export function buildMergedConfig(
     existing = stripped.cleaned;
   }
 
-  existing = stripOmxTopLevelKeys(existing);
+  existing = stripOmcpTopLevelKeys(existing);
   existing = stripOrphanedManagedNotify(existing);
   if (options.modelOverride) {
     existing = stripRootLevelKeys(existing, ["model"]);
   }
-  existing = stripOrphanedOmxSections(existing);
+  existing = stripOrphanedOmcpSections(existing);
   existing = upsertFeatureFlags(existing);
   existing = upsertEnvSettings(existing);
   existing = upsertAgentsSettings(existing);
@@ -950,12 +950,12 @@ export function buildMergedConfig(
     : { cleaned: existing, hadExistingTui: false };
   existing = tuiUpsert.cleaned;
 
-  const topLines = getOmxTopLevelLines(
+  const topLines = getOmcpTopLevelLines(
     pkgRoot,
     existing,
     options.modelOverride,
   );
-  const tablesBlock = getOmxTablesBlock(
+  const tablesBlock = getOmcpTablesBlock(
     pkgRoot,
     includeTui && !tuiUpsert.hadExistingTui,
   );
@@ -978,10 +978,10 @@ export function buildMergedConfig(
 /**
  * Detect and repair upgrade-era managed config incompatibilities in config.toml.
  *
- * After an omx version upgrade the OLD setup code (still loaded in memory)
+ * After an omcp version upgrade the OLD setup code (still loaded in memory)
  * may leave a config with duplicate [tui] sections or the retired
- * [mcp_servers.omx_team_run] table. Codex rejects duplicate tables and newer
- * OMX builds no longer ship the team MCP entrypoint, so we repair both before
+ * [mcp_servers.omcp_team_run] table. Codex rejects duplicate tables and newer
+ * OMCP builds no longer ship the team MCP entrypoint, so we repair both before
  * the CLI is spawned.
  *
  * Returns `true` if a repair was performed.
@@ -995,7 +995,7 @@ export async function repairConfigIfNeeded(
 
   const content = await readFile(configPath, "utf-8");
   const tuiCount = (content.match(/^\s*\[tui\]\s*$/gm) || []).length;
-  const hasLegacyTeamRunTable = hasLegacyOmxTeamRunTable(content);
+  const hasLegacyTeamRunTable = hasLegacyOmcpTeamRunTable(content);
   const hasLauncherTimeoutGap = findLauncherTimeoutRepairTargets(content).length > 0;
   if (tuiCount <= 1 && !hasLegacyTeamRunTable && !hasLauncherTimeoutGap) return false;
 
@@ -1017,10 +1017,10 @@ export async function mergeConfig(
     existing = await readFile(configPath, "utf-8");
   }
 
-  if (existing.includes("oh-my-codex (OMX) Configuration")) {
-    const stripped = stripExistingOmxBlocks(existing);
+  if (existing.includes("oh-my-copilot (OMCP) Configuration")) {
+    const stripped = stripExistingOmcpBlocks(existing);
     if (options.verbose && stripped.removed > 0) {
-      console.log("  Updating existing OMX config block.");
+      console.log("  Updating existing OMCP config block.");
     }
   }
 

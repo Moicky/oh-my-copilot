@@ -1,8 +1,8 @@
 import { spawn } from 'node:child_process';
-import { resolveOmxCliEntryPath } from '../utils/paths.js';
+import { resolveOmcpCliEntryPath } from '../utils/paths.js';
 import type { QuestionAnswer, QuestionInput } from './types.js';
 
-export interface OmxQuestionSuccessPayload {
+export interface OmcpQuestionSuccessPayload {
   ok: true;
   question_id: string;
   session_id?: string;
@@ -10,7 +10,7 @@ export interface OmxQuestionSuccessPayload {
   answer: QuestionAnswer;
 }
 
-export interface OmxQuestionErrorPayload {
+export interface OmcpQuestionErrorPayload {
   ok: false;
   question_id?: string;
   session_id?: string;
@@ -20,30 +20,30 @@ export interface OmxQuestionErrorPayload {
   };
 }
 
-export type OmxQuestionPayload = OmxQuestionSuccessPayload | OmxQuestionErrorPayload;
+export type OmcpQuestionPayload = OmcpQuestionSuccessPayload | OmcpQuestionErrorPayload;
 
-export interface OmxQuestionClientOptions {
+export interface OmcpQuestionClientOptions {
   cwd?: string;
   env?: NodeJS.ProcessEnv;
   argv1?: string | null;
-  runner?: OmxQuestionProcessRunner;
+  runner?: OmcpQuestionProcessRunner;
 }
 
-export interface OmxQuestionProcessResult {
+export interface OmcpQuestionProcessResult {
   code: number | null;
   stdout: string;
   stderr: string;
 }
 
-export type OmxQuestionProcessRunner = (
+export type OmcpQuestionProcessRunner = (
   command: string,
   args: string[],
   options: { cwd: string; env: NodeJS.ProcessEnv },
-) => Promise<OmxQuestionProcessResult>;
+) => Promise<OmcpQuestionProcessResult>;
 
-export class OmxQuestionError extends Error {
+export class OmcpQuestionError extends Error {
   readonly code: string;
-  readonly payload?: OmxQuestionErrorPayload;
+  readonly payload?: OmcpQuestionErrorPayload;
   readonly stdout: string;
   readonly stderr: string;
   readonly exitCode: number | null;
@@ -52,14 +52,14 @@ export class OmxQuestionError extends Error {
     code: string,
     message: string,
     options: {
-      payload?: OmxQuestionErrorPayload;
+      payload?: OmcpQuestionErrorPayload;
       stdout?: string;
       stderr?: string;
       exitCode?: number | null;
     } = {},
   ) {
     super(`${code}: ${message}`);
-    this.name = 'OmxQuestionError';
+    this.name = 'OmcpQuestionError';
     this.code = code;
     this.payload = options.payload;
     this.stdout = options.stdout ?? '';
@@ -68,11 +68,11 @@ export class OmxQuestionError extends Error {
   }
 }
 
-export async function defaultOmxQuestionProcessRunner(
+export async function defaultOmcpQuestionProcessRunner(
   command: string,
   args: string[],
   options: { cwd: string; env: NodeJS.ProcessEnv },
-): Promise<OmxQuestionProcessResult> {
+): Promise<OmcpQuestionProcessResult> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       cwd: options.cwd,
@@ -93,10 +93,10 @@ export async function defaultOmxQuestionProcessRunner(
   });
 }
 
-function parseQuestionStdout(stdout: string, stderr: string, exitCode: number | null): OmxQuestionPayload {
+function parseQuestionStdout(stdout: string, stderr: string, exitCode: number | null): OmcpQuestionPayload {
   const trimmed = stdout.trim();
   if (!trimmed) {
-    throw new OmxQuestionError('question_no_stdout', 'omx question did not emit a JSON response on stdout.', {
+    throw new OmcpQuestionError('question_no_stdout', 'omcp question did not emit a JSON response on stdout.', {
       stdout,
       stderr,
       exitCode,
@@ -104,37 +104,37 @@ function parseQuestionStdout(stdout: string, stderr: string, exitCode: number | 
   }
 
   try {
-    return JSON.parse(trimmed) as OmxQuestionPayload;
+    return JSON.parse(trimmed) as OmcpQuestionPayload;
   } catch (error) {
-    throw new OmxQuestionError(
+    throw new OmcpQuestionError(
       'question_invalid_stdout',
-      `omx question emitted invalid JSON on stdout: ${(error as Error).message}`,
+      `omcp question emitted invalid JSON on stdout: ${(error as Error).message}`,
       { stdout, stderr, exitCode },
     );
   }
 }
 
-export async function runOmxQuestion(
+export async function runOmcpQuestion(
   input: Partial<QuestionInput> & { question: string },
-  options: OmxQuestionClientOptions = {},
-): Promise<OmxQuestionSuccessPayload> {
+  options: OmcpQuestionClientOptions = {},
+): Promise<OmcpQuestionSuccessPayload> {
   const cwd = options.cwd ?? process.cwd();
   const env = options.env ?? process.env;
-  const omxBin = resolveOmxCliEntryPath({ argv1: options.argv1, cwd, env });
-  if (!omxBin) {
-    throw new OmxQuestionError('question_cli_not_found', 'Could not resolve the omx CLI entrypoint for blocking question execution.');
+  const omcpBin = resolveOmcpCliEntryPath({ argv1: options.argv1, cwd, env });
+  if (!omcpBin) {
+    throw new OmcpQuestionError('question_cli_not_found', 'Could not resolve the omcp CLI entrypoint for blocking question execution.');
   }
 
-  const runner = options.runner ?? defaultOmxQuestionProcessRunner;
+  const runner = options.runner ?? defaultOmcpQuestionProcessRunner;
   const result = await runner(
     process.execPath,
-    [omxBin, 'question', '--json', '--input', JSON.stringify(input)],
+    [omcpBin, 'question', '--json', '--input', JSON.stringify(input)],
     { cwd, env },
   );
   const payload = parseQuestionStdout(result.stdout, result.stderr, result.code);
 
   if (!payload.ok) {
-    throw new OmxQuestionError(payload.error.code, payload.error.message, {
+    throw new OmcpQuestionError(payload.error.code, payload.error.message, {
       payload,
       stdout: result.stdout,
       stderr: result.stderr,
@@ -143,9 +143,9 @@ export async function runOmxQuestion(
   }
 
   if (result.code !== 0) {
-    throw new OmxQuestionError(
+    throw new OmcpQuestionError(
       'question_nonzero_exit',
-      `omx question returned an answer but exited with code ${result.code}.`,
+      `omcp question returned an answer but exited with code ${result.code}.`,
       { stdout: result.stdout, stderr: result.stderr, exitCode: result.code },
     );
   }

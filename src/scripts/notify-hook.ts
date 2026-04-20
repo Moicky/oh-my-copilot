@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * oh-my-codex Notification Hook
+ * oh-my-copilot Notification Hook
  * Codex CLI fires this after each agent turn via the `notify` config.
  * Receives JSON payload as the last argv argument.
  *
@@ -47,7 +47,7 @@ import {
   isDeepInterviewInputLockActive,
   syncSkillStateFromTurn,
 } from './notify-hook/auto-nudge.js';
-import { isManagedOmxSession } from './notify-hook/managed-tmux.js';
+import { isManagedOmcpSession } from './notify-hook/managed-tmux.js';
 import { logNotifyHookEvent } from './notify-hook/log.js';
 import { reconcileRalphSessionResume } from './notify-hook/ralph-session-resume.js';
 import { sendPaneInput } from './notify-hook/team-tmux-guard.js';
@@ -179,22 +179,22 @@ async function main() {
   const isTurnComplete = isTurnCompletePayload(payload);
 
   // Team worker detection via environment variable
-  const teamWorkerEnv = process.env.OMX_TEAM_WORKER; // e.g., "fix-ts/worker-1"
+  const teamWorkerEnv = process.env.OMCP_TEAM_WORKER; // e.g., "fix-ts/worker-1"
   const parsedTeamWorker = parseTeamWorkerEnv(teamWorkerEnv);
   const isTeamWorker = !!parsedTeamWorker;
 
   const stateDir = (isTeamWorker && parsedTeamWorker)
     ? await resolveTeamStateDirForWorker(cwd, parsedTeamWorker)
-    : join(cwd, '.omx', 'state');
-  const logsDir = join(cwd, '.omx', 'logs');
-  const omxDir = join(cwd, '.omx');
-  let currentOmxSessionId = '';
-  const getEffectiveSessionId = () => currentOmxSessionId || payloadSessionId;
+    : join(cwd, '.omcp', 'state');
+  const logsDir = join(cwd, '.omcp', 'logs');
+  const omcpDir = join(cwd, '.omcp');
+  let currentOmcpSessionId = '';
+  const getEffectiveSessionId = () => currentOmcpSessionId || payloadSessionId;
 
   // Ensure directories exist
   await mkdir(logsDir, { recursive: true }).catch(() => {});
   await mkdir(stateDir, { recursive: true }).catch(() => {});
-  currentOmxSessionId = await readCurrentSessionId(stateDir).catch(() => '') || '';
+  currentOmcpSessionId = await readCurrentSessionId(stateDir).catch(() => '') || '';
 
   // Turn-level dedupe prevents double-processing when native notify and fallback
   // watcher both emit the same completed turn.
@@ -277,13 +277,13 @@ async function main() {
         payloadSessionId,
         payloadThreadId,
       });
-      currentOmxSessionId = resumeResult.currentOmxSessionId;
+      currentOmcpSessionId = resumeResult.currentOmcpSessionId;
       if (resumeResult.resumed || resumeResult.updatedCurrentOwner) {
         await logNotifyHookEvent(logsDir, {
           timestamp: new Date().toISOString(),
           type: 'ralph_session_resume',
           reason: resumeResult.reason,
-          current_omx_session_id: resumeResult.currentOmxSessionId || null,
+          current_omcp_session_id: resumeResult.currentOmcpSessionId || null,
           payload_codex_session_id: payloadSessionId || null,
           source_path: resumeResult.sourcePath || null,
           target_path: resumeResult.targetPath || null,
@@ -363,7 +363,7 @@ async function main() {
 
   // 3. Track subagent metrics (lead session only)
   if (!isTeamWorker) {
-    const metricsPath = join(omxDir, 'metrics.json');
+    const metricsPath = join(omcpDir, 'metrics.json');
     try {
       let metrics = {
         total_turns: 0,
@@ -434,7 +434,7 @@ async function main() {
     }
   }
 
-  // 4. Write HUD state summary for `omx hud` (lead session only)
+  // 4. Write HUD state summary for `omcp hud` (lead session only)
   if (!isTeamWorker) {
     try {
       const scopedSessionId = getEffectiveSessionId();
@@ -554,7 +554,7 @@ async function main() {
       input_messages: normalizeInputMessages(payload),
       output_preview: outputPreview,
       native_session_id: payloadSessionId || null,
-      omx_session_id: sessionIdForHooks || null,
+      omcp_session_id: sessionIdForHooks || null,
       ...readRepositoryMetadata(cwd),
       session_name: resolveOperationalSessionName(cwd, sessionIdForHooks),
       project_path: cwd,
@@ -577,7 +577,7 @@ async function main() {
         errorSummary: signal.error_summary,
         extra: {
           native_session_id: payloadSessionId || null,
-          omx_session_id: sessionIdForHooks || null,
+          omcp_session_id: sessionIdForHooks || null,
           source_event: safeString(payload.type || 'agent-turn-complete'),
         },
       }), {
@@ -696,13 +696,13 @@ async function main() {
   }
 
   // 10. Code simplifier: delegate recently modified files for simplification.
-  //     Opt-in via ~/.omx/config.json: { "codeSimplifier": { "enabled": true } }
+  //     Opt-in via ~/.omcp/config.json: { "codeSimplifier": { "enabled": true } }
   if (!isTeamWorker) {
     try {
       const { processCodeSimplifier } = await import('../hooks/code-simplifier/index.js');
       const csResult = processCodeSimplifier(cwd, stateDir);
       if (csResult.triggered) {
-        const managedSession = await isManagedOmxSession(cwd, payload, { allowTeamWorker: false });
+        const managedSession = await isManagedOmcpSession(cwd, payload, { allowTeamWorker: false });
         if (!managedSession) {
           const { logTmuxHookEvent } = await import('./notify-hook/log.js');
           await logTmuxHookEvent(logsDir, {

@@ -1,5 +1,5 @@
 /**
- * AGENTS.md Runtime Overlay for oh-my-codex
+ * AGENTS.md Runtime Overlay for oh-my-copilot
  *
  * Dynamically injects session-specific context into AGENTS.md before Codex
  * launches, then strips it after session ends. Uses marker-bounded sections
@@ -20,8 +20,8 @@ import { existsSync } from "fs";
 import {
   codexHome,
   listInstalledSkillDirectories,
-  omxNotepadPath,
-  omxProjectMemoryPath,
+  omcpNotepadPath,
+  omcpProjectMemoryPath,
   packageRoot,
 } from "../utils/paths.js";
 import {
@@ -41,17 +41,17 @@ import {
   readVisibleSkillActiveState,
 } from "../state/skill-active.js";
 
-const START_MARKER = "<!-- OMX:RUNTIME:START -->";
-const END_MARKER = "<!-- OMX:RUNTIME:END -->";
-const WORKER_START_MARKER = "<!-- OMX:TEAM:WORKER:START -->";
-const WORKER_END_MARKER = "<!-- OMX:TEAM:WORKER:END -->";
+const START_MARKER = "<!-- OMCP:RUNTIME:START -->";
+const END_MARKER = "<!-- OMCP:RUNTIME:END -->";
+const WORKER_START_MARKER = "<!-- OMCP:TEAM:WORKER:START -->";
+const WORKER_END_MARKER = "<!-- OMCP:TEAM:WORKER:END -->";
 const MAX_OVERLAY_SIZE = 3500;
 const SKILL_REFERENCE_PATTERN = /\/skills\/([^/\s`]+)\/SKILL\.md\b/g;
 
 // ── Lock helpers ─────────────────────────────────────────────────────────────
 
 function lockPath(cwd: string): string {
-  return join(cwd, ".omx", "state", "agents-md.lock");
+  return join(cwd, ".omcp", "state", "agents-md.lock");
 }
 
 async function acquireLock(
@@ -264,7 +264,7 @@ async function readActiveModes(
 }
 
 async function readNotepadPriority(cwd: string): Promise<string> {
-  const notePath = omxNotepadPath(cwd);
+  const notePath = omcpNotepadPath(cwd);
   if (!existsSync(notePath)) return "";
 
   try {
@@ -284,7 +284,7 @@ async function readNotepadPriority(cwd: string): Promise<string> {
 }
 
 async function readProjectMemorySummary(cwd: string): Promise<string> {
-  const memPath = omxProjectMemoryPath(cwd);
+  const memPath = omcpProjectMemoryPath(cwd);
   if (!existsSync(memPath)) return "";
 
   try {
@@ -463,7 +463,7 @@ export async function generateOverlay(
 
     sections.push({
       key: "ralph_planning_gate",
-      text: `**Ralph Ralplan-First Gate:** ${gateStatus}\n- Requirement: complete planning artifacts before implementation/tool execution.\n- ${details}\n- Path: \`.omx/plans/\``,
+      text: `**Ralph Ralplan-First Gate:** ${gateStatus}\n- Requirement: complete planning artifacts before implementation/tool execution.\n- ${details}\n- Path: \`.omcp/plans/\``,
       optional: false,
     });
   }

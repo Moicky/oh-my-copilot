@@ -5,8 +5,8 @@ import {
 	slugifyMissionName,
 } from "../autoresearch/contracts.js";
 import {
-	OmxQuestionError,
-	type OmxQuestionSuccessPayload,
+	OmcpQuestionError,
+	type OmcpQuestionSuccessPayload,
 } from "../question/client.js";
 import { evaluateQuestionPolicy } from "../question/policy.js";
 import type { QuestionType } from "../question/types.js";
@@ -52,7 +52,7 @@ export interface AutoresearchStructuredQuestionInput {
 
 export type AutoresearchStructuredQuestionAsker = (
 	input: AutoresearchStructuredQuestionInput,
-) => Promise<OmxQuestionSuccessPayload>;
+) => Promise<OmcpQuestionSuccessPayload>;
 
 function createQuestionIO(): AutoresearchQuestionIO {
 	const rl = createInterface({ input: process.stdin, output: process.stdout });
@@ -172,14 +172,14 @@ async function ensureStructuredQuestionFallbackAllowed(
 ): Promise<void> {
 	const policy = await evaluateQuestionPolicy({ cwd: repoRoot });
 	if (policy.allowed || policy.fallbackAllowed !== false) return;
-	throw new OmxQuestionError(
+	throw new OmcpQuestionError(
 		policy.code ?? "question_policy_denied",
-		policy.message ?? "Structured questions are unavailable in the current OMX workflow context.",
+		policy.message ?? "Structured questions are unavailable in the current OMCP workflow context.",
 	);
 }
 
 function shouldFallbackFromStructuredQuestion(error: unknown): boolean {
-	if (error instanceof OmxQuestionError) {
+	if (error instanceof OmcpQuestionError) {
 		if (
 			error.code === "worker_blocked"
 			|| error.code === "team_blocked"
@@ -191,7 +191,7 @@ function shouldFallbackFromStructuredQuestion(error: unknown): boolean {
 	}
 
 	const message = error instanceof Error ? error.message : String(error);
-	return /omx question/i.test(message);
+	return /omcp question/i.test(message);
 }
 
 function ensureLaunchReadyEvaluator(command: string): void {
@@ -216,8 +216,8 @@ export function buildAutoresearchDeepInterviewPrompt(
 		"$deep-interview --autoresearch",
 		"Run the deep-interview skill in autoresearch mode for `$autoresearch`.",
 		"Guide the user through research topic definition, evaluator readiness, keep policy, and slug/session naming.",
-		"Do not launch tmux or run `omx autoresearch` yourself; direct CLI launch is deprecated. Hand off to `$autoresearch` after confirmation.",
-		"When the user confirms launch and the evaluator is concrete, write/update these canonical artifacts under `.omx/specs/`:",
+		"Do not launch tmux or run `omcp autoresearch` yourself; direct CLI launch is deprecated. Hand off to `$autoresearch` after confirmation.",
+		"When the user confirms launch and the evaluator is concrete, write/update these canonical artifacts under `.omcp/specs/`:",
 		"- `deep-interview-autoresearch-{slug}.md`",
 		"- `autoresearch-{slug}/mission.md`",
 		"- `autoresearch-{slug}/sandbox.md`",
@@ -324,7 +324,7 @@ export async function runAutoresearchNoviceBridge(
 			if (!warnedAboutStructuredQuestionFallback) {
 				warnedAboutStructuredQuestionFallback = true;
 				console.warn(
-					`[omx] warning: structured question UI unavailable (${error instanceof Error ? error.message : String(error)}). Falling back to plain terminal prompts.`,
+					`[omcp] warning: structured question UI unavailable (${error instanceof Error ? error.message : String(error)}). Falling back to plain terminal prompts.`,
 				);
 			}
 			return operation();
@@ -343,7 +343,7 @@ export async function runAutoresearchNoviceBridge(
 			const evaluatorIntent = await withStructuredQuestionFallback((question) =>
 				promptWithDefault(
 					io,
-					"\nHow should OMX judge success? Describe it in plain language",
+					"\nHow should OMCP judge success? Describe it in plain language",
 					topic,
 					question,
 				),

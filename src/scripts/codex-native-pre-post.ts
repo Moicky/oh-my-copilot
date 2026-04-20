@@ -107,7 +107,7 @@ function matchesDestructiveFixture(command: string): boolean {
 }
 
 function isMcpLikeToolName(toolName: string): boolean {
-  return /^(mcp__|omx_(?:state|memory|trace|code_intel)\b|state_|project_memory_|notepad_|trace_)/i.test(toolName);
+  return /^(mcp__|omcp_(?:state|memory|trace|code_intel)\b|state_|project_memory_|notepad_|trace_)/i.test(toolName);
 }
 
 const MCP_TRANSPORT_FAILURE_PATTERNS = [
@@ -123,7 +123,7 @@ const MCP_TRANSPORT_FAILURE_PATTERNS = [
   /mcp(?: server)? .*closed/i,
 ];
 
-type OmxParityCommand =
+type OmcpParityCommand =
   | "state"
   | "notepad"
   | "project-memory"
@@ -147,7 +147,7 @@ export function detectMcpTransportFailure(
 
   const mcpContextDetected = isMcpLikeToolName(normalized.toolName)
     || /\bmcp\b/i.test(combined)
-    || /\bomx-(?:state|memory|trace|code-intel)-server\b/i.test(combined);
+    || /\bomcp-(?:state|memory|trace|code-intel)-server\b/i.test(combined);
   if (!mcpContextDetected) return null;
   if (!combined) return null;
   if (!MCP_TRANSPORT_FAILURE_PATTERNS.some((pattern) => pattern.test(combined))) {
@@ -160,8 +160,8 @@ export function detectMcpTransportFailure(
   };
 }
 
-function resolveOmxParityTarget(toolName: string): { command: OmxParityCommand; tool: string } | null {
-  const match = toolName.match(/^mcp__omx_(state|memory|trace|code_intel)__([a-z0-9_]+)$/i);
+function resolveOmcpParityTarget(toolName: string): { command: OmcpParityCommand; tool: string } | null {
+  const match = toolName.match(/^mcp__omcp_(state|memory|trace|code_intel)__([a-z0-9_]+)$/i);
   if (!match) return null;
 
   const [, server, tool] = match;
@@ -181,11 +181,11 @@ function shellSingleQuote(value: string): string {
   return `'${value.replace(/'/g, `'\"'\"'`)}'`;
 }
 
-function buildOmxParityFallbackCommand(payload: CodexHookPayload, toolName: string): string | null {
-  const target = resolveOmxParityTarget(toolName);
+function buildOmcpParityFallbackCommand(payload: CodexHookPayload, toolName: string): string | null {
+  const target = resolveOmcpParityTarget(toolName);
   if (!target) return null;
   const input = safeObject(payload.tool_input) ?? {};
-  return `omx ${target.command} ${target.tool} --input ${shellSingleQuote(JSON.stringify(input))} --json`;
+  return `omcp ${target.command} ${target.tool} --input ${shellSingleQuote(JSON.stringify(input))} --json`;
 }
 
 const LORE_TRAILER_PREFIXES = [
@@ -200,7 +200,7 @@ const LORE_TRAILER_PREFIXES = [
   "Related:",
 ] as const;
 
-const OMX_COAUTHOR_TRAILER = "Co-authored-by: OmX <omx@oh-my-codex.dev>";
+const OMCP_COAUTHOR_TRAILER = "Co-authored-by: OMCP <omcp@oh-my-copilot.dev>";
 
 function isDoubleQuotedShellEscapeTarget(char: string | undefined): boolean {
   return char === "\"" || char === "\\" || char === "$" || char === "`" || char === "\n";
@@ -457,7 +457,7 @@ function parseGitCommitCommand(commandText: string): GitCommitCommandParseResult
 }
 
 function isLoreTrailerLine(line: string): boolean {
-  return line === OMX_COAUTHOR_TRAILER
+  return line === OMCP_COAUTHOR_TRAILER
     || LORE_TRAILER_PREFIXES.some((prefix) => line.startsWith(prefix));
 }
 
@@ -505,7 +505,7 @@ function buildGitCommitComplianceErrors(message: string | null): string[] {
   const normalized = message.replace(/\r\n?/g, "\n").trim();
   if (!normalized) {
     return [
-      "Provide a non-empty Lore-format commit message with an intent-first subject, narrative body, Lore trailers, and the OmX co-author trailer.",
+      "Provide a non-empty Lore-format commit message with an intent-first subject, narrative body, Lore trailers, and the OMCP co-author trailer.",
     ];
   }
 
@@ -525,8 +525,8 @@ function buildGitCommitComplianceErrors(message: string | null): string[] {
   if (!trailerLines.some((line) => LORE_TRAILER_PREFIXES.some((prefix) => line.startsWith(prefix)))) {
     errors.push("Add at least one Lore trailer such as `Constraint:`, `Confidence:`, or `Tested:`.");
   }
-  if (!trailerLines.includes(OMX_COAUTHOR_TRAILER)) {
-    errors.push(`Add the required co-author trailer: \`${OMX_COAUTHOR_TRAILER}\`.`);
+  if (!trailerLines.includes(OMCP_COAUTHOR_TRAILER)) {
+    errors.push(`Add the required co-author trailer: \`${OMCP_COAUTHOR_TRAILER}\`.`);
   }
 
   return errors;
@@ -547,7 +547,7 @@ function buildGitCommitEnforcementOutput(commandText: string): Record<string, un
   return {
     decision: "block",
     reason:
-      "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OmX co-author trailer.",
+      "git commit is blocked until the inline commit message satisfies the Lore format and includes the required OMCP co-author trailer.",
     hookSpecificOutput: {
       hookEventName: "PreToolUse",
       additionalContext: [
@@ -556,7 +556,7 @@ function buildGitCommitEnforcementOutput(commandText: string): Record<string, un
       ].join("\n"),
     },
     systemMessage: [
-      "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-codex.dev>`.",
+      "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OMCP <omcp@oh-my-copilot.dev>`.",
       ...errors.map((error) => `- ${error}`),
     ].join("\n"),
   };
@@ -589,17 +589,17 @@ export function buildNativePostToolUseOutput(
 ): Record<string, unknown> | null {
   const mcpTransportFailure = detectMcpTransportFailure(payload);
   if (mcpTransportFailure) {
-    const fallbackCommand = buildOmxParityFallbackCommand(payload, mcpTransportFailure.toolName);
+    const fallbackCommand = buildOmcpParityFallbackCommand(payload, mcpTransportFailure.toolName);
     const fallbackText = fallbackCommand
       ? `Retry via CLI parity with \`${fallbackCommand}\`.`
-      : "Retry via the matching OMX CLI parity surface instead of retrying the MCP transport blindly.";
+      : "Retry via the matching OMCP CLI parity surface instead of retrying the MCP transport blindly.";
     return {
       decision: "block",
-      reason: "The MCP tool appears to have lost its transport/server connection. Preserve state, debug the transport failure, and use OMX CLI/file-backed fallbacks instead of retrying blindly.",
+      reason: "The MCP tool appears to have lost its transport/server connection. Preserve state, debug the transport failure, and use OMCP CLI/file-backed fallbacks instead of retrying blindly.",
       hookSpecificOutput: {
         hookEventName: "PostToolUse",
         additionalContext:
-          `Clear MCP transport-death signal detected. Preserve current team/runtime state. ${fallbackText} OMX MCP servers are plain Node stdio processes, so they still shut down when stdin/transport closes. If this happened during team runtime, inspect first with \`omx team status <team>\` or \`omx team api read-stall-state --input '{"team_name":"<team>"}' --json\`, and only force cleanup after capturing needed state. For root-cause debugging, rerun with \`OMX_MCP_TRANSPORT_DEBUG=1\` to log why the stdio transport closed.`,
+          `Clear MCP transport-death signal detected. Preserve current team/runtime state. ${fallbackText} OMCP MCP servers are plain Node stdio processes, so they still shut down when stdin/transport closes. If this happened during team runtime, inspect first with \`omcp team status <team>\` or \`omcp team api read-stall-state --input '{"team_name":"<team>"}' --json\`, and only force cleanup after capturing needed state. For root-cause debugging, rerun with \`OMCP_MCP_TRANSPORT_DEBUG=1\` to log why the stdio transport closed.`,
       },
     };
   }

@@ -1,5 +1,5 @@
 /**
- * omx setup - Automated installation of oh-my-codex
+ * omcp setup - Automated installation of oh-my-copilot
  * Installs skills, prompts, MCP servers config, and AGENTS.md
  */
 
@@ -23,15 +23,15 @@ import {
   codexPromptsDir,
   codexAgentsDir,
   userSkillsDir,
-  omxStateDir,
+  omcpStateDir,
   detectLegacySkillRootOverlap,
-  omxPlansDir,
-  omxLogsDir,
+  omcpPlansDir,
+  omcpLogsDir,
 } from "../utils/paths.js";
 import {
   buildMergedConfig,
   getRootModelName,
-  hasLegacyOmxTeamRunTable,
+  hasLegacyOmcpTeamRunTable,
 } from "../config/generator.js";
 import { mergeManagedCodexHooksConfig } from "../config/codex-hooks.js";
 import {
@@ -50,8 +50,8 @@ import { tryReadCatalogManifest } from "../catalog/reader.js";
 import { DEFAULT_FRONTIER_MODEL } from "../config/models.js";
 import {
   addGeneratedAgentsMarker,
-  hasOmxManagedAgentsSections,
-  isOmxGeneratedAgentsMd,
+  hasOmcpManagedAgentsSections,
+  isOmcpGeneratedAgentsMd,
 } from "../utils/agents-md.js";
 import {
   resolveAgentsModelTableContext,
@@ -117,7 +117,7 @@ interface SetupBackupContext {
 
 interface ManagedConfigResult {
   finalConfig: string;
-  omxManagesTui: boolean;
+  omcpManagesTui: boolean;
   repairedLegacyTeamRunTable: boolean;
 }
 
@@ -132,7 +132,7 @@ export interface SkillFrontmatterMetadata {
 }
 
 const PROJECT_GITIGNORE_ENTRIES = [
-  ".omx/",
+  ".omcp/",
   ".codex/*",
   "!.codex/agents/",
   "!.codex/agents/**",
@@ -201,12 +201,12 @@ function getBackupContext(
   const timestamp = new Date().toISOString().replace(/[:]/g, "-");
   if (scope === "project") {
     return {
-      backupRoot: join(projectRoot, ".omx", "backups", "setup", timestamp),
+      backupRoot: join(projectRoot, ".omcp", "backups", "setup", timestamp),
       baseRoot: projectRoot,
     };
   }
   return {
-    backupRoot: join(homedir(), ".omx", "backups", "setup", timestamp),
+    backupRoot: join(homedir(), ".omcp", "backups", "setup", timestamp),
     baseRoot: homedir(),
   };
 }
@@ -346,7 +346,7 @@ function rewriteInstalledSkillDescriptionBadge(
   filePath = "SKILL.md",
 ): string {
   const metadata = parseSkillFrontmatter(content, filePath);
-  const badgePrefix = "[OMX] ";
+  const badgePrefix = "[OMCP] ";
   const displayDescription = metadata.description.startsWith(badgePrefix)
     ? metadata.description
     : `${badgePrefix}${metadata.description}`;
@@ -405,7 +405,7 @@ function isSetupScope(value: string): value is SetupScope {
   return SETUP_SCOPES.includes(value as SetupScope);
 }
 function getScopeFilePath(projectRoot: string): string {
-  return join(projectRoot, ".omx", "setup-scope.json");
+  return join(projectRoot, ".omcp", "setup-scope.json");
 }
 
 export function resolveScopeDirectories(
@@ -451,7 +451,7 @@ async function readPersistedSetupPreferences(
       const migrated = LEGACY_SCOPE_MIGRATION[parsed.scope];
       if (migrated) {
         console.warn(
-          `[omx] Migrating persisted setup scope "${parsed.scope}" → "${migrated}" ` +
+          `[omcp] Migrating persisted setup scope "${parsed.scope}" → "${migrated}" ` +
             `(see issue #243: simplified to user/project).`,
         );
         persisted.scope = migrated;
@@ -540,7 +540,7 @@ function probeInstalledCodexVersion(): string | null {
   return stdout === "" ? null : stdout;
 }
 
-function shouldOmxManageTuiFromCodexVersion(versionOutput: string | null): boolean {
+function shouldOmcpManageTuiFromCodexVersion(versionOutput: string | null): boolean {
   if (!versionOutput) return true;
   const parsed = parseSemverTriplet(versionOutput);
   if (!parsed) return true;
@@ -692,10 +692,10 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   const resolvedScope = await resolveSetupScope(projectRoot, requestedScope);
   const scopeDirs = resolveScopeDirectories(resolvedScope.scope, projectRoot);
   const scopeSourceMessage =
-    resolvedScope.source === "persisted" ? " (from .omx/setup-scope.json)" : "";
+    resolvedScope.source === "persisted" ? " (from .omcp/setup-scope.json)" : "";
   const backupContext = getBackupContext(resolvedScope.scope, projectRoot);
 
-  console.log("oh-my-codex setup");
+  console.log("oh-my-copilot setup");
   console.log("=================\n");
   console.log(
     `Using setup scope: ${resolvedScope.scope}${scopeSourceMessage}\n`,
@@ -708,9 +708,9 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     scopeDirs.promptsDir,
     scopeDirs.skillsDir,
     scopeDirs.nativeAgentsDir,
-    omxStateDir(projectRoot),
-    omxPlansDir(projectRoot),
-    omxLogsDir(projectRoot),
+    omcpStateDir(projectRoot),
+    omcpPlansDir(projectRoot),
+    omcpLogsDir(projectRoot),
   ];
   for (const dir of dirs) {
     if (!dryRun) {
@@ -732,11 +732,11 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     );
     if (gitignoreResult === "created") {
       console.log(
-        "  Created .gitignore with OMX project ignore rules so local runtime state stays out of source control while .codex agents, skills, and prompts remain trackable.\n",
+        "  Created .gitignore with OMCP project ignore rules so local runtime state stays out of source control while .codex agents, skills, and prompts remain trackable.\n",
       );
     } else if (gitignoreResult === "updated") {
       console.log(
-        "  Updated .gitignore with OMX project ignore rules so local runtime state stays out of source control while .codex agents, skills, and prompts remain trackable.\n",
+        "  Updated .gitignore with OMCP project ignore rules so local runtime state stays out of source control while .codex agents, skills, and prompts remain trackable.\n",
       );
     }
   }
@@ -858,7 +858,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   const resolvedConfig = managedConfig.finalConfig;
   if (managedConfig.repairedLegacyTeamRunTable) {
     console.log(
-      "  Removed retired [mcp_servers.omx_team_run] config during refresh.",
+      "  Removed retired [mcp_servers.omcp_team_run] config during refresh.",
     );
   }
   if (resolvedScope.scope === "user") {
@@ -894,10 +894,10 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   console.log("[5.5/8] Verifying Team CLI API interop...");
   const teamToolsCheck = await verifyTeamCliApiInterop(pkgRoot);
   if (teamToolsCheck.ok) {
-    console.log("  omx team api command detected (CLI-first interop ready)");
+    console.log("  omcp team api command detected (CLI-first interop ready)");
   } else {
     console.log(`  WARNING: ${teamToolsCheck.message}`);
-    console.log("  Run `npm run build` and then re-run `omx setup`.");
+    console.log("  Run `npm run build` and then re-run `omcp setup`.");
   }
   console.log();
 
@@ -934,7 +934,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     if (agentsMdExists) {
       const existing = await readFile(agentsMdDst, "utf-8");
       changed = existing !== rewritten;
-      if (hasOmxManagedAgentsSections(existing)) {
+      if (hasOmcpManagedAgentsSections(existing)) {
         managedRefreshContent = upsertAgentsModelTable(
           existing,
           modelTableContext,
@@ -951,7 +951,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     ) {
       summary.agentsMd.skipped += 1;
       console.log(
-        "  WARNING: Active omx session detected (pid " +
+        "  WARNING: Active omcp session detected (pid " +
           activeSession?.pid +
           ").",
       );
@@ -1021,21 +1021,21 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
 
   // Step 8: Configure HUD
   console.log("[8/8] Configuring HUD...");
-  const hudConfigPath = join(projectRoot, ".omx", "hud-config.json");
+  const hudConfigPath = join(projectRoot, ".omcp", "hud-config.json");
   if (force || !existsSync(hudConfigPath)) {
     if (!dryRun) {
       const defaultHudConfig = { preset: "focused" };
       await writeFile(hudConfigPath, JSON.stringify(defaultHudConfig, null, 2));
     }
-    if (verbose) console.log("  Wrote .omx/hud-config.json");
+    if (verbose) console.log("  Wrote .omcp/hud-config.json");
     console.log("  HUD config created (preset: focused).");
   } else {
     console.log("  HUD config already exists (use --force to overwrite).");
   }
-  if (managedConfig.omxManagesTui) {
+  if (managedConfig.omcpManagesTui) {
     console.log("  StatusLine configured in config.toml via [tui] section.");
   } else {
-    console.log("  Codex CLI >= 0.107.0 manages [tui]; OMX left that section untouched.");
+    console.log("  Codex CLI >= 0.107.0 manages [tui]; OMCP left that section untouched.");
   }
   console.log();
 
@@ -1060,7 +1060,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     console.log();
   }
 
-  console.log('Setup complete! Run "omx doctor" to verify installation.');
+  console.log('Setup complete! Run "omcp doctor" to verify installation.');
   console.log("\nNext steps:");
   console.log("  1. Start Codex CLI in your project directory");
   console.log(
@@ -1072,10 +1072,10 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     "  5. Native agent defaults configured in config.toml [agents] and TOML files written to .codex/agents/",
   );
   console.log(
-    '  6. "omx explore" and "omx sparkshell" can hydrate native release binaries on first use; source installs still allow repo-local fallbacks and OMX_EXPLORE_BIN / OMX_SPARKSHELL_BIN overrides',
+    '  6. "omcp explore" and "omcp sparkshell" can hydrate native release binaries on first use; source installs still allow repo-local fallbacks and OMCP_EXPLORE_BIN / OMCP_SPARKSHELL_BIN overrides',
   );
   if (isGitHubCliConfigured()) {
-    console.log("\nSupport the project: gh repo star Yeachan-Heo/oh-my-codex");
+    console.log("\nSupport the project: gh repo star Moicky/oh-my-copilot");
   }
 }
 
@@ -1240,7 +1240,7 @@ async function syncManagedAgentsContent(
     if (!shouldOverwrite) {
       summary.skipped += 1;
       if (options.verbose) {
-        const managedLabel = isOmxGeneratedAgentsMd(existing)
+        const managedLabel = isOmcpGeneratedAgentsMd(existing)
           ? "managed"
           : "unmanaged";
         console.log(`  skipped ${managedLabel} AGENTS.md at ${dstPath}`);
@@ -1617,12 +1617,12 @@ async function updateManagedConfig(
   const existing = existsSync(configPath)
     ? await readFile(configPath, "utf-8")
     : "";
-  const hadLegacyTeamRunTable = hasLegacyOmxTeamRunTable(existing);
+  const hadLegacyTeamRunTable = hasLegacyOmcpTeamRunTable(existing);
   const currentModel = getRootModelName(existing);
   let modelOverride: string | undefined;
   const codexVersion =
     options.codexVersionProbe?.() ?? probeInstalledCodexVersion();
-  const omxManagesTui = shouldOmxManageTuiFromCodexVersion(codexVersion);
+  const omcpManagesTui = shouldOmcpManageTuiFromCodexVersion(codexVersion);
 
   if (currentModel === LEGACY_SETUP_MODEL) {
     const shouldPrompt =
@@ -1639,7 +1639,7 @@ async function updateManagedConfig(
   }
 
   const finalConfig = buildMergedConfig(existing, pkgRoot, {
-    includeTui: omxManagesTui,
+    includeTui: omcpManagesTui,
     modelOverride,
     sharedMcpServers: sharedMcpRegistry.servers,
     sharedMcpRegistrySource: sharedMcpRegistry.sourcePath,
@@ -1651,7 +1651,7 @@ async function updateManagedConfig(
     summary.unchanged += 1;
     return {
       finalConfig,
-      omxManagesTui,
+      omcpManagesTui,
       repairedLegacyTeamRunTable: false,
     };
   }
@@ -1690,9 +1690,9 @@ async function updateManagedConfig(
   }
   return {
     finalConfig,
-    omxManagesTui,
+    omcpManagesTui,
     repairedLegacyTeamRunTable:
-      hadLegacyTeamRunTable && !hasLegacyOmxTeamRunTable(finalConfig),
+      hadLegacyTeamRunTable && !hasLegacyOmcpTeamRunTable(finalConfig),
   };
 }
 

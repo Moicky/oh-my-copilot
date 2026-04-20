@@ -16,25 +16,25 @@ Initialize a PRD (Product Requirements Document) for structured ralph-loop execu
 ## Behavior
 
 1. **Gather requirements** via interactive interview or from the provided description
-2. **Create PRD** at `.omx/plans/prd-{slug}.md` with:
+2. **Create PRD** at `.omcp/plans/prd-{slug}.md` with:
    - Problem statement
    - Goals and non-goals
    - Acceptance criteria (testable)
    - Technical constraints
    - Implementation phases
 3. **Link to Ralph** so that `/ralph` can use the PRD as its completion criteria
-4. **Initialize/ensure canonical progress ledger** at `.omx/state/{scope}/ralph-progress.json` (session scope if active session exists)
+4. **Initialize/ensure canonical progress ledger** at `.omcp/state/{scope}/ralph-progress.json` (session scope if active session exists)
 
 ### Canonical source contract
 
-- Canonical PRD source of truth is `.omx/plans/prd-{slug}.md`.
-- Ralph progress source of truth is `.omx/state/{scope}/ralph-progress.json` (session scope when available).
-- During the current compatibility window, Ralph `--prd` startup still validates machine-readable story state from `.omx/prd.json`.
-- Legacy `.omx/prd.json` / `.omx/progress.txt` inputs migrate one-way into canonical artifacts, but canonical PRD markdown is not yet the startup validation source for `omx ralph --prd ...`.
+- Canonical PRD source of truth is `.omcp/plans/prd-{slug}.md`.
+- Ralph progress source of truth is `.omcp/state/{scope}/ralph-progress.json` (session scope when available).
+- During the current compatibility window, Ralph `--prd` startup still validates machine-readable story state from `.omcp/prd.json`.
+- Legacy `.omcp/prd.json` / `.omcp/progress.txt` inputs migrate one-way into canonical artifacts, but canonical PRD markdown is not yet the startup validation source for `omcp ralph --prd ...`.
 
 ## Output
 
-A structured PRD file saved to `.omx/plans/` that serves as the definition of done for Ralph execution.
+A structured PRD file saved to `.omcp/plans/` that serves as the definition of done for Ralph execution.
 
 ## Next Steps
 

@@ -13,11 +13,11 @@ describe('explore + sparkshell guidance contract', () => {
   it('keeps AGENTS root and template aligned on conditional explore routing and opt-in sparkshell guidance', () => {
     const patterns = [
       /USE_OMX_EXPLORE_CMD/i,
-      /SHOULD treat `omx explore`|strongly prefer `omx explore`/i,
+      /SHOULD treat `omcp explore`|strongly prefer `omcp explore`/i,
       /--prompt/i,
       /shell-only, allowlisted, read-only path|shell-only allowlisted read-only path/i,
       /gracefully fall back to the normal path/i,
-      /omx sparkshell --tmux-pane/i,
+      /omcp sparkshell --tmux-pane/i,
       /explicit opt-?in/i,
       /When to use what/i,
     ];
@@ -36,7 +36,7 @@ describe('explore + sparkshell guidance contract', () => {
 
     expectPatterns('prompts/explore-harness.md', [
       /simple read-only repository lookup tasks/i,
-      /Prefer `omx explore --prompt/i,
+      /Prefer `omcp explore --prompt/i,
       /fall back to the richer normal path/i,
     ]);
   });
@@ -54,7 +54,7 @@ describe('explore + sparkshell guidance contract', () => {
     ]) {
       expectPatterns(surface, [
         /USE_OMX_EXPLORE_CMD/i,
-        /prefer `omx explore`|use `omx explore` FIRST/i,
+        /prefer `omcp explore`|use `omcp explore` FIRST/i,
         /fall back normally|fallback normally|graceful fallback|richer normal explore path/i,
       ]);
     }
@@ -68,7 +68,7 @@ describe('explore + sparkshell guidance contract', () => {
     ]);
 
     expectPatterns('skills/team/SKILL.md', [
-      /omx sparkshell --tmux-pane/i,
+      /omcp sparkshell --tmux-pane/i,
       /explicit opt-?in/i,
       /raw `tmux capture-pane` evidence/i,
     ]);

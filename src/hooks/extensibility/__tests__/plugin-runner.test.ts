@@ -98,7 +98,7 @@ describe('plugin-runner', () => {
   });
 
   it('emits invalid_export for plugin without onHookEvent', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runner-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runner-'));
     try {
       const pluginPath = join(cwd, 'no-export.mjs');
       await writeFile(pluginPath, 'export const x = 1;');
@@ -126,7 +126,7 @@ describe('plugin-runner', () => {
   });
 
   it('emits ok for valid plugin', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runner-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runner-'));
     try {
       const pluginPath = join(cwd, 'valid.mjs');
       await writeFile(pluginPath, 'export async function onHookEvent(event, sdk) {}');
@@ -155,7 +155,7 @@ describe('plugin-runner', () => {
   });
 
   it('emits runner_error when plugin throws', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runner-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runner-'));
     try {
       const pluginPath = join(cwd, 'throws.mjs');
       await writeFile(pluginPath, 'export function onHookEvent() { throw new Error("boom"); }');
@@ -184,7 +184,7 @@ describe('plugin-runner', () => {
   });
 
   it('derives pluginId from path when not provided', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runner-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runner-'));
     try {
       const pluginPath = join(cwd, 'derived-name.mjs');
       await writeFile(pluginPath, 'export async function onHookEvent() {}');

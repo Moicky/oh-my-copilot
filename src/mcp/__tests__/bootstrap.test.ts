@@ -21,11 +21,11 @@ const ALL_SERVERS: readonly McpServerName[] = [
 ] as const;
 
 const SERVER_DISABLE_ENV: Record<McpServerName, string> = {
-  state: 'OMX_STATE_SERVER_DISABLE_AUTO_START',
-  memory: 'OMX_MEMORY_SERVER_DISABLE_AUTO_START',
-  code_intel: 'OMX_CODE_INTEL_SERVER_DISABLE_AUTO_START',
-  trace: 'OMX_TRACE_SERVER_DISABLE_AUTO_START',
-  wiki: 'OMX_WIKI_SERVER_DISABLE_AUTO_START',
+  state: 'OMCP_STATE_SERVER_DISABLE_AUTO_START',
+  memory: 'OMCP_MEMORY_SERVER_DISABLE_AUTO_START',
+  code_intel: 'OMCP_CODE_INTEL_SERVER_DISABLE_AUTO_START',
+  trace: 'OMCP_TRACE_SERVER_DISABLE_AUTO_START',
+  wiki: 'OMCP_WIKI_SERVER_DISABLE_AUTO_START',
 };
 
 const SERVER_ENTRYPOINTS: Array<{ server: McpServerName; file: string }> = [
@@ -37,14 +37,14 @@ const SERVER_ENTRYPOINTS: Array<{ server: McpServerName; file: string }> = [
 ];
 
 describe('mcp bootstrap auto-start guard', () => {
-  it('allows auto-start by default for every OMX MCP server', () => {
+  it('allows auto-start by default for every OMCP MCP server', () => {
     for (const server of ALL_SERVERS) {
       assert.equal(shouldAutoStartMcpServer(server, {}), true, `${server} should auto-start by default`);
     }
   });
 
   it('disables all servers when global disable flag is set', () => {
-    const env = { OMX_MCP_SERVER_DISABLE_AUTO_START: '1' };
+    const env = { OMCP_MCP_SERVER_DISABLE_AUTO_START: '1' };
 
     for (const server of ALL_SERVERS) {
       assert.equal(shouldAutoStartMcpServer(server, env), false, `${server} should honor global disable flag`);
@@ -128,11 +128,11 @@ describe('mcp shared stdio lifecycle contract', () => {
 describe('mcp duplicate sibling detection', () => {
   it('extracts same-entrypoint markers from command lines', () => {
     assert.equal(
-      extractMcpEntrypointMarker('node /tmp/oh-my-codex/dist/mcp/state-server.js'),
+      extractMcpEntrypointMarker('node /tmp/oh-my-copilot/dist/mcp/state-server.js'),
       'state-server.js',
     );
     assert.equal(
-      extractMcpEntrypointMarker('node C:\\\\tmp\\\\oh-my-codex\\\\dist\\\\mcp\\\\trace-server.ts'),
+      extractMcpEntrypointMarker('node C:\\\\tmp\\\\oh-my-copilot\\\\dist\\\\mcp\\\\trace-server.ts'),
       'trace-server.ts',
     );
     assert.equal(extractMcpEntrypointMarker('node something-else.js'), null);

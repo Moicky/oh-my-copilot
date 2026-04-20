@@ -3,7 +3,7 @@
  * Reads JSON config from stdin, runs startTeam/monitorTeam/shutdownTeam,
  * writes structured JSON result to stdout.
  *
- * Spawned by OMX team orchestration entrypoints when a background team run starts.
+ * Spawned by OMCP team orchestration entrypoints when a background team run starts.
  */
 
 import { createInterface } from 'readline';
@@ -17,7 +17,7 @@ import { resolveCanonicalTeamStateRoot } from './state-root.js';
 
 async function promptStaleCleanup(summary: StaleTeamSummary): Promise<boolean> {
   process.stderr.write(
-    `\n[omx] Stale artifacts from previous team "${summary.teamName}":\n` +
+    `\n[omcp] Stale artifacts from previous team "${summary.teamName}":\n` +
     `  Worktrees: ${summary.worktreePaths.join(', ')}\n` +
     `  State dir: ${summary.statePath}\n` +
     (summary.hasDirtyWorktrees
@@ -77,10 +77,10 @@ async function writePanesFile(
   paneIds: string[],
   leaderPaneId: string,
 ): Promise<void> {
-  const omxJobsDir = process.env.OMX_JOBS_DIR;
-  if (!jobId || !omxJobsDir) return;
+  const omcpJobsDir = process.env.OMCP_JOBS_DIR;
+  if (!jobId || !omcpJobsDir) return;
 
-  const panesPath = join(omxJobsDir, `${jobId}-panes.json`);
+  const panesPath = join(omcpJobsDir, `${jobId}-panes.json`);
   await writeFile(
     panesPath + '.tmp',
     JSON.stringify({ paneIds: [...paneIds], leaderPaneId }),
@@ -181,8 +181,8 @@ export function buildTerminalCliResult(
     exitCode: status === 'completed' ? 0 : 1,
     notice:
       `[runtime-cli] phase=${phase} reached terminal state; preserving team state for inspection. `
-      + `Inspect with "omx team status ${teamName} --json" or "omx team api read-stall-state --input '{\"team_name\":\"${teamName}\"}' --json". `
-      + `Run "omx team shutdown ${teamName}" (or --force after state capture) when explicit cleanup is desired.\n`,
+      + `Inspect with "omcp team status ${teamName} --json" or "omcp team api read-stall-state --input '{\"team_name\":\"${teamName}\"}' --json". `
+      + `Run "omcp team shutdown ${teamName}" (or --force after state capture) when explicit cleanup is desired.\n`,
   };
 }
 
@@ -300,13 +300,13 @@ async function main(): Promise<void> {
   process.on('SIGINT', () => handleShutdown('SIGINT'));
   process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 
-  // Start the team — OMX's startTeam takes individual parameters
+  // Start the team — OMCP's startTeam takes individual parameters
   const agentType = 'executor';
   try {
     const providers = normalizeAgentTypes(agentTypes, workerCount);
-    const previousCliMap = process.env.OMX_TEAM_WORKER_CLI_MAP;
+    const previousCliMap = process.env.OMCP_TEAM_WORKER_CLI_MAP;
     try {
-      process.env.OMX_TEAM_WORKER_CLI_MAP = providers.join(',');
+      process.env.OMCP_TEAM_WORKER_CLI_MAP = providers.join(',');
       runtime = await startTeam(
         teamName,
         tasks.map(t => t.subject).join('; '),
@@ -317,16 +317,16 @@ async function main(): Promise<void> {
         { confirmStaleCleanup: promptStaleCleanup },
       );
     } finally {
-      if (typeof previousCliMap === 'string') process.env.OMX_TEAM_WORKER_CLI_MAP = previousCliMap;
-      else delete process.env.OMX_TEAM_WORKER_CLI_MAP;
+      if (typeof previousCliMap === 'string') process.env.OMCP_TEAM_WORKER_CLI_MAP = previousCliMap;
+      else delete process.env.OMCP_TEAM_WORKER_CLI_MAP;
     }
   } catch (err) {
     process.stderr.write(`[runtime-cli] startTeam failed: ${err}\n`);
     process.exit(1);
   }
 
-  // Persist pane IDs when a background launcher provides an OMX job ID.
-  const jobId = process.env.OMX_JOB_ID;
+  // Persist pane IDs when a background launcher provides an OMCP job ID.
+  const jobId = process.env.OMCP_JOB_ID;
   try {
     const livePanes = await loadLivePaneState(teamName, cwd);
     if (livePanes) {
@@ -406,7 +406,7 @@ async function main(): Promise<void> {
   }
 }
 
-const shouldAutoStart = process.env.OMX_RUNTIME_CLI_DISABLE_AUTO_START !== '1';
+const shouldAutoStart = process.env.OMCP_RUNTIME_CLI_DISABLE_AUTO_START !== '1';
 
 if (shouldAutoStart) {
   main().catch(err => {

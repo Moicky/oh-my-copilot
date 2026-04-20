@@ -21,7 +21,7 @@ function git(cwd: string, args: string[], env: NodeJS.ProcessEnv = {}): string {
   return String(result.stdout || '').trim();
 }
 
-const TEMPLATE = `# oh-my-codex v0.0.0
+const TEMPLATE = `# oh-my-copilot v0.0.0
 
 ## Summary
 
@@ -44,13 +44,13 @@ Outdated contributor text.
 
 describe('generate-release-body', () => {
   it('preserves custom sections while refreshing contributors and compare metadata from git', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'omx-generate-release-body-'));
+    const root = await mkdtemp(join(tmpdir(), 'omcp-generate-release-body-'));
     const originalGitHubRepository = process.env.GITHUB_REPOSITORY;
     try {
       git(root, ['init']);
       git(root, ['config', 'user.name', 'Release Bot']);
       git(root, ['config', 'user.email', 'release@example.com']);
-      git(root, ['remote', 'add', 'origin', 'https://github.com/example/oh-my-codex.git']);
+      git(root, ['remote', 'add', 'origin', 'https://github.com/example/oh-my-copilot.git']);
 
       await writeFile(join(root, 'RELEASE_BODY.md'), TEMPLATE);
       await writeFile(join(root, 'notes.txt'), 'base\n');
@@ -76,11 +76,11 @@ describe('generate-release-body', () => {
       });
 
       const generated = await readFile(join(root, 'RELEASE_BODY.generated.md'), 'utf-8');
-      assert.match(generated, /^# oh-my-codex v0.13.0/m);
+      assert.match(generated, /^# oh-my-copilot v0.13.0/m);
       assert.match(generated, /Custom summary that must stay intact\./);
       assert.match(generated, /Keep this handwritten section\./);
       assert.match(generated, /## Contributors\n\nThanks to Alice Example and Bob Example for contributing to this release\./);
-      assert.match(generated, /\*\*Full Changelog\*\*: \[`v0\.12\.0\.\.\.v0\.13\.0`\]\(https:\/\/github\.com\/example\/oh-my-codex\/compare\/v0\.12\.0\.\.\.v0\.13\.0\)/);
+      assert.match(generated, /\*\*Full Changelog\*\*: \[`v0\.12\.0\.\.\.v0\.13\.0`\]\(https:\/\/github\.com\/example\/oh-my-copilot\/compare\/v0\.12\.0\.\.\.v0\.13\.0\)/);
     } finally {
       if (originalGitHubRepository === undefined) {
         delete process.env.GITHUB_REPOSITORY;
@@ -92,7 +92,7 @@ describe('generate-release-body', () => {
   });
 
   it('prefers GitHub contributor handles when compare metadata is available', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'omx-generate-release-body-gh-'));
+    const root = await mkdtemp(join(tmpdir(), 'omcp-generate-release-body-gh-'));
     try {
       await writeFile(join(root, 'RELEASE_BODY.md'), TEMPLATE);
       const originalFetch = global.fetch;
@@ -111,7 +111,7 @@ describe('generate-release-body', () => {
           outPath: 'RELEASE_BODY.generated.md',
           currentTag: 'v0.13.1',
           previousTag: 'v0.13.0',
-          repo: 'example/oh-my-codex',
+          repo: 'example/oh-my-copilot',
           githubToken: 'test-token',
         });
       } finally {
@@ -127,9 +127,9 @@ describe('generate-release-body', () => {
 
 
   it('fails validation when the template is missing required metadata anchors', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'omx-generate-release-body-invalid-'));
+    const root = await mkdtemp(join(tmpdir(), 'omcp-generate-release-body-invalid-'));
     try {
-      await writeFile(join(root, 'RELEASE_BODY.md'), `# oh-my-codex v0.0.0
+      await writeFile(join(root, 'RELEASE_BODY.md'), `# oh-my-copilot v0.0.0
 
 ## Summary
 
@@ -142,7 +142,7 @@ Missing required sections.
           outPath: 'RELEASE_BODY.generated.md',
           currentTag: 'v0.13.1',
           previousTag: 'v0.13.0',
-          repo: 'example/oh-my-codex',
+          repo: 'example/oh-my-copilot',
         }),
         /missing section: ## Contributors|missing the Full Changelog line/,
       );
@@ -155,12 +155,12 @@ Missing required sections.
     const contributors: Contributor[] = [];
     assert.equal(renderContributorsSection(contributors), 'Thanks to the contributors who made this release possible.');
     assert.equal(
-      buildFullChangelogLine('example/oh-my-codex', 'v0.13.1', 'v0.13.0'),
-      '**Full Changelog**: [`v0.13.0...v0.13.1`](https://github.com/example/oh-my-codex/compare/v0.13.0...v0.13.1)',
+      buildFullChangelogLine('example/oh-my-copilot', 'v0.13.1', 'v0.13.0'),
+      '**Full Changelog**: [`v0.13.0...v0.13.1`](https://github.com/example/oh-my-copilot/compare/v0.13.0...v0.13.1)',
     );
     assert.equal(
-      buildFullChangelogLine('example/oh-my-codex', 'v0.1.0'),
-      '**Full Changelog**: [`v0.1.0`](https://github.com/example/oh-my-codex/releases/tag/v0.1.0)',
+      buildFullChangelogLine('example/oh-my-copilot', 'v0.1.0'),
+      '**Full Changelog**: [`v0.1.0`](https://github.com/example/oh-my-copilot/releases/tag/v0.1.0)',
     );
   });
 });

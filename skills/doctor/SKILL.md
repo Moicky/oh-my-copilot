@@ -1,6 +1,6 @@
 ---
 name: doctor
-description: Diagnose and fix oh-my-codex installation issues
+description: Diagnose and fix oh-my-copilot installation issues
 ---
 
 # Doctor Skill
@@ -9,28 +9,28 @@ Note: All `~/.codex/...` paths in this guide respect `CODEX_HOME` when that envi
 
 ## Canonical skill root
 
-OMX installs skills to `${CODEX_HOME:-~/.codex}/skills/` — this is the path current Codex CLI natively loads as its skill root.
+OMCP installs skills to `${CODEX_HOME:-~/.codex}/skills/` — this is the path current Codex CLI natively loads as its skill root.
 
-`~/.agents/skills/` is a **historical legacy path** from an older Codex CLI release, before Codex settled on `~/.codex` as its home directory. Current Codex CLI and OMX no longer write there.
+`~/.agents/skills/` is a **historical legacy path** from an older Codex CLI release, before Codex settled on `~/.codex` as its home directory. Current Codex CLI and OMCP no longer write there.
 
-**In a mixed OMX + plain Codex environment:**
+**In a mixed OMCP + plain Codex environment:**
 - **Use**: `${CODEX_HOME:-~/.codex}/skills/` (user scope) or `.codex/skills/` (project scope)
 - **Clean up if present**: `~/.agents/skills/` — if this still exists alongside the canonical root, Codex's Enable/Disable Skills UI will show duplicate entries for any skill present in both trees
-- **Interop rule**: OMX writes only to the canonical path; archive or remove `~/.agents/skills/` once you have confirmed `${CODEX_HOME:-~/.codex}/skills/` is your active root
+- **Interop rule**: OMCP writes only to the canonical path; archive or remove `~/.agents/skills/` once you have confirmed `${CODEX_HOME:-~/.codex}/skills/` is your active root
 
 ## Task: Run Installation Diagnostics
 
-You are the OMX Doctor - diagnose and fix installation issues.
+You are the OMCP Doctor - diagnose and fix installation issues.
 
 ### Step 1: Check Plugin Version
 
 ```bash
 # Get installed version
-INSTALLED=$(ls ~/.codex/plugins/cache/omc/oh-my-codex/ 2>/dev/null | sort -V | tail -1)
+INSTALLED=$(ls ~/.codex/plugins/cache/omc/oh-my-copilot/ 2>/dev/null | sort -V | tail -1)
 echo "Installed: $INSTALLED"
 
 # Get latest from npm
-LATEST=$(npm view oh-my-codex version 2>/dev/null)
+LATEST=$(npm view oh-my-copilot version 2>/dev/null)
 echo "Latest: $LATEST"
 ```
 
@@ -66,19 +66,19 @@ ls -la ~/.codex/hooks/*.sh 2>/dev/null
 # Check if AGENTS.md exists
 ls -la ~/.codex/AGENTS.md 2>/dev/null
 
-# Check for OMX marker
-grep -q "oh-my-codex Multi-Agent System" ~/.codex/AGENTS.md 2>/dev/null && echo "Has OMX config" || echo "Missing OMX config"
+# Check for OMCP marker
+grep -q "oh-my-copilot Multi-Agent System" ~/.codex/AGENTS.md 2>/dev/null && echo "Has OMCP config" || echo "Missing OMCP config"
 ```
 
 **Diagnosis**:
 - If missing: CRITICAL - AGENTS.md not configured
-- If missing OMX marker: WARN - outdated AGENTS.md
+- If missing OMCP marker: WARN - outdated AGENTS.md
 
 ### Step 5: Check for Stale Plugin Cache
 
 ```bash
 # Count versions in cache
-ls ~/.codex/plugins/cache/omc/oh-my-codex/ 2>/dev/null | wc -l
+ls ~/.codex/plugins/cache/omc/oh-my-copilot/ 2>/dev/null | wc -l
 ```
 
 **Diagnosis**:
@@ -103,15 +103,15 @@ ls -la ~/.agents/skills/ 2>/dev/null
 ```
 
 **Diagnosis**:
-- If `~/.codex/agents/` exists with oh-my-codex-related files: WARN - legacy agents (now provided by plugin)
-- If `~/.codex/commands/` exists with oh-my-codex-related files: WARN - legacy commands (now provided by plugin)
-- If `${CODEX_HOME:-~/.codex}/skills/` exists with OMX skills: OK - canonical current user skill root
+- If `~/.codex/agents/` exists with oh-my-copilot-related files: WARN - legacy agents (now provided by plugin)
+- If `~/.codex/commands/` exists with oh-my-copilot-related files: WARN - legacy commands (now provided by plugin)
+- If `${CODEX_HOME:-~/.codex}/skills/` exists with OMCP skills: OK - canonical current user skill root
 - If `~/.agents/skills/` exists: WARN - historical legacy skill root that can overlap with `${CODEX_HOME:-~/.codex}/skills/` and cause duplicate Enable/Disable Skills entries
 
 Look for files like:
 - `architect.md`, `researcher.md`, `explore.md`, `executor.md`, etc. in agents/
 - `ultrawork.md`, `deepsearch.md`, etc. in commands/
-- Any oh-my-codex-related `.md` files in skills/
+- Any oh-my-copilot-related `.md` files in skills/
 
 ---
 
@@ -120,7 +120,7 @@ Look for files like:
 After running all checks, output a report:
 
 ```
-## OMX Doctor Report
+## OMCP Doctor Report
 
 ### Summary
 [HEALTHY / ISSUES FOUND]
@@ -168,21 +168,21 @@ rm -f ~/.codex/hooks/stop-continuation.sh
 
 ### Fix: Outdated Plugin
 ```bash
-rm -rf ~/.codex/plugins/cache/omc/oh-my-codex
+rm -rf ~/.codex/plugins/cache/omc/oh-my-copilot
 echo "Plugin cache cleared. Restart Codex CLI to fetch latest version."
 ```
 
 ### Fix: Stale Cache (multiple versions)
 ```bash
 # Keep only latest version
-cd ~/.codex/plugins/cache/omc/oh-my-codex/
+cd ~/.codex/plugins/cache/omc/oh-my-copilot/
 ls | sort -V | head -n -1 | xargs rm -rf
 ```
 
 ### Fix: Missing/Outdated AGENTS.md
 Fetch latest from GitHub and write to `~/.codex/AGENTS.md`:
 ```
-WebFetch(url: "https://raw.githubusercontent.com/Yeachan-Heo/oh-my-codex/main/docs/AGENTS.md", prompt: "Return the complete raw markdown content exactly as-is")
+WebFetch(url: "https://raw.githubusercontent.com/Moicky/oh-my-copilot/main/docs/AGENTS.md", prompt: "Return the complete raw markdown content exactly as-is")
 ```
 
 ### Fix: Legacy Curl-Installed Content
@@ -201,7 +201,7 @@ rm -rf ~/.codex/commands
 rm -rf ~/.agents/skills
 ```
 
-**Note**: Only remove if these contain oh-my-codex-related files. If user has custom agents/commands/skills, warn them and ask before removing.
+**Note**: Only remove if these contain oh-my-copilot-related files. If user has custom agents/commands/skills, warn them and ask before removing.
 
 ---
 

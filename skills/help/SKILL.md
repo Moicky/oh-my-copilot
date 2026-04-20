@@ -1,11 +1,11 @@
 ---
 name: help
-description: Guide on using oh-my-codex plugin
+description: Guide on using oh-my-copilot plugin
 ---
 
-# How OMX Works
+# How OMCP Works
 
-Plain English works as best-effort guidance — OMX inspects each prompt and may add advisory routing context to steer the model toward a suitable lane. This is **advisory prompt-routing context**: it does not activate a skill or workflow by itself. Explicit keywords remain the deterministic control surface when you want exact, guaranteed routing.
+Plain English works as best-effort guidance — OMCP inspects each prompt and may add advisory routing context to steer the model toward a suitable lane. This is **advisory prompt-routing context**: it does not activate a skill or workflow by itself. Explicit keywords remain the deterministic control surface when you want exact, guaranteed routing.
 
 **Triage lanes** (when no keyword matches): complex/multi-step prompts may receive HEAVY guidance (autopilot-shaped); read-only lookups receive LIGHT/explore guidance; implementation work receives LIGHT/executor guidance; UI work receives LIGHT/designer guidance; simple conversational prompts receive no injection (PASS). To opt out per prompt, include a phrase such as `no workflow`, `just chat`, or `plain answer`.
 
@@ -43,10 +43,10 @@ I'll figure out what to stop based on context.
 
 ## First Time Setup
 
-If you haven't configured OMX yet:
+If you haven't configured OMCP yet:
 
 ```
-/omx-setup
+/omcp-setup
 ```
 
 This is the **only command** you need to know. It downloads the configuration and you're done.
@@ -54,7 +54,7 @@ This is the **only command** you need to know. It downloads the configuration an
 If you only need lightweight directory guidance scaffolding for `AGENTS.md` files, use:
 
 ```bash
-omx agents-init .
+omcp agents-init .
 ```
 
 That command is intentionally narrower than full setup: it only bootstraps `AGENTS.md` files for the target directory and its immediate child directories.
@@ -69,14 +69,14 @@ But now you don't NEED them - everything is automatic.
 
 ## Usage Analysis
 
-Analyze your oh-my-codex usage and get tailored recommendations to improve your workflow.
+Analyze your oh-my-copilot usage and get tailored recommendations to improve your workflow.
 
 > Note: This replaces the former `/learn-about-omc` skill.
 
 ### What It Does
 
-1. Reads token tracking from `~/.omx/state/token-tracking.jsonl`
-2. Reads session history from `.omx/state/session-history.json`
+1. Reads token tracking from `~/.omcp/state/token-tracking.jsonl`
+2. Reads session history from `.omcp/state/session-history.json`
 3. Analyzes agent usage patterns
 4. Identifies underutilized features
 5. Recommends configuration changes
@@ -85,11 +85,11 @@ Analyze your oh-my-codex usage and get tailored recommendations to improve your 
 
 ```bash
 # Check for token tracking data
-TOKEN_FILE="$HOME/.omx/state/token-tracking.jsonl"
-SESSION_FILE=".omx/state/session-history.json"
-CONFIG_FILE="$HOME/.codex/.omx-config.json"
+TOKEN_FILE="$HOME/.omcp/state/token-tracking.jsonl"
+SESSION_FILE=".omcp/state/session-history.json"
+CONFIG_FILE="$HOME/.codex/.omcp-config.json"
 
-echo "Analyzing OMX Usage..."
+echo "Analyzing OMCP Usage..."
 echo ""
 
 # Check what data is available
@@ -144,7 +144,7 @@ Based on patterns found, output recommendations:
 - "Use security-reviewer after auth/API changes"
 
 **If defaultExecutionMode not set:**
-- "Set defaultExecutionMode in /omx-setup for consistent behavior"
+- "Set defaultExecutionMode in /omcp-setup for consistent behavior"
 
 ### Step 4: Output Report
 
@@ -157,7 +157,7 @@ Format a summary with:
 ### Example Output
 
 ```
-📊 Your OMX Usage Analysis
+📊 Your OMCP Usage Analysis
 
 TOKEN SUMMARY:
 - Total records: 1,234
@@ -186,16 +186,16 @@ If no data found:
 📊 Limited Usage Data Available
 
 No token tracking found. To enable tracking:
-1. Ensure ~/.omx/state/ directory exists
-2. Run any OMX command to start tracking
+1. Ensure ~/.omcp/state/ directory exists
+2. Run any OMCP command to start tracking
 
-Tip: Run /omx-setup to configure OMX properly.
+Tip: Run /omcp-setup to configure OMCP properly.
 ```
 
 ## Need More Help?
 
-- **README**: https://github.com/Yeachan-Heo/oh-my-codex
-- **Issues**: https://github.com/Yeachan-Heo/oh-my-codex/issues
+- **README**: https://github.com/Moicky/oh-my-copilot
+- **Issues**: https://github.com/Moicky/oh-my-copilot/issues
 
 ---
 

@@ -240,7 +240,7 @@
       "internalRequired": false
     },
     {
-      "name": "omx-setup",
+      "name": "omcp-setup",
       "category": "utility",
       "status": "active",
       "core": false,

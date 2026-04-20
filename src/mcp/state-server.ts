@@ -1,7 +1,7 @@
 /**
- * OMX State Management MCP Server
+ * OMCP State Management MCP Server
  * Provides state read/write/clear/list tools for workflow modes
- * Storage: .omx/state/{mode}-state.json
+ * Storage: .omcp/state/{mode}-state.json
  */
 
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
@@ -119,7 +119,7 @@ async function writeAtomicFile(path: string, data: string): Promise<void> {
 }
 
 const server = new Server(
-	{ name: "omx-state", version: "0.1.0" },
+	{ name: "omcp-state", version: "0.1.0" },
 	{ capabilities: { tools: {} } },
 );
 
@@ -377,9 +377,9 @@ export async function handleStateToolCall(request: {
 						if (
 							mode === "ralph" &&
 							effectiveSessionId &&
-						typeof mergedRaw.owner_omx_session_id !== "string"
+						typeof mergedRaw.owner_omcp_session_id !== "string"
 					) {
-						mergedRaw.owner_omx_session_id = effectiveSessionId;
+						mergedRaw.owner_omcp_session_id = effectiveSessionId;
 					}
 
 					if (mode === "ralph") {

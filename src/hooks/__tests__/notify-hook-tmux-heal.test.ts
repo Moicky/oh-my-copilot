@@ -11,7 +11,7 @@ import { handleTmuxInjection, resolvePaneTarget } from '../../scripts/notify-hoo
 const NOTIFY_HOOK_SCRIPT = new URL('../../../dist/scripts/notify-hook.js', import.meta.url);
 
 async function withTempWorkingDir(run: (cwd: string) => Promise<void>): Promise<void> {
-  const cwd = await mkdtemp(join(tmpdir(), 'omx-notify-tmux-heal-'));
+  const cwd = await mkdtemp(join(tmpdir(), 'omcp-notify-tmux-heal-'));
   try {
     await run(cwd);
   } finally {
@@ -31,17 +31,17 @@ function withPatchedEnv<T>(patch: Record<string, string>, run: () => Promise<T>)
   const managedKeys = new Set([
     ...Object.keys(patch),
     'CODEX_HOME',
-    'OMX_SESSION_ID',
-    'OMX_RUNTIME_BRIDGE',
-    'OMX_NOTIFY_FALLBACK',
-    'OMX_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS',
-    'OMX_HOOK_CONFIG',
-    'OMX_NOTIFY_PROFILE',
-    'OMX_NOTIFY_VERBOSITY',
-    'OMX_TEAM_WORKER',
-    'OMX_TEAM_STATE_ROOT',
-    'OMX_TEAM_LEADER_CWD',
-    'OMX_MODEL_INSTRUCTIONS_FILE',
+    'OMCP_SESSION_ID',
+    'OMCP_RUNTIME_BRIDGE',
+    'OMCP_NOTIFY_FALLBACK',
+    'OMCP_NOTIFY_FALLBACK_AUTO_NUDGE_STALL_MS',
+    'OMCP_HOOK_CONFIG',
+    'OMCP_NOTIFY_PROFILE',
+    'OMCP_NOTIFY_VERBOSITY',
+    'OMCP_TEAM_WORKER',
+    'OMCP_TEAM_STATE_ROOT',
+    'OMCP_TEAM_LEADER_CWD',
+    'OMCP_MODEL_INSTRUCTIONS_FILE',
     'TMUX',
     'TMUX_PANE',
   ]);
@@ -100,15 +100,15 @@ async function writeManagedSessionState(stateDir: string, cwd: string, sessionId
 describe('notify-hook tmux target healing', () => {
   it('falls back to global mode state when scoped session has no allowed active mode', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
-      const configPath = join(omxDir, 'tmux-hook.json');
+      const configPath = join(omcpDir, 'tmux-hook.json');
       const hookStatePath = join(stateDir, 'tmux-hook-state.json');
 
       await mkdir(sessionStateDir, { recursive: true });
@@ -124,8 +124,8 @@ describe('notify-hook tmux target healing', () => {
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -183,17 +183,17 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX_PANE;
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);
@@ -204,12 +204,12 @@ exit 1
 
   it('does not revive a legacy root Ralph fallback when canonical skill state excludes Ralph', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
-      const configPath = join(omxDir, 'tmux-hook.json');
+      const configPath = join(omcpDir, 'tmux-hook.json');
       const hookStatePath = join(stateDir, 'tmux-hook-state.json');
       const sessionStatePath = join(stateDir, 'session.json');
       const fakeBinDir = join(cwd, 'fake-bin');
@@ -240,8 +240,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -306,16 +306,16 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);
@@ -330,15 +330,15 @@ exit 1
 
   it('falls back to current tmux pane and heals stale session target', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
-      const configPath = join(omxDir, 'tmux-hook.json');
+      const configPath = join(omcpDir, 'tmux-hook.json');
       const hookStatePath = join(stateDir, 'tmux-hook-state.json');
 
       await mkdir(sessionStateDir, { recursive: true });
@@ -353,8 +353,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -439,18 +439,18 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       const previousTmuxPane = process.env.TMUX_PANE;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         process.env.TMUX_PANE = '%42';
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
         if (typeof previousTmuxPane === 'string') process.env.TMUX_PANE = previousTmuxPane;
         else delete process.env.TMUX_PANE;
       }
@@ -467,15 +467,15 @@ exit 1
 
   it('skips injection when fallback pane cwd does not match hook cwd', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
-      const configPath = join(omxDir, 'tmux-hook.json');
+      const configPath = join(omcpDir, 'tmux-hook.json');
       const hookStatePath = join(stateDir, 'tmux-hook-state.json');
 
       await mkdir(sessionStateDir, { recursive: true });
@@ -490,8 +490,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -576,18 +576,18 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       const previousTmuxPane = process.env.TMUX_PANE;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         process.env.TMUX_PANE = '%42';
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
         if (typeof previousTmuxPane === 'string') process.env.TMUX_PANE = previousTmuxPane;
         else delete process.env.TMUX_PANE;
       }
@@ -601,9 +601,9 @@ exit 1
   it('accepts alias and canonical twin paths when resolving managed pane ownership', async () => {
     await withTempWorkingDir(async (cwd) => {
       const aliasCwd = `${cwd}-alias`;
-      const omxDir = join(cwd, '.omx');
-      const stateDir = join(omxDir, 'state');
-      const sessionId = 'omx-abc123';
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const sessionId = 'omcp-abc123';
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
@@ -655,12 +655,12 @@ exit 1
       await chmod(fakeTmuxPath, 0o755);
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       const previousTmux = process.env.TMUX;
       const previousTmuxPane = process.env.TMUX_PANE;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX;
         delete process.env.TMUX_PANE;
 
@@ -677,8 +677,8 @@ exit 1
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
         if (typeof previousTmux === 'string') process.env.TMUX = previousTmux;
         else delete process.env.TMUX;
         if (typeof previousTmuxPane === 'string') process.env.TMUX_PANE = previousTmuxPane;
@@ -690,15 +690,15 @@ exit 1
 
   it('resolves the explicit managed session target without shared-cwd guessing', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
-      const configPath = join(omxDir, 'tmux-hook.json');
+      const configPath = join(omcpDir, 'tmux-hook.json');
       const hookStatePath = join(stateDir, 'tmux-hook-state.json');
 
       await mkdir(sessionStateDir, { recursive: true });
@@ -713,8 +713,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -790,17 +790,17 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX_PANE;
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);
@@ -811,15 +811,15 @@ exit 1
 
   it('heals a stale HUD pane target back to the canonical codex pane', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-hud-stale';
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
+      const sessionId = 'omcp-hud-stale';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
-      const configPath = join(omxDir, 'tmux-hook.json');
+      const configPath = join(omcpDir, 'tmux-hook.json');
       const hookStatePath = join(stateDir, 'tmux-hook-state.json');
 
       await mkdir(sessionStateDir, { recursive: true });
@@ -834,8 +834,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -863,7 +863,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%77" ]]; then
-    echo "node dist/cli/omx.js hud --watch"
+    echo "node dist/cli/omcp.js hud --watch"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%77" ]]; then
@@ -897,7 +897,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%77\t1\tnode\tnode dist/cli/omx.js hud --watch\n%%99\t0\tcodex\tcodex\n"
+    printf "%%77\t1\tnode\tnode dist/cli/omcp.js hud --watch\n%%99\t0\tcodex\tcodex\n"
     exit 0
   fi
   exit 1
@@ -921,18 +921,18 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       const previousTmuxPane = process.env.TMUX_PANE;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         process.env.TMUX_PANE = '%99';
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
         if (typeof previousTmuxPane === 'string') process.env.TMUX_PANE = previousTmuxPane;
         else delete process.env.TMUX_PANE;
       }
@@ -949,15 +949,15 @@ exit 1
 
   it('prefers active mode state tmux_pane_id when present', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
-      const configPath = join(omxDir, 'tmux-hook.json');
+      const configPath = join(omcpDir, 'tmux-hook.json');
       const hookStatePath = join(stateDir, 'tmux-hook-state.json');
 
       await mkdir(sessionStateDir, { recursive: true });
@@ -976,8 +976,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -1035,17 +1035,17 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX_PANE;
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);
@@ -1060,15 +1060,15 @@ exit 1
 
   it('does not heal the repo-scoped target when a preGuard skip returns early', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-preguard-heal';
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
+      const sessionId = 'omcp-preguard-heal';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
-      const configPath = join(omxDir, 'tmux-hook.json');
+      const configPath = join(omcpDir, 'tmux-hook.json');
       const hookStatePath = join(stateDir, 'tmux-hook-state.json');
 
       await mkdir(sessionStateDir, { recursive: true });
@@ -1087,8 +1087,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -1142,13 +1142,13 @@ exit 1
         session_id: sessionId,
         'thread-id': 'thread-test-preguard-heal',
         'turn-id': 'turn-test-preguard-heal',
-        'input-messages': ['already contains [OMX_TMUX_INJECT] marker'],
+        'input-messages': ['already contains [OMCP_TMUX_INJECT] marker'],
         'last-assistant-message': 'output',
       };
 
       await withPatchedEnv({
         PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-        OMX_TEAM_WORKER: '',
+        OMCP_TEAM_WORKER: '',
       }, async () => {
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       });
@@ -1164,15 +1164,15 @@ exit 1
   });
   it('prefers scoped active mode state over global mode state for tmux pane selection', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
-      const configPath = join(omxDir, 'tmux-hook.json');
+      const configPath = join(omcpDir, 'tmux-hook.json');
       const hookStatePath = join(stateDir, 'tmux-hook-state.json');
 
       await mkdir(sessionStateDir, { recursive: true });
@@ -1196,8 +1196,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -1263,17 +1263,17 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX_PANE;
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);
@@ -1288,15 +1288,15 @@ exit 1
 
   it('skips injection when the resolved pane is still busy', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-busy-pane';
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
+      const sessionId = 'omcp-busy-pane';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
-      const configPath = join(omxDir, 'tmux-hook.json');
+      const configPath = join(omcpDir, 'tmux-hook.json');
       const hookStatePath = join(stateDir, 'tmux-hook-state.json');
 
       await mkdir(sessionStateDir, { recursive: true });
@@ -1311,8 +1311,8 @@ exit 1
         allowed_modes: ['ralph'],
         cooldown_ms: 0,
         max_injections_per_session: 10,
-        prompt_template: 'Continue [OMX_TMUX_INJECT]',
-        marker: '[OMX_TMUX_INJECT]',
+        prompt_template: 'Continue [OMCP_TMUX_INJECT]',
+        marker: '[OMCP_TMUX_INJECT]',
         dry_run: false,
         log_level: 'debug',
       });
@@ -1378,17 +1378,17 @@ exit 1
       };
 
       const previousPath = process.env.PATH;
-      const previousTeamWorker = process.env.OMX_TEAM_WORKER;
+      const previousTeamWorker = process.env.OMCP_TEAM_WORKER;
       try {
         process.env.PATH = `${fakeBinDir}:${process.env.PATH || ''}`;
-        process.env.OMX_TEAM_WORKER = '';
+        process.env.OMCP_TEAM_WORKER = '';
         delete process.env.TMUX_PANE;
         await handleTmuxInjection({ payload, cwd, stateDir, logsDir });
       } finally {
         if (typeof previousPath === 'string') process.env.PATH = previousPath;
         else delete process.env.PATH;
-        if (typeof previousTeamWorker === 'string') process.env.OMX_TEAM_WORKER = previousTeamWorker;
-        else delete process.env.OMX_TEAM_WORKER;
+        if (typeof previousTeamWorker === 'string') process.env.OMCP_TEAM_WORKER = previousTeamWorker;
+        else delete process.env.OMCP_TEAM_WORKER;
       }
 
       const hookState = await readJson<Record<string, unknown>>(hookStatePath);

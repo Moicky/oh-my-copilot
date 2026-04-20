@@ -27,7 +27,7 @@ Examples:
 - the user explicitly wants code edits, a fix, or execution — use the appropriate implementation lane instead
 - the user wants a new product plan or acceptance criteria — use `$plan` / `$ralplan`
 - the request is a simple one-file fact lookup — read the file and answer directly
-- the request is purely about running the OMX tmux team runtime — use `$team` only when OMX runtime is active
+- the request is purely about running the OMCP tmux team runtime — use `$team` only when OMCP runtime is active
 
 ## Non-negotiable contract
 
@@ -82,7 +82,7 @@ Parallel exploration is allowed when it improves quality, but it must stay runti
 - Default to direct read-only analysis when the answer is simple.
 - When parallelism helps, prefer **native subagents by default** or equivalent in-session parallel exploration when available.
 - Keep parallel lanes bounded: each lane should answer a concrete sub-question or inspect a specific subsystem.
-- Use **`$team` only when OMX runtime is active** and durable tmux-based coordination is actually needed.
+- Use **`$team` only when OMCP runtime is active** and durable tmux-based coordination is actually needed.
 - Do not imply that `$team` is available in plain Codex/App sessions.
 
 A good default split for complex analysis is:

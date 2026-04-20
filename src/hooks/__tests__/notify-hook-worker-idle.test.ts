@@ -9,7 +9,7 @@ import { join } from 'node:path';
 const NOTIFY_HOOK_SCRIPT = new URL('../../../dist/scripts/notify-hook.js', import.meta.url);
 
 async function withTempWorkingDir(run: (cwd: string) => Promise<void>): Promise<void> {
-  const cwd = await mkdtemp(join(tmpdir(), 'omx-notify-worker-idle-'));
+  const cwd = await mkdtemp(join(tmpdir(), 'omcp-notify-worker-idle-'));
   try {
     await run(cwd);
   } finally {
@@ -62,14 +62,14 @@ function runNotifyHookAsWorker(
     env: {
       ...process.env,
       PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-      OMX_TEAM_WORKER: workerEnv,
-      OMX_TEAM_WORKER_IDLE_COOLDOWN_MS: '500',
-      OMX_TEAM_ALL_IDLE_COOLDOWN_MS: '600000', // suppress all-idle to isolate per-worker
+      OMCP_TEAM_WORKER: workerEnv,
+      OMCP_TEAM_WORKER_IDLE_COOLDOWN_MS: '500',
+      OMCP_TEAM_ALL_IDLE_COOLDOWN_MS: '600000', // suppress all-idle to isolate per-worker
       TMUX: '',
       TMUX_PANE: '',
       // Isolate from inherited team env (same pattern as all-workers-idle tests)
-      OMX_TEAM_STATE_ROOT: '',
-      OMX_TEAM_LEADER_CWD: '',
+      OMCP_TEAM_STATE_ROOT: '',
+      OMCP_TEAM_LEADER_CWD: '',
       ...extraEnv,
     },
   });
@@ -78,8 +78,8 @@ function runNotifyHookAsWorker(
 describe('notify-hook per-worker idle notification', () => {
   it('fires notification on working->idle transition', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'idle-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -139,8 +139,8 @@ describe('notify-hook per-worker idle notification', () => {
 
   it('fires notification on working->done transition', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'done-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -194,8 +194,8 @@ describe('notify-hook per-worker idle notification', () => {
 
   it('does not inject worker-idle notification into a shell leader pane', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'shell-idle-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -280,8 +280,8 @@ exit 0
 
   it('injects worker-idle notification even while the leader pane has an active task', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'busy-leader-worker-idle';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -372,8 +372,8 @@ exit 0
 
   it('does not fire when worker was already idle (idle->idle)', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'no-transition';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -420,8 +420,8 @@ exit 0
 
   it('does not fire when worker is still working', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'still-working';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -462,8 +462,8 @@ exit 0
 
   it('respects per-worker cooldown', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'cooldown-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -503,7 +503,7 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHookAsWorker(cwd, fakeBinDir, `${teamName}/worker-1`, {
-        OMX_TEAM_WORKER_IDLE_COOLDOWN_MS: '600000', // 10 minute cooldown
+        OMCP_TEAM_WORKER_IDLE_COOLDOWN_MS: '600000', // 10 minute cooldown
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -514,10 +514,10 @@ exit 0
     });
   });
 
-  it('can be disabled via OMX_TEAM_WORKER_IDLE_NOTIFY=false', async () => {
+  it('can be disabled via OMCP_TEAM_WORKER_IDLE_NOTIFY=false', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'disabled-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -551,7 +551,7 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHookAsWorker(cwd, fakeBinDir, `${teamName}/worker-1`, {
-        OMX_TEAM_WORKER_IDLE_NOTIFY: 'false',
+        OMCP_TEAM_WORKER_IDLE_NOTIFY: 'false',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -562,10 +562,10 @@ exit 0
     });
   });
 
-  it('can be disabled via OMX_TEAM_WORKER_IDLE_NOTIFY=0', async () => {
+  it('can be disabled via OMCP_TEAM_WORKER_IDLE_NOTIFY=0', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'disabled-zero';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -595,7 +595,7 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHookAsWorker(cwd, fakeBinDir, `${teamName}/worker-1`, {
-        OMX_TEAM_WORKER_IDLE_NOTIFY: '0',
+        OMCP_TEAM_WORKER_IDLE_NOTIFY: '0',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -606,10 +606,10 @@ exit 0
     });
   });
 
-  it('can be disabled via OMX_TEAM_WORKER_IDLE_NOTIFY=off', async () => {
+  it('can be disabled via OMCP_TEAM_WORKER_IDLE_NOTIFY=off', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'disabled-off';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -639,7 +639,7 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHookAsWorker(cwd, fakeBinDir, `${teamName}/worker-1`, {
-        OMX_TEAM_WORKER_IDLE_NOTIFY: 'off',
+        OMCP_TEAM_WORKER_IDLE_NOTIFY: 'off',
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -652,8 +652,8 @@ exit 0
 
   it('writes worker_idle event to events.ndjson', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'event-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -708,14 +708,14 @@ exit 0
       assert.ok(workerIdleEvent.created_at, 'event should have a created_at');
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-      assert.doesNotMatch(tmuxLog, /\[OMX_INTENT:/);
+      assert.doesNotMatch(tmuxLog, /\[OMCP_INTENT:/);
     });
   });
 
   it('targets leader_pane_id when available', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'pane-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -758,8 +758,8 @@ exit 0
 
   it('does not fire for leader (non-team-worker) context', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'leader-test';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -791,7 +791,7 @@ exit 0
       await writeFile(fakeTmuxPath, buildFakeTmux(tmuxLogPath));
       await chmod(fakeTmuxPath, 0o755);
 
-      // Run as LEADER (no OMX_TEAM_WORKER env var)
+      // Run as LEADER (no OMCP_TEAM_WORKER env var)
       const payload = {
         cwd,
         type: 'agent-turn-complete',
@@ -805,7 +805,7 @@ exit 0
         env: {
           ...process.env,
           PATH: `${fakeBinDir}:${process.env.PATH || ''}`,
-          OMX_TEAM_WORKER: '',
+          OMCP_TEAM_WORKER: '',
           TMUX: '',
           TMUX_PANE: '',
         },
@@ -821,8 +821,8 @@ exit 0
 
   it('fires on first invocation when no prev state file exists (unknown->idle)', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'first-run';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -863,8 +863,8 @@ exit 0
 
   it('does not fire when worker status is stale', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'stale-status';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -911,8 +911,8 @@ exit 0
 
   it('existing all-workers-idle hook still fires alongside per-worker', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const teamName = 'both-hooks';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -946,7 +946,7 @@ exit 0
       await chmod(fakeTmuxPath, 0o755);
 
       const result = runNotifyHookAsWorker(cwd, fakeBinDir, `${teamName}/worker-1`, {
-        OMX_TEAM_ALL_IDLE_COOLDOWN_MS: '500', // re-enable all-idle
+        OMCP_TEAM_ALL_IDLE_COOLDOWN_MS: '500', // re-enable all-idle
       });
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
@@ -955,8 +955,8 @@ exit 0
       assert.match(tmuxLog, /worker-1 idle/, 'per-worker idle should fire');
       assert.match(tmuxLog, /Next: read worker-1's latest message\/output, then assign the next concrete step or mark the task complete/, 'per-worker idle nudge should include a next action');
       assert.match(tmuxLog, /All 1 worker idle/, 'all-workers-idle should also fire');
-      assert.match(tmuxLog, /Run `omx team status both-hooks` now, read unread worker messages, then assign the next concrete task, reconcile results, or shut the team down/, 'all-workers-idle nudge should tell the agent to execute the runtime status check directly');
-      assert.doesNotMatch(tmuxLog, /Next: run omx team status both-hooks, read unread worker messages, then decide whether to assign the next concrete task, reconcile results, or shut the team down/, 'all-workers-idle nudge should not fall back to human-advisory wording');
+      assert.match(tmuxLog, /Run `omcp team status both-hooks` now, read unread worker messages, then assign the next concrete task, reconcile results, or shut the team down/, 'all-workers-idle nudge should tell the agent to execute the runtime status check directly');
+      assert.doesNotMatch(tmuxLog, /Next: run omcp team status both-hooks, read unread worker messages, then decide whether to assign the next concrete task, reconcile results, or shut the team down/, 'all-workers-idle nudge should not fall back to human-advisory wording');
     });
   });
 });

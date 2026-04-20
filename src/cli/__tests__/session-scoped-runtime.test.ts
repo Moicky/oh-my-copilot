@@ -8,10 +8,10 @@ import { fileURLToPath } from 'url';
 
 const testDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(testDir, '..', '..', '..');
-const omxBin = join(repoRoot, 'dist', 'cli', 'omx.js');
+const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
 
-function runOmx(cwd: string, ...args: string[]) {
-  return spawnSync(process.execPath, [omxBin, ...args], {
+function runOmcp(cwd: string, ...args: string[]) {
+  return spawnSync(process.execPath, [omcpBin, ...args], {
     cwd,
     encoding: 'utf-8',
   });
@@ -19,23 +19,23 @@ function runOmx(cwd: string, ...args: string[]) {
 
 describe('CLI session-scoped state parity', () => {
   it('status and cancel include session-scoped states', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-cli-session-scope-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-cli-session-scope-'));
     try {
-      await mkdir(join(wd, '.omx', 'state'), { recursive: true });
-      await writeFile(join(wd, '.omx', 'state', 'session.json'), JSON.stringify({ session_id: 'sess1' }));
-      const scopedDir = join(wd, '.omx', 'state', 'sessions', 'sess1');
+      await mkdir(join(wd, '.omcp', 'state'), { recursive: true });
+      await writeFile(join(wd, '.omcp', 'state', 'session.json'), JSON.stringify({ session_id: 'sess1' }));
+      const scopedDir = join(wd, '.omcp', 'state', 'sessions', 'sess1');
       await mkdir(scopedDir, { recursive: true });
       await writeFile(join(scopedDir, 'team-state.json'), JSON.stringify({
         active: true,
         current_phase: 'team-exec',
       }));
 
-      const statusResult = runOmx(wd, 'status');
+      const statusResult = runOmcp(wd, 'status');
       if (statusResult.error && /(EPERM|EACCES)/i.test(statusResult.error.message)) return;
       assert.equal(statusResult.status, 0, statusResult.stderr || statusResult.stdout);
       assert.match(statusResult.stdout, /team: ACTIVE/);
 
-      const cancelResult = runOmx(wd, 'cancel');
+      const cancelResult = runOmcp(wd, 'cancel');
       assert.equal(cancelResult.status, 0, cancelResult.stderr || cancelResult.stdout);
       assert.match(cancelResult.stdout, /Cancelled: team/);
 
@@ -49,9 +49,9 @@ describe('CLI session-scoped state parity', () => {
   });
 
   it('cancels linked ultrawork when Ralph is active', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-cli-ralph-link-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-cli-ralph-link-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const sessionId = 'sess-link';
       const sessionDir = join(stateDir, 'sessions', sessionId);
       await mkdir(sessionDir, { recursive: true });
@@ -70,7 +70,7 @@ describe('CLI session-scoped state parity', () => {
         current_phase: 'executing',
       }));
 
-      const cancelResult = runOmx(wd, 'cancel');
+      const cancelResult = runOmcp(wd, 'cancel');
       assert.equal(cancelResult.status, 0, cancelResult.stderr || cancelResult.stdout);
       assert.match(cancelResult.stdout, /Cancelled: ralph/);
       assert.match(cancelResult.stdout, /Cancelled: ultrawork/);
@@ -89,9 +89,9 @@ describe('CLI session-scoped state parity', () => {
   });
 
   it('does not mutate unrelated sessions when cancelling current session mode', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-cli-cross-session-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-cli-cross-session-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const sessionA = join(stateDir, 'sessions', 'sessA');
       const sessionB = join(stateDir, 'sessions', 'sessB');
       await mkdir(sessionA, { recursive: true });
@@ -109,7 +109,7 @@ describe('CLI session-scoped state parity', () => {
         started_at: '2026-02-22T00:00:00.000Z',
       }));
 
-      const cancelResult = runOmx(wd, 'cancel');
+      const cancelResult = runOmcp(wd, 'cancel');
       assert.equal(cancelResult.status, 0, cancelResult.stderr || cancelResult.stdout);
       assert.match(cancelResult.stdout, /Cancelled: ralph/);
 

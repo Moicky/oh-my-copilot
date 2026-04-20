@@ -1,10 +1,10 @@
 /**
  * Keyword Detection Engine
  *
- * In OMC/legacy OMX flows, this logic detects workflow keywords and can inject
+ * In OMC/legacy OMCP flows, this logic detects workflow keywords and can inject
  * prompt-side routing guidance.
  *
- * In current OMX, native `UserPromptSubmit` is the canonical execution surface:
+ * In current OMCP, native `UserPromptSubmit` is the canonical execution surface:
  * this module owns the keyword registry, runtime gating, and hook-seeded
  * skill/workflow state. AGENTS.md now carries the behavioral fallback contract
  * rather than the full keyword/state table.
@@ -304,13 +304,13 @@ function resolveSeedStateFilePath(
   if (scope !== 'root' && sessionId?.trim()) {
     return {
       absolutePath: join(stateDir, 'sessions', sessionId, `${mode}-state.json`),
-      relativePath: `.omx/state/sessions/${sessionId}/${mode}-state.json`,
+      relativePath: `.omcp/state/sessions/${sessionId}/${mode}-state.json`,
     };
   }
 
   return {
     absolutePath: join(stateDir, `${mode}-state.json`),
-    relativePath: `.omx/state/${mode}-state.json`,
+    relativePath: `.omcp/state/${mode}-state.json`,
   };
 }
 
@@ -407,7 +407,7 @@ type IntentKeyword = 'ralph' | 'team' | 'swarm' | 'stop' | 'abort' | 'parallel' 
  * "team" / "swarm" require explicit orchestration phrasing so a generic
  * reference in prose doesn't spin up the skill.
  *
- * "stop" / "abort" require a bare imperative or explicit OMX mode reference so
+ * "stop" / "abort" require a bare imperative or explicit OMCP mode reference so
  * test-log lines like "stop retrying" or "request aborted" do not trigger cancel.
  *
  * "parallel" requires an explicit instruction to run in parallel mode so that
@@ -435,7 +435,7 @@ const KEYWORD_INTENT_PATTERNS: Record<IntentKeyword, RegExp[]> = {
   ],
   stop: [
     /^(?:please\s+)?stop(?:\s+now)?\s*[.!]?\s*$/i,
-    /\bcancelomx\b/i,
+    /\bcancelomcp\b/i,
     /(?:^|[^\w])\$(?:stop|cancel|abort)\b/i,
     /\/(?:cancel|stop|abort)\b/i,
     /\bstop\s+(?:the\s+)?(?:agent|ralph|autopilot|team|ultrawork|execution|current\s+(?:mode|task|run))\b/i,
@@ -443,7 +443,7 @@ const KEYWORD_INTENT_PATTERNS: Record<IntentKeyword, RegExp[]> = {
   ],
   abort: [
     /^(?:please\s+)?abort(?:\s+now)?\s*[.!]?\s*$/i,
-    /\bcancelomx\b/i,
+    /\bcancelomcp\b/i,
     /(?:^|[^\w])\$(?:stop|cancel|abort)\b/i,
     /\/(?:cancel|stop|abort)\b/i,
     /\babort\s+(?:the\s+)?(?:agent|ralph|autopilot|team|ultrawork|execution|current\s+(?:mode|task|run))\b/i,
@@ -699,7 +699,7 @@ export async function recordSkillActivation(input: RecordSkillActivationInput): 
       );
       await persistDeepInterviewModeState(input.stateDir, state, nowIso, previous, input);
     } catch (error) {
-      console.warn('[omx] warning: failed to persist keyword activation state', error);
+      console.warn('[omcp] warning: failed to persist keyword activation state', error);
     }
 
     return state;
@@ -872,7 +872,7 @@ export async function recordSkillActivation(input: RecordSkillActivationInput): 
       await persistDeepInterviewModeState(input.stateDir, nextState, nowIso, previous, input);
       return nextState;
     } catch (error) {
-      console.warn('[omx] warning: failed to persist keyword activation state', error);
+      console.warn('[omcp] warning: failed to persist keyword activation state', error);
     }
 
     return workflowState;
@@ -915,7 +915,7 @@ export async function recordSkillActivation(input: RecordSkillActivationInput): 
     await persistDeepInterviewModeState(input.stateDir, nextState, nowIso, previous, input);
     return nextState;
   } catch (error) {
-    console.warn('[omx] warning: failed to persist keyword activation state', error);
+    console.warn('[omcp] warning: failed to persist keyword activation state', error);
   }
 
   return state;
@@ -925,7 +925,7 @@ export async function recordSkillActivation(input: RecordSkillActivationInput): 
  * Pre-execution gate — ported from OMC src/hooks/keyword-detector/index.ts
  *
  * In OMC these functions run at prompt time in bridge.ts (mandatory enforcement).
- * In OMX they generate AGENTS.md instructions and serve as test infrastructure.
+ * In OMCP they generate AGENTS.md instructions and serve as test infrastructure.
  * See task-size-detector.ts for full advisory-nature documentation.
  */
 

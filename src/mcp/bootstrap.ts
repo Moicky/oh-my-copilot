@@ -4,15 +4,15 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 export type McpServerName = 'state' | 'memory' | 'code_intel' | 'trace' | 'wiki';
 
 const SERVER_DISABLE_ENV: Record<McpServerName, string> = {
-  state: 'OMX_STATE_SERVER_DISABLE_AUTO_START',
-  memory: 'OMX_MEMORY_SERVER_DISABLE_AUTO_START',
-  code_intel: 'OMX_CODE_INTEL_SERVER_DISABLE_AUTO_START',
-  trace: 'OMX_TRACE_SERVER_DISABLE_AUTO_START',
-  wiki: 'OMX_WIKI_SERVER_DISABLE_AUTO_START',
+  state: 'OMCP_STATE_SERVER_DISABLE_AUTO_START',
+  memory: 'OMCP_MEMORY_SERVER_DISABLE_AUTO_START',
+  code_intel: 'OMCP_CODE_INTEL_SERVER_DISABLE_AUTO_START',
+  trace: 'OMCP_TRACE_SERVER_DISABLE_AUTO_START',
+  wiki: 'OMCP_WIKI_SERVER_DISABLE_AUTO_START',
 };
 
-const GLOBAL_DISABLE_ENV = 'OMX_MCP_SERVER_DISABLE_AUTO_START';
-const LIFECYCLE_DEBUG_ENV = 'OMX_MCP_TRANSPORT_DEBUG';
+const GLOBAL_DISABLE_ENV = 'OMCP_MCP_SERVER_DISABLE_AUTO_START';
+const LIFECYCLE_DEBUG_ENV = 'OMCP_MCP_TRANSPORT_DEBUG';
 const PARENT_WATCHDOG_INTERVAL_MS = 25;
 const DUPLICATE_SIBLING_WATCHDOG_INTERVAL_MS = 5_000;
 const DUPLICATE_SIBLING_PRE_TRAFFIC_GRACE_MS = 2_000;
@@ -225,7 +225,7 @@ export function autoStartStdioMcpServer(
   const logLifecycle = (message: string, error?: unknown) => {
     if (!lifecycleDebugEnabled) return;
     const detail = error ? ` ${error instanceof Error ? error.message : String(error)}` : '';
-    process.stderr.write(`[omx-${serverName}-server] ${message}${detail}\n`);
+    process.stderr.write(`[omcp-${serverName}-server] ${message}${detail}\n`);
   };
 
   const parentWatchdog = trackedParentPid > 1
@@ -295,7 +295,7 @@ export function autoStartStdioMcpServer(
     try {
       await server.close();
     } catch (error) {
-      console.error(`[omx-${serverName}-server] shutdown failed`, error);
+      console.error(`[omcp-${serverName}-server] shutdown failed`, error);
     }
 
     logLifecycle('transport shutdown: exit');

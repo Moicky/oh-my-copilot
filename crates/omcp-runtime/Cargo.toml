@@ -1,0 +1,12 @@
+[package]
+name = "omcp-runtime"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+omcp-mux = { path = "../omcp-mux" }
+omcp-runtime-core = { path = "../omcp-runtime-core" }
+serde_json = "1"
+

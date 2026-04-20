@@ -16,7 +16,7 @@ function runNotifyHook(payload: Record<string, unknown>) {
     encoding: 'utf-8',
     env: {
       ...process.env,
-      OMX_TEAM_WORKER: '',
+      OMCP_TEAM_WORKER: '',
       TMUX: '',
       TMUX_PANE: '',
     },
@@ -25,9 +25,9 @@ function runNotifyHook(payload: Record<string, unknown>) {
 
 describe('notify-hook session-scoped iteration updates', () => {
   it('does not mutate root active mode state when current session scope exists only in session.json', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-root-fallback-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-root-fallback-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const sessionId = 'sess-current';
       await mkdir(stateDir, { recursive: true });
 
@@ -59,9 +59,9 @@ describe('notify-hook session-scoped iteration updates', () => {
   });
 
   it('increments iteration for active session-scoped mode states', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-test-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-test-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const sessionId = 'sess1';
       const sessionScopedDir = join(stateDir, 'sessions', sessionId);
       await mkdir(sessionScopedDir, { recursive: true });
@@ -88,9 +88,9 @@ describe('notify-hook session-scoped iteration updates', () => {
   });
 
   it('auto-expands active Ralph max_iterations by 10 when the run is still progressing', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-test-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-test-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const sessionId = 'sess1';
       const sessionScopedDir = join(stateDir, 'sessions', sessionId);
       await mkdir(sessionScopedDir, { recursive: true });
@@ -129,9 +129,9 @@ describe('notify-hook session-scoped iteration updates', () => {
   });
 
   it('still marks non-Ralph modes complete when max_iterations is reached', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-test-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-test-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const sessionId = 'sess1';
       const sessionScopedDir = join(stateDir, 'sessions', sessionId);
       await mkdir(sessionScopedDir, { recursive: true });
@@ -167,9 +167,9 @@ describe('notify-hook session-scoped iteration updates', () => {
   });
 
   it('writes hud progress timestamps for leader turns', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-hud-progress-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-hud-progress-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       await mkdir(stateDir, { recursive: true });
 
       const result = runNotifyHook({
@@ -191,11 +191,11 @@ describe('notify-hook session-scoped iteration updates', () => {
     }
   });
 
-  it('prefers the canonical OMX session scope over a different native payload session id for notify sidefiles', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-canonical-session-'));
+  it('prefers the canonical OMCP session scope over a different native payload session id for notify sidefiles', async () => {
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-canonical-session-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
-      const canonicalSessionId = 'omx-canonical-session';
+      const stateDir = join(wd, '.omcp', 'state');
+      const canonicalSessionId = 'omcp-canonical-session';
       const nativeSessionId = 'codex-native-session';
       const canonicalDir = join(stateDir, 'sessions', canonicalSessionId);
       await mkdir(canonicalDir, { recursive: true });
@@ -227,12 +227,12 @@ describe('notify-hook session-scoped iteration updates', () => {
   });
 
 
-  it('prefers the invocation OMX session id over the persisted canonical session for notify sidefiles when a fork scope exists', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-fork-session-'));
+  it('prefers the invocation OMCP session id over the persisted canonical session for notify sidefiles when a fork scope exists', async () => {
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-fork-session-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
-      const canonicalSessionId = 'omx-canonical-session';
-      const forkSessionId = 'omx-fork-session';
+      const stateDir = join(wd, '.omcp', 'state');
+      const canonicalSessionId = 'omcp-canonical-session';
+      const forkSessionId = 'omcp-fork-session';
       const nativeSessionId = 'codex-native-session';
       const forkDir = join(stateDir, 'sessions', forkSessionId);
       await mkdir(forkDir, { recursive: true });
@@ -256,8 +256,8 @@ describe('notify-hook session-scoped iteration updates', () => {
         encoding: 'utf-8',
         env: {
           ...process.env,
-          OMX_SESSION_ID: forkSessionId,
-          OMX_TEAM_WORKER: '',
+          OMCP_SESSION_ID: forkSessionId,
+          OMCP_TEAM_WORKER: '',
           TMUX: '',
           TMUX_PANE: '',
         },
@@ -274,7 +274,7 @@ describe('notify-hook session-scoped iteration updates', () => {
   });
 
   it('persists visual-verdict feedback from runtime assistant output', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-visual-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-visual-'));
     try {
       const sessionId = 'sessVisual';
       const result = runNotifyHook({
@@ -306,7 +306,7 @@ describe('notify-hook session-scoped iteration updates', () => {
       });
       assert.equal(result.status, 0, result.stderr || result.stdout);
 
-      const progressPath = join(wd, '.omx', 'state', 'sessions', sessionId, 'ralph-progress.json');
+      const progressPath = join(wd, '.omcp', 'state', 'sessions', sessionId, 'ralph-progress.json');
       assert.equal(existsSync(progressPath), true);
       const progress = JSON.parse(await readFile(progressPath, 'utf-8')) as {
         visual_feedback?: Array<{

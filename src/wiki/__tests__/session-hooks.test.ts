@@ -22,9 +22,9 @@ describe('Wiki lifecycle hooks', () => {
     await fsp.rm(tempDir, { recursive: true, force: true });
   });
 
-  it('respects autoCapture=false from project .omx-config.json', () => {
+  it('respects autoCapture=false from project .omcp-config.json', () => {
     fs.writeFileSync(
-      path.join(tempDir, '.omx-config.json'),
+      path.join(tempDir, '.omcp-config.json'),
       JSON.stringify({ wiki: { autoCapture: false } }),
     );
 

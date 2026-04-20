@@ -1,7 +1,5 @@
 ## Summary
 
-> For normal contributions, target base branch `dev`. Use `main` only when a maintainer explicitly asks for it.
-
 Describe the problem and why this change is needed.
 
 ## Changes
@@ -12,7 +10,7 @@ Describe the problem and why this change is needed.
 
 - [ ] `npm run build`
 - [ ] `npm test`
-- [ ] `omx doctor` (when setup/config behavior changes)
+- [ ] `omcp doctor` (when setup/config behavior changes)
 
 ## Checklist
 

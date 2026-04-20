@@ -18,13 +18,13 @@ describe('analyzePaneContent', () => {
     assert.ok(result.confidence >= 0.5);
   });
 
-  it('detects "omx" keyword', () => {
-    const result = analyzePaneContent('omx session started');
+  it('detects "omcp" keyword', () => {
+    const result = analyzePaneContent('omcp session started');
     assert.equal(result.hasCodex, true);
   });
 
-  it('detects "oh-my-codex" keyword', () => {
-    const result = analyzePaneContent('oh-my-codex v1.0');
+  it('detects "oh-my-copilot" keyword', () => {
+    const result = analyzePaneContent('oh-my-copilot v1.0');
     assert.equal(result.hasCodex, true);
   });
 
@@ -81,7 +81,7 @@ describe('analyzePaneContent', () => {
   });
 
   it('caps confidence at 1.0', () => {
-    const result = analyzePaneContent('Codex $ > agent task running omx');
+    const result = analyzePaneContent('Codex $ > agent task running omcp');
     assert.ok(result.confidence <= 1.0);
   });
 

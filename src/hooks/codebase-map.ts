@@ -1,5 +1,5 @@
 /**
- * Codebase Map Generator for oh-my-codex
+ * Codebase Map Generator for oh-my-copilot
  *
  * Generates a lightweight snapshot of the project's source structure and
  * key exported symbols, injected into agent context at session start.

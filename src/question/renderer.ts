@@ -4,7 +4,7 @@ import { parsePaneIdFromTmuxOutput, shellEscapeSingle } from '../hud/tmux.js';
 import { sanitizeReplyInput } from '../notifications/reply-listener.js';
 import { getCurrentTmuxPaneId } from '../notifications/tmux.js';
 import { resolveTmuxBinaryForPlatform } from '../utils/platform-command.js';
-import { resolveOmxCliEntryPath } from '../utils/paths.js';
+import { resolveOmcpCliEntryPath } from '../utils/paths.js';
 import type { QuestionAnswer, QuestionRendererState } from './types.js';
 
 export type QuestionRendererStrategy = 'inside-tmux' | 'detached-tmux' | 'test-noop' | 'unsupported';
@@ -31,22 +31,22 @@ export function resolveQuestionRendererStrategy(
   env: NodeJS.ProcessEnv = process.env,
   tmuxBinary = resolveTmuxBinaryForPlatform(),
 ): QuestionRendererStrategy {
-  if (safeString(env.OMX_QUESTION_TEST_RENDERER).trim() === 'noop') return 'test-noop';
+  if (safeString(env.OMCP_QUESTION_TEST_RENDERER).trim() === 'noop') return 'test-noop';
   if (safeString(env.TMUX).trim() !== '') return 'inside-tmux';
   if (tmuxBinary) return 'detached-tmux';
   return 'unsupported';
 }
 
 function buildQuestionUiCommand(recordPath: string, sessionId?: string): string {
-  const omxBin = resolveOmxCliEntryPath() || process.argv[1];
-  if (!omxBin) throw new Error('Unable to resolve OMX CLI entry path for question UI launch.');
-  const sessionPrefix = sessionId ? `OMX_SESSION_ID=${shellEscapeSingle(sessionId)} ` : '';
-  return `${sessionPrefix}${shellEscapeSingle(process.execPath)} ${shellEscapeSingle(omxBin)} question --ui --state-path ${shellEscapeSingle(recordPath)}`;
+  const omcpBin = resolveOmcpCliEntryPath() || process.argv[1];
+  if (!omcpBin) throw new Error('Unable to resolve OMCP CLI entry path for question UI launch.');
+  const sessionPrefix = sessionId ? `OMCP_SESSION_ID=${shellEscapeSingle(sessionId)} ` : '';
+  return `${sessionPrefix}${shellEscapeSingle(process.execPath)} ${shellEscapeSingle(omcpBin)} question --ui --state-path ${shellEscapeSingle(recordPath)}`;
 }
 
 function defaultExecTmux(args: string[]): string {
   const tmux = resolveTmuxBinaryForPlatform();
-  if (!tmux) throw new Error('tmux is unavailable; omx question requires tmux for OMX-owned question UI rendering.');
+  if (!tmux) throw new Error('tmux is unavailable; omcp question requires tmux for OMCP-owned question UI rendering.');
   return execFileSync(tmux, args, {
     encoding: 'utf-8',
     ...(process.platform === 'win32' ? { windowsHide: true } : {}),
@@ -61,7 +61,7 @@ function resolveReturnTarget(env: NodeJS.ProcessEnv = process.env): string | und
 }
 
 export function formatQuestionAnswerForInjection(answer: QuestionAnswer): string {
-  const prefix = '[omx question answered]';
+  const prefix = '[omcp question answered]';
   if (answer.kind === 'other') {
     return sanitizeReplyInput(`${prefix} ${answer.other_text ?? String(answer.value)}`);
   }
@@ -114,7 +114,7 @@ export function launchQuestionRenderer(
       command,
     ]);
     const paneId = parsePaneIdFromTmuxOutput(rawPane);
-    if (!paneId) throw new Error('Failed to create tmux split pane for omx question UI.');
+    if (!paneId) throw new Error('Failed to create tmux split pane for omcp question UI.');
     const returnTarget = resolveReturnTarget(options.env ?? process.env);
     return {
       renderer: 'tmux-pane',
@@ -126,7 +126,7 @@ export function launchQuestionRenderer(
 
   if (strategy === 'detached-tmux') {
     const baseName = basename(options.recordPath, '.json').replace(/[^A-Za-z0-9_-]+/g, '-').slice(0, 32) || 'question';
-    const sessionName = `omx-question-${baseName}`;
+    const sessionName = `omcp-question-${baseName}`;
     const output = execTmux([
       'new-session',
       '-d',
@@ -154,5 +154,5 @@ export function launchQuestionRenderer(
     };
   }
 
-  throw new Error('omx question requires tmux for OMX-owned question UI rendering in this session.');
+  throw new Error('omcp question requires tmux for OMCP-owned question UI rendering in this session.');
 }

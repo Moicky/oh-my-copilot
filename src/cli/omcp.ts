@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+
+// oh-my-copilot CLI entry point
+// Requires compiled JavaScript output in dist/
+
+import { fileURLToPath, pathToFileURL } from 'url';
+import { dirname, join } from 'path';
+import { existsSync } from 'fs';
+import { rememberOmcpLaunchContext } from '../utils/paths.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const root = join(__dirname, '..', '..');
+
+rememberOmcpLaunchContext();
+
+// Execute compiled entrypoint
+const distEntry = join(root, 'dist', 'cli', 'index.js');
+
+if (existsSync(distEntry)) {
+  const { main } = await import(pathToFileURL(distEntry).href);
+  await main(process.argv.slice(2));
+  process.exit(process.exitCode ?? 0);
+} else {
+  console.error('oh-my-copilot: run "npm run build" first');
+  process.exit(1);
+}

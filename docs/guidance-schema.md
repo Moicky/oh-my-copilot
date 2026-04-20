@@ -40,14 +40,14 @@ This standard is additive and migration-safe: it does not change task-state APIs
 
 ### Marker contracts
 
-- `<!-- OMX:RUNTIME:START --> ... <!-- OMX:RUNTIME:END -->`
-- `<!-- OMX:TEAM:WORKER:START --> ... <!-- OMX:TEAM:WORKER:END -->`
+- `<!-- OMCP:RUNTIME:START --> ... <!-- OMCP:RUNTIME:END -->`
+- `<!-- OMCP:TEAM:WORKER:START --> ... <!-- OMCP:TEAM:WORKER:END -->`
 
 ### Worker task/mailbox contracts
 
-- Task file path format: `.omx/state/team/<team>/tasks/task-<id>.json` (example: `task-3.json`)
+- Task file path format: `.omcp/state/team/<team>/tasks/task-<id>.json` (example: `task-3.json`)
 - State/MCP API id format: `task_id: "<id>"` (example: `"3"`, never `"task-3"`)
-- Mailbox path: `.omx/state/team/<team>/mailbox/<worker>.json`
+- Mailbox path: `.omcp/state/team/<team>/mailbox/<worker>.json`
 
 ## Mapping Matrix
 
