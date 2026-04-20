@@ -13,7 +13,7 @@ let resetOpenClawConfigCache: typeof import('../../openclaw/config.js').resetOpe
 
 async function writeCodexConfig(contents: unknown): Promise<void> {
   await mkdir(tempCodexHome, { recursive: true });
-  await writeFile(join(tempCodexHome, '.omx-config.json'), JSON.stringify(contents, null, 2));
+  await writeFile(join(tempCodexHome, '.omcp-config.json'), JSON.stringify(contents, null, 2));
 }
 
 function clearEnv(): void {
@@ -25,7 +25,7 @@ function clearEnv(): void {
 describe('notification custom alias enablement defaults', () => {
   before(async () => {
     clearEnv();
-    tempCodexHome = await mkdtemp(join(tmpdir(), 'omx-custom-alias-'));
+    tempCodexHome = await mkdtemp(join(tmpdir(), 'omcp-custom-alias-'));
     process.env.CODEX_HOME = tempCodexHome;
     process.env.OMX_OPENCLAW = '1';
 
@@ -41,7 +41,7 @@ describe('notification custom alias enablement defaults', () => {
 
   afterEach(async () => {
     resetOpenClawConfigCache();
-    await rm(join(tempCodexHome, '.omx-config.json'), { force: true });
+    await rm(join(tempCodexHome, '.omcp-config.json'), { force: true });
   });
 
   after(async () => {

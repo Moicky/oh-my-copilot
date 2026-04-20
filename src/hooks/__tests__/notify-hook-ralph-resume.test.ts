@@ -127,9 +127,9 @@ async function withPatchedEnv<T>(
 
 describe('notify-hook Ralph session resume', () => {
   it('resumes a matching prior Ralph into the current OMCP session and rebinds the pane', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-resume-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-resume-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const currentOmxSessionId = 'sess-current';
       const priorOmxSessionId = 'sess-prior';
       const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
@@ -174,9 +174,9 @@ describe('notify-hook Ralph session resume', () => {
   });
 
   it('rebinds the current pane for an already-active current-session Ralph state', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-current-pane-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-current-pane-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const currentOmxSessionId = 'sess-current';
       const priorOmxSessionId = 'sess-prior';
       const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
@@ -228,9 +228,9 @@ describe('notify-hook Ralph session resume', () => {
   });
 
   it('preserves current-session legacy owner_codex_thread_id until owner_codex_session_id is available', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-current-legacy-owner-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-current-legacy-owner-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const currentOmxSessionId = 'sess-current';
       const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
       const currentPaneId = '%79';
@@ -267,9 +267,9 @@ describe('notify-hook Ralph session resume', () => {
   });
 
   it('adopts a same-thread Ralph across OMCP session turnover even when Codex session id is absent', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-thread-turnover-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-thread-turnover-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const priorOmxSessionId = 'sess-prior';
       const currentOmxSessionId = 'sess-current';
       const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
@@ -352,9 +352,9 @@ describe('notify-hook Ralph session resume', () => {
 
     for (const scenario of scenarios) {
       await t.test(scenario.name, async () => {
-        const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-no-resume-'));
+        const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-no-resume-'));
         try {
-          const stateDir = join(wd, '.omx', 'state');
+          const stateDir = join(wd, '.omcp', 'state');
           const currentOmxSessionId = 'sess-current';
           const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
           await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
@@ -395,9 +395,9 @@ describe('notify-hook Ralph session resume', () => {
   });
 
   it('resumes a legacy prior Ralph that only tracks owner_codex_thread_id', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-thread-resume-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-thread-resume-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const currentOmxSessionId = 'sess-current';
       const priorOmxSessionId = 'sess-prior';
       const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
@@ -443,9 +443,9 @@ describe('notify-hook Ralph session resume', () => {
   });
 
   it('does not fall back to owner_codex_thread_id when owner_codex_session_id is present and mismatched', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-session-precedence-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-session-precedence-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const currentOmxSessionId = 'sess-current';
       const priorOmxSessionId = 'sess-prior';
       const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
@@ -481,9 +481,9 @@ describe('notify-hook Ralph session resume', () => {
   });
 
   it('does not auto-resume a legacy Ralph when both source and payload thread ids are missing', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-empty-thread-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-empty-thread-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const currentOmxSessionId = 'sess-current';
       const priorOmxSessionId = 'sess-prior';
       const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
@@ -516,9 +516,9 @@ describe('notify-hook Ralph session resume', () => {
   });
 
   it('does not treat blocked_on_user Ralph state as resumable', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-blocked-on-user-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-blocked-on-user-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const currentOmxSessionId = 'sess-current';
       const priorOmxSessionId = 'sess-prior';
       const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
@@ -552,9 +552,9 @@ describe('notify-hook Ralph session resume', () => {
   });
 
   it('does not auto-resume over an inactive current-session Ralph file', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-inactive-current-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-inactive-current-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const currentOmxSessionId = 'sess-current';
       const priorOmxSessionId = 'sess-prior';
       const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
@@ -601,9 +601,9 @@ describe('notify-hook Ralph session resume', () => {
   });
 
   it('does not auto-resume over an unreadable current-session Ralph file', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-unreadable-current-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-unreadable-current-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const currentOmxSessionId = 'sess-current';
       const priorOmxSessionId = 'sess-prior';
       const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
@@ -641,9 +641,9 @@ describe('notify-hook Ralph session resume', () => {
   });
 
   it('serializes concurrent resume attempts so only one transfer occurs', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-concurrent-resume-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-concurrent-resume-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const currentOmxSessionId = 'sess-current';
       const priorOmxSessionId = 'sess-prior';
       const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
@@ -719,9 +719,9 @@ describe('notify-hook Ralph session resume', () => {
   });
 
   it('rolls back the target state when transfer fails after writing the current session', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-transfer-rollback-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-transfer-rollback-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const currentOmxSessionId = 'sess-current';
       const priorOmxSessionId = 'sess-prior';
       const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);

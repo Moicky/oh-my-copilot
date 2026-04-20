@@ -44,7 +44,7 @@ import { readTeamEvents } from '../state/events.js';
 import { sanitizeTeamName } from '../tmux-session.js';
 
 async function initRepo(): Promise<string> {
-  const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-worktree-repo-'));
+  const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-worktree-repo-'));
   execFileSync('git', ['init'], { cwd, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Test User'], { cwd, stdio: 'ignore' });
@@ -85,7 +85,7 @@ function expectedLowComplexityModel(codexHomeOverride?: string): string {
 }
 
 async function readTeamDeliveryLog(cwd: string): Promise<Array<Record<string, unknown>>> {
-  const path = join(cwd, '.omx', 'logs', `team-delivery-${new Date().toISOString().slice(0, 10)}.jsonl`);
+  const path = join(cwd, '.omcp', 'logs', `team-delivery-${new Date().toISOString().slice(0, 10)}.jsonl`);
   const raw = await readFile(path, 'utf-8').catch(() => '');
   return raw
     .split('\n')
@@ -245,7 +245,7 @@ type MockBinarySpec = {
 
 
 function teamStateTestPath(cwd: string, ...parts: string[]): string {
-  const stateRoot = process.env.OMX_TEAM_STATE_ROOT ?? join(cwd, '.omx', 'state');
+  const stateRoot = process.env.OMX_TEAM_STATE_ROOT ?? join(cwd, '.omcp', 'state');
   return join(stateRoot, ...parts);
 }
 
@@ -349,9 +349,9 @@ describe('runtime', () => {
 
   it('resolveWorkerLaunchArgsFromEnv reads low-complexity model from config when present', async () => {
     const previousCodexHome = process.env.CODEX_HOME;
-    const tempCodexHome = await mkdtemp(join(tmpdir(), 'omx-codex-home-'));
+    const tempCodexHome = await mkdtemp(join(tmpdir(), 'omcp-codex-home-'));
     await writeFile(
-      join(tempCodexHome, '.omx-config.json'),
+      join(tempCodexHome, '.omcp-config.json'),
       JSON.stringify({ models: { team_low_complexity: 'gpt-4.1-mini' } }),
     );
     process.env.CODEX_HOME = tempCodexHome;
@@ -578,7 +578,7 @@ describe('runtime', () => {
   });
 
   it('waitForClaudeStartupEvidence requires first-start ACK/task progress before startup dispatch is treated as settled', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-claude-startup-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-claude-startup-'));
     try {
       await initTeamState('claude-startup', 'startup evidence test', 'executor', 1, cwd);
 
@@ -602,7 +602,7 @@ describe('runtime', () => {
       assert.equal(ack, 'leader_ack');
 
       await writeAtomic(
-        join(cwd, '.omx', 'state', 'team', 'claude-startup', 'workers', 'worker-1', 'status.json'),
+        join(cwd, '.omcp', 'state', 'team', 'claude-startup', 'workers', 'worker-1', 'status.json'),
         JSON.stringify({
           state: 'working',
           current_task_id: 'task-1',
@@ -623,7 +623,7 @@ describe('runtime', () => {
   });
 
   it('waitForWorkerStartupEvidence ignores Codex ACK-only startup replies until work is claimed', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-codex-startup-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-codex-startup-'));
     try {
       await initTeamState('codex-startup', 'startup evidence test', 'executor', 1, cwd);
 
@@ -639,7 +639,7 @@ describe('runtime', () => {
       assert.equal(ackOnly, 'none');
 
       await writeAtomic(
-        join(cwd, '.omx', 'state', 'team', 'codex-startup', 'workers', 'worker-1', 'status.json'),
+        join(cwd, '.omcp', 'state', 'team', 'codex-startup', 'workers', 'worker-1', 'status.json'),
         JSON.stringify({
           state: 'working',
           current_task_id: 'task-1',
@@ -661,12 +661,12 @@ describe('runtime', () => {
   });
 
   it('waitForWorkerStartupEvidence treats blocked worker status as settled progress even without a claimed task id', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-codex-blocked-startup-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-codex-blocked-startup-'));
     try {
       await initTeamState('codex-blocked-startup', 'blocked startup evidence test', 'executor', 1, cwd);
 
       await writeAtomic(
-        join(cwd, '.omx', 'state', 'team', 'codex-blocked-startup', 'workers', 'worker-1', 'status.json'),
+        join(cwd, '.omcp', 'state', 'team', 'codex-blocked-startup', 'workers', 'worker-1', 'status.json'),
         JSON.stringify({
           state: 'blocked',
           reason: 'waiting on shared file',
@@ -688,7 +688,7 @@ describe('runtime', () => {
   });
 
   it('startTeam rejects interactive startup when tmux fallback never produces worker startup evidence', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-startup-no-evidence-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-startup-no-evidence-'));
     const prevTmux = process.env.TMUX;
     const prevTmuxPane = process.env.TMUX_PANE;
     const prevLaunchMode = process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
@@ -699,7 +699,7 @@ describe('runtime', () => {
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-startup-no-evidence-bin-',
+          dirPrefix: 'omcp-runtime-startup-no-evidence-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${tmuxLogPath}"
@@ -853,7 +853,7 @@ esac
   });
 
   it('startTeam rejects nested team invocation inside worker context', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     const prev = process.env.OMX_TEAM_WORKER;
     process.env.OMX_TEAM_WORKER = 'alpha/worker-1';
     try {
@@ -869,7 +869,7 @@ esac
   });
 
   it('startTeam allows nested team invocation when parent governance enables it', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-nested-allow-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-nested-allow-'));
     const binDir = join(cwd, 'bin');
     const fakeGeminiPath = join(binDir, 'gemini');
     await mkdir(binDir, { recursive: true });
@@ -882,7 +882,7 @@ sleep 5
     );
 
     await initTeamState('parent-team', 'parent', 'executor', 1, cwd);
-    const parentManifestPath = join(cwd, '.omx', 'state', 'team', 'parent-team', 'manifest.v2.json');
+    const parentManifestPath = join(cwd, '.omcp', 'state', 'team', 'parent-team', 'manifest.v2.json');
     const parentManifest = JSON.parse(await readFile(parentManifestPath, 'utf-8')) as any;
     parentManifest.governance = { ...(parentManifest.governance || {}), nested_teams_allowed: true };
     await writeFile(parentManifestPath, JSON.stringify(parentManifest, null, 2));
@@ -898,7 +898,7 @@ sleep 5
     process.env.PATH = `${binDir}:${prevPath ?? ''}`;
     delete process.env.TMUX;
     process.env.OMX_TEAM_WORKER = 'parent-team/worker-1';
-    process.env.OMX_TEAM_STATE_ROOT = join(cwd, '.omx', 'state');
+    process.env.OMX_TEAM_STATE_ROOT = join(cwd, '.omcp', 'state');
     process.env.OMX_TEAM_LEADER_CWD = cwd;
     process.env.OMX_TEAM_WORKER_LAUNCH_MODE = 'prompt';
     process.env.OMX_TEAM_WORKER_CLI = 'gemini';
@@ -940,7 +940,7 @@ sleep 5
   });
 
   it('startTeam throws when tmux is not available', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     const prevLaunchMode = process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
     try {
       process.env.OMX_TEAM_WORKER_LAUNCH_MODE = 'interactive';
@@ -959,7 +959,7 @@ sleep 5
   });
 
   it('startTeam rejects duplicate active same-name team state without mutating existing files', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-duplicate-team-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-duplicate-team-'));
     const prevSessionId = process.env.OMX_SESSION_ID;
     const prevLaunchMode = process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
     try {
@@ -1016,15 +1016,15 @@ sleep 5
   it('skips interactive worker process-tree prekill on native Windows split-pane sessions', async () => {
     await withNativeWindowsPlatform(async () => {
       assert.equal(shouldPrekillInteractiveShutdownProcessTrees('leader:0'), false);
-      assert.equal(shouldPrekillInteractiveShutdownProcessTrees('omx-team-alpha'), true);
+      assert.equal(shouldPrekillInteractiveShutdownProcessTrees('omcp-team-alpha'), true);
     });
 
     assert.equal(shouldPrekillInteractiveShutdownProcessTrees('leader:0'), false);
-    assert.equal(shouldPrekillInteractiveShutdownProcessTrees('omx-team-alpha'), true);
+    assert.equal(shouldPrekillInteractiveShutdownProcessTrees('omcp-team-alpha'), true);
   });
 
   it('startTeam accepts native Windows tmux clients even when TMUX env vars are absent', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-win32-no-env-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-win32-no-env-'));
     const prevTmux = process.env.TMUX;
     const prevTmuxPane = process.env.TMUX_PANE;
     const prevLaunchMode = process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
@@ -1041,7 +1041,7 @@ sleep 5
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-win32-no-env-',
+          dirPrefix: 'omcp-runtime-win32-no-env-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${tmuxLogPath}"
@@ -1153,7 +1153,7 @@ esac
   });
 
   it('applyCreatedInteractiveSessionToConfig persists worker pane ids before readiness waits', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-pane-persist-race-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-pane-persist-race-'));
     try {
       const config = await initTeamState('team-pane-persist-race', 'persist pane ids before readiness wait', 'executor', 2, cwd);
       const workerPaneIds = Array.from({ length: 2 }, () => undefined as string | undefined);
@@ -1180,7 +1180,7 @@ esac
   });
 
   it('startTeam captures interactive worker pid from the resolved pane id', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-pane-pid-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-pane-pid-'));
     const prevTmux = process.env.TMUX;
     const prevTmuxPane = process.env.TMUX_PANE;
     const prevLaunchMode = process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
@@ -1191,7 +1191,7 @@ esac
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-pane-pid-bin-',
+          dirPrefix: 'omcp-runtime-pane-pid-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\n' "$*" >> "${tmuxLogPath}"
@@ -1237,8 +1237,8 @@ case "\${1:-}" in
   split-window)
     case "$*" in
       *" -h "*)
-        mkdir -p "${cwd}/.omx/state/team/team-pane-pid/workers/worker-1"
-        cat > "${cwd}/.omx/state/team/team-pane-pid/workers/worker-1/status.json" <<'EOF'
+        mkdir -p "${cwd}/.omcp/state/team/team-pane-pid/workers/worker-1"
+        cat > "${cwd}/.omcp/state/team/team-pane-pid/workers/worker-1/status.json" <<'EOF'
 {
   "state": "working",
   "current_task_id": "1",
@@ -1283,7 +1283,7 @@ esac
           assert.equal(runtime.config.workers[0]?.pane_id, '%2');
           assert.equal(runtime.config.workers[0]?.pid, 2222);
 
-          const identityPath = join(cwd, '.omx', 'state', 'team', runtime.teamName, 'workers', 'worker-1', 'identity.json');
+          const identityPath = join(cwd, '.omcp', 'state', 'team', runtime.teamName, 'workers', 'worker-1', 'identity.json');
           const identity = JSON.parse(await readFile(identityPath, 'utf-8')) as { pid?: number; pane_id?: string };
           assert.equal(identity.pane_id, '%2');
           assert.equal(identity.pid, 2222);
@@ -1328,7 +1328,7 @@ esac
   });
 
   it('startTeam records recoverable startup issues per worker instead of failing launch early when panes stay alive', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-no-startup-evidence-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-no-startup-evidence-'));
     const previousTmux = process.env.TMUX;
     const previousTmuxPane = process.env.TMUX_PANE;
     const previousLaunchMode = process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
@@ -1341,7 +1341,7 @@ esac
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-no-startup-evidence-bin-',
+          dirPrefix: 'omcp-runtime-no-startup-evidence-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${tmuxLogPath}"
@@ -1472,7 +1472,7 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('startTeam still fails startup when the worker pane is dead/unrecoverable', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-dead-startup-pane-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-dead-startup-pane-'));
     const previousTmux = process.env.TMUX;
     const previousTmuxPane = process.env.TMUX_PANE;
     const previousLaunchMode = process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
@@ -1482,7 +1482,7 @@ process.on('SIGTERM', () => process.exit(0));
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-dead-startup-pane-bin-',
+          dirPrefix: 'omcp-runtime-dead-startup-pane-bin-',
           tmuxScript: () => `#!/bin/sh
 set -eu
 case "$1" in
@@ -1574,7 +1574,7 @@ esac
   });
 
   it('startTeam materializes all worker identity/inbox files before worker-1 startup evidence can block later workers', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-materialize-before-evidence-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-materialize-before-evidence-'));
     const previousTmux = process.env.TMUX;
     const previousTmuxPane = process.env.TMUX_PANE;
     const previousLaunchMode = process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
@@ -1585,7 +1585,7 @@ esac
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-materialize-before-evidence-bin-',
+          dirPrefix: 'omcp-runtime-materialize-before-evidence-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${tmuxLogPath}"
@@ -1695,9 +1695,9 @@ process.on('SIGTERM', () => process.exit(0));
             (error: unknown) => ({ ok: false as const, error }),
           );
 
-          const workerOneIdentity = join(cwd, '.omx', 'state', 'team', sanitizedTeamName, 'workers', 'worker-1', 'identity.json');
-          const workerTwoIdentity = join(cwd, '.omx', 'state', 'team', sanitizedTeamName, 'workers', 'worker-2', 'identity.json');
-          const workerTwoInbox = join(cwd, '.omx', 'state', 'team', sanitizedTeamName, 'workers', 'worker-2', 'inbox.md');
+          const workerOneIdentity = join(cwd, '.omcp', 'state', 'team', sanitizedTeamName, 'workers', 'worker-1', 'identity.json');
+          const workerTwoIdentity = join(cwd, '.omcp', 'state', 'team', sanitizedTeamName, 'workers', 'worker-2', 'identity.json');
+          const workerTwoInbox = join(cwd, '.omcp', 'state', 'team', sanitizedTeamName, 'workers', 'worker-2', 'inbox.md');
 
           let materializedAllWorkers = false;
           for (let attempt = 0; attempt < 450; attempt += 1) {
@@ -1723,7 +1723,7 @@ process.on('SIGTERM', () => process.exit(0));
           assert.match(String((outcome as { ok: false; error: Error }).error), /worker_notify_failed:worker-1/);
 
           assert.equal(
-            existsSync(join(cwd, '.omx', 'state', 'team', sanitizedTeamName)),
+            existsSync(join(cwd, '.omcp', 'state', 'team', sanitizedTeamName)),
             false,
           );
         },
@@ -1774,7 +1774,7 @@ process.on('SIGTERM', () => process.exit(0));
         encoding: 'utf-8',
       });
       assert.doesNotMatch(listedWorktrees, /team-team-dirty-preflight-worker-1/);
-      assert.equal(existsSync(join(repo, '.omx', 'state', 'team', 'team-dirty-preflight')), false);
+      assert.equal(existsSync(join(repo, '.omcp', 'state', 'team', 'team-dirty-preflight')), false);
     } finally {
       if (typeof prevLaunchMode === 'string') process.env.OMX_TEAM_WORKER_LAUNCH_MODE = prevLaunchMode;
       else delete process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
@@ -1783,7 +1783,7 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('startTeam launches gemini workers with startup prompt and no default model passthrough', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-gemini-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-gemini-'));
     const binDir = join(cwd, 'bin');
     const fakeGeminiPath = join(binDir, 'gemini');
     const capturePath = join(cwd, 'gemini-argv.json');
@@ -1828,7 +1828,7 @@ sleep 5
 
       const expectedArgv = [
         '-i',
-        'Read .omx/state/team/team-gemini-prompt/workers/worker-1/inbox.md, start work now, report concrete progress, then continue assigned work or next feasible task.',
+        'Read .omcp/state/team/team-gemini-prompt/workers/worker-1/inbox.md, start work now, report concrete progress, then continue assigned work or next feasible task.',
       ];
       let argv: string[] | null = null;
       for (let attempt = 0; attempt < 50; attempt += 1) {
@@ -1867,7 +1867,7 @@ sleep 5
   });
 
   it('startTeam rejects codex prompt mode even when explicit launch args are provided', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-codex-explicit-launch-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-codex-explicit-launch-'));
     const binDir = join(cwd, 'bin');
     const fakeCodexPath = join(binDir, 'codex');
     await mkdir(binDir, { recursive: true });
@@ -1903,7 +1903,7 @@ process.exit(0);
           )),
         /prompt_mode_codex_requires_tty/,
       );
-      assert.equal(existsSync(join(cwd, '.omx', 'state', 'team', 'team-codex-explicit-launch')), false);
+      assert.equal(existsSync(join(cwd, '.omcp', 'state', 'team', 'team-codex-explicit-launch')), false);
     } finally {
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
       else delete process.env.PATH;
@@ -1921,7 +1921,7 @@ process.exit(0);
 
 
   it('startTeam preserves routed task roles into team state and worker launch args', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-role-routing-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-role-routing-'));
     const binDir = join(cwd, 'bin');
     const fakeCodexPath = join(binDir, 'codex');
     const captureDir = join(cwd, 'captures');
@@ -1987,8 +1987,8 @@ process.on('SIGTERM', () => process.exit(0));
       assert.equal(task1?.role, 'test-engineer');
       assert.equal(task2?.role, 'writer');
 
-      const worker1Instructions = await readFile(join(cwd, '.omx', 'state', 'team', runtime.teamName, 'workers', 'worker-1', 'AGENTS.md'), 'utf-8');
-      const worker2Instructions = await readFile(join(cwd, '.omx', 'state', 'team', runtime.teamName, 'workers', 'worker-2', 'AGENTS.md'), 'utf-8');
+      const worker1Instructions = await readFile(join(cwd, '.omcp', 'state', 'team', runtime.teamName, 'workers', 'worker-1', 'AGENTS.md'), 'utf-8');
+      const worker2Instructions = await readFile(join(cwd, '.omcp', 'state', 'team', runtime.teamName, 'workers', 'worker-2', 'AGENTS.md'), 'utf-8');
       assert.match(worker1Instructions, /You are operating as the \*\*test-engineer\*\* role/);
       assert.match(worker1Instructions, /Test Engineer/);
       assert.doesNotMatch(worker1Instructions, /exact gpt-5\.4-mini model/);
@@ -2042,7 +2042,7 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('startTeam does not apply mini guidance for exact-match negatives like gpt-5.4-mini-tuned', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-mini-tuned-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-mini-tuned-'));
     const binDir = join(cwd, 'bin');
     const fakeCodexPath = join(binDir, 'codex');
     const captureDir = join(cwd, 'captures');
@@ -2095,7 +2095,7 @@ process.on('SIGTERM', () => process.exit(0));
             cwd,
           )));
 
-      const workerInstructions = await readFile(join(cwd, '.omx', 'state', 'team', runtime.teamName, 'workers', 'worker-1', 'AGENTS.md'), 'utf-8');
+      const workerInstructions = await readFile(join(cwd, '.omcp', 'state', 'team', runtime.teamName, 'workers', 'worker-1', 'AGENTS.md'), 'utf-8');
       assert.match(workerInstructions, /You are operating as the \*\*writer\*\* role/);
       assert.match(workerInstructions, /You are Writer\./);
       assert.doesNotMatch(workerInstructions, /exact gpt-5\.4-mini model/);
@@ -2139,7 +2139,7 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('startTeam rejects codex prompt mode without tmux with an explicit non-tty error', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-prompt-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-prompt-'));
     const binDir = join(cwd, 'bin');
     const fakeCodexPath = join(binDir, 'codex');
     await mkdir(binDir, { recursive: true });
@@ -2176,7 +2176,7 @@ process.on('SIGTERM', () => process.exit(0));
           )),
         /prompt_mode_codex_requires_tty/,
       );
-      assert.equal(existsSync(join(cwd, '.omx', 'state', 'team', 'team-prompt')), false);
+      assert.equal(existsSync(join(cwd, '.omcp', 'state', 'team', 'team-prompt')), false);
     } finally {
       if (typeof prevPath === 'string') process.env.PATH = prevPath;
       else delete process.env.PATH;
@@ -2191,7 +2191,7 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('startTeam relaunch re-creates HUD pane and re-registers reconcile hooks after shutdown', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-relaunch-hud-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-relaunch-hud-'));
     const previousTmux = process.env.TMUX;
     const previousTmuxPane = process.env.TMUX_PANE;
     const previousLaunchMode = process.env.OMX_TEAM_WORKER_LAUNCH_MODE;
@@ -2200,7 +2200,7 @@ process.on('SIGTERM', () => process.exit(0));
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-relaunch-hud-bin-',
+          dirPrefix: 'omcp-runtime-relaunch-hud-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${tmuxLogPath}"
@@ -2328,7 +2328,7 @@ exit 0
 
   it('startTeam routes detached worktree worker inbox and mailbox triggers through leader-root state references', async () => {
     const repo = await initRepo();
-    const toolingDir = await mkdtemp(join(tmpdir(), 'omx-runtime-worktree-tools-'));
+    const toolingDir = await mkdtemp(join(tmpdir(), 'omcp-runtime-worktree-tools-'));
     const binDir = join(toolingDir, 'bin');
     const fakeCodexPath = join(binDir, 'codex');
     const logDir = join(toolingDir, 'worker-logs');
@@ -2400,7 +2400,7 @@ process.on('SIGTERM', () => process.exit(0));
       );
       assert.doesNotMatch(
         startupLog,
-        /Read \.omx\/state\/team\/team-detached-worktree-paths\/workers\/worker-1\/inbox\.md/,
+        /Read \.omcp\/state\/team\/team-detached-worktree-paths\/workers\/worker-1\/inbox\.md/,
       );
 
       const envLog = JSON.parse(await waitForFileText(envLogPath, (content) => content.includes('teamStateRoot'))) as {
@@ -2409,7 +2409,7 @@ process.on('SIGTERM', () => process.exit(0));
         worker: string;
       };
       assert.equal(envLog.cwd, workerPath);
-      assert.equal(envLog.teamStateRoot, join(repo, '.omx', 'state'));
+      assert.equal(envLog.teamStateRoot, join(repo, '.omcp', 'state'));
       assert.equal(envLog.worker, 'team-detached-worktree-paths/worker-1');
       const rootAgents = await readFile(join(workerPath, 'AGENTS.md'), 'utf-8');
       assert.match(rootAgents, /Team Worker Runtime Instructions/);
@@ -2448,7 +2448,7 @@ process.on('SIGTERM', () => process.exit(0));
 
   it('shutdownTeam removes team-created detached worktrees on normal shutdown', async () => {
     const repo = await initRepo();
-    const toolingDir = await mkdtemp(join(tmpdir(), 'omx-runtime-worktree-tools-'));
+    const toolingDir = await mkdtemp(join(tmpdir(), 'omcp-runtime-worktree-tools-'));
     const binDir = join(toolingDir, 'bin');
     const fakeCodexPath = join(binDir, 'codex');
     await mkdir(binDir, { recursive: true });
@@ -2496,7 +2496,7 @@ process.on('SIGTERM', () => process.exit(0));
       runtime = null;
 
       assert.equal(existsSync(worktreePath as string), false);
-      assert.equal(existsSync(join(repo, '.omx', 'state', 'team', 'team-detached-worktree-shutdown')), false);
+      assert.equal(existsSync(join(repo, '.omcp', 'state', 'team', 'team-detached-worktree-shutdown')), false);
     } finally {
       if (runtime) {
         await shutdownTeam(runtime.teamName, repo, { force: true }).catch(() => {});
@@ -2516,9 +2516,9 @@ process.on('SIGTERM', () => process.exit(0));
 
   it('resumeTeam preserves detached worktree metadata for live prompt workers', async () => {
     const repo = await initRepo();
-    const binDir = await mkdtemp(join(tmpdir(), 'omx-runtime-prompt-bin-'));
+    const binDir = await mkdtemp(join(tmpdir(), 'omcp-runtime-prompt-bin-'));
     const fakeCodexPath = join(binDir, 'codex');
-    const logDir = await mkdtemp(join(tmpdir(), 'omx-runtime-prompt-logs-'));
+    const logDir = await mkdtemp(join(tmpdir(), 'omcp-runtime-prompt-logs-'));
     const envLogPath = join(logDir, 'env.json');
     await writeFile(
       fakeCodexPath,
@@ -2576,17 +2576,17 @@ process.on('SIGTERM', () => process.exit(0));
         worker: string;
       };
       assert.equal(envLog.cwd, originalWorktreePath);
-      assert.equal(envLog.teamStateRoot, join(repo, '.omx', 'state'));
+      assert.equal(envLog.teamStateRoot, join(repo, '.omcp', 'state'));
 
       const resumed = await resumeTeam(runtime.teamName, repo);
       assert.ok(resumed, 'resumeTeam should reuse live prompt workers');
       assert.equal(resumed?.config.workers[0]?.worktree_path, originalWorktreePath);
       assert.equal(resumed?.config.workers[0]?.worktree_created, true);
-      assert.equal(resumed?.config.workers[0]?.team_state_root, join(repo, '.omx', 'state'));
+      assert.equal(resumed?.config.workers[0]?.team_state_root, join(repo, '.omcp', 'state'));
 
       const identityPath = join(
         repo,
-        '.omx',
+        '.omcp',
         'state',
         'team',
         runtime.teamName,
@@ -2601,7 +2601,7 @@ process.on('SIGTERM', () => process.exit(0));
       };
       assert.equal(identity.worktree_path, originalWorktreePath);
       assert.equal(identity.worktree_created, true);
-      assert.equal(identity.team_state_root, join(repo, '.omx', 'state'));
+      assert.equal(identity.team_state_root, join(repo, '.omcp', 'state'));
 
       await shutdownTeam(runtime.teamName, repo, { force: true });
       runtime = null;
@@ -2626,7 +2626,7 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('shutdownTeam force-kills prompt workers that ignore SIGTERM', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-prompt-stubborn-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-prompt-stubborn-'));
     const binDir = join(cwd, 'bin');
     const fakeCodexPath = join(binDir, 'codex');
     await mkdir(binDir, { recursive: true });
@@ -2683,7 +2683,7 @@ process.on('SIGTERM', () => {
   });
 
   it('shutdownTeam reaps detached prompt-worker descendants', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-prompt-descendants-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-prompt-descendants-'));
     const binDir = join(cwd, 'bin');
     const fakeCodexPath = join(binDir, 'codex');
     const helperPidPath = join(cwd, 'helper.pid');
@@ -2757,7 +2757,7 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('monitorTeam returns null for non-existent team', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       const snapshot = await monitorTeam('missing-team', cwd);
       assert.equal(snapshot, null);
@@ -2767,7 +2767,7 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('monitorTeam returns correct task counts from state files', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-counts', 'monitor task counts', 'executor', 2, cwd);
 
@@ -2785,7 +2785,7 @@ process.on('SIGTERM', () => process.exit(0));
 
       const statusPath = join(
         cwd,
-        '.omx',
+        '.omcp',
         'state',
         'team',
         'team-counts',
@@ -2829,7 +2829,7 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('monitorTeam surfaces reclaimed work pickup attempts when an idle worker is available', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-reassign-reclaimed-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-reassign-reclaimed-'));
     const prevTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
     delete process.env.OMX_TEAM_STATE_ROOT;
     let sleeper1: ReturnType<typeof spawn> | null = null;
@@ -2841,12 +2841,12 @@ process.on('SIGTERM', () => process.exit(0));
       assert.ok(claim.ok);
       if (!claim.ok) throw new Error('claim failed');
 
-      const taskPath = join(cwd, '.omx', 'state', 'team', 'team-runtime-reassign', 'tasks', `task-${task.id}.json`);
+      const taskPath = join(cwd, '.omcp', 'state', 'team', 'team-runtime-reassign', 'tasks', `task-${task.id}.json`);
       const current = JSON.parse(await readFile(taskPath, 'utf-8')) as any;
       current.claim.leased_until = new Date(Date.now() - 1000).toISOString();
       await writeAtomic(taskPath, JSON.stringify(current, null, 2));
 
-      const manifestPath = join(cwd, '.omx', 'state', 'team', 'team-runtime-reassign', 'manifest.v2.json');
+      const manifestPath = join(cwd, '.omcp', 'state', 'team', 'team-runtime-reassign', 'manifest.v2.json');
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as any;
       sleeper1 = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore', detached: false });
       sleeper2 = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], { stdio: 'ignore', detached: false });
@@ -2858,11 +2858,11 @@ process.on('SIGTERM', () => process.exit(0));
       await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
 
       await writeAtomic(
-        join(cwd, '.omx', 'state', 'team', 'team-runtime-reassign', 'workers', 'worker-1', 'status.json'),
+        join(cwd, '.omcp', 'state', 'team', 'team-runtime-reassign', 'workers', 'worker-1', 'status.json'),
         JSON.stringify({ state: 'working', current_task_id: task.id, updated_at: new Date().toISOString() }, null, 2),
       );
       await writeAtomic(
-        join(cwd, '.omx', 'state', 'team', 'team-runtime-reassign', 'workers', 'worker-2', 'status.json'),
+        join(cwd, '.omcp', 'state', 'team', 'team-runtime-reassign', 'workers', 'worker-2', 'status.json'),
         JSON.stringify({ state: 'idle', updated_at: new Date().toISOString() }, null, 2),
       );
 
@@ -2882,7 +2882,7 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('monitorTeam reclaims expired task claims and surfaces the recovery in recommendations', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-reclaim-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-reclaim-'));
     const prevTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
     delete process.env.OMX_TEAM_STATE_ROOT;
     try {
@@ -2892,7 +2892,7 @@ process.on('SIGTERM', () => process.exit(0));
       assert.ok(claim.ok);
       if (!claim.ok) throw new Error('claim failed');
 
-      const taskPath = join(cwd, '.omx', 'state', 'team', 'team-runtime-reclaim', 'tasks', `task-${t.id}.json`);
+      const taskPath = join(cwd, '.omcp', 'state', 'team', 'team-runtime-reclaim', 'tasks', `task-${t.id}.json`);
       const current = JSON.parse(await readFile(taskPath, 'utf-8')) as any;
       current.claim.leased_until = new Date(Date.now() - 1000).toISOString();
       await writeAtomic(taskPath, JSON.stringify(current, null, 2));
@@ -2911,7 +2911,7 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('monitorTeam keeps phase in team-verify when completed code tasks lack verification evidence', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-verify-gate-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-verify-gate-'));
     const prevTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
     delete process.env.OMX_TEAM_STATE_ROOT;
     try {
@@ -2936,7 +2936,7 @@ process.on('SIGTERM', () => process.exit(0));
         true,
       );
 
-      const taskPath = join(cwd, '.omx', 'state', 'team', 'team-verify-gate', 'tasks', `task-${task.id}.json`);
+      const taskPath = join(cwd, '.omcp', 'state', 'team', 'team-verify-gate', 'tasks', `task-${task.id}.json`);
       const fromDisk = JSON.parse(await readFile(taskPath, 'utf-8')) as Record<string, unknown>;
       fromDisk.result = [
         'Summary: done',
@@ -2959,7 +2959,7 @@ process.on('SIGTERM', () => process.exit(0));
 
 
   it('monitorTeam deactivates root team-state.json when the local phase becomes terminal', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-root-team-state-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-root-team-state-'));
     try {
       await initTeamState('team-root-sync', 'root sync test', 'executor', 1, cwd);
       await createTask(
@@ -2973,7 +2973,7 @@ process.on('SIGTERM', () => process.exit(0));
         },
         cwd,
       );
-      const rootStatePath = join(cwd, '.omx', 'state', 'team-state.json');
+      const rootStatePath = join(cwd, '.omcp', 'state', 'team-state.json');
       await writeFile(rootStatePath, JSON.stringify({
         active: true,
         current_phase: 'team-exec',
@@ -2995,7 +2995,7 @@ process.on('SIGTERM', () => process.exit(0));
 
 
   it('monitorTeam emits worker_state_changed, worker_idle, and task_completed events based on transitions', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-events', 'monitor event test', 'executor', 1, cwd);
       const t = await createTask('team-events', { subject: 'a', description: 'd', status: 'pending' }, cwd);
@@ -3005,17 +3005,17 @@ process.on('SIGTERM', () => process.exit(0));
 
       // Transition task to completed and worker status to idle.
       await writeAtomic(
-        join(cwd, '.omx', 'state', 'team', 'team-events', 'tasks', `task-${t.id}.json`),
+        join(cwd, '.omcp', 'state', 'team', 'team-events', 'tasks', `task-${t.id}.json`),
         JSON.stringify({ ...t, status: 'completed', owner: 'worker-1' }, null, 2),
       );
       await writeAtomic(
-        join(cwd, '.omx', 'state', 'team', 'team-events', 'workers', 'worker-1', 'status.json'),
+        join(cwd, '.omcp', 'state', 'team', 'team-events', 'workers', 'worker-1', 'status.json'),
         JSON.stringify({ state: 'idle', updated_at: new Date().toISOString() }, null, 2),
       );
 
       await monitorTeam('team-events', cwd);
 
-      const eventsPath = join(cwd, '.omx', 'state', 'team', 'team-events', 'events', 'events.ndjson');
+      const eventsPath = join(cwd, '.omcp', 'state', 'team', 'team-events', 'events', 'events.ndjson');
       const content = await readFile(eventsPath, 'utf-8');
       assert.match(content, /\"type\":\"task_completed\"/);
       assert.match(content, /\"type\":\"worker_state_changed\"/);
@@ -3029,7 +3029,7 @@ process.on('SIGTERM', () => process.exit(0));
     const repo = await initRepo();
     let workerPath = '';
     try {
-      workerPath = await addWorktree(repo, 'worker-1-branch', 'omx-runtime-worker-1-wt-');
+      workerPath = await addWorktree(repo, 'worker-1-branch', 'omcp-runtime-worker-1-wt-');
       await writeFile(join(workerPath, 'worker.txt'), 'from worker\n', 'utf-8');
       execFileSync('git', ['add', 'worker.txt'], { cwd: workerPath, stdio: 'ignore' });
       execFileSync('git', ['commit', '-m', 'worker change'], { cwd: workerPath, stdio: 'ignore' });
@@ -3091,7 +3091,7 @@ process.on('SIGTERM', () => process.exit(0));
     const repo = await initRepo();
     let workerPath = '';
     try {
-      workerPath = await addWorktree(repo, 'wk1-ac-branch', 'omx-runtime-wk1-auto-commit-');
+      workerPath = await addWorktree(repo, 'wk1-ac-branch', 'omcp-runtime-wk1-auto-commit-');
 
       // Add uncommitted file (dirty worktree — no git commit)
       await writeFile(join(workerPath, 'dirty.txt'), 'uncommitted content\n', 'utf-8');
@@ -3120,13 +3120,13 @@ process.on('SIGTERM', () => process.exit(0));
 
       // Verify the commit message matches the auto-checkpoint pattern
       const log = execFileSync('git', ['log', '-1', '--format=%s'], { cwd: workerPath, encoding: 'utf-8' }).trim();
-      assert.match(log, /omx\(team\): auto-checkpoint worker-1 \[1\]/, 'commit message should match auto-checkpoint pattern');
+      assert.match(log, /omcp\(team\): auto-checkpoint worker-1 \[1\]/, 'commit message should match auto-checkpoint pattern');
 
       // Verify worker's changes are integrated into leader
       const snapshot = await readMonitorSnapshot('team-auto-commit', repo);
       assert.ok(snapshot?.integrationByWorker?.['worker-1']?.last_integrated_head, 'auto-committed changes should be integrated');
 
-      const ledgerPath = join(repo, '.omx', 'reports', 'team-commit-hygiene', 'team-auto-commit.ledger.json');
+      const ledgerPath = join(repo, '.omcp', 'reports', 'team-commit-hygiene', 'team-auto-commit.ledger.json');
       assert.equal(existsSync(ledgerPath), true, 'commit hygiene ledger should be written for runtime operational commits');
       const ledger = JSON.parse(await readFile(ledgerPath, 'utf-8')) as {
         entries: Array<{ operation: string; operational_commit?: string | null }>;
@@ -3145,7 +3145,7 @@ process.on('SIGTERM', () => process.exit(0));
     const repo = await initRepo();
     let workerPath = '';
     try {
-      workerPath = await addWorktree(repo, 'wk1-merge-branch', 'omx-runtime-wk1-merge-clean-');
+      workerPath = await addWorktree(repo, 'wk1-merge-branch', 'omcp-runtime-wk1-merge-clean-');
 
       // Commit only in worker (worker is cleanly ahead of leader)
       await writeFile(join(workerPath, 'feature.txt'), 'new feature\n', 'utf-8');
@@ -3194,7 +3194,7 @@ process.on('SIGTERM', () => process.exit(0));
     const repo = await initRepo();
     let workerPath = '';
     try {
-      workerPath = await addWorktree(repo, 'wk1-detached-merge-branch', 'omx-runtime-wk1-detached-merge-');
+      workerPath = await addWorktree(repo, 'wk1-detached-merge-branch', 'omcp-runtime-wk1-detached-merge-');
 
       await writeFile(join(workerPath, 'detached-feature.txt'), 'detached worker feature\n', 'utf-8');
       execFileSync('git', ['add', 'detached-feature.txt'], { cwd: workerPath, stdio: 'ignore' });
@@ -3244,7 +3244,7 @@ process.on('SIGTERM', () => process.exit(0));
         true,
       );
 
-      const ledgerPath = join(repo, '.omx', 'reports', 'team-commit-hygiene', 'team-merge-detached.ledger.json');
+      const ledgerPath = join(repo, '.omcp', 'reports', 'team-commit-hygiene', 'team-merge-detached.ledger.json');
       const ledger = JSON.parse(await readFile(ledgerPath, 'utf-8')) as {
         entries: Array<{
           operation: string;
@@ -3273,11 +3273,11 @@ process.on('SIGTERM', () => process.exit(0));
   it('monitorTeam does not emit INTEGRATED when merge reports success but leader HEAD never advances', async () => {
     const repo = await initRepo();
     let workerPath = '';
-    const fakeBinDir = await mkdtemp(join(tmpdir(), 'omx-runtime-fake-git-'));
+    const fakeBinDir = await mkdtemp(join(tmpdir(), 'omcp-runtime-fake-git-'));
     const previousPath = process.env.PATH;
     const previousFakeMode = process.env.OMX_FAKE_GIT_SUCCESS_NOOP;
     try {
-      workerPath = await addWorktree(repo, 'wk1-merge-noadvance-branch', 'omx-runtime-wk1-merge-noadvance-');
+      workerPath = await addWorktree(repo, 'wk1-merge-noadvance-branch', 'omcp-runtime-wk1-merge-noadvance-');
       await writeFile(join(workerPath, 'feature.txt'), 'new feature\n', 'utf-8');
       execFileSync('git', ['add', 'feature.txt'], { cwd: workerPath, stdio: 'ignore' });
       execFileSync('git', ['commit', '-m', 'worker feature'], { cwd: workerPath, stdio: 'ignore' });
@@ -3345,7 +3345,7 @@ exec "${realGit}" "$@"
     const repo = await initRepo();
     let workerPath = '';
     try {
-      workerPath = await addWorktree(repo, 'wk1-div-branch', 'omx-runtime-wk1-diverged-');
+      workerPath = await addWorktree(repo, 'wk1-div-branch', 'omcp-runtime-wk1-diverged-');
 
       // Commit in worker
       await writeFile(join(workerPath, 'worker-file.txt'), 'worker content\n', 'utf-8');
@@ -3400,8 +3400,8 @@ exec "${realGit}" "$@"
     let worker1Path = '';
     let worker2Path = '';
     try {
-      worker1Path = await addWorktree(repo, 'wk1-xr-branch', 'omx-runtime-wk1-cross-rebase-');
-      worker2Path = await addWorktree(repo, 'wk2-xr-branch', 'omx-runtime-wk2-cross-rebase-');
+      worker1Path = await addWorktree(repo, 'wk1-xr-branch', 'omcp-runtime-wk1-cross-rebase-');
+      worker2Path = await addWorktree(repo, 'wk2-xr-branch', 'omcp-runtime-wk2-cross-rebase-');
 
       // Worker-1 commits a change
       await writeFile(join(worker1Path, 'w1.txt'), 'from worker 1\n', 'utf-8');
@@ -3456,7 +3456,7 @@ exec "${realGit}" "$@"
       const mergeBase = execFileSync('git', ['merge-base', newLeaderHead, 'wk2-xr-branch'], { cwd: repo, encoding: 'utf-8' }).trim();
       assert.equal(mergeBase, newLeaderHead, 'worker-2 should be rebased onto new leader HEAD');
 
-      const ledgerPath = join(repo, '.omx', 'reports', 'team-commit-hygiene', 'team-cross-rebase.ledger.json');
+      const ledgerPath = join(repo, '.omcp', 'reports', 'team-commit-hygiene', 'team-cross-rebase.ledger.json');
       const ledger = JSON.parse(await readFile(ledgerPath, 'utf-8')) as {
         entries: Array<{ operation: string; worker_name: string; status: string }>;
       };
@@ -3479,7 +3479,7 @@ exec "${realGit}" "$@"
     const repo = await initRepo();
     let workerPath = '';
     try {
-      workerPath = await addWorktree(repo, 'wk1-cr-branch', 'omx-runtime-wk1-conflict-resolve-');
+      workerPath = await addWorktree(repo, 'wk1-cr-branch', 'omcp-runtime-wk1-conflict-resolve-');
 
       // Worker edits README.md (same file, different content → conflict)
       await writeFile(join(workerPath, 'README.md'), 'worker version\n', 'utf-8');
@@ -3534,8 +3534,8 @@ exec "${realGit}" "$@"
     let worker1Path = '';
     let worker2Path = '';
     try {
-      worker1Path = await addWorktree(repo, 'wk1-gate-branch', 'omx-runtime-wk1-rebase-gate-');
-      worker2Path = await addWorktree(repo, 'wk2-gate-branch', 'omx-runtime-wk2-rebase-gate-');
+      worker1Path = await addWorktree(repo, 'wk1-gate-branch', 'omcp-runtime-wk1-rebase-gate-');
+      worker2Path = await addWorktree(repo, 'wk2-gate-branch', 'omcp-runtime-wk2-rebase-gate-');
 
       // Worker-1 commits a change
       await writeFile(join(worker1Path, 'w1.txt'), 'from worker 1\n', 'utf-8');
@@ -3599,8 +3599,8 @@ exec "${realGit}" "$@"
       execFileSync('git', ['add', 'original.txt'], { cwd: repo, stdio: 'ignore' });
       execFileSync('git', ['commit', '-m', 'add original.txt'], { cwd: repo, stdio: 'ignore' });
 
-      worker1Path = await addWorktree(repo, 'wk1-rf-branch', 'omx-runtime-wk1-rebase-fail-');
-      worker2Path = await addWorktree(repo, 'wk2-rf-branch', 'omx-runtime-wk2-rebase-fail-');
+      worker1Path = await addWorktree(repo, 'wk1-rf-branch', 'omcp-runtime-wk1-rebase-fail-');
+      worker2Path = await addWorktree(repo, 'wk2-rf-branch', 'omcp-runtime-wk2-rebase-fail-');
 
       // Worker-1 renames original.txt → renamed-by-w1.txt (will be integrated to leader)
       execFileSync('git', ['mv', 'original.txt', 'renamed-by-w1.txt'], { cwd: worker1Path, stdio: 'ignore' });
@@ -3653,7 +3653,7 @@ exec "${realGit}" "$@"
       assert.doesNotMatch(gitStatusOutput, /rebase in progress/, 'worktree should not have rebase in progress');
 
       // Verify integration report logged the failure
-      const reportPath = join(repo, '.omx', 'state', 'team', 'team-rebase-fail', 'integration-report.md');
+      const reportPath = join(repo, '.omcp', 'state', 'team', 'team-rebase-fail', 'integration-report.md');
       assert.equal(existsSync(reportPath), true, 'integration report should exist after rebase failure');
       const report = await readFile(reportPath, 'utf-8');
       assert.match(report, /rebase/, 'report should mention the rebase operation');
@@ -3669,12 +3669,12 @@ exec "${realGit}" "$@"
   });
 
   it('shutdownTeam cleans up state even when tmux session doesn\'t exist', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-shutdown', 'shutdown test', 'executor', 1, cwd);
       await shutdownTeam('team-shutdown', cwd);
 
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-shutdown');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-shutdown');
       assert.equal(existsSync(teamRoot), false);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3682,12 +3682,12 @@ exec "${realGit}" "$@"
   });
 
   it('shutdownTeam clean fast path ignores worker shutdown ack files', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-clean-fast-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-clean-fast-'));
     try {
       await initTeamState('team-shutdown-clean-fast', 'shutdown clean fast path test', 'executor', 1, cwd);
       const ackPath = join(
         cwd,
-        '.omx',
+        '.omcp',
         'state',
         'team',
         'team-shutdown-clean-fast',
@@ -3702,7 +3702,7 @@ exec "${realGit}" "$@"
 
       await shutdownTeam('team-shutdown-clean-fast', cwd);
 
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-shutdown-clean-fast');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-shutdown-clean-fast');
       assert.equal(existsSync(teamRoot), false);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3710,7 +3710,7 @@ exec "${realGit}" "$@"
   });
 
   it('shutdownTeam blocks when pending tasks remain (shutdown gate)', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-gate-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-gate-'));
     try {
       await initTeamState('team-shutdown-gate-pending', 'shutdown gate pending test', 'executor', 1, cwd);
       await createTask(
@@ -3724,7 +3724,7 @@ exec "${realGit}" "$@"
         /shutdown_gate_blocked:pending=1,blocked=0,in_progress=0,failed=0/,
       );
 
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-shutdown-gate-pending');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-shutdown-gate-pending');
       assert.equal(existsSync(teamRoot), true);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3732,7 +3732,7 @@ exec "${realGit}" "$@"
   });
 
   it('shutdownTeam honors governance cleanup override when active tasks remain', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-gate-override-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-gate-override-'));
     try {
       await initTeamState('team-shutdown-gate-override', 'shutdown gate override test', 'executor', 1, cwd);
       await createTask(
@@ -3741,7 +3741,7 @@ exec "${realGit}" "$@"
         cwd,
       );
 
-      const manifestPath = join(cwd, '.omx', 'state', 'team', 'team-shutdown-gate-override', 'manifest.v2.json');
+      const manifestPath = join(cwd, '.omcp', 'state', 'team', 'team-shutdown-gate-override', 'manifest.v2.json');
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as any;
       manifest.governance = {
         ...(manifest.governance || {}),
@@ -3751,7 +3751,7 @@ exec "${realGit}" "$@"
 
       await shutdownTeam('team-shutdown-gate-override', cwd);
 
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-shutdown-gate-override');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-shutdown-gate-override');
       assert.equal(existsSync(teamRoot), false);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3759,7 +3759,7 @@ exec "${realGit}" "$@"
   });
 
   it('shutdownTeam honors legacy policy cleanup override after governance hydration', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-gate-legacy-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-gate-legacy-'));
     try {
       await initTeamState('team-shutdown-gate-legacy', 'shutdown gate legacy policy test', 'executor', 1, cwd);
       await createTask(
@@ -3768,7 +3768,7 @@ exec "${realGit}" "$@"
         cwd,
       );
 
-      const manifestPath = join(cwd, '.omx', 'state', 'team', 'team-shutdown-gate-legacy', 'manifest.v2.json');
+      const manifestPath = join(cwd, '.omcp', 'state', 'team', 'team-shutdown-gate-legacy', 'manifest.v2.json');
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as any;
       manifest.policy = {
         ...(manifest.policy || {}),
@@ -3779,7 +3779,7 @@ exec "${realGit}" "$@"
 
       await shutdownTeam('team-shutdown-gate-legacy', cwd);
 
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-shutdown-gate-legacy');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-shutdown-gate-legacy');
       assert.equal(existsSync(teamRoot), false);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3787,7 +3787,7 @@ exec "${realGit}" "$@"
   });
 
   it('shutdownTeam requires explicit issue confirmation when failed tasks remain', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-gate-failed-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-gate-failed-'));
     try {
       await initTeamState('team-shutdown-gate-failed', 'shutdown gate failed test', 'executor', 1, cwd);
       await createTask(
@@ -3798,7 +3798,7 @@ exec "${realGit}" "$@"
 
       await assert.rejects(
         () => shutdownTeam('team-shutdown-gate-failed', cwd),
-        /shutdown_confirm_issues_required:failed=1:rerun=omx team shutdown team-shutdown-gate-failed --confirm-issues/,
+        /shutdown_confirm_issues_required:failed=1:rerun=omcp team shutdown team-shutdown-gate-failed --confirm-issues/,
       );
 
       const teamRoot = teamStateTestPath(cwd, 'team', 'team-shutdown-gate-failed');
@@ -3809,7 +3809,7 @@ exec "${realGit}" "$@"
   });
 
   it('shutdownTeam force=true bypasses shutdown gate and cleans up', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-gate-force-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-gate-force-'));
     try {
       await initTeamState('team-shutdown-gate-force', 'shutdown gate force test', 'executor', 1, cwd);
       await createTask(
@@ -3819,7 +3819,7 @@ exec "${realGit}" "$@"
       );
 
       await shutdownTeam('team-shutdown-gate-force', cwd, { force: true });
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-shutdown-gate-force');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-shutdown-gate-force');
       // Verify the forced shutdown audit event was written before cleanup removed state
       assert.equal(existsSync(teamRoot), false);
     } finally {
@@ -3828,7 +3828,7 @@ exec "${realGit}" "$@"
   });
 
   it('shutdownTeam force=true emits shutdown_gate_forced audit event', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-gate-forced-event-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-gate-forced-event-'));
     try {
       await initTeamState('team-gate-forced-event', 'forced event test', 'executor', 1, cwd);
       await createTask(
@@ -3837,12 +3837,12 @@ exec "${realGit}" "$@"
         cwd,
       );
 
-      const eventsPath = join(cwd, '.omx', 'state', 'team', 'team-gate-forced-event', 'events', 'events.ndjson');
+      const eventsPath = join(cwd, '.omcp', 'state', 'team', 'team-gate-forced-event', 'events', 'events.ndjson');
       await shutdownTeam('team-gate-forced-event', cwd, { force: true });
 
       // Events file may have been removed during cleanup; if it existed before cleanup
       // the audit event was appended. Verify by checking that the team root is gone (cleanup ran).
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-gate-forced-event');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-gate-forced-event');
       assert.equal(existsSync(teamRoot), false);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3850,22 +3850,22 @@ exec "${realGit}" "$@"
   });
 
   it('shutdownTeam handles persisted resize hook metadata during cleanup', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-resize-meta-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-resize-meta-'));
     try {
-      const configPath = join(cwd, '.omx', 'state', 'team', 'team-resize-meta', 'config.json');
-      const manifestPath = join(cwd, '.omx', 'state', 'team', 'team-resize-meta', 'manifest.v2.json');
+      const configPath = join(cwd, '.omcp', 'state', 'team', 'team-resize-meta', 'config.json');
+      const manifestPath = join(cwd, '.omcp', 'state', 'team', 'team-resize-meta', 'manifest.v2.json');
       await initTeamState('team-resize-meta', 'shutdown resize metadata', 'executor', 1, cwd);
       const config = JSON.parse(await readFile(configPath, 'utf-8')) as Record<string, unknown>;
       config.resize_hook_name = 'omx_resize_team_resize_meta_test';
-      config.resize_hook_target = 'omx-team-team-resize-meta:0';
+      config.resize_hook_target = 'omcp-team-team-resize-meta:0';
       await writeFile(configPath, JSON.stringify(config, null, 2));
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as Record<string, unknown>;
       manifest.resize_hook_name = 'omx_resize_team_resize_meta_test';
-      manifest.resize_hook_target = 'omx-team-team-resize-meta:0';
+      manifest.resize_hook_target = 'omcp-team-team-resize-meta:0';
       await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
 
       await shutdownTeam('team-resize-meta', cwd);
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-resize-meta');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-resize-meta');
       assert.equal(existsSync(teamRoot), false);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3873,11 +3873,11 @@ exec "${realGit}" "$@"
   });
 
   it('shutdownTeam continues cleanup when resize hook unregister fails while session remains active', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-gate-failed-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-gate-failed-'));
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-fake-tmux-',
+          dirPrefix: 'omcp-runtime-fake-tmux-',
           env: { TMUX_TEST_LOG: undefined },
           tmuxScript: () => `#!/bin/sh
 set -eu
@@ -3890,7 +3890,7 @@ case "$1" in
     exit 0
     ;;
   list-sessions)
-    echo "omx-team-team-shutdown-gate-failed"
+    echo "omcp-team-team-shutdown-gate-failed"
     exit 0
     ;;
   set-hook)
@@ -3917,14 +3917,14 @@ esac
           const configPath = teamStateTestPath(cwd, 'team', 'team-shutdown-gate-failed', 'config.json');
           const manifestPath = teamStateTestPath(cwd, 'team', 'team-shutdown-gate-failed', 'manifest.v2.json');
           const config = JSON.parse(await readFile(configPath, 'utf-8')) as Record<string, unknown>;
-          config.tmux_session = 'omx-team-team-shutdown-gate-failed';
+          config.tmux_session = 'omcp-team-team-shutdown-gate-failed';
           config.resize_hook_name = 'omx_resize_team_shutdown_gate_failed_test';
-          config.resize_hook_target = 'omx-team-team-shutdown-gate-failed:0';
+          config.resize_hook_target = 'omcp-team-team-shutdown-gate-failed:0';
           await writeFile(configPath, JSON.stringify(config, null, 2));
           const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as Record<string, unknown>;
-          manifest.tmux_session = 'omx-team-team-shutdown-gate-failed';
+          manifest.tmux_session = 'omcp-team-team-shutdown-gate-failed';
           manifest.resize_hook_name = 'omx_resize_team_shutdown_gate_failed_test';
-          manifest.resize_hook_target = 'omx-team-team-shutdown-gate-failed:0';
+          manifest.resize_hook_target = 'omcp-team-team-shutdown-gate-failed:0';
           await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
           process.env.TMUX_TEST_LOG = tmuxLogPath;
 
@@ -3934,8 +3934,8 @@ esac
           assert.equal(existsSync(teamRoot), false);
 
           const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-          assert.match(tmuxLog, /set-hook -u -t omx-team-team-shutdown-gate-failed:0 client-resized\[\d+\]/);
-          assert.match(tmuxLog, /kill-session -t omx-team-team-shutdown-gate-failed/);
+          assert.match(tmuxLog, /set-hook -u -t omcp-team-team-shutdown-gate-failed:0 client-resized\[\d+\]/);
+          assert.match(tmuxLog, /kill-session -t omcp-team-team-shutdown-gate-failed/);
         },
       );
     } finally {
@@ -3944,13 +3944,13 @@ esac
   });
 
   it('shutdownTeam returns rejection error when worker rejects shutdown and force is false', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-reject', 'shutdown reject test', 'executor', 1, cwd);
       await attachDirtyWorkerRepo('team-reject', cwd, 'team-reject-repo');
       const ackPath = join(
         cwd,
-        '.omx',
+        '.omcp',
         'state',
         'team',
         'team-reject',
@@ -3970,13 +3970,13 @@ esac
   });
 
   it('shutdownTeam emits shutdown_ack event when worker ack is received', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-ack-evt', 'shutdown ack event test', 'executor', 1, cwd);
       await attachDirtyWorkerRepo('team-ack-evt', cwd, 'team-ack-evt-repo');
       const ackPath = join(
         cwd,
-        '.omx',
+        '.omcp',
         'state',
         'team',
         'team-ack-evt',
@@ -3992,7 +3992,7 @@ esac
       await assert.rejects(() => shutdownTeam('team-ack-evt', cwd), /shutdown_rejected/);
 
       // Verify that a shutdown_ack event was written to the event log
-      const eventLogPath = join(cwd, '.omx', 'state', 'team', 'team-ack-evt', 'events', 'events.ndjson');
+      const eventLogPath = join(cwd, '.omcp', 'state', 'team', 'team-ack-evt', 'events', 'events.ndjson');
       assert.ok(existsSync(eventLogPath), 'event log should exist');
       const raw = await readFile(eventLogPath, 'utf-8');
       const events = raw.trim().split('\n').map(line => JSON.parse(line));
@@ -4007,12 +4007,12 @@ esac
   });
 
   it('shutdownTeam emits shutdown_ack event with accept reason for accepted acks', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-ack-accept', 'shutdown ack accept test', 'executor', 1, cwd);
       const ackPath = join(
         cwd,
-        '.omx',
+        '.omcp',
         'state',
         'team',
         'team-ack-accept',
@@ -4026,14 +4026,14 @@ esac
       );
 
       // Read the event log before cleanup destroys it
-      const eventLogPath = join(cwd, '.omx', 'state', 'team', 'team-ack-accept', 'events', 'events.ndjson');
+      const eventLogPath = join(cwd, '.omcp', 'state', 'team', 'team-ack-accept', 'events', 'events.ndjson');
 
       await shutdownTeam('team-ack-accept', cwd);
 
       // State is cleaned up, but we can verify the event was emitted by checking
       // that cleanup succeeded (no error) -- the event was written before cleanup.
       // For a more direct test, check that the team root was cleaned up.
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-ack-accept');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-ack-accept');
       assert.equal(existsSync(teamRoot), false);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4041,12 +4041,12 @@ esac
   });
 
   it('shutdownTeam force=true ignores rejection and cleans up team state', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-force', 'shutdown force test', 'executor', 1, cwd);
       const ackPath = join(
         cwd,
-        '.omx',
+        '.omcp',
         'state',
         'team',
         'team-force',
@@ -4060,7 +4060,7 @@ esac
       );
 
       await shutdownTeam('team-force', cwd, { force: true });
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-force');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-force');
       assert.equal(existsSync(teamRoot), false);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4068,12 +4068,12 @@ esac
   });
 
   it('shutdownTeam ignores stale rejection ack from a prior request', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-stale-ack', 'shutdown stale ack test', 'executor', 1, cwd);
       const ackPath = join(
         cwd,
-        '.omx',
+        '.omcp',
         'state',
         'team',
         'team-stale-ack',
@@ -4087,7 +4087,7 @@ esac
       );
 
       await shutdownTeam('team-stale-ack', cwd);
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-stale-ack');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-stale-ack');
       assert.equal(existsSync(teamRoot), false);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4095,7 +4095,7 @@ esac
   });
 
   it('shutdownTeam confirmIssues=true allows failed-task shutdown without worker ack handshake', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-confirm-issues-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-confirm-issues-'));
     try {
       await initTeamState('team-confirm-issues', 'shutdown confirm issues test', 'executor', 1, cwd);
       await createTask(
@@ -4105,7 +4105,7 @@ esac
       );
       const ackPath = join(
         cwd,
-        '.omx',
+        '.omcp',
         'state',
         'team',
         'team-confirm-issues',
@@ -4120,7 +4120,7 @@ esac
 
       await shutdownTeam('team-confirm-issues', cwd, { confirmIssues: true });
 
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-confirm-issues');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-confirm-issues');
       assert.equal(existsSync(teamRoot), false);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4128,11 +4128,11 @@ esac
   });
 
   it('shutdownTeam applies best-effort teardown even when worker pane is already dead', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-dead-pane-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-dead-pane-'));
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-shutdown-dead-pane-bin-',
+          dirPrefix: 'omcp-runtime-shutdown-dead-pane-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${tmuxLogPath}"
@@ -4165,19 +4165,19 @@ esac
           const config = await readTeamConfig('team-shutdown-dead-pane', cwd);
           assert.ok(config);
           if (!config) return;
-          config.tmux_session = 'omx-team-team-shutdown-dead-pane';
+          config.tmux_session = 'omcp-team-team-shutdown-dead-pane';
           config.workers[0]!.pane_id = '%404';
           config.workers[1]!.pane_id = '%405';
           await saveTeamConfig(config, cwd);
 
           await shutdownTeam('team-shutdown-dead-pane', cwd, { force: true });
-          const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-shutdown-dead-pane');
+          const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-shutdown-dead-pane');
           assert.equal(existsSync(teamRoot), false);
 
           const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
           assert.match(tmuxLog, /kill-pane -t %404/);
           assert.match(tmuxLog, /kill-pane -t %405/);
-          assert.match(tmuxLog, /kill-session -t omx-team-team-shutdown-dead-pane/);
+          assert.match(tmuxLog, /kill-session -t omcp-team-team-shutdown-dead-pane/);
         },
       );
     } finally {
@@ -4186,11 +4186,11 @@ esac
   });
 
   it('shutdownTeam reconciles persisted worker panes with live tmux panes before teardown', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-pane-reconcile-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-pane-reconcile-'));
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-shutdown-pane-reconcile-bin-',
+          dirPrefix: 'omcp-runtime-shutdown-pane-reconcile-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${tmuxLogPath}"
@@ -4214,9 +4214,9 @@ case "$1" in
         exit 0
         ;;
       *"-t leader:0 -F #{pane_id}"*"#{pane_current_command}"*)
-        printf "%%11\\tzsh\\tzsh\\n%%12\\tnode\\tnode /tmp/bin/omx.js hud --watch\\n%%13\\tcodex\\tcodex\\n%%14\\tcodex\\tcodex\\n"
+        printf "%%11\\tzsh\\tzsh\\n%%12\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%13\\tcodex\\tcodex\\n%%14\\tcodex\\tcodex\\n"
         if [ -f "$restored_marker" ]; then
-          printf "%%44\\tnode\\tnode /tmp/bin/omx.js hud --watch\\n"
+          printf "%%44\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n"
         fi
         exit 0
         ;;
@@ -4275,12 +4275,12 @@ esac
   });
 
   it('shutdownTeam skips prekill and keeps the leader pane alive on native Windows split-pane shutdown', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-win32-split-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-win32-split-'));
     try {
       await withNativeWindowsPlatform(async () => {
         await withMockTmuxFixture(
           {
-            dirPrefix: 'omx-runtime-shutdown-win32-split-bin-',
+            dirPrefix: 'omcp-runtime-shutdown-win32-split-bin-',
             tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${tmuxLogPath}"
@@ -4295,7 +4295,7 @@ case "$1" in
         exit 1
         ;;
       *"-t leader:0 -F #{pane_id}"*"#{pane_current_command}"*)
-        printf "%%11\\tpwsh\\tpwsh\\n%%12\\tnode\\tnode /tmp/bin/omx.js hud --watch\\n%%13\\tcodex\\tcodex\\n%%14\\tcodex\\tcodex\\n"
+        printf "%%11\\tpwsh\\tpwsh\\n%%12\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%13\\tcodex\\tcodex\\n%%14\\tcodex\\tcodex\\n"
         exit 0
         ;;
       *)
@@ -4330,7 +4330,7 @@ esac
 
             await shutdownTeam('team-shutdown-win32-split', cwd, { force: true });
 
-            const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-shutdown-win32-split');
+            const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-shutdown-win32-split');
             assert.equal(existsSync(teamRoot), false);
             assert.equal(await readMonitorSnapshot('team-shutdown-win32-split', cwd), null);
 
@@ -4354,13 +4354,13 @@ esac
   });
 
   it('shutdownTeam reconciles stale leader and hud pane ids before native Windows split-pane teardown', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-win32-stale-topology-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-win32-stale-topology-'));
     const teamName = 'team-win32-stale-topo';
     try {
       await withNativeWindowsPlatform(async () => {
         await withMockTmuxFixture(
           {
-            dirPrefix: 'omx-runtime-shutdown-win32-stale-topology-bin-',
+            dirPrefix: 'omcp-runtime-shutdown-win32-stale-topology-bin-',
             tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${tmuxLogPath}"
@@ -4375,7 +4375,7 @@ case "$1" in
         exit 1
         ;;
       *"-t leader:0 -F #{pane_id}"*"#{pane_current_command}"*)
-        printf "%%21\\tpwsh\\tpwsh\\n%%22\\tnode\\tnode /tmp/bin/omx.js hud --watch\\n%%23\\tcodex\\tcodex\\n%%24\\tcodex\\tcodex\\n"
+        printf "%%21\\tpwsh\\tpwsh\\n%%22\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%23\\tcodex\\tcodex\\n%%24\\tcodex\\tcodex\\n"
         exit 0
         ;;
       *)
@@ -4410,7 +4410,7 @@ esac
 
             await shutdownTeam(teamName, cwd, { force: true });
 
-            const teamRoot = join(cwd, '.omx', 'state', 'team', teamName);
+            const teamRoot = join(cwd, '.omcp', 'state', 'team', teamName);
             assert.equal(existsSync(teamRoot), false);
             assert.equal(await readMonitorSnapshot(teamName, cwd), null);
 
@@ -4431,11 +4431,11 @@ esac
   });
 
   it('shutdownTeam skips prekill and keeps the leader pane alive on shared-session shutdown', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-shared-session-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-shared-session-'));
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-shutdown-shared-session-bin-',
+          dirPrefix: 'omcp-runtime-shutdown-shared-session-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${tmuxLogPath}"
@@ -4450,7 +4450,7 @@ case "$1" in
         exit 1
         ;;
       *"-t leader:0 -F #{pane_id}"*"#{pane_current_command}"*)
-        printf "%%11\\tzsh\\tzsh\\n%%12\\tnode\\tnode /tmp/bin/omx.js hud --watch\\n%%13\\tcodex\\tcodex\\n%%14\\tcodex\\tcodex\\n"
+        printf "%%11\\tzsh\\tzsh\\n%%12\\tnode\\tnode /tmp/bin/omcp.js hud --watch\\n%%13\\tcodex\\tcodex\\n%%14\\tcodex\\tcodex\\n"
         exit 0
         ;;
       *)
@@ -4485,7 +4485,7 @@ esac
 
           await shutdownTeam('team-shutdown-shared-session', cwd, { force: true });
 
-          const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-shutdown-shared-session');
+          const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-shutdown-shared-session');
           assert.equal(existsSync(teamRoot), false);
           assert.equal(await readMonitorSnapshot('team-shutdown-shared-session', cwd), null);
 
@@ -4508,11 +4508,11 @@ esac
 
 
   it('shutdownTeam restores a standalone HUD pane after tearing down the team HUD', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-restore-hud-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-restore-hud-'));
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-shutdown-restore-hud-bin-',
+          dirPrefix: 'omcp-runtime-shutdown-restore-hud-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\n' "$*" >> "${tmuxLogPath}"
@@ -4567,11 +4567,11 @@ esac
   });
 
   it('shutdownTeam preserves leader exclusion while tearing down the hud pane', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-shutdown-exclusions-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-shutdown-exclusions-'));
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-shutdown-exclusions-bin-',
+          dirPrefix: 'omcp-runtime-shutdown-exclusions-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${tmuxLogPath}"
@@ -4597,7 +4597,7 @@ esac
           const config = await readTeamConfig('team-shutdown-exclusions', cwd);
           assert.ok(config);
           if (!config) return;
-          config.tmux_session = 'omx-team-team-shutdown-exclusions';
+          config.tmux_session = 'omcp-team-team-shutdown-exclusions';
           config.leader_pane_id = '%11';
           config.hud_pane_id = '%12';
           config.workers[0]!.pane_id = '%11';
@@ -4618,7 +4618,7 @@ esac
   });
 
   it('shutdownTeam still requires confirm-issues on failed tasks', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-normal-gate-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-normal-gate-'));
     try {
       await initTeamState('team-normal-gate', 'normal gate test', 'executor', 1, cwd);
       await createTask(
@@ -4632,7 +4632,7 @@ esac
         /shutdown_confirm_issues_required:failed=1/,
       );
 
-      const teamRoot = join(cwd, '.omx', 'state', 'team', 'team-normal-gate');
+      const teamRoot = join(cwd, '.omcp', 'state', 'team', 'team-normal-gate');
       assert.equal(existsSync(teamRoot), true);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4641,7 +4641,7 @@ esac
 
 
   it('resumeTeam returns null for non-existent team', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       const runtime = await resumeTeam('missing-team', cwd);
       assert.equal(runtime, null);
@@ -4651,7 +4651,7 @@ esac
   });
 
   it('resumeTeam returns null for prompt teams when worker handles are missing after restart', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-prompt-resume-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-prompt-resume-'));
     const sleeper = spawn(process.execPath, ['-e', 'setInterval(() => {}, 1000)'], {
       stdio: 'ignore',
       detached: false,
@@ -4664,7 +4664,7 @@ esac
 
     try {
       await initTeamState('team-prompt-resume', 'prompt resume test', 'executor', 1, cwd);
-      const configPath = join(cwd, '.omx', 'state', 'team', 'team-prompt-resume', 'config.json');
+      const configPath = join(cwd, '.omcp', 'state', 'team', 'team-prompt-resume', 'config.json');
       const config = JSON.parse(await readFile(configPath, 'utf-8')) as any;
       config.worker_launch_mode = 'prompt';
       config.tmux_session = 'prompt-team-prompt-resume';
@@ -4693,7 +4693,7 @@ esac
   });
 
   it('assignTask enforces delegation_only policy for leader-fixed worker', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-delegation', 'delegation policy test', 'executor', 1, cwd);
       const task = await createTask(
@@ -4702,7 +4702,7 @@ esac
         cwd,
       );
 
-      const manifestPath = join(cwd, '.omx', 'state', 'team', 'team-delegation', 'manifest.v2.json');
+      const manifestPath = join(cwd, '.omcp', 'state', 'team', 'team-delegation', 'manifest.v2.json');
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as any;
       manifest.governance = { ...(manifest.governance || {}), delegation_only: true };
       await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
@@ -4717,7 +4717,7 @@ esac
   });
 
   it('assignTask does not claim task when worker does not exist', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-missing-worker', 'assignment test', 'executor', 1, cwd);
       const task = await createTask(
@@ -4740,7 +4740,7 @@ esac
   });
 
   it('assignTask rolls back claim when notification transport fails', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-notify-fail', 'assignment test', 'executor', 1, cwd);
       const task = await createTask(
@@ -4765,7 +4765,7 @@ esac
   });
 
   it('assignTask rolls back claim when inbox write fails after claim', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-inbox-fail', 'assignment test', 'executor', 1, cwd);
       const task = await createTask(
@@ -4773,7 +4773,7 @@ esac
         { subject: 'x', description: 'd', status: 'pending', requires_code_change: false },
         cwd,
       );
-      const workerDir = join(cwd, '.omx', 'state', 'team', 'team-inbox-fail', 'workers', 'worker-1');
+      const workerDir = join(cwd, '.omcp', 'state', 'team', 'team-inbox-fail', 'workers', 'worker-1');
       await rm(workerDir, { recursive: true, force: true });
       // Force inbox write failure by turning the would-be directory into a file.
       await writeFile(workerDir, 'not-a-directory');
@@ -4793,7 +4793,7 @@ esac
   });
 
   it('assignTask enforces plan approval for code-change tasks when required', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-approval', 'approval policy test', 'executor', 1, cwd);
       const task = await createTask(
@@ -4802,7 +4802,7 @@ esac
         cwd,
       );
 
-      const manifestPath = join(cwd, '.omx', 'state', 'team', 'team-approval', 'manifest.v2.json');
+      const manifestPath = join(cwd, '.omcp', 'state', 'team', 'team-approval', 'manifest.v2.json');
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as any;
       manifest.governance = { ...(manifest.governance || {}), plan_approval_required: true };
       await writeFile(manifestPath, JSON.stringify(manifest, null, 2));
@@ -4819,12 +4819,12 @@ esac
   it('monitorTeam does not re-notify already-notified mailbox messages (issue #116)', async () => {
     // Regression: deliverPendingMailboxMessages used to re-notify every 15 s via shouldRetry.
     // After the fix it must NOT re-notify messages that already have notified_at set.
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-no-spam-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-no-spam-'));
     try {
       await initTeamState('team-no-spam', 'no spam test', 'executor', 1, cwd);
 
       // Write a mailbox message that is already notified but not yet delivered.
-      const mailboxDir = join(cwd, '.omx', 'state', 'team', 'team-no-spam', 'mailbox');
+      const mailboxDir = join(cwd, '.omcp', 'state', 'team', 'team-no-spam', 'mailbox');
       await mkdir(mailboxDir, { recursive: true });
       const notifiedAt = new Date(Date.now() - 60_000).toISOString(); // 1 minute ago
       await writeFile(join(mailboxDir, 'worker-1.json'), JSON.stringify({
@@ -4872,11 +4872,11 @@ esac
   it('monitorTeam only notifies once per new message even without notified_at (issue #116)', async () => {
     // Regression: messages delivered via team_send_message MCP have no notified_at.
     // After the first successful poll that sets notified_at, subsequent polls must not re-notify.
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-new-msg-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-new-msg-'));
     try {
       await initTeamState('team-new-msg', 'new msg test', 'executor', 1, cwd);
 
-      const mailboxDir = join(cwd, '.omx', 'state', 'team', 'team-new-msg', 'mailbox');
+      const mailboxDir = join(cwd, '.omcp', 'state', 'team', 'team-new-msg', 'mailbox');
       await mkdir(mailboxDir, { recursive: true });
       const createdAt = new Date().toISOString();
       await writeFile(join(mailboxDir, 'worker-1.json'), JSON.stringify({
@@ -4942,7 +4942,7 @@ esac
   });
 
   it('monitorTeam does not emit duplicate task_completed when transitionTaskStatus completed the task first (issue #161)', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-no-dup-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-no-dup-'));
     try {
       await initTeamState('team-no-dup', 'dedup test', 'executor', 1, cwd);
       const t = await createTask('team-no-dup', { subject: 'task', description: 'd', status: 'pending' }, cwd);
@@ -4960,7 +4960,7 @@ esac
       // Run monitorTeam again — it must NOT emit a second task_completed event.
       await monitorTeam('team-no-dup', cwd);
 
-      const eventsPath = join(cwd, '.omx', 'state', 'team', 'team-no-dup', 'events', 'events.ndjson');
+      const eventsPath = join(cwd, '.omcp', 'state', 'team', 'team-no-dup', 'events', 'events.ndjson');
       const content = await readFile(eventsPath, 'utf-8');
       const events = content.trim().split('\n').filter(Boolean).map(line => JSON.parse(line));
       const completedEvents = events.filter((e: { type: string }) => e.type === 'task_completed');
@@ -4971,7 +4971,7 @@ esac
   });
 
   it('sendWorkerMessage allows worker to message leader-fixed mailbox', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-leader-msg', 'leader mailbox test', 'executor', 2, cwd);
       await sendWorkerMessage('team-leader-msg', 'worker-1', 'leader-fixed', 'worker one ack', cwd);
@@ -4989,7 +4989,7 @@ esac
   });
 
   it('sendWorkerMessage dedupes identical undelivered leader-fixed messages', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-'));
     try {
       await initTeamState('team-leader-dedupe', 'leader mailbox dedupe test', 'executor', 1, cwd);
       await sendWorkerMessage('team-leader-dedupe', 'worker-1', 'leader-fixed', 'INTEGRATED: same-body', cwd);
@@ -5005,11 +5005,11 @@ esac
 
 
   it('sendWorkerMessage keeps hook-preferred duplicate leader mailbox sends idempotent after notification', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-leader-dedupe-notified-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-leader-dedupe-notified-'));
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-leader-dedupe-notified-bin-',
+          dirPrefix: 'omcp-runtime-leader-dedupe-notified-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\n' "$$*" >> "${tmuxLogPath}"
@@ -5054,11 +5054,11 @@ esac
   });
 
   it('sendWorkerMessage hook-preferred path persists leader mailbox guidance when leader pane exists', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-leader-inject-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-leader-inject-'));
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-leader-inject-bin-',
+          dirPrefix: 'omcp-runtime-leader-inject-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\n' "$*" >> "${tmuxLogPath}"
@@ -5122,11 +5122,11 @@ esac
   });
 
   it('sendWorkerMessage keeps failed hook receipts failed when fallback mailbox persistence confirms delivery', { concurrency: false }, async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-leader-failed-receipt-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-leader-failed-receipt-'));
     try {
       await withMockTmuxFixture(
         {
-          dirPrefix: 'omx-runtime-leader-failed-receipt-bin-',
+          dirPrefix: 'omcp-runtime-leader-failed-receipt-bin-',
           tmuxScript: (tmuxLogPath) => `#!/bin/sh
 set -eu
 printf '%s\n' "$*" >> "${tmuxLogPath}"
@@ -5194,7 +5194,7 @@ esac
   });
 
   it('sendWorkerMessage hook-preferred path for leader waits for receipt then falls back to mailbox persistence', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-leader-hook-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-leader-hook-'));
     try {
       await initTeamState('team-leader-hook', 'leader hook fallback test', 'executor', 1, cwd);
       const cfg = await readTeamConfig('team-leader-hook', cwd);
@@ -5230,7 +5230,7 @@ esac
   });
 
   it('sendWorkerMessage transport_direct keeps leader-fixed request pending when leader_pane_id missing', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-leader-direct-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-leader-direct-'));
     try {
       await initTeamState('team-leader-direct', 'leader direct transport test', 'executor', 1, cwd);
       const cfg = await readTeamConfig('team-leader-direct', cwd);
@@ -5239,7 +5239,7 @@ esac
       cfg.leader_pane_id = '';
       await saveTeamConfig(cfg, cwd);
 
-      const manifestPath = join(cwd, '.omx', 'state', 'team', 'team-leader-direct', 'manifest.v2.json');
+      const manifestPath = join(cwd, '.omcp', 'state', 'team', 'team-leader-direct', 'manifest.v2.json');
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8'));
       manifest.policy = { ...(manifest.policy || {}), dispatch_mode: 'transport_direct' };
       await writeFile(manifestPath, JSON.stringify(manifest, null, 2));

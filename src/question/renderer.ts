@@ -46,7 +46,7 @@ function buildQuestionUiCommand(recordPath: string, sessionId?: string): string 
 
 function defaultExecTmux(args: string[]): string {
   const tmux = resolveTmuxBinaryForPlatform();
-  if (!tmux) throw new Error('tmux is unavailable; omx question requires tmux for OMCP-owned question UI rendering.');
+  if (!tmux) throw new Error('tmux is unavailable; omcp question requires tmux for OMCP-owned question UI rendering.');
   return execFileSync(tmux, args, {
     encoding: 'utf-8',
     ...(process.platform === 'win32' ? { windowsHide: true } : {}),
@@ -61,7 +61,7 @@ function resolveReturnTarget(env: NodeJS.ProcessEnv = process.env): string | und
 }
 
 export function formatQuestionAnswerForInjection(answer: QuestionAnswer): string {
-  const prefix = '[omx question answered]';
+  const prefix = '[omcp question answered]';
   if (answer.kind === 'other') {
     return sanitizeReplyInput(`${prefix} ${answer.other_text ?? String(answer.value)}`);
   }
@@ -114,7 +114,7 @@ export function launchQuestionRenderer(
       command,
     ]);
     const paneId = parsePaneIdFromTmuxOutput(rawPane);
-    if (!paneId) throw new Error('Failed to create tmux split pane for omx question UI.');
+    if (!paneId) throw new Error('Failed to create tmux split pane for omcp question UI.');
     const returnTarget = resolveReturnTarget(options.env ?? process.env);
     return {
       renderer: 'tmux-pane',
@@ -126,7 +126,7 @@ export function launchQuestionRenderer(
 
   if (strategy === 'detached-tmux') {
     const baseName = basename(options.recordPath, '.json').replace(/[^A-Za-z0-9_-]+/g, '-').slice(0, 32) || 'question';
-    const sessionName = `omx-question-${baseName}`;
+    const sessionName = `omcp-question-${baseName}`;
     const output = execTmux([
       'new-session',
       '-d',
@@ -154,5 +154,5 @@ export function launchQuestionRenderer(
     };
   }
 
-  throw new Error('omx question requires tmux for OMCP-owned question UI rendering in this session.');
+  throw new Error('omcp question requires tmux for OMCP-owned question UI rendering in this session.');
 }

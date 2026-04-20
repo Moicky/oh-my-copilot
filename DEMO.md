@@ -17,7 +17,7 @@ npm run build
 npm link
 
 # Run setup (installs prompts, skills, configures Codex CLI)
-omx setup
+omcp setup
 ```
 
 **Expected output:**
@@ -51,13 +51,13 @@ oh-my-copilot setup
   HUD config created (preset: focused).
   StatusLine configured in config.toml via [tui] section.
 
-Setup complete! Run "omx doctor" to verify installation.
+Setup complete! Run "omcp doctor" to verify installation.
 ```
 
 ## Verify Installation
 
 ```bash
-omx doctor
+omcp doctor
 ```
 
 **Expected output:**
@@ -72,7 +72,7 @@ oh-my-copilot doctor
   [OK] Prompts: 30 agent prompts installed
   [OK] Skills: 40 skills installed
   [OK] AGENTS.md: found in project root
-  [OK] State dir: .omx/state
+  [OK] State dir: .omcp/state
   [OK] MCP Servers: 4 servers configured (OMCP present)
 
 Results: 9 passed, 0 warnings, 0 failed
@@ -83,7 +83,7 @@ Results: 9 passed, 0 warnings, 0 failed
 Start Codex CLI in any project directory:
 
 ```bash
-omx
+omcp
 ```
 
 Then use role and workflow keywords:
@@ -123,23 +123,23 @@ Codex CLI loads this automatically at session start.
 
 ```bash
 # Check version
-omx version
+omcp version
 
 # Check all active modes
-omx status
+omcp status
 
 # Cancel any active mode
-omx cancel
+omcp cancel
 ```
 
-**Expected output for `omx version`:**
+**Expected output for `omcp version`:**
 ```
 oh-my-copilot vX.Y.Z
 Node.js v20+
 Platform: linux x64
 ```
 
-**Expected output for `omx status` (no active modes):**
+**Expected output for `omcp status` (no active modes):**
 ```
 No active modes.
 ```
@@ -170,7 +170,7 @@ The MCP servers are configured in `config.toml` and provide state/memory tools t
 > Use notepad_write_working to save a note about current progress
 ```
 
-**Expected:** Agent accesses `.omx/state/` and `.omx/project-memory.json` through MCP tool calls.
+**Expected:** Agent accesses `.omcp/state/` and `.omcp/project-memory.json` through MCP tool calls.
 
 ## Demo 6: E2E Team CLI (5+ Parallel Workers, Mixed Codex/Claude)
 
@@ -180,7 +180,7 @@ This demo showcases the **tmux-based multi-agent orchestration** system that spa
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    tmux Session "omx-team"                   │
+│                    tmux Session "omcp-team"                   │
 │  ┌──────────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐ │
 │  │   Leader     │  │ Worker 1 │  │ Worker 2 │  │ Worker N │ │
 │  │  (main pane) │  │ (codex)  │  │ (codex)  │  │ (claude) │ │
@@ -215,19 +215,19 @@ export OMX_TEAM_WORKER_CLI_MAP=codex,codex,codex,claude,claude,claude
 export OMX_TEAM_WORKER_LAUNCH_ARGS='-c model_reasoning_effort="low"'
 
 # 5-worker baseline
-omx team 5:executor "parallel team smoke"
+omcp team 5:executor "parallel team smoke"
 
 # 6-worker mixed-CLI E2E run
-omx team 6:executor "$TEAM_TASK"
+omcp team 6:executor "$TEAM_TASK"
 
 # Discover team command help
-omx team --help
-omx team api --help
+omcp team --help
+omcp team api --help
 
 # Lifecycle commands
-omx team status "$TEAM_NAME"
-omx team resume "$TEAM_NAME"
-omx team shutdown "$TEAM_NAME"
+omcp team status "$TEAM_NAME"
+omcp team resume "$TEAM_NAME"
+omcp team shutdown "$TEAM_NAME"
 ```
 
 **Expected:**
@@ -236,74 +236,74 @@ omx team shutdown "$TEAM_NAME"
 - `status` shows task distribution and worker health.
 - `shutdown` cleans up workers and team state.
 
-## Demo 7: `omx team api` Rich CLI Interop Demonstration
+## Demo 7: `omcp team api` Rich CLI Interop Demonstration
 
-All mutations should use CLI interop (`omx team api ... --json`) with the stable JSON envelope.
+All mutations should use CLI interop (`omcp team api ... --json`) with the stable JSON envelope.
 
 ### 7.1 Task lifecycle (claim-safe)
 
 ```bash
-CREATE_JSON=$(omx team api create-task --input '{"team_name":"e2e-team-demo","subject":"Demo lifecycle","description":"Claim-safe lifecycle demo","owner":"worker-1"}' --json)
+CREATE_JSON=$(omcp team api create-task --input '{"team_name":"e2e-team-demo","subject":"Demo lifecycle","description":"Claim-safe lifecycle demo","owner":"worker-1"}' --json)
 TASK_ID=$(echo "$CREATE_JSON" | jq -r '.data.task.id')
 
-CLAIM_JSON=$(omx team api claim-task --input "{\"team_name\":\"e2e-team-demo\",\"task_id\":\"$TASK_ID\",\"worker\":\"worker-1\",\"expected_version\":1}" --json)
+CLAIM_JSON=$(omcp team api claim-task --input "{\"team_name\":\"e2e-team-demo\",\"task_id\":\"$TASK_ID\",\"worker\":\"worker-1\",\"expected_version\":1}" --json)
 CLAIM_TOKEN=$(echo "$CLAIM_JSON" | jq -r '.data.claimToken')
 
-omx team api transition-task-status --input "{\"team_name\":\"e2e-team-demo\",\"task_id\":\"$TASK_ID\",\"from\":\"in_progress\",\"to\":\"completed\",\"claim_token\":\"$CLAIM_TOKEN\"}" --json
+omcp team api transition-task-status --input "{\"team_name\":\"e2e-team-demo\",\"task_id\":\"$TASK_ID\",\"from\":\"in_progress\",\"to\":\"completed\",\"claim_token\":\"$CLAIM_TOKEN\"}" --json
 ```
 
 ### 7.2 Mailbox/message flow
 
 ```bash
-omx team api send-message --input '{"team_name":"e2e-team-demo","from_worker":"leader-fixed","to_worker":"worker-1","body":"ACK: worker-1 ready"}' --json
-omx team api broadcast --input '{"team_name":"e2e-team-demo","from_worker":"leader-fixed","body":"Sync checkpoint"}' --json
-MAILBOX_JSON=$(omx team api mailbox-list --input '{"team_name":"e2e-team-demo","worker":"worker-1"}' --json)
+omcp team api send-message --input '{"team_name":"e2e-team-demo","from_worker":"leader-fixed","to_worker":"worker-1","body":"ACK: worker-1 ready"}' --json
+omcp team api broadcast --input '{"team_name":"e2e-team-demo","from_worker":"leader-fixed","body":"Sync checkpoint"}' --json
+MAILBOX_JSON=$(omcp team api mailbox-list --input '{"team_name":"e2e-team-demo","worker":"worker-1"}' --json)
 MESSAGE_ID=$(echo "$MAILBOX_JSON" | jq -r '.data.messages[0].message_id // empty')
-omx team api mailbox-mark-notified --input "{\"team_name\":\"e2e-team-demo\",\"worker\":\"worker-1\",\"message_id\":\"$MESSAGE_ID\"}" --json
-omx team api mailbox-mark-delivered --input "{\"team_name\":\"e2e-team-demo\",\"worker\":\"worker-1\",\"message_id\":\"$MESSAGE_ID\"}" --json
+omcp team api mailbox-mark-notified --input "{\"team_name\":\"e2e-team-demo\",\"worker\":\"worker-1\",\"message_id\":\"$MESSAGE_ID\"}" --json
+omcp team api mailbox-mark-delivered --input "{\"team_name\":\"e2e-team-demo\",\"worker\":\"worker-1\",\"message_id\":\"$MESSAGE_ID\"}" --json
 ```
 
 ### 7.3 Complete operations matrix (broad coverage)
 
 ```bash
-omx team api read-task --input '{"team_name":"e2e-team-demo","task_id":"<TASK_ID>"}' --json
-omx team api list-tasks --input '{"team_name":"e2e-team-demo"}' --json
-omx team api update-task --input '{"team_name":"e2e-team-demo","task_id":"<TASK_ID>","description":"Updated via CLI interop"}' --json
-omx team api release-task-claim --input '{"team_name":"e2e-team-demo","task_id":"<TASK_ID>","claim_token":"<CLAIM_TOKEN>","worker":"worker-1"}' --json
-omx team api read-config --input '{"team_name":"e2e-team-demo"}' --json
-omx team api read-manifest --input '{"team_name":"e2e-team-demo"}' --json
-omx team api read-worker-status --input '{"team_name":"e2e-team-demo","worker":"worker-1"}' --json
-omx team api read-worker-heartbeat --input '{"team_name":"e2e-team-demo","worker":"worker-1"}' --json
-omx team api update-worker-heartbeat --input '{"team_name":"e2e-team-demo","worker":"worker-1","pid":12345,"turn_count":12,"alive":true}' --json
-omx team api write-worker-inbox --input '{"team_name":"e2e-team-demo","worker":"worker-1","content":"# Inbox update\nProceed with task 2."}' --json
-omx team api write-worker-identity --input '{"team_name":"e2e-team-demo","worker":"worker-9","index":9,"role":"executor"}' --json
-omx team api append-event --input '{"team_name":"e2e-team-demo","type":"task_completed","worker":"worker-1","task_id":"<TASK_ID>","reason":"demo"}' --json
-omx team api get-summary --input '{"team_name":"e2e-team-demo"}' --json
-omx team api write-shutdown-request --input '{"team_name":"e2e-team-demo","worker":"worker-1","requested_by":"leader-fixed"}' --json
-omx team api read-shutdown-ack --input '{"team_name":"e2e-team-demo","worker":"worker-1"}' --json
-omx team api read-monitor-snapshot --input '{"team_name":"e2e-team-demo"}' --json
-omx team api write-monitor-snapshot --input '{"team_name":"e2e-team-demo","snapshot":{"taskStatusById":{"1":"completed"},"workerAliveByName":{"worker-1":true},"workerStateByName":{"worker-1":"idle"},"workerTurnCountByName":{"worker-1":12},"workerTaskIdByName":{"worker-1":"1"},"mailboxNotifiedByMessageId":{},"completedEventTaskIds":{"1":true}}}' --json
-omx team api read-task-approval --input '{"team_name":"e2e-team-demo","task_id":"<TASK_ID>"}' --json
-omx team api write-task-approval --input '{"team_name":"e2e-team-demo","task_id":"<TASK_ID>","status":"approved","reviewer":"leader-fixed","decision_reason":"demo approval","required":true}' --json
-omx team api cleanup --input '{"team_name":"e2e-team-demo"}' --json
+omcp team api read-task --input '{"team_name":"e2e-team-demo","task_id":"<TASK_ID>"}' --json
+omcp team api list-tasks --input '{"team_name":"e2e-team-demo"}' --json
+omcp team api update-task --input '{"team_name":"e2e-team-demo","task_id":"<TASK_ID>","description":"Updated via CLI interop"}' --json
+omcp team api release-task-claim --input '{"team_name":"e2e-team-demo","task_id":"<TASK_ID>","claim_token":"<CLAIM_TOKEN>","worker":"worker-1"}' --json
+omcp team api read-config --input '{"team_name":"e2e-team-demo"}' --json
+omcp team api read-manifest --input '{"team_name":"e2e-team-demo"}' --json
+omcp team api read-worker-status --input '{"team_name":"e2e-team-demo","worker":"worker-1"}' --json
+omcp team api read-worker-heartbeat --input '{"team_name":"e2e-team-demo","worker":"worker-1"}' --json
+omcp team api update-worker-heartbeat --input '{"team_name":"e2e-team-demo","worker":"worker-1","pid":12345,"turn_count":12,"alive":true}' --json
+omcp team api write-worker-inbox --input '{"team_name":"e2e-team-demo","worker":"worker-1","content":"# Inbox update\nProceed with task 2."}' --json
+omcp team api write-worker-identity --input '{"team_name":"e2e-team-demo","worker":"worker-9","index":9,"role":"executor"}' --json
+omcp team api append-event --input '{"team_name":"e2e-team-demo","type":"task_completed","worker":"worker-1","task_id":"<TASK_ID>","reason":"demo"}' --json
+omcp team api get-summary --input '{"team_name":"e2e-team-demo"}' --json
+omcp team api write-shutdown-request --input '{"team_name":"e2e-team-demo","worker":"worker-1","requested_by":"leader-fixed"}' --json
+omcp team api read-shutdown-ack --input '{"team_name":"e2e-team-demo","worker":"worker-1"}' --json
+omcp team api read-monitor-snapshot --input '{"team_name":"e2e-team-demo"}' --json
+omcp team api write-monitor-snapshot --input '{"team_name":"e2e-team-demo","snapshot":{"taskStatusById":{"1":"completed"},"workerAliveByName":{"worker-1":true},"workerStateByName":{"worker-1":"idle"},"workerTurnCountByName":{"worker-1":12},"workerTaskIdByName":{"worker-1":"1"},"mailboxNotifiedByMessageId":{},"completedEventTaskIds":{"1":true}}}' --json
+omcp team api read-task-approval --input '{"team_name":"e2e-team-demo","task_id":"<TASK_ID>"}' --json
+omcp team api write-task-approval --input '{"team_name":"e2e-team-demo","task_id":"<TASK_ID>","status":"approved","reviewer":"leader-fixed","decision_reason":"demo approval","required":true}' --json
+omcp team api cleanup --input '{"team_name":"e2e-team-demo"}' --json
 ```
 
 ### 7.4 Verification expectations
 
 ```bash
 # Envelope checks (schema_version + operation + ok)
-omx team api get-summary --input '{"team_name":"e2e-team-demo"}' --json | jq -e '.schema_version == "1.0" and .operation == "get-summary" and (.ok == true or .ok == false)'
+omcp team api get-summary --input '{"team_name":"e2e-team-demo"}' --json | jq -e '.schema_version == "1.0" and .operation == "get-summary" and (.ok == true or .ok == false)'
 
 # Team lifecycle checks
-omx team status "e2e-team-demo"
-omx team shutdown "e2e-team-demo"
+omcp team status "e2e-team-demo"
+omcp team shutdown "e2e-team-demo"
 ```
 
 Success criteria:
-- All `omx team api` examples return valid JSON envelopes.
+- All `omcp team api` examples return valid JSON envelopes.
 - Task lifecycle uses `create-task -> claim-task -> transition-task-status`.
 - Message lifecycle uses `send-message/broadcast -> mailbox-list -> mailbox-mark-*`.
-- Team lifecycle demonstrates `omx team`, `omx team status`, `omx team resume`, and `omx team shutdown`.
+- Team lifecycle demonstrates `omcp team`, `omcp team status`, `omcp team resume`, and `omcp team shutdown`.
 
 ## Demo 8: One-Shot E2E Script (Copy/Paste)
 
@@ -336,35 +336,35 @@ export OMX_TEAM_WORKER_CLI_MAP=codex,codex,codex,claude,claude,claude
 export OMX_TEAM_WORKER_LAUNCH_ARGS='-c model_reasoning_effort="low"'
 
 echo "[1/8] start team (6 workers mixed codex/claude)"
-omx team 6:executor "$TEAM_TASK"
+omcp team 6:executor "$TEAM_TASK"
 
 echo "[2/8] lifecycle status"
-omx team status "$TEAM_NAME"
+omcp team status "$TEAM_NAME"
 
 echo "[3/8] create task"
-CREATE_JSON=$(omx team api create-task --input "{\"team_name\":\"$TEAM_NAME\",\"subject\":\"one-shot lifecycle\",\"description\":\"demo task\",\"owner\":\"worker-1\"}" --json)
+CREATE_JSON=$(omcp team api create-task --input "{\"team_name\":\"$TEAM_NAME\",\"subject\":\"one-shot lifecycle\",\"description\":\"demo task\",\"owner\":\"worker-1\"}" --json)
 TASK_ID=$(echo "$CREATE_JSON" | jq -r '.data.task.id')
 
 echo "[4/8] claim task"
-CLAIM_JSON=$(omx team api claim-task --input "{\"team_name\":\"$TEAM_NAME\",\"task_id\":\"$TASK_ID\",\"worker\":\"worker-1\",\"expected_version\":1}" --json)
+CLAIM_JSON=$(omcp team api claim-task --input "{\"team_name\":\"$TEAM_NAME\",\"task_id\":\"$TASK_ID\",\"worker\":\"worker-1\",\"expected_version\":1}" --json)
 CLAIM_TOKEN=$(echo "$CLAIM_JSON" | jq -r '.data.claimToken')
 
 echo "[5/8] transition task -> completed"
-omx team api transition-task-status --input "{\"team_name\":\"$TEAM_NAME\",\"task_id\":\"$TASK_ID\",\"from\":\"in_progress\",\"to\":\"completed\",\"claim_token\":\"$CLAIM_TOKEN\"}" --json
+omcp team api transition-task-status --input "{\"team_name\":\"$TEAM_NAME\",\"task_id\":\"$TASK_ID\",\"from\":\"in_progress\",\"to\":\"completed\",\"claim_token\":\"$CLAIM_TOKEN\"}" --json
 
 echo "[6/8] mailbox flow"
-omx team api send-message --input "{\"team_name\":\"$TEAM_NAME\",\"from_worker\":\"leader-fixed\",\"to_worker\":\"worker-1\",\"body\":\"ACK one-shot\"}" --json
-MAILBOX_JSON=$(omx team api mailbox-list --input "{\"team_name\":\"$TEAM_NAME\",\"worker\":\"worker-1\"}" --json)
+omcp team api send-message --input "{\"team_name\":\"$TEAM_NAME\",\"from_worker\":\"leader-fixed\",\"to_worker\":\"worker-1\",\"body\":\"ACK one-shot\"}" --json
+MAILBOX_JSON=$(omcp team api mailbox-list --input "{\"team_name\":\"$TEAM_NAME\",\"worker\":\"worker-1\"}" --json)
 MESSAGE_ID=$(echo "$MAILBOX_JSON" | jq -r '.data.messages[0].message_id // empty')
-omx team api mailbox-mark-notified --input "{\"team_name\":\"$TEAM_NAME\",\"worker\":\"worker-1\",\"message_id\":\"$MESSAGE_ID\"}" --json
-omx team api mailbox-mark-delivered --input "{\"team_name\":\"$TEAM_NAME\",\"worker\":\"worker-1\",\"message_id\":\"$MESSAGE_ID\"}" --json
+omcp team api mailbox-mark-notified --input "{\"team_name\":\"$TEAM_NAME\",\"worker\":\"worker-1\",\"message_id\":\"$MESSAGE_ID\"}" --json
+omcp team api mailbox-mark-delivered --input "{\"team_name\":\"$TEAM_NAME\",\"worker\":\"worker-1\",\"message_id\":\"$MESSAGE_ID\"}" --json
 
 echo "[7/8] summary envelope check"
-omx team api get-summary --input "{\"team_name\":\"$TEAM_NAME\"}" --json | jq -e '.schema_version == "1.0" and .operation == "get-summary" and .ok == true'
+omcp team api get-summary --input "{\"team_name\":\"$TEAM_NAME\"}" --json | jq -e '.schema_version == "1.0" and .operation == "get-summary" and .ok == true'
 
 echo "[8/8] shutdown + cleanup"
-omx team shutdown "$TEAM_NAME"
-omx team api cleanup --input "{\"team_name\":\"$TEAM_NAME\"}" --json
+omcp team shutdown "$TEAM_NAME"
+omcp team api cleanup --input "{\"team_name\":\"$TEAM_NAME\"}" --json
 
 echo "E2E demo complete."
 ```
@@ -382,18 +382,18 @@ Expected:
 | Agent prompts | 30 | `~/.codex/prompts/*.md` |
 | Skills | 40 | `~/.codex/skills/*/SKILL.md` |
 | MCP servers | 4 | Configured in `~/.codex/config.toml` |
-| CLI commands | 11+ | `omx (launch), setup, doctor, team, version, tmux-hook, hud, status, cancel, reasoning, help` |
+| CLI commands | 11+ | `omcp (launch), setup, doctor, team, version, tmux-hook, hud, status, cancel, reasoning, help` |
 | AGENTS.md | 1 | Project root (generated) |
 
 ## Troubleshooting
 
 **Codex CLI not found:** Install with `npm install -g @openai/codex`
 
-**Slash commands not appearing:** Run `omx setup --force` to reinstall prompts
+**Slash commands not appearing:** Run `omcp setup --force` to reinstall prompts
 
 **MCP servers not connecting:** Check `~/.codex/config.toml` for `[mcp_servers.omx_state]`, `[mcp_servers.omx_memory]`, `[mcp_servers.omx_code_intel]`, and `[mcp_servers.omx_trace]` entries
 
-**Doctor shows warnings:** Run `omx setup` to install missing components
+**Doctor shows warnings:** Run `omcp setup` to install missing components
 
 ---
 
@@ -411,7 +411,7 @@ Quick start:
 ./scripts/run-autoresearch-showcase.sh bayesopt
 
 # run several showcases back-to-back
-./scripts/run-autoresearch-showcase.sh omx-self ml-tabular bayesopt
+./scripts/run-autoresearch-showcase.sh omcp-self ml-tabular bayesopt
 ```
 
 See `playground/README.md` for the mission index, completed-result summaries, and repository-hygiene guidance.

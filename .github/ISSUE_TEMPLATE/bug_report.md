@@ -33,4 +33,4 @@ What actually happened.
 
 ## Logs / screenshots
 
-Paste relevant command output (for example `omx doctor`) and screenshots if helpful.
+Paste relevant command output (for example `omcp doctor`) and screenshots if helpful.

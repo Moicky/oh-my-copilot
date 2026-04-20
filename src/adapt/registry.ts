@@ -23,11 +23,11 @@ function capability(
 
 const FOUNDATION_CAPABILITIES: AdaptCapabilityReport[] = [
 	capability(
-		"omx-adapter-paths",
+		"omcp-adapter-paths",
 		"OMCP-owned adapter paths",
-		"omx-owned",
+		"omcp-owned",
 		"ready",
-		"Adapter artifacts stay under .omx/adapters/<target>/... rather than .omx/state or target internals.",
+		"Adapter artifacts stay under .omcp/adapters/<target>/... rather than .omcp/state or target internals.",
 	),
 	capability(
 		"planning-artifact-linkage",
@@ -77,7 +77,7 @@ const TARGET_DESCRIPTORS: Record<AdaptTarget, AdaptTargetDescriptor> = {
 		summary:
 			"Foundation seam for an OMCP-owned adapter around Hermes ACP, gateway, and persistent-session surfaces.",
 		followupHint:
-			"Hermes adapter reads external ACP, gateway, and session-store evidence while keeping all writes under .omx/adapters/hermes/.",
+			"Hermes adapter reads external ACP, gateway, and session-store evidence while keeping all writes under .omcp/adapters/hermes/.",
 		capabilities: [
 			...FOUNDATION_CAPABILITIES,
 			capability(

@@ -13,16 +13,16 @@ This document explains how OMCP tracks workflow/skill state, how transition rule
 
 ### 1. Per-mode state files — authoritative
 
-Authoritative workflow state lives in per-mode files under `.omx/state/`:
+Authoritative workflow state lives in per-mode files under `.omcp/state/`:
 
-- root scope: `.omx/state/<mode>-state.json`
-- session scope: `.omx/state/sessions/<session_id>/<mode>-state.json`
+- root scope: `.omcp/state/<mode>-state.json`
+- session scope: `.omcp/state/sessions/<session_id>/<mode>-state.json`
 
 Examples:
 
-- `.omx/state/ralplan-state.json`
-- `.omx/state/sessions/<session_id>/ralph-state.json`
-- `.omx/state/team-state.json`
+- `.omcp/state/ralplan-state.json`
+- `.omcp/state/sessions/<session_id>/ralph-state.json`
+- `.omcp/state/team-state.json`
 
 These files determine whether a workflow mode is active, completed, cancelled, or failed.
 
@@ -32,8 +32,8 @@ These files determine whether a workflow mode is active, completed, cancelled, o
 
 Locations:
 
-- `.omx/state/skill-active-state.json`
-- `.omx/state/sessions/<session_id>/skill-active-state.json`
+- `.omcp/state/skill-active-state.json`
+- `.omcp/state/sessions/<session_id>/skill-active-state.json`
 
 ### 3. Session precedence
 

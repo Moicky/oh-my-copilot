@@ -36,7 +36,7 @@ describe('launchQuestionRenderer', () => {
     const result = launchQuestionRenderer(
       {
         cwd: '/repo',
-        recordPath: '/repo/.omx/state/sessions/s1/questions/question-1.json',
+        recordPath: '/repo/.omcp/state/sessions/s1/questions/question-1.json',
         sessionId: 's1',
         nowIso: '2026-04-19T00:00:00.000Z',
         env: { TMUX: '/tmp/tmux-demo', TMUX_PANE: '%11' } as NodeJS.ProcessEnv,
@@ -64,14 +64,14 @@ describe('launchQuestionRenderer', () => {
     const result = launchQuestionRenderer(
       {
         cwd: '/repo',
-        recordPath: '/repo/.omx/state/sessions/s1/questions/question-2.json',
+        recordPath: '/repo/.omcp/state/sessions/s1/questions/question-2.json',
         nowIso: '2026-04-19T00:00:00.000Z',
       },
       {
         strategy: 'detached-tmux',
         execTmux: (args) => {
           calls.push(args);
-          return 'omx-question-question-2\n';
+          return 'omcp-question-question-2\n';
         },
       },
     );
@@ -93,7 +93,7 @@ describe('question answer injection', () => {
         selected_values: ['hello\nworld'],
         other_text: 'hello\nworld',
       }),
-      '[omx question answered] hello world',
+      '[omcp question answered] hello world',
     );
   });
 
@@ -115,7 +115,7 @@ describe('question answer injection', () => {
 
     assert.equal(ok, true);
     assert.deepEqual(calls, [
-      ['send-keys', '-t', '%11', '-l', '--', '[omx question answered] proceed'],
+      ['send-keys', '-t', '%11', '-l', '--', '[omcp question answered] proceed'],
       ['send-keys', '-t', '%11', 'Enter'],
       ['send-keys', '-t', '%11', 'Enter'],
       ['send-keys', '-t', '%11', 'Enter'],

@@ -18,9 +18,9 @@ Search agents that return incomplete results or miss obvious matches force the c
 - Never store results in files; return them as message text.
 - For finding all usages of a symbol, use the best available local search tools first; if full reference tracing still requires a higher-capability surface, report that need upward to the leader.
 - If the task turns into “how does the chosen external technology work?” or “should we adopt / upgrade / replace this dependency?”, report the boundary crossing upward for `researcher` or `dependency-expert` instead of stretching `explore`.
-- This prompt is the richer explorer contract. `omx explore` uses a separate shell-only harness contract in `prompts/explore-harness.md`.
-- If session guidance enables `USE_OMX_EXPLORE_CMD`, treat `omx explore` as the preferred low-cost path for simple read-only file/symbol/pattern/relationship lookups; keep prompts narrow and concrete there, and keep this richer prompt for ambiguous, relationship-heavy, or non-shell-only investigations.
-- If `omx explore` is unavailable or fails, continue on this richer normal path instead of dropping the search.
+- This prompt is the richer explorer contract. `omcp explore` uses a separate shell-only harness contract in `prompts/explore-harness.md`.
+- If session guidance enables `USE_OMX_EXPLORE_CMD`, treat `omcp explore` as the preferred low-cost path for simple read-only file/symbol/pattern/relationship lookups; keep prompts narrow and concrete there, and keep this richer prompt for ambiguous, relationship-heavy, or non-shell-only investigations.
+- If `omcp explore` is unavailable or fails, continue on this richer normal path instead of dropping the search.
 </scope_guard>
 
 <ask_gate>

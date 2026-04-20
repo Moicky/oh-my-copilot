@@ -6,16 +6,16 @@ All notable changes to this project are documented in this file.
 
 ## [0.14.0] - 2026-04-19
 
-Minor release centered on interactive orchestration changes: the new `omx question` blocking-question entrypoint, deep-interview and autoresearch flow tightening, advisory triage routing, explicit runtime run outcomes, specialist-routing cleanup, and release-proof hardening for the shipped package.
+Minor release centered on interactive orchestration changes: the new `omcp question` blocking-question entrypoint, deep-interview and autoresearch flow tightening, advisory triage routing, explicit runtime run outcomes, specialist-routing cleanup, and release-proof hardening for the shipped package.
 
 ### Added
-- **`omx question` CLI entrypoint** — OMCP now exposes an owned blocking-question command that accepts structured prompt payloads, records question state, renders tmux/native UI flows, and returns structured answers to the invoking agent/runtime.
+- **`omcp question` CLI entrypoint** — OMCP now exposes an owned blocking-question command that accepts structured prompt payloads, records question state, renders tmux/native UI flows, and returns structured answers to the invoking agent/runtime.
 - **Structured deep-interview question obligations** — deep-interview rounds now create explicit pending-question obligations so OMCP can track completion and prevent premature Stop while a required question is still unanswered.
 - **Advisory triage routing layer** — non-keyword prompts can now receive PASS/LIGHT/HEAVY routing hints backed by persisted triage state and follow-up suppression.
 
 ### Changed
-- **Deep-interview uses `omx question` end-to-end** — interactive clarification now routes through the structured question UI instead of fallback ad-hoc prompting, making question ownership and lifecycle explicit.
-- **Autoresearch is now skill-first and validator-gated** — direct `omx autoresearch` invocation is hard-deprecated in favor of the prompt/skill workflow, and completion now requires validator evidence.
+- **Deep-interview uses `omcp question` end-to-end** — interactive clarification now routes through the structured question UI instead of fallback ad-hoc prompting, making question ownership and lifecycle explicit.
+- **Autoresearch is now skill-first and validator-gated** — direct `omcp autoresearch` invocation is hard-deprecated in favor of the prompt/skill workflow, and completion now requires validator evidence.
 - **Runtime continuation semantics are explicit** — run outcomes are normalized into a shared terminal/non-terminal contract so stop/continue behavior stays consistent across runtime loops and state surfaces.
 - **Specialist routing guidance is clearer** — repository lookup, official-doc research, and dependency-evaluation routes now have narrower ownership boundaries in prompts and role routing.
 - **Lint validation now targets tracked source roots** — `npm run lint` validates `src` and `bin` directly so nested local worktrees/runtime dirs with their own Biome roots no longer break release gating.
@@ -52,15 +52,15 @@ Patch release covering security hardening, persistent-hook and Stop-handling cor
 - **Worker runtime identity preservation** — worker runtime role identity survives startup and scaling, with worker identity verification collapsed into one narrow, reviewable path. (PR [#1676](https://github.com/Moicky/oh-my-copilot/pull/1676))
 
 #### Explore / launch safety
-- **Explore shell-startup re-entry fail-closed** — `omx explore` fails closed on shell-startup re-entry instead of recursing. (PR [#1700](https://github.com/Moicky/oh-my-copilot/pull/1700), issue [#1698](https://github.com/Moicky/oh-my-copilot/issues/1698))
-- **Explore allowlist wrapper self-resolution** — `omx explore` allowlist wrappers no longer self-resolve and recurse. (PR [#1695](https://github.com/Moicky/oh-my-copilot/pull/1695), issue [#1692](https://github.com/Moicky/oh-my-copilot/issues/1692))
+- **Explore shell-startup re-entry fail-closed** — `omcp explore` fails closed on shell-startup re-entry instead of recursing. (PR [#1700](https://github.com/Moicky/oh-my-copilot/pull/1700), issue [#1698](https://github.com/Moicky/oh-my-copilot/issues/1698))
+- **Explore allowlist wrapper self-resolution** — `omcp explore` allowlist wrappers no longer self-resolve and recurse. (PR [#1695](https://github.com/Moicky/oh-my-copilot/pull/1695), issue [#1692](https://github.com/Moicky/oh-my-copilot/issues/1692))
 
 #### Hooks / notifications / session state
 - **Forked notify-hook routing** — forked notify-hook activity stays attached to the active fork session instead of drifting. (PR [#1680](https://github.com/Moicky/oh-my-copilot/pull/1680), issue [#1679](https://github.com/Moicky/oh-my-copilot/issues/1679))
 - **Stale watcher PID reuse** — notify-fallback-watcher verifies process identity before reaping stale PIDs, with a plain-text PID fallback, lock-directory holder PID, liveness checks, and a Windows guard. (PR [#1672](https://github.com/Moicky/oh-my-copilot/pull/1672), issue [#1657](https://github.com/Moicky/oh-my-copilot/issues/1657))
 - **tmux extended-keys stale lock recovery** — tmux extended-keys lease lock now recovers from stale holders instead of hanging indefinitely. (PR [#1668](https://github.com/Moicky/oh-my-copilot/pull/1668), issue [#1655](https://github.com/Moicky/oh-my-copilot/issues/1655))
 - **MCP duplicate sibling cleanup** — post-traffic duplicate MCP siblings self-exit after extended idle instead of leaking. (PR [#1666](https://github.com/Moicky/oh-my-copilot/pull/1666))
-- **Project-root discovery** — OMCP now resolves the project root by walking to `.omx` instead of a hardcoded directory depth. (PR [#1664](https://github.com/Moicky/oh-my-copilot/pull/1664))
+- **Project-root discovery** — OMCP now resolves the project root by walking to `.omcp` instead of a hardcoded directory depth. (PR [#1664](https://github.com/Moicky/oh-my-copilot/pull/1664))
 - **AGENTS.md preservation on setup refresh** — local `AGENTS.md` content is preserved during auto-update refresh. (PR [#1673](https://github.com/Moicky/oh-my-copilot/pull/1673), issue [#1671](https://github.com/Moicky/oh-my-copilot/issues/1671))
 - **Fresh-session context isolation** — new sessions are isolated from stale task-scoped startup context. (PR [#1634](https://github.com/Moicky/oh-my-copilot/pull/1634), issue [#1624](https://github.com/Moicky/oh-my-copilot/issues/1624))
 
@@ -81,17 +81,17 @@ Patch release covering security hardening, persistent-hook and Stop-handling cor
 Hotfix release for the detached tmux startup regression introduced in `0.13.0`.
 
 ### Fixed
-- **Detached tmux stdin preservation** — detached leader shells now keep Codex stdin attached during background startup, so `omx --madmax --high` and related detached launch paths no longer exit immediately on macOS/iTerm2-style interactive sessions. (PR [#1631](https://github.com/Moicky/oh-my-copilot/pull/1631), issues [#1627](https://github.com/Moicky/oh-my-copilot/issues/1627), [#1628](https://github.com/Moicky/oh-my-copilot/issues/1628))
+- **Detached tmux stdin preservation** — detached leader shells now keep Codex stdin attached during background startup, so `omcp --madmax --high` and related detached launch paths no longer exit immediately on macOS/iTerm2-style interactive sessions. (PR [#1631](https://github.com/Moicky/oh-my-copilot/pull/1631), issues [#1627](https://github.com/Moicky/oh-my-copilot/issues/1627), [#1628](https://github.com/Moicky/oh-my-copilot/issues/1628))
 
 ### Changed
 - **Release metadata sync** — Node/Cargo package metadata, lockfiles, changelog, release body, release notes, and release-readiness docs aligned to `0.13.1`.
 
 ## [0.13.0] - 2026-04-16
 
-Minor release for the new `omx adapt` surface, stronger Ralph / runtime session authority, safer cross-platform launch behavior, and another broad pass over hook, HUD, notification, and release-process correctness.
+Minor release for the new `omcp adapt` surface, stronger Ralph / runtime session authority, safer cross-platform launch behavior, and another broad pass over hook, HUD, notification, and release-process correctness.
 
 ### Added
-- **OMCP adapt foundations** — `omx adapt` now exposes OMCP-owned adapter foundations for persistent external targets, with read-only probe/status/doctor surfaces, init/envelope output under `.omx/adapters/<target>/...`, planning artifact linkage, and target-specific OpenClaw and Hermes evidence. (PRs [#1600](https://github.com/Moicky/oh-my-copilot/pull/1600), [#1599](https://github.com/Moicky/oh-my-copilot/pull/1599), [#1598](https://github.com/Moicky/oh-my-copilot/pull/1598))
+- **OMCP adapt foundations** — `omcp adapt` now exposes OMCP-owned adapter foundations for persistent external targets, with read-only probe/status/doctor surfaces, init/envelope output under `.omcp/adapters/<target>/...`, planning artifact linkage, and target-specific OpenClaw and Hermes evidence. (PRs [#1600](https://github.com/Moicky/oh-my-copilot/pull/1600), [#1599](https://github.com/Moicky/oh-my-copilot/pull/1599), [#1598](https://github.com/Moicky/oh-my-copilot/pull/1598))
 - **Hermes runtime observation** — Hermes adaptation reports ACP, gateway, session-store, and bootstrap evidence without writing into the Hermes runtime. (PR [#1598](https://github.com/Moicky/oh-my-copilot/pull/1598))
 - **OpenClaw local observation** — OpenClaw adaptation summarizes local config, gateway, hook mapping, and lifecycle bridge evidence while keeping command gateways gated. (PR [#1599](https://github.com/Moicky/oh-my-copilot/pull/1599))
 
@@ -99,12 +99,12 @@ Minor release for the new `omx adapt` surface, stronger Ralph / runtime session 
 
 #### Ralph / runtime authority / workflow semantics
 - **Ralph session authority** — Ralph assignment and tmux Ralph nudges now stay scoped to the activating/current session instead of drifting across concurrent OMCP sessions. (PRs [#1604](https://github.com/Moicky/oh-my-copilot/pull/1604), [#1591](https://github.com/Moicky/oh-my-copilot/pull/1591))
-- **Prompt-side Ralph vs PRD CLI startup** — prompt activation no longer pretends to be `omx ralph --prd`, and PRD story validation remains required on the explicit CLI path. (PR [#1608](https://github.com/Moicky/oh-my-copilot/pull/1608))
+- **Prompt-side Ralph vs PRD CLI startup** — prompt activation no longer pretends to be `omcp ralph --prd`, and PRD story validation remains required on the explicit CLI path. (PR [#1608](https://github.com/Moicky/oh-my-copilot/pull/1608))
 - **Native Stop stability** — Stop handling is stable across session-id drift, permission-seeking handoffs resume automatically, and native hook metadata no longer hijacks routing. (PRs [#1590](https://github.com/Moicky/oh-my-copilot/pull/1590), [#1611](https://github.com/Moicky/oh-my-copilot/pull/1611); direct commit `4377e1e`)
 - **MCP state transport resilience** — resumed duplicate MCP state writers stay alive after reconcile/self-teardown paths. (PR [#1596](https://github.com/Moicky/oh-my-copilot/pull/1596))
 
 #### Launch / platform / worktree safety
-- **Explore harness resolution** — `omx explore` skips unusable PATH node entries, resolves POSIX Codex shims under sandboxed pnpm-style PATHs, and fails closed before Windows paths hit the POSIX allowlist wrapper. (PRs [#1562](https://github.com/Moicky/oh-my-copilot/pull/1562), [#1610](https://github.com/Moicky/oh-my-copilot/pull/1610); direct commit `72b1e5d`)
+- **Explore harness resolution** — `omcp explore` skips unusable PATH node entries, resolves POSIX Codex shims under sandboxed pnpm-style PATHs, and fails closed before Windows paths hit the POSIX allowlist wrapper. (PRs [#1562](https://github.com/Moicky/oh-my-copilot/pull/1562), [#1610](https://github.com/Moicky/oh-my-copilot/pull/1610); direct commit `72b1e5d`)
 - **Detached leader cleanup** — detached Codex children are terminated when their leader shell exits on signal, with regression coverage for the orphan path. (PR [#1605](https://github.com/Moicky/oh-my-copilot/pull/1605))
 - **Windows cleanup discovery** — Windows OMCP cleanup finds real orphaned servers again. (PR [#1589](https://github.com/Moicky/oh-my-copilot/pull/1589))
 - **Stale worktree startup** — detached team startup no longer fails just because an old recorded worktree path is missing. (PR [#1582](https://github.com/Moicky/oh-my-copilot/pull/1582))
@@ -117,7 +117,7 @@ Minor release for the new `omx adapt` surface, stronger Ralph / runtime session 
 - **Receiving-agent ownership** — generated guidance now treats safe reversible OMCP/runtime operations as the receiving agent's responsibility instead of asking the user to perform ordinary cleanup. (direct commit `76e808e`)
 
 #### Setup / docs / release workflow
-- **Wiki setup registration** — `omx setup` installs the shipped wiki skill/config assets consistently. (PR [#1571](https://github.com/Moicky/oh-my-copilot/pull/1571))
+- **Wiki setup registration** — `omcp setup` installs the shipped wiki skill/config assets consistently. (PR [#1571](https://github.com/Moicky/oh-my-copilot/pull/1571))
 - **Native hook doctor coverage** — doctor/config output now surfaces missing native-hook coverage before it looks like a broken OMCP install. (PR [#1546](https://github.com/Moicky/oh-my-copilot/pull/1546))
 - **Contribution branch guardrail** — normal contribution guidance now makes `dev` the obvious PR base. (PR [#1567](https://github.com/Moicky/oh-my-copilot/pull/1567))
 
@@ -147,7 +147,7 @@ Wiki-first knowledge workflows, notification and hook delivery hardening, launch
 #### Launch / setup / operator safety
 - **Reusable worktree dependency bootstrap** — launch worktrees can reuse safe parent `node_modules` instead of forcing fresh installs. (PR [#1510](https://github.com/Moicky/oh-my-copilot/pull/1510), issue [#1507](https://github.com/Moicky/oh-my-copilot/issues/1507))
 - **Malformed native-hook stdin handling** — runtime no longer destabilizes on broken native hook JSON input. (PR [#1504](https://github.com/Moicky/oh-my-copilot/pull/1504), issue [#1503](https://github.com/Moicky/oh-my-copilot/issues/1503))
-- **AGENTS preservation during setup** — `omx setup` keeps user-authored AGENTS guidance intact. (PR [#1524](https://github.com/Moicky/oh-my-copilot/pull/1524), issue [#1521](https://github.com/Moicky/oh-my-copilot/issues/1521))
+- **AGENTS preservation during setup** — `omcp setup` keeps user-authored AGENTS guidance intact. (PR [#1524](https://github.com/Moicky/oh-my-copilot/pull/1524), issue [#1521](https://github.com/Moicky/oh-my-copilot/issues/1521))
 - **tmux worker environment inheritance** — team workers preserve proxy access from the invoking environment. (PR [#1523](https://github.com/Moicky/oh-my-copilot/pull/1523), issue [#1522](https://github.com/Moicky/oh-my-copilot/issues/1522))
 - **Dirty worktree caution flow** — reusable dirty worktrees now warn inside the caution flow while retaining hard failures outside it. (PR [#1535](https://github.com/Moicky/oh-my-copilot/pull/1535), issue [#1532](https://github.com/Moicky/oh-my-copilot/issues/1532))
 - **Claude issue approval prompts** — obvious repository reads no longer stall issue sessions on unnecessary approval prompts. (PR [#1537](https://github.com/Moicky/oh-my-copilot/pull/1537), issue [#1536](https://github.com/Moicky/oh-my-copilot/issues/1536))
@@ -165,9 +165,9 @@ Wiki-first knowledge workflows, notification and hook delivery hardening, launch
 Team-runtime and multi-workflow state hardening, Windows reliability fixes, tmux/shell stability improvements, and HUD session anchoring across 25 PRs.
 
 ### Added
-- **Current-task baseline branch guardrails** — `omx team` now tracks a baseline branch per task so workers stay anchored to the correct starting point. (PR [#1419](https://github.com/Moicky/oh-my-copilot/pull/1419), issue [#1407](https://github.com/Moicky/oh-my-copilot/issues/1407))
+- **Current-task baseline branch guardrails** — `omcp team` now tracks a baseline branch per task so workers stay anchored to the correct starting point. (PR [#1419](https://github.com/Moicky/oh-my-copilot/pull/1419), issue [#1407](https://github.com/Moicky/oh-my-copilot/issues/1407))
 - **Approved multi-workflow overlaps** — canonical state now accepts approved workflow overlaps without corrupting session visibility. (PR [#1427](https://github.com/Moicky/oh-my-copilot/pull/1427))
-- **Windows ps fallback for notifications** — `omx notify` tolerates missing `ps` on Windows via a graceful process-list fallback. (PR [#1457](https://github.com/Moicky/oh-my-copilot/pull/1457))
+- **Windows ps fallback for notifications** — `omcp notify` tolerates missing `ps` on Windows via a graceful process-list fallback. (PR [#1457](https://github.com/Moicky/oh-my-copilot/pull/1457))
 
 ### Fixed
 
@@ -186,7 +186,7 @@ Team-runtime and multi-workflow state hardening, Windows reliability fixes, tmux
 - **Split-pane shutdown leader-pane targeting** — stale leader pane ID no longer misdirects split-pane shutdown signals. (PR [#1470](https://github.com/Moicky/oh-my-copilot/pull/1470), issue [#1353](https://github.com/Moicky/oh-my-copilot/issues/1353))
 - **Native psmux worker startup path** — Windows workers now start on the resolved Codex launcher path, not a stale entrypoint. (PR [#1469](https://github.com/Moicky/oh-my-copilot/pull/1469), issue [#1361](https://github.com/Moicky/oh-my-copilot/issues/1361))
 - **MCP orphan cleanup** — Windows MCP child processes no longer survive parent shutdown. (PR [#1437](https://github.com/Moicky/oh-my-copilot/pull/1437), issue [#1435](https://github.com/Moicky/oh-my-copilot/issues/1435))
-- **Retired team MCP config repair** — `omx doctor` and the launch path now realign retired team MCP config entries on upgrade. (PR [#1436](https://github.com/Moicky/oh-my-copilot/pull/1436))
+- **Retired team MCP config repair** — `omcp doctor` and the launch path now realign retired team MCP config entries on upgrade. (PR [#1436](https://github.com/Moicky/oh-my-copilot/pull/1436))
 
 #### tmux / macOS / shell
 - **Detached tmux launch cwd** — detached tmux panes now start in the requested working directory, not the caller's cwd. (PR [#1468](https://github.com/Moicky/oh-my-copilot/pull/1468), issue [#1374](https://github.com/Moicky/oh-my-copilot/issues/1374))
@@ -202,7 +202,7 @@ Team-runtime and multi-workflow state hardening, Windows reliability fixes, tmux
 - **Stop auto-continuation in intent-first phase** — native Stop no longer fires auto-continuation while deep-interview is in its ask-user questioning phase; that phase is now treated as planning for stall detection. (PR [#1473](https://github.com/Moicky/oh-my-copilot/pull/1473), issue [#1472](https://github.com/Moicky/oh-my-copilot/issues/1472))
 
 #### Explore harness
-- **rustup shim without default toolchain** — `omx explore` now emits a clear actionable error instead of surfacing a raw rustup message when `cargo` exists as a shim but no default toolchain is configured. (`src/cli/explore.ts`)
+- **rustup shim without default toolchain** — `omcp explore` now emits a clear actionable error instead of surfacing a raw rustup message when `cargo` exists as a shim but no default toolchain is configured. (`src/cli/explore.ts`)
 
 #### Hooks / auth / notify
 - **Stop-hook Ralph session scoping** — Ralph stop-hook no longer leaks across sessions; session authority is enforced before gating. (PR [#1466](https://github.com/Moicky/oh-my-copilot/pull/1466), issue [#1461](https://github.com/Moicky/oh-my-copilot/issues/1461))
@@ -221,7 +221,7 @@ Team-runtime and multi-workflow state hardening, Windows reliability fixes, tmux
 MCP-CLI parity surface, HUD recovery and reconciliation hardening, native-hook and team-runtime stability fixes, and state operations module extraction.
 
 ### Added
-- **MCP-CLI parity surface** — new `omx state`, `omx notepad`, `omx project-memory`, `omx trace`, and `omx code-intel` CLI subcommands expose MCP server tools via CLI, enabling scriptable access without MCP transport. (`src/cli/mcp-parity.ts`, `src/cli/state.ts`)
+- **MCP-CLI parity surface** — new `omcp state`, `omcp notepad`, `omcp project-memory`, `omcp trace`, and `omcp code-intel` CLI subcommands expose MCP server tools via CLI, enabling scriptable access without MCP transport. (`src/cli/mcp-parity.ts`, `src/cli/state.ts`)
 - **HUD reconciliation module** — new `src/hud/reconcile.ts` auto-reconciles HUD pane state across session boundaries.
 - **Shared HUD tmux helpers** — tmux pane management (`parseTmuxPaneSnapshot`, `createHudWatchPane`, `killTmuxPane`, etc.) extracted to `src/hud/tmux.ts` for shared use by CLI and reconciliation.
 - **State operations module** — new `src/state/operations.ts` provides read/write/clear/list-active/get-status for mode state, backing both the MCP state server and the new CLI parity surface.
@@ -229,7 +229,7 @@ MCP-CLI parity surface, HUD recovery and reconciliation hardening, native-hook a
 
 ### Fixed
 - **HUD recovery via OMCP CLI entry** — prompt-submit recovery now restores the real HUD process instead of silently skipping it. (PRs [#1413](https://github.com/Moicky/oh-my-copilot/pull/1413), [#1414](https://github.com/Moicky/oh-my-copilot/pull/1414))
-- **User-owned Codex hooks preserved** — `omx setup` no longer clobbers user-written hooks when refreshing OMCP wrappers.
+- **User-owned Codex hooks preserved** — `omcp setup` no longer clobbers user-written hooks when refreshing OMCP wrappers.
 - **HUD prompt-submit layout churn** — prompt-submit autosizing stopped while preserving recovery behavior.
 - **Duplicate native-hook continuations** — stale Ralph state and unknown `$tokens` no longer trigger duplicate hook continuations.
 - **Stale team worktree cleanup** — `startTeam()` detects and cleans stale worktrees at launch. (PR [#1382](https://github.com/Moicky/oh-my-copilot/pull/1382), issue [#1354](https://github.com/Moicky/oh-my-copilot/issues/1354))
@@ -241,7 +241,7 @@ MCP-CLI parity surface, HUD recovery and reconciliation hardening, native-hook a
 - **CI hang prevention** — teardown dead-time reduced; CI hangs no longer stall root-cause work. (PR [#1405](https://github.com/Moicky/oh-my-copilot/pull/1405))
 
 ### Changed
-- **State CLI routing** — `omx state` routed consistently through the CLI via `src/cli/state.ts`.
+- **State CLI routing** — `omcp state` routed consistently through the CLI via `src/cli/state.ts`.
 - **Tmux session name truncation** — smarter truncation preserves session token when name exceeds 120 chars.
 - **Release metadata sync** — Node/Cargo package metadata, lockfiles, changelog, release body, and release notes aligned to `0.12.4`.
 
@@ -255,7 +255,7 @@ MCP-CLI parity surface, HUD recovery and reconciliation hardening, native-hook a
 Follow-up patch release for the `v0.12.2..v0.12.3` train: `$team` prompt-routing correctness and duplicate team launch teardown. This ships PR [#1364](https://github.com/Moicky/oh-my-copilot/pull/1364) that was intended for `0.12.2` but finished its conflict resolution after the `0.12.2` cut.
 
 ### Fixed
-- **`$team` keyword prompt routing** — `UserPromptSubmit` detection of `$team` now seeds root `team-state.json` and nudges operators toward `omx team ...` / `omx team --help` instead of silently misrouting the prompt. (PR [#1364](https://github.com/Moicky/oh-my-copilot/pull/1364))
+- **`$team` keyword prompt routing** — `UserPromptSubmit` detection of `$team` now seeds root `team-state.json` and nudges operators toward `omcp team ...` / `omcp team --help` instead of silently misrouting the prompt. (PR [#1364](https://github.com/Moicky/oh-my-copilot/pull/1364))
 - **Duplicate active same-name team launches** — `startTeam` now rejects duplicate active same-name team launches with a `team_name_conflict` error before mutating team state or provisioning worktrees, so the existing team config and tasks stay intact. (PR [#1364](https://github.com/Moicky/oh-my-copilot/pull/1364))
 
 ### Changed
@@ -272,7 +272,7 @@ Follow-up patch release for the `v0.12.2..v0.12.3` train: `$team` prompt-routing
 Patch release for the `v0.12.1..v0.12.2` train: Windows team worker boot and shutdown hardening, postLaunch mode-state shutdown-race recovery, canonical HUD skill-state visibility, and team state preservation on monitor-driven exits.
 
 ### Fixed
-- **Windows split-pane shutdown safety** — `omx team shutdown --force` no longer kills the leader pane on native Windows + psmux split-pane sessions by skipping the process-tree prekill step when leader/client ancestry overlaps. (PR [#1358](https://github.com/Moicky/oh-my-copilot/pull/1358))
+- **Windows split-pane shutdown safety** — `omcp team shutdown --force` no longer kills the leader pane on native Windows + psmux split-pane sessions by skipping the process-tree prekill step when leader/client ancestry overlaps. (PR [#1358](https://github.com/Moicky/oh-my-copilot/pull/1358))
 - **PostLaunch mode-state shutdown race** — empty or truncated mode-state JSON left by concurrent writers during session exit is now recovered into a minimal inactive record instead of crashing cleanup; structurally complete malformed JSON is warned but left untouched. (PR [#1360](https://github.com/Moicky/oh-my-copilot/pull/1360))
 - **Windows psmux worker boot** — native Windows team workers now launch through an explicit PowerShell path instead of being routed through POSIX `/bin/sh -lc`, which caused workers to never report ready. (PR [#1362](https://github.com/Moicky/oh-my-copilot/pull/1362))
 - **Stale HUD workflow badges** — canonical session-scoped skill-active state now drives HUD badge visibility, suppressing stale root-only mode badges that outlived their session while preserving backward compatibility for legacy single-skill readers. (PR [#1367](https://github.com/Moicky/oh-my-copilot/pull/1367))
@@ -292,7 +292,7 @@ Patch release for the `v0.12.1..v0.12.2` train: Windows team worker boot and shu
 Patch release for the `v0.12.0..v0.12.1` train: team-runtime hygiene, launch/cleanup follow-through, notify-fallback hardening, and release-collateral sync.
 
 ### Fixed
-- **Machine-readable team status output** — leader mailbox pruning no longer re-issues duplicate delivered-message bridge calls, so `omx team status --json` stays parseable instead of leaking mailbox-delivery stderr noise.
+- **Machine-readable team status output** — leader mailbox pruning no longer re-issues duplicate delivered-message bridge calls, so `omcp team status --json` stays parseable instead of leaking mailbox-delivery stderr noise.
 - **Interactive worker PID capture** — team startup now resolves worker PIDs from the actual pane id and persists them into worker metadata for diagnostics and cleanup.
 - **Launch-safe orphan cleanup** — stale OMCP MCP cleanup preserves live launcher/session ancestry instead of reaping processes that still belong to the active tree.
 - **Notify-fallback log growth** — once-mode fallback watcher logs now rotate instead of growing silently on long-lived runs.
@@ -330,11 +330,11 @@ Minor release for native Codex hook ownership, first-party Bash pre/post tool gu
 ### Verified
 - `npm ci`
 - `npm run build`
-- `node dist/cli/omx.js version`
+- `node dist/cli/omcp.js version`
 - `node --test dist/cli/__tests__/version-sync-contract.test.js`
 - `npm run lint`
 - `npm test`
-- `cargo test -p omx-runtime-core`
+- `cargo test -p omcp-runtime-core`
 - `npm run smoke:packed-install`
 - `git diff --check origin/main...HEAD`
 
@@ -352,7 +352,7 @@ Patch release for team/runtime delivery integrity, busy-leader nudge handling, r
 - **Release branch repair** — the accidental placeholder corruption in `src/hooks/__tests__/notify-fallback-watcher.test.ts` is restored before the patch cut so the release branch builds cleanly again.
 
 ### Verified
-- `cargo test -p omx-runtime-core`
+- `cargo test -p omcp-runtime-core`
 - `npm run build`
 - `npm run lint`
 - `node --test dist/hooks/__tests__/notify-fallback-watcher.test.js`
@@ -535,13 +535,13 @@ Version bump for release.
 
 ### Added
 - **Lore commit protocol in AGENTS.md template** — executor prompt and AGENTS.md template now include a Lore commit protocol for structured commit metadata. (PR [#916](https://github.com/Moicky/oh-my-copilot/pull/916))
-- **AGENTS.md model capability table auto-generated during setup** — `omx setup` now generates a model capability table in AGENTS.md for quick reference. (PR [#894](https://github.com/Moicky/oh-my-copilot/pull/894))
+- **AGENTS.md model capability table auto-generated during setup** — `omcp setup` now generates a model capability table in AGENTS.md for quick reference. (PR [#894](https://github.com/Moicky/oh-my-copilot/pull/894))
 - **Native skill_ref bridges and subagent tracking** — skill references can now bridge to native subagents with lifecycle tracking. (PR [#892](https://github.com/Moicky/oh-my-copilot/pull/892))
 - **Codex native subagent integration phase 1** — first-pass integration of Codex CLI native subagent spawning and coordination. (PR [#886](https://github.com/Moicky/oh-my-copilot/pull/886))
 - **AGENTS autonomy directive** — AGENTS.md now includes an explicit autonomy directive for self-directed agent operation. (PR [#883](https://github.com/Moicky/oh-my-copilot/pull/883))
 - **Autoresearch novice deep-interview intake bridge** — autoresearch can now route novice users through the deep-interview intake flow before launching autonomous research. (PR [#906](https://github.com/Moicky/oh-my-copilot/pull/906))
-- **`omx cleanup` for orphaned MCP servers** — new cleanup command detects and removes orphaned MCP server processes. (PR [#901](https://github.com/Moicky/oh-my-copilot/pull/901), closes [#900](https://github.com/Moicky/oh-my-copilot/issues/900))
-- **Stale `/tmp` cleanup in `omx cleanup`** — cleanup now also removes stale temporary files from `/tmp`. (PR [#912](https://github.com/Moicky/oh-my-copilot/pull/912), closes [#908](https://github.com/Moicky/oh-my-copilot/issues/908))
+- **`omcp cleanup` for orphaned MCP servers** — new cleanup command detects and removes orphaned MCP server processes. (PR [#901](https://github.com/Moicky/oh-my-copilot/pull/901), closes [#900](https://github.com/Moicky/oh-my-copilot/issues/900))
+- **Stale `/tmp` cleanup in `omcp cleanup`** — cleanup now also removes stale temporary files from `/tmp`. (PR [#912](https://github.com/Moicky/oh-my-copilot/pull/912), closes [#908](https://github.com/Moicky/oh-my-copilot/issues/908))
 - **Autoresearch showcase hub** — added showcase index, runner script, and completed demos for adaptive sorting, latent subspace discovery, noisy bayesopt, and kaggle-style ML missions. (PRs [#884](https://github.com/Moicky/oh-my-copilot/pull/884))
 
 ### Changed
@@ -551,7 +551,7 @@ Version bump for release.
 - **Packed-install smoke deps bootstrapped in worktrees** — worktree-based CI now correctly bootstraps smoke test dependencies for packed installs. (PR [#919](https://github.com/Moicky/oh-my-copilot/pull/919), closes [#917](https://github.com/Moicky/oh-my-copilot/issues/917))
 - **Deep-interview launch for autoresearch intake** — autoresearch intake now correctly uses the deep-interview launch path. (PR [#915](https://github.com/Moicky/oh-my-copilot/pull/915), closes [#911](https://github.com/Moicky/oh-my-copilot/issues/911))
 - **musl Linux assets preferred before glibc** — native asset resolution now prefers musl-linked Linux binaries over glibc for broader compatibility. (PRs [#914](https://github.com/Moicky/oh-my-copilot/pull/914), [#907](https://github.com/Moicky/oh-my-copilot/pull/907))
-- **Autoresearch worktree paths use project-local `.omx/`** — worktrees are now created under `.omx/worktrees/` instead of global paths. (PR [#913](https://github.com/Moicky/oh-my-copilot/pull/913))
+- **Autoresearch worktree paths use project-local `.omcp/`** — worktrees are now created under `.omcp/worktrees/` instead of global paths. (PR [#913](https://github.com/Moicky/oh-my-copilot/pull/913))
 - **Stale obsolete native agents cleaned up** — removed leftover native agent files that were no longer in use. (PR [#899](https://github.com/Moicky/oh-my-copilot/pull/899))
 - **Skill agent generation stopped** — setup no longer generates agent files for skills, reducing file bloat. (PR [#897](https://github.com/Moicky/oh-my-copilot/pull/897))
 - **`__dirname` ESM error in autoresearch guided flow** — resolved CommonJS `__dirname` reference in ESM context. (PR [#903](https://github.com/Moicky/oh-my-copilot/pull/903))
@@ -575,11 +575,11 @@ Version bump for release.
 6 PRs landed after the `0.10.0` release bump and before this `0.10.1` release-prep commit: 4 urgent hotfix PRs, 1 fast-follow autoresearch UX PR, and 1 docs follow-up. The `0.10.0` bump commit landed at `2026-03-15 17:22 UTC`; the urgent hotfix train was merged by `2026-03-16 03:18 UTC`, and the last shipped `dev` follow-up merge landed at `2026-03-16 05:59 UTC`, for a turnaround of about 12 hours 37 minutes before release prep closed the patch.
 
 ### Added
-- **Guided autoresearch setup and `init` scaffolding** — `omx autoresearch` now supports an interactive guided setup on TTYs plus a scriptable `omx autoresearch init` path for creating mission files and launching the supervisor cleanly. (PR [#873](https://github.com/Moicky/oh-my-copilot/pull/873), closes [#863](https://github.com/Moicky/oh-my-copilot/issues/863))
+- **Guided autoresearch setup and `init` scaffolding** — `omcp autoresearch` now supports an interactive guided setup on TTYs plus a scriptable `omcp autoresearch init` path for creating mission files and launching the supervisor cleanly. (PR [#873](https://github.com/Moicky/oh-my-copilot/pull/873), closes [#863](https://github.com/Moicky/oh-my-copilot/issues/863))
 
 ### Fixed
 - **Autoresearch now bypasses approvals and sandbox by default** — prevents autonomous runs from stalling on approval/sandbox prompts unless callers already supplied their own flags. (PR [#856](https://github.com/Moicky/oh-my-copilot/pull/856), closes [#855](https://github.com/Moicky/oh-my-copilot/issues/855))
-- **Autoresearch worktree cleanliness ignores `.omx/` runtime artifacts** — avoids false dirty-worktree failures caused by session state and other runtime files. (PR [#858](https://github.com/Moicky/oh-my-copilot/pull/858), closes [#857](https://github.com/Moicky/oh-my-copilot/issues/857))
+- **Autoresearch worktree cleanliness ignores `.omcp/` runtime artifacts** — avoids false dirty-worktree failures caused by session state and other runtime files. (PR [#858](https://github.com/Moicky/oh-my-copilot/pull/858), closes [#857](https://github.com/Moicky/oh-my-copilot/issues/857))
 - **Installed skills are deduplicated across project and user scopes** — project-local skills now take precedence and shadowed duplicates are filtered from composed AGENTS/team instructions. (PR [#864](https://github.com/Moicky/oh-my-copilot/pull/864), closes [#861](https://github.com/Moicky/oh-my-copilot/issues/861))
 - **Team worker readiness detection matches Codex 0.114.0 startup behavior** — accepts the new welcome-helper text and uses a safer ready wait path to reduce false startup failures. (PR [#868](https://github.com/Moicky/oh-my-copilot/pull/868), closes [#866](https://github.com/Moicky/oh-my-copilot/issues/866))
 
@@ -591,8 +591,8 @@ Version bump for release.
 54 commits across 26 PRs from `v0.9.1..dev`. Contributors: [@Yeachan-Heo](https://github.com/Yeachan-Heo), [@HaD0Yun](https://github.com/HaD0Yun).
 
 ### Added
-- **`omx autoresearch`** _(experimental)_ — new autonomous research mode that iteratively explores topics and self-terminates after repeated noop iterations. (PRs [#847](https://github.com/Moicky/oh-my-copilot/pull/847), [#849](https://github.com/Moicky/oh-my-copilot/pull/849))
-- **`omx exec` wrapper** — first-pass execution wrapper that lets users run commands through the OMCP orchestration layer directly. (PR [#832](https://github.com/Moicky/oh-my-copilot/pull/832))
+- **`omcp autoresearch`** _(experimental)_ — new autonomous research mode that iteratively explores topics and self-terminates after repeated noop iterations. (PRs [#847](https://github.com/Moicky/oh-my-copilot/pull/847), [#849](https://github.com/Moicky/oh-my-copilot/pull/849))
+- **`omcp exec` wrapper** — first-pass execution wrapper that lets users run commands through the OMCP orchestration layer directly. (PR [#832](https://github.com/Moicky/oh-my-copilot/pull/832))
 - **Team worktrees enforced by default** — team mode now creates isolated git worktrees for each worker by default, improving parallel safety. (PR [#804](https://github.com/Moicky/oh-my-copilot/pull/804))
 - **Deep-interview intent-first mode** — deep-interview now classifies user intent upfront before entering the Socratic question loop. (PR [#829](https://github.com/Moicky/oh-my-copilot/pull/829))
 - **Incremental worktree merge tracking** — team worktree merges are now tracked incrementally, enabling smarter conflict detection and resolution. (PR [#846](https://github.com/Moicky/oh-my-copilot/pull/846))
@@ -611,7 +611,7 @@ Version bump for release.
 - **Post-ralplan team context preserved** — team follow-up context no longer lost after ralplan completes. (PR [#833](https://github.com/Moicky/oh-my-copilot/pull/833))
 - **Pipeline planning artifact checks unified** — planning-complete artifact detection now uses a single consistent check. (PR [#828](https://github.com/Moicky/oh-my-copilot/pull/828), issue [#827](https://github.com/Moicky/oh-my-copilot/issues/827))
 - **Config.toml merge fix** — existing notify and tui entries are now preserved during config merge. (PR [#826](https://github.com/Moicky/oh-my-copilot/pull/826), issue [#825](https://github.com/Moicky/oh-my-copilot/issues/825))
-- **Project .omx gitignore sync** — fixed gitignore sync for project-scoped `.omx` directories. (PR [#824](https://github.com/Moicky/oh-my-copilot/pull/824), issue [#823](https://github.com/Moicky/oh-my-copilot/issues/823))
+- **Project .omcp gitignore sync** — fixed gitignore sync for project-scoped `.omcp` directories. (PR [#824](https://github.com/Moicky/oh-my-copilot/pull/824), issue [#823](https://github.com/Moicky/oh-my-copilot/issues/823))
 - **Team HUD full-width** — team HUD layout now spans the full terminal width. (PR [#822](https://github.com/Moicky/oh-my-copilot/pull/822), issue [#822](https://github.com/Moicky/oh-my-copilot/issues/822))
 - **tmux mouse state leak** — stopped leaking server-global mouse state across sessions. (PR [#820](https://github.com/Moicky/oh-my-copilot/pull/820), issue [#817](https://github.com/Moicky/oh-my-copilot/issues/817))
 - **Sparkshell glibc fallback** — sparkshell now falls back gracefully when encountering glibc mismatch on older Linux systems. (PR [#813](https://github.com/Moicky/oh-my-copilot/pull/813), issue [#812](https://github.com/Moicky/oh-my-copilot/issues/812))
@@ -635,13 +635,13 @@ Version bump for release.
 55 non-merge commits from `v0.8.15..dev`. Contributors: [@Yeachan-Heo](https://github.com/Moicky/oh-my-copilot), Bellman, 2233admin, [@seunghwaneom](https://github.com/seunghwaneom), [@hoky1227](https://github.com/hoky1227).
 
 ### Added
-- **`omx explore` native harness and packaging flow** — OMCP now ships a dedicated read-only exploration entrypoint backed by a Rust harness, packaged/source fallback logic, and release-aware native asset resolution. (commit `fb07c3c`)
-- **`omx sparkshell` operator-facing native sidecar** — added a direct shell-native specialist surface plus explicit tmux-pane summarization support for operator inspection workflows. (commit `71858c3`)
-- **Cross-platform native release publishing** — release automation now publishes native archives for both `omx-explore-harness` and `omx-sparkshell`, with generated release-manifest metadata and a packed-install smoke gate. (commit `23d1cf5`, `559089f`)
+- **`omcp explore` native harness and packaging flow** — OMCP now ships a dedicated read-only exploration entrypoint backed by a Rust harness, packaged/source fallback logic, and release-aware native asset resolution. (commit `fb07c3c`)
+- **`omcp sparkshell` operator-facing native sidecar** — added a direct shell-native specialist surface plus explicit tmux-pane summarization support for operator inspection workflows. (commit `71858c3`)
+- **Cross-platform native release publishing** — release automation now publishes native archives for both `omcp-explore-harness` and `omcp-sparkshell`, with generated release-manifest metadata and a packed-install smoke gate. (commit `23d1cf5`, `559089f`)
 - **`build:full` one-shot build path** — added a release-oriented build command that compiles TypeScript plus the packaged explore harness and sparkshell binaries, and validated it in CI. (commit `d12e5f4`, `99ce264`)
 
 ### Changed
-- **Qualifying `omx explore` shell-native prompts can route through sparkshell** — simple read-only shell tasks now use sparkshell as a backend when that is the cheaper fit, while preserving explicit fallback to the direct explore harness. (PR [#782](https://github.com/Moicky/oh-my-copilot/pull/782))
+- **Qualifying `omcp explore` shell-native prompts can route through sparkshell** — simple read-only shell tasks now use sparkshell as a backend when that is the cheaper fit, while preserving explicit fallback to the direct explore harness. (PR [#782](https://github.com/Moicky/oh-my-copilot/pull/782))
 - **Default model resolution is now centralized** — runtime/docs/tests now align around one OMCP default-model resolution path instead of scattered model-default handling. (PR [#787](https://github.com/Moicky/oh-my-copilot/pull/787))
 - **Release/runtime guidance now documents the native exploration stack more explicitly** — README and guidance surfaces better describe explore/sparkshell routing, native hydration, and raw-vs-summary expectations. (commit `25bdd23`, `c83223d`)
 
@@ -655,7 +655,7 @@ Version bump for release.
 19 non-merge commits from `main..dev`. Contributors: [@Yeachan-Heo](https://github.com/Yeachan-Heo), [@HaD0Yun](https://github.com/HaD0Yun), [@gobylor](https://github.com/gobylor).
 
 ### Added
-- **Top-level `omx resume` command** — added `omx resume` passthrough so OMCP mirrors `codex resume`, with CLI/help/docs coverage. (PR [#752](https://github.com/Moicky/oh-my-copilot/pull/752) — @gobylor)
+- **Top-level `omcp resume` command** — added `omcp resume` passthrough so OMCP mirrors `codex resume`, with CLI/help/docs coverage. (PR [#752](https://github.com/Moicky/oh-my-copilot/pull/752) — @gobylor)
 - **Team allocation and conservative rebalance policy seams** — team startup assignment is now lane-aware, and runtime monitoring can safely reassign reclaimed pending work to eligible idle workers without rewriting the claim model. (PR [#761](https://github.com/Moicky/oh-my-copilot/pull/761) — @HaD0Yun)
 
 ### Changed
@@ -665,8 +665,8 @@ Version bump for release.
 
 ### Fixed
 - **Fallback team delivery and stale-alert latency** — faster fallback watcher cadence, leader nudge evaluation on fallback ticks, and a larger default dispatch ack budget reduce lag in team message delivery and stale alerts. (PR [#739](https://github.com/Moicky/oh-my-copilot/pull/739), issue [#738](https://github.com/Moicky/oh-my-copilot/issues/738))
-- **Invalid Codex TOML detection in `omx doctor`** — doctor now flags malformed `~/.codex/config.toml` with a clearer duplicate-table hint. (PR [#740](https://github.com/Moicky/oh-my-copilot/pull/740), related issue [#486](https://github.com/Moicky/oh-my-copilot/issues/486))
-- **Linked Team Ralph lifecycle synchronization** — `omx team ralph` now establishes linked Ralph state on launch, propagates linked terminal cancellation directly from runtime transitions, and keeps continue-steer alive when the launcher parent exits while Ralph work is still active. (PR [#749](https://github.com/Moicky/oh-my-copilot/pull/749), issue [#742](https://github.com/Moicky/oh-my-copilot/issues/742); PR [#750](https://github.com/Moicky/oh-my-copilot/pull/750), issue [#743](https://github.com/Moicky/oh-my-copilot/issues/743); PR [#751](https://github.com/Moicky/oh-my-copilot/pull/751))
+- **Invalid Codex TOML detection in `omcp doctor`** — doctor now flags malformed `~/.codex/config.toml` with a clearer duplicate-table hint. (PR [#740](https://github.com/Moicky/oh-my-copilot/pull/740), related issue [#486](https://github.com/Moicky/oh-my-copilot/issues/486))
+- **Linked Team Ralph lifecycle synchronization** — `omcp team ralph` now establishes linked Ralph state on launch, propagates linked terminal cancellation directly from runtime transitions, and keeps continue-steer alive when the launcher parent exits while Ralph work is still active. (PR [#749](https://github.com/Moicky/oh-my-copilot/pull/749), issue [#742](https://github.com/Moicky/oh-my-copilot/issues/742); PR [#750](https://github.com/Moicky/oh-my-copilot/pull/750), issue [#743](https://github.com/Moicky/oh-my-copilot/issues/743); PR [#751](https://github.com/Moicky/oh-my-copilot/pull/751))
 - **Team worker and leader nudges are more actionable** — auto-nudge follow-up phrases are detected more reliably, leader nudges now derive next actions from live team state, mailbox guidance is more explicit, and stale “keep polling” wording was replaced with orchestration guidance. (PR [#754](https://github.com/Moicky/oh-my-copilot/pull/754); PR [#759](https://github.com/Moicky/oh-my-copilot/pull/759), issue [#759](https://github.com/Moicky/oh-my-copilot/issues/759); PR [#763](https://github.com/Moicky/oh-my-copilot/pull/763); PR [#766](https://github.com/Moicky/oh-my-copilot/pull/766))
 - **HUD cleanup during team shutdown** — interactive shutdown now tears down the HUD pane cleanly to avoid stale panes across rapid relaunch cycles. (PR [#764](https://github.com/Moicky/oh-my-copilot/pull/764), issue [#764](https://github.com/Moicky/oh-my-copilot/issues/764))
 - **CLI startup no longer eagerly loads `doctor`** — the `doctor` command is now lazy-loaded so unrelated CLI invocations avoid unnecessary work. (commit [`2503d95`](https://github.com/Moicky/oh-my-copilot/commit/2503d9528d175a032bbc247f61137c5daf547923))
@@ -677,8 +677,8 @@ Version bump for release.
 
 ### Added
 - **Team orchestrator brain and executor lane split** — team workflow now uses dedicated `team-orchestrator` and `team-executor` agent roles for clearer separation of planning and execution concerns. (PR [#715](https://github.com/Moicky/oh-my-copilot/pull/715))
-- **Session history search command** — `omx session-history search` (alias: `omx sh search`) enables full-text search across command history, prompts, and tool interactions with multi-field matching and interactive filtering. (PR [#724](https://github.com/Moicky/oh-my-copilot/pull/724))
-- **Team idle and stall read APIs** — `omx team api` now exposes `idle-read` and `stall-read` operations for programmatic monitoring of team worker states. (PR [#720](https://github.com/Moicky/oh-my-copilot/pull/720))
+- **Session history search command** — `omcp session-history search` (alias: `omcp sh search`) enables full-text search across command history, prompts, and tool interactions with multi-field matching and interactive filtering. (PR [#724](https://github.com/Moicky/oh-my-copilot/pull/724))
+- **Team idle and stall read APIs** — `omcp team api` now exposes `idle-read` and `stall-read` operations for programmatic monitoring of team worker states. (PR [#720](https://github.com/Moicky/oh-my-copilot/pull/720))
 - **Ralph periodic active continue steer** — Ralph mode now periodically prompts active agents to continue when progress has stalled, reducing idle wait times. (PR [#733](https://github.com/Moicky/oh-my-copilot/pull/733))
 - **Team leader status monitoring hints** — improved leader-side status hints for better visibility into team member progress and stalled states. (PR [#734](https://github.com/Moicky/oh-my-copilot/pull/734))
 
@@ -698,7 +698,7 @@ Version bump for release.
 Generated from the latest merged `dev` runtime/model-default work and validated on `dev` before release.
 
 ### Added
-- **Additive team event-query APIs** — `omx team api` now exposes dedicated event-query operations so team runtime signals can be consumed more structurally. (PR [#714](https://github.com/Moicky/oh-my-copilot/pull/714))
+- **Additive team event-query APIs** — `omcp team api` now exposes dedicated event-query operations so team runtime signals can be consumed more structurally. (PR [#714](https://github.com/Moicky/oh-my-copilot/pull/714))
 - **Explicit model-default contract** — runtime/docs/tests now align around the intended main/spark default model behavior (`gpt-5.4` / `gpt-5.3-codex-spark`). (PR [#718](https://github.com/Moicky/oh-my-copilot/pull/718))
 
 ### Changed
@@ -722,7 +722,7 @@ Generated from the latest merged `dev` runtime/model-default work and validated 
 - **Local development artifacts are now ignored by git** — `.codex/` and `coverage/` are ignored to avoid committing local session state and generated coverage data. (direct commit `3149747` — @Yeachan-Heo)
 
 ### Fixed
-- **Auto-update now refreshes OMCP setup immediately after a successful global install** — successful `omx` self-updates now force a setup refresh so prompts, skills, and `AGENTS.md` stay in sync without a separate manual refresh. (PR [#648](https://github.com/Moicky/oh-my-copilot/pull/648) — @Yeachan-Heo)
+- **Auto-update now refreshes OMCP setup immediately after a successful global install** — successful `omcp` self-updates now force a setup refresh so prompts, skills, and `AGENTS.md` stay in sync without a separate manual refresh. (PR [#648](https://github.com/Moicky/oh-my-copilot/pull/648) — @Yeachan-Heo)
 - **tmux Enter submission is more reliable in alternate-screen UIs** — added a settle delay before the first `C-m` submit and mirrored that protection in the hook extensibility tmux submission path. (PR [#649](https://github.com/Moicky/oh-my-copilot/pull/649) — @Yeachan-Heo, fixes [#647](https://github.com/Moicky/oh-my-copilot/issues/647))
 
 ## [0.8.9] - 2026-03-08
@@ -748,7 +748,7 @@ Generated from the latest merged `dev` runtime/model-default work and validated 
 
 ### Fixed
 - **Deep-interview auto-approval injection is now lock-protected** — keyword detection and notify-hook auto-nudge paths were hardened so deep-interview auto-approval injection stays bounded, with expanded regression coverage around notify-hook modules and keyword routing. (PR [#637](https://github.com/Moicky/oh-my-copilot/pull/637))
-- **Published npm bin path normalization** — normalized the package bin path contract and updated the package-bin regression test to keep the published `omx` entrypoint aligned. (PR [#638](https://github.com/Moicky/oh-my-copilot/pull/638))
+- **Published npm bin path normalization** — normalized the package bin path contract and updated the package-bin regression test to keep the published `omcp` entrypoint aligned. (PR [#638](https://github.com/Moicky/oh-my-copilot/pull/638))
 - **Worker role reservation remains team-only** — prompt-guidance contract enforcement now reserves the worker role for team mode explicitly, backed by routing regression coverage.
 
 ## [0.8.7] - 2026-03-08
@@ -759,7 +759,7 @@ Generated from the latest merged `dev` runtime/model-default work and validated 
 - **Prompt-guidance contract docs and reusable fragments** — added a first-class prompt-guidance contract document, reusable guidance fragments, a sync script, and shared contract test helpers so root instructions, templates, and prompts can stay aligned more systematically. (PR [#620](https://github.com/Moicky/oh-my-copilot/pull/620) — @Yeachan-Heo)
 - **Team hardening benchmark and deeper runtime/worktree coverage** — added a dedicated hardening benchmark plus broader runtime, state, worktree, and end-to-end regression coverage for expired-claim recovery and worker hygiene. (PR [#624](https://github.com/Moicky/oh-my-copilot/pull/624) — @HaD0Yun)
 - **Centralized MCP stdio lifecycle bootstrap** — state, memory, code-intel, trace, and team MCP servers now share a common `autoStartStdioMcpServer` helper and a dedicated lifecycle regression suite for idle teardown. (PR [#626](https://github.com/Moicky/oh-my-copilot/pull/626), [#627](https://github.com/Moicky/oh-my-copilot/pull/627) — @Yeachan-Heo)
-- **Package-bin contract coverage for global installs** — added an explicit contract test to keep the published npm bin path aligned with global `omx` installation behavior. (PR [#633](https://github.com/Moicky/oh-my-copilot/pull/633) — @Yeachan-Heo)
+- **Package-bin contract coverage for global installs** — added an explicit contract test to keep the published npm bin path aligned with global `omcp` installation behavior. (PR [#633](https://github.com/Moicky/oh-my-copilot/pull/633) — @Yeachan-Heo)
 
 ### Changed
 - **Prompt surfaces were normalized around contract-driven XML structure** — prompt guidance validation was centralized, shared fragments were extracted, all agent prompts were migrated from Markdown-style headings to XML-tag structure, and the 2-layer orchestrator/role-prompt model was clarified across docs, templates, and config generation. (PR [#619](https://github.com/Moicky/oh-my-copilot/pull/619), [#623](https://github.com/Moicky/oh-my-copilot/pull/623) — @HaD0Yun)
@@ -768,14 +768,14 @@ Generated from the latest merged `dev` runtime/model-default work and validated 
 ### Fixed
 - **Windows native startup and tmux capability detection** — OMCP now checks tmux capability instead of hard-blocking on `win32`, supports `psmux`, uses Windows-appropriate command resolution where needed, and documents the platform setup path more clearly. (PR [#616](https://github.com/Moicky/oh-my-copilot/pull/616) — @marlocarlo)
 - **Leader-only orchestration boundaries in prompt surfaces** — worker-facing and role-specific prompts now preserve leader orchestration responsibilities more explicitly, with regression coverage for the boundary contract. (PR [#625](https://github.com/Moicky/oh-my-copilot/pull/625) — @HaD0Yun)
-- **npm global-install bin contract** — corrected the published `omx` bin path entry in `package.json` and locked it down with a dedicated contract test for packed tarballs and global installation behavior. (PR [#633](https://github.com/Moicky/oh-my-copilot/pull/633) — @Yeachan-Heo)
+- **npm global-install bin contract** — corrected the published `omcp` bin path entry in `package.json` and locked it down with a dedicated contract test for packed tarballs and global installation behavior. (PR [#633](https://github.com/Moicky/oh-my-copilot/pull/633) — @Yeachan-Heo)
 
 ## [0.8.6] - 2026-03-07
 
 4 non-merge commits from `main..dev`. Contributor: [@Yeachan-Heo](https://github.com/Yeachan-Heo).
 
 ### Added
-- **Event-aware team waiting and canonical event normalization** — team runtime/state handling now includes additive `wake_on=event` / `after_event_id` waiting in `omx_run_team_wait`, shared event normalization/cursor helpers, canonical event typing across runtime/state/API layers, and new `omx team await <team-name>` CLI support. Runtime now emits `worker_state_changed` while preserving legacy `worker_idle` compatibility. (PR [#609](https://github.com/Moicky/oh-my-copilot/pull/609) — @Yeachan-Heo)
+- **Event-aware team waiting and canonical event normalization** — team runtime/state handling now includes additive `wake_on=event` / `after_event_id` waiting in `omx_run_team_wait`, shared event normalization/cursor helpers, canonical event typing across runtime/state/API layers, and new `omcp team await <team-name>` CLI support. Runtime now emits `worker_state_changed` while preserving legacy `worker_idle` compatibility. (PR [#609](https://github.com/Moicky/oh-my-copilot/pull/609) — @Yeachan-Heo)
 - **GPT-5.4 prompt-guidance rollout across core prompt surfaces** — root/template `AGENTS.md`, executor/planner/verifier prompts, generated `developer_instructions`, and regression coverage were updated to encode compact output defaults, low-risk follow-through, localized task-update overrides, and dependency-aware tool persistence more explicitly. (PR [#611](https://github.com/Moicky/oh-my-copilot/pull/611) — @Yeachan-Heo, addresses [#608](https://github.com/Moicky/oh-my-copilot/issues/608))
 - **GPT-5.4 prompt-guidance expansion across the wider prompt catalog and execution-heavy skills** — the same guidance was extended across the remaining agent prompts plus execution-heavy skills including `analyze`, `autopilot`, `plan`, `ralph`, `ralplan`, `team`, `ultraqa`, `code-review`, `security-review`, and `build-fix`, with scenario-focused regression coverage added for prompt catalogs, wave-two guidance, and skill contracts. (PR [#612](https://github.com/Moicky/oh-my-copilot/pull/612) — @Yeachan-Heo, follow-up to [#611](https://github.com/Moicky/oh-my-copilot/pull/611))
 
@@ -792,7 +792,7 @@ Generated from the latest merged `dev` runtime/model-default work and validated 
 - **Maintainers section** added to README with @Yeachan-Heo and @HaD0Yun.
 
 ### Fixed
-- **Windows ESM import crash** — `bin/omx.js` now converts absolute paths to `file://` URLs before `import()`, fixing `ERR_UNSUPPORTED_ESM_URL_SCHEME` on Windows. (PR [#589](https://github.com/Moicky/oh-my-copilot/pull/589) — @sjals93, fixes [#557](https://github.com/Moicky/oh-my-copilot/issues/557))
+- **Windows ESM import crash** — `bin/omcp.js` now converts absolute paths to `file://` URLs before `import()`, fixing `ERR_UNSUPPORTED_ESM_URL_SCHEME` on Windows. (PR [#589](https://github.com/Moicky/oh-my-copilot/pull/589) — @sjals93, fixes [#557](https://github.com/Moicky/oh-my-copilot/issues/557))
 - **tmux capture-pane history flag** — replaced invalid `-l` flag with the correct `-S` negative-offset form so `capture-pane` actually returns recent output. (PR [#593](https://github.com/Moicky/oh-my-copilot/pull/593), fixes [#591](https://github.com/Moicky/oh-my-copilot/issues/591))
 - **Legacy model alias cleanup** — removed stale `gpt-5.3-codex` / `o3` references from 15 prompt files and runtime agent metadata generation, preventing confusion when posture routing is active. (part of PR [#592](https://github.com/Moicky/oh-my-copilot/pull/592))
 
@@ -802,7 +802,7 @@ Generated from `v0.8.3..dev` (non-merge commits) and release validation on `dev`
 
 ### Changed
 - Bumped package version to `0.8.4`.
-- `omx setup` now refreshes managed OMCP artifacts by default while preserving backups of overwritten files where applicable.
+- `omcp setup` now refreshes managed OMCP artifacts by default while preserving backups of overwritten files where applicable.
 
 ### Added
 - Setup refresh coverage for managed artifact replacement, scope-aware updates, and uninstall compatibility paths.
@@ -848,7 +848,7 @@ Generated from `v0.8.1..main` (non-merge commits) and release validation on `mai
 - Expanded OpenClaw integration docs and localized navigation links (`#571`).
 
 ### Fixed
-- `omx setup` now skips writing the deprecated `[tui]` section for Codex CLI `>= 0.107.0` (`#572`, fixes `#564`).
+- `omcp setup` now skips writing the deprecated `[tui]` section for Codex CLI `>= 0.107.0` (`#572`, fixes `#564`).
 - Prevented unresolved placeholder leakage in OpenClaw hook instruction templates (`#581`, closes `#578`).
 - Hardened explicit multi-skill ordering and blocked implicit keyword auto-activation for direct `/prompts:<name>` invocations (`#582`).
 
@@ -860,7 +860,7 @@ Generated from `v0.8.1..main` (non-merge commits) and release validation on `mai
 Generated from `4141fd6..HEAD` (non-merge commits) and release validation on `dev`.
 
 ### Added
-- Team CLI interop API (`omx team api ...`) with hard deprecation of legacy `team_*` MCP tools.
+- Team CLI interop API (`omcp team api ...`) with hard deprecation of legacy `team_*` MCP tools.
 - Finalized CLI-first team interop/dispatch reliability flow.
 
 ### Changed
@@ -882,7 +882,7 @@ Generated from `4141fd6..HEAD` (non-merge commits) and release validation on `de
 Generated from `v0.7.6..dev` (non-merge commits) and release validation on `dev`.
 
 ### Added
-- New canonical provider advisor command: `omx ask <claude|gemini> "<prompt>"`.
+- New canonical provider advisor command: `omcp ask <claude|gemini> "<prompt>"`.
 - Ouroboros-inspired ambiguity-gated deep interview workflow (`$deep-interview`) for requirement clarification.
 - Required pre-context intake gates for execution-heavy flows (autopilot, ralph, team, ralplan, and deep-interview preflight).
 - New `$web-clone` skill for URL-driven website cloning and verification loops.
@@ -891,11 +891,11 @@ Generated from `v0.7.6..dev` (non-merge commits) and release validation on `dev`
 
 ### Changed
 - Bumped package version to `0.8.0`.
-- `ask-claude` and `ask-gemini` skill guidance now routes to canonical `omx ask ...` usage.
+- `ask-claude` and `ask-gemini` skill guidance now routes to canonical `omcp ask ...` usage.
 - Ask docs/CLI parsing now explicitly align with provider help flags (`claude --print|-p`, `gemini --prompt|-p`).
 - Legacy wrapper/npm script entrypoints remain available as transitional compatibility paths with migration hints.
 - Refactored team state facade into bounded modules and extracted canonical state-root resolution.
-- Improved CLI behavior around `omx ralph --prd`, `--version` routing, and PRD-focused help guidance.
+- Improved CLI behavior around `omcp ralph --prd`, `--version` routing, and PRD-focused help guidance.
 - Hardened runtime quality/performance/concurrency paths (dispatch polling backoff, notepad atomicity, scaling rollback, shutdown guards).
 
 ### Fixed
@@ -903,7 +903,7 @@ Generated from `v0.7.6..dev` (non-merge commits) and release validation on `dev`
 - Fixed launch worktree reuse to gracefully handle pre-existing paths.
 - Fixed team claim lifecycle contract enforcement (`releaseTaskClaim` token validation) and worker bootstrap lifecycle docs.
 - Fixed `writeAtomic` ENOENT masking behavior and team rebase/typecheck regressions.
-- Fixed onboarding warning copy clarity in `omx doctor`.
+- Fixed onboarding warning copy clarity in `omcp doctor`.
 - Fixed missing pre-context gate text for team/ralplan skill docs.
 
 ### CI / Test / Docs
@@ -999,7 +999,7 @@ Generated strictly from commit logs in `main..dev`:
 
 ### Added
 - Configurable pipeline orchestrator with stage-based execution (ralph-verify, ralplan, team-exec) (#398).
-- `omx uninstall` command with `--dry-run`, `--keep-config`, `--purge`, and `--scope` options (#389).
+- `omcp uninstall` command with `--dry-run`, `--keep-config`, `--purge`, and `--scope` options (#389).
 - Openclaw dispatcher passes originating channel context to webhook hooks (#387).
 
 ### Fixed
@@ -1008,7 +1008,7 @@ Generated strictly from commit logs in `main..dev`:
 - Team dispatch lock timeout and binary path mismatch resolved (#401).
 - Team dispatch retries on Codex trust prompt instead of rolling back (#395).
 - Team dispatch draft consumption verified before marking notified (#392).
-- Config generator prevents duplicate OMCP blocks on repeated `omx setup` (#386).
+- Config generator prevents duplicate OMCP blocks on repeated `omcp setup` (#386).
 - Team operator docs now clarify Claude-pane Enter (`C-m`) can queue while busy and document state-first/safe manual intervention guidance for `$team`.
 
 ### Changed
@@ -1026,7 +1026,7 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 - Added `shutdown_gate_forced` audit event when force-bypass is used, closing an observability gap in the event log.
 
 ### Changed
-- Updated usage string to document `[--force]` option: `omx team shutdown <team-name> [--force]`.
+- Updated usage string to document `[--force]` option: `omcp team shutdown <team-name> [--force]`.
 - Added `shutdown_gate_forced` to `TeamEventType` union and `TEAM_EVENT_TYPES` constant.
 
 ## [0.7.1] - 2026-02-26
@@ -1202,8 +1202,8 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 ### Added
 - **Native worktree orchestration for team mode**: Workers now launch in git worktrees with canonical state-root metadata, enabling true isolation for parallel team workstreams.
 - **Cross-worktree team state resolution**: MCP state tools and the notify hook resolve team state across worktrees, so the leader always sees the correct shared state regardless of which worktree a worker is running in.
-- **`omx ralph` CLI subcommand**: `omx ralph "<task>"` starts a ralph persistence loop directly from the command line, removing the need to manually invoke the skill inside a session (closes #153).
-- **Scoped ralph state with canonical persistence migration**: Ralph state is now scoped per session/worktree and migrated from legacy flat paths to the canonical `.omx/state/sessions/` layout automatically.
+- **`omcp ralph` CLI subcommand**: `omcp ralph "<task>"` starts a ralph persistence loop directly from the command line, removing the need to manually invoke the skill inside a session (closes #153).
+- **Scoped ralph state with canonical persistence migration**: Ralph state is now scoped per session/worktree and migrated from legacy flat paths to the canonical `.omcp/state/sessions/` layout automatically.
 - **Claim-safe team transition tool for MCP interop**: New `team_transition_task` MCP tool applies state transitions atomically with claim-token verification, preventing race conditions between concurrent workers.
 - **Clean tmux pane output before notifications**: Notification content is sanitized (ANSI escapes, tmux artifacts stripped) before being sent to notification integrations, eliminating garbled messages.
 - **Startup codebase map injection hook**: Session start injects a lightweight file-tree snapshot into the agent context so workers have structural awareness of the project without extra exploration turns (closes #136).
@@ -1270,7 +1270,7 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 
 ### Removed
 - Removed deprecated prompts: `deep-executor`, `scientist`.
-- Removed deprecated skills: `deepinit`, `learn-about-omx`, `learner`, `pipeline`, `project-session-manager`, `psm`, `release`, `ultrapilot`, `writer-memory`.
+- Removed deprecated skills: `deepinit`, `learn-about-omcp`, `learner`, `pipeline`, `project-session-manager`, `psm`, `release`, `ultrapilot`, `writer-memory`.
 
 ## [0.4.4] - 2026-02-19
 
@@ -1292,7 +1292,7 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 
 ### Fixed
 - Fixed worker message submission reliability by adding settle/delay timing before and during submit key rounds.
-- Fixed CLI exit behavior by awaiting `main(...)` in `bin/omx.js` so `/exit` terminates cleanly.
+- Fixed CLI exit behavior by awaiting `main(...)` in `bin/omcp.js` so `/exit` terminates cleanly.
 - Replaced deprecated `collab` feature references with `multi_agent` across generator logic, docs, and tests.
 
 ### Tests
@@ -1321,7 +1321,7 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 ## [0.3.8] - 2026-02-15
 
 ### Fixed
-- Fixed `omx` not launching tmux session when run outside of tmux (regression in 0.3.7).
+- Fixed `omcp` not launching tmux session when run outside of tmux (regression in 0.3.7).
 
 ## [0.3.7] - 2026-02-15
 
@@ -1332,7 +1332,7 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 
 ### Changed
 - Defaulted low-complexity team workers to `gpt-5.3-codex-spark`.
-- Improved `omx` CLI behavior for session-scoped `model_instructions_file` handling.
+- Improved `omcp` CLI behavior for session-scoped `model_instructions_file` handling.
 - Hardened worker bootstrap/orchestrator guidance flow and executor prompt migration.
 - Improved HUD pane dedupe and `--help` launch behavior in tmux workflows.
 
@@ -1345,7 +1345,7 @@ Hotfix: team shutdown `--force` flag was not being parsed from CLI arguments.
 ### Added
 - Added pane-canonical tmux hook routing tests for heal/fallback behavior.
 - Added shared mode runtime context wrapper to capture mode tmux pane metadata.
-- Added tmux session name generation in `omx-<directory>-<branch>-<sessionid>` format.
+- Added tmux session name generation in `omcp-<directory>-<branch>-<sessionid>` format.
 
 ### Changed
 - Switched tmux hook targeting to pane-canonical behavior with migration from legacy session targets.

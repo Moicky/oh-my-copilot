@@ -127,7 +127,7 @@ export interface EventNotificationConfig {
   webhook?: WebhookNotificationConfig;
 }
 
-/** Top-level notification configuration (stored in .omx-config.json) */
+/** Top-level notification configuration (stored in .omcp-config.json) */
 export interface FullNotificationConfig {
   /** Global enable/disable for all notifications */
   enabled: boolean;

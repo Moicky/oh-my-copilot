@@ -13,7 +13,7 @@ function runOmx(
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omx.js');
+  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
   const r = spawnSync(process.execPath, [omxBin, ...argv], {
     cwd,
     encoding: 'utf-8',
@@ -31,9 +31,9 @@ function shouldSkipForSpawnPermissions(err: string): boolean {
   return typeof err === 'string' && /(EPERM|EACCES)/i.test(err);
 }
 
-describe('omx setup (gh star hint)', () => {
+describe('omcp setup (gh star hint)', () => {
   it('prints a star hint when GitHub CLI is configured', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-setup-gh-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-setup-gh-'));
     try {
       const fakeBin = join(wd, 'bin');
       await mkdir(fakeBin, { recursive: true });
@@ -60,7 +60,7 @@ describe('omx setup (gh star hint)', () => {
   });
 
   it('does not print a star hint when GitHub CLI is missing', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-setup-gh-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-setup-gh-'));
     try {
       const home = join(wd, 'home');
       await mkdir(home, { recursive: true });

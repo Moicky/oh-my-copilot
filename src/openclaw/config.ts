@@ -1,7 +1,7 @@
 /**
  * OpenClaw Configuration Reader
  *
- * Reads OpenClaw config from the notifications.openclaw key in ~/.codex/.omx-config.json.
+ * Reads OpenClaw config from the notifications.openclaw key in ~/.codex/.omcp-config.json.
  * Also supports generic alias shapes under notifications.custom_cli_command
  * and notifications.custom_webhook_command, normalized to OpenClaw runtime config.
  *
@@ -203,7 +203,7 @@ function isValidOpenClawConfig(
 }
 
 function defaultOmxConfigPath(): string {
-	return join(codexHome(), ".omx-config.json");
+	return join(codexHome(), ".omcp-config.json");
 }
 
 export function inspectOpenClawConfig(
@@ -415,7 +415,7 @@ export function inspectOpenClawConfig(
  *
  * Config is read from:
  * 1. OMX_OPENCLAW_CONFIG env var path (separate file), if set
- * 2. notifications.openclaw key in ~/.codex/.omx-config.json
+ * 2. notifications.openclaw key in ~/.codex/.omcp-config.json
  * 3. notifications.custom_cli_command / notifications.custom_webhook_command aliases
  */
 export function getOpenClawConfig(): OpenClawConfig | null {
@@ -449,7 +449,7 @@ export function getOpenClawConfig(): OpenClawConfig | null {
 			return raw;
 		}
 
-		// Primary: read from notifications block in .omx-config.json
+		// Primary: read from notifications block in .omcp-config.json
 		const omxConfigPath = defaultOmxConfigPath();
 		if (!existsSync(omxConfigPath)) {
 			_cachedConfig = undefined;

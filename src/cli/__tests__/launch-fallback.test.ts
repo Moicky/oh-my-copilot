@@ -16,7 +16,7 @@ function runOmx(
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omx.js');
+  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
   const result = spawnSync(process.execPath, [omxBin, ...argv], {
     cwd,
     encoding: 'utf-8',
@@ -39,9 +39,9 @@ function shouldSkipForSpawnPermissions(err: string): boolean {
   return typeof err === 'string' && /(EPERM|EACCES)/i.test(err);
 }
 
-describe('omx launch fallback when tmux is unavailable', () => {
+describe('omcp launch fallback when tmux is unavailable', () => {
   it('launches codex directly without tmux ENOENT noise', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-launch-fallback-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-launch-fallback-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
@@ -82,9 +82,9 @@ describe('omx launch fallback when tmux is unavailable', () => {
   });
 });
 
-describe('omx launcher when tmux is available', () => {
+describe('omcp launcher when tmux is available', () => {
   it('launches --madmax through explicitly requested detached tmux so HUD bootstrap can run', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-launch-tmux-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-launch-tmux-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
@@ -166,7 +166,7 @@ exit 0
   });
 
   it('preserves the requested cwd through detached tmux launch when an unsupported SHELL value falls back away from rc-driven cwd drift', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-launch-tmux-cwd-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-launch-tmux-cwd-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
@@ -263,7 +263,7 @@ exit 0
   });
 
   it('falls back to /bin/sh for detached tmux launch when SHELL drifts to an unsupported path', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-launch-tmux-shell-fallback-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-launch-tmux-shell-fallback-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');

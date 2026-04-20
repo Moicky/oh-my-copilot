@@ -25,7 +25,7 @@ let tempCodexHome: string;
 
 async function writeCodexConfig(contents: unknown): Promise<void> {
   await mkdir(tempCodexHome, { recursive: true });
-  await writeFile(join(tempCodexHome, '.omx-config.json'), JSON.stringify(contents, null, 2));
+  await writeFile(join(tempCodexHome, '.omcp-config.json'), JSON.stringify(contents, null, 2));
 }
 
 function clearEnv(): void {
@@ -38,7 +38,7 @@ describe('notification temp mode', () => {
   beforeEach(async () => {
     clearEnv();
     resetOpenClawConfigCache();
-    tempCodexHome = await mkdtemp(join(tmpdir(), 'omx-notify-temp-'));
+    tempCodexHome = await mkdtemp(join(tmpdir(), 'omcp-notify-temp-'));
     process.env.CODEX_HOME = tempCodexHome;
   });
 

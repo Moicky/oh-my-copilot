@@ -185,9 +185,9 @@ async function main() {
 
   const stateDir = (isTeamWorker && parsedTeamWorker)
     ? await resolveTeamStateDirForWorker(cwd, parsedTeamWorker)
-    : join(cwd, '.omx', 'state');
-  const logsDir = join(cwd, '.omx', 'logs');
-  const omxDir = join(cwd, '.omx');
+    : join(cwd, '.omcp', 'state');
+  const logsDir = join(cwd, '.omcp', 'logs');
+  const omxDir = join(cwd, '.omcp');
   let currentOmxSessionId = '';
   const getEffectiveSessionId = () => currentOmxSessionId || payloadSessionId;
 
@@ -434,7 +434,7 @@ async function main() {
     }
   }
 
-  // 4. Write HUD state summary for `omx hud` (lead session only)
+  // 4. Write HUD state summary for `omcp hud` (lead session only)
   if (!isTeamWorker) {
     try {
       const scopedSessionId = getEffectiveSessionId();
@@ -696,7 +696,7 @@ async function main() {
   }
 
   // 10. Code simplifier: delegate recently modified files for simplification.
-  //     Opt-in via ~/.omx/config.json: { "codeSimplifier": { "enabled": true } }
+  //     Opt-in via ~/.omcp/config.json: { "codeSimplifier": { "enabled": true } }
   if (!isTeamWorker) {
     try {
       const { processCodeSimplifier } = await import('../hooks/code-simplifier/index.js');

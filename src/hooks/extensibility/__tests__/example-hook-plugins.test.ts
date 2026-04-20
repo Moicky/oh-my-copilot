@@ -44,7 +44,7 @@ export async function onHookEvent(event, sdk) {
 }
 
 async function setupExamplePlugins(cwd: string): Promise<void> {
-  const hooksDir = join(cwd, '.omx', 'hooks');
+  const hooksDir = join(cwd, '.omcp', 'hooks');
   await mkdir(hooksDir, { recursive: true });
 
   for (const eventName of ALL_EVENTS) {
@@ -54,7 +54,7 @@ async function setupExamplePlugins(cwd: string): Promise<void> {
 }
 
 function pluginDataPath(cwd: string, eventName: string): string {
-  return join(cwd, '.omx', 'state', 'hooks', 'plugins', `example-${eventName}`, 'data.json');
+  return join(cwd, '.omcp', 'state', 'hooks', 'plugins', `example-${eventName}`, 'data.json');
 }
 
 async function readPluginData(cwd: string, eventName: string): Promise<Record<string, unknown> | null> {
@@ -80,7 +80,7 @@ async function readPluginData(cwd: string, eventName: string): Promise<Record<st
 
 describe('example hook plugins', () => {
   it('dispatches only the matching example plugin for a single event', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-hook-examples-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-hook-examples-'));
 
     try {
       await setupExamplePlugins(cwd);
@@ -122,7 +122,7 @@ describe('example hook plugins', () => {
   });
 
   it('covers all example plugin event types with deterministic state assertions', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-hook-examples-all-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-hook-examples-all-'));
 
     try {
       await setupExamplePlugins(cwd);

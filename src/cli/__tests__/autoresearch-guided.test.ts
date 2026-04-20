@@ -19,7 +19,7 @@ import {
 } from "../autoresearch-intake.js";
 
 async function initWorkspace(): Promise<string> {
-	return mkdtemp(join(tmpdir(), "omx-autoresearch-guided-test-"));
+	return mkdtemp(join(tmpdir(), "omcp-autoresearch-guided-test-"));
 }
 
 function withMockedTty<T>(fn: () => Promise<T>): Promise<T> {
@@ -162,7 +162,7 @@ describe("parseInitArgs", () => {
 	});
 
 	it("sanitizes slug via slugifyMissionName", () => {
-		const result = parseInitArgs(["--slug", "../../etc/cron.d/omx"]);
+		const result = parseInitArgs(["--slug", "../../etc/cron.d/omcp"]);
 		assert.ok(result.slug);
 		assert.doesNotMatch(result.slug!, /\.\./);
 		assert.doesNotMatch(result.slug!, /\//);
@@ -182,7 +182,7 @@ describe("autoresearch intake draft artifacts", () => {
 
 			assert.match(
 				artifact.path,
-				/\.omx\/specs\/deep-interview-autoresearch-improve-onboarding-for-first-time-contributors\.md$/,
+				/\.omcp\/specs\/deep-interview-autoresearch-improve-onboarding-for-first-time-contributors\.md$/,
 			);
 			assert.equal(artifact.launchReady, false);
 			assert.match(artifact.content, /## Mission Draft/);
@@ -264,7 +264,7 @@ describe("buildAutoresearchDeepInterviewPrompt", () => {
 		assert.match(prompt, /\$deep-interview --autoresearch/);
 		assert.match(
 			prompt,
-			/Do not launch tmux or run `omx autoresearch` yourself/,
+			/Do not launch tmux or run `omcp autoresearch` yourself/,
 		);
 		assert.match(prompt, /deep-interview-autoresearch-\{slug\}\.md/);
 		assert.match(prompt, /autoresearch-\{slug\}\/mission\.md/);
@@ -276,7 +276,7 @@ describe("buildAutoresearchDeepInterviewPrompt", () => {
 });
 
 describe("runAutoresearchNoviceBridge", () => {
-	it("falls back to plain terminal prompts when omx question is unavailable", async () => {
+	it("falls back to plain terminal prompts when omcp question is unavailable", async () => {
 		const repo = await initWorkspace();
 		try {
 			const result = await withMockedTty(() =>
@@ -292,13 +292,13 @@ describe("runAutoresearchNoviceBridge", () => {
 						"launch",
 					]),
 					async () => {
-						throw new Error("omx question requires tmux for OMCP-owned question UI rendering in this session.");
+						throw new Error("omcp question requires tmux for OMCP-owned question UI rendering in this session.");
 					},
 				),
 			);
 
 			assert.equal(result.slug, "ux-eval");
-			assert.equal(result.resultPath, join(repo, ".omx", "specs", "autoresearch-ux-eval", "result.json"));
+			assert.equal(result.resultPath, join(repo, ".omcp", "specs", "autoresearch-ux-eval", "result.json"));
 		} finally {
 			await rm(repo, { recursive: true, force: true });
 		}
@@ -307,17 +307,17 @@ describe("runAutoresearchNoviceBridge", () => {
 	it("does not fall back to plain prompts when question policy denies structured questions", async () => {
 		const repo = await initWorkspace();
 		try {
-			await mkdir(join(repo, ".omx", "state", "sessions", "sess-autoresearch"), {
+			await mkdir(join(repo, ".omcp", "state", "sessions", "sess-autoresearch"), {
 				recursive: true,
 			});
 			await writeFile(
-				join(repo, ".omx", "state", "session.json"),
+				join(repo, ".omcp", "state", "session.json"),
 				JSON.stringify({ session_id: "sess-autoresearch" }),
 			);
 			await writeFile(
 				join(
 					repo,
-					".omx",
+					".omcp",
 					"state",
 					"sessions",
 					"sess-autoresearch",
@@ -339,7 +339,7 @@ describe("runAutoresearchNoviceBridge", () => {
 							async () => {
 								throw new OmxQuestionError(
 									"active_execution_mode_blocked",
-									"omx question is unavailable while auto-executing workflows are active: autoresearch.",
+									"omcp question is unavailable while auto-executing workflows are active: autoresearch.",
 								);
 							},
 						),
@@ -355,7 +355,7 @@ describe("runAutoresearchNoviceBridge", () => {
 		}
 	});
 
-	it("uses structured omx-question prompts and resumes from returned stdout answers", async () => {
+	it("uses structured omcp-question prompts and resumes from returned stdout answers", async () => {
 		const repo = await initWorkspace();
 		const askedQuestions: Array<{ question: string; options: string[]; allowOther: boolean }> = [];
 		try {
@@ -379,7 +379,7 @@ describe("runAutoresearchNoviceBridge", () => {
 			);
 
 			assert.equal(result.slug, "ux-eval");
-			assert.equal(result.resultPath, join(repo, ".omx", "specs", "autoresearch-ux-eval", "result.json"));
+			assert.equal(result.resultPath, join(repo, ".omcp", "specs", "autoresearch-ux-eval", "result.json"));
 			assert.equal(askedQuestions.length, 6);
 			assert.equal(askedQuestions[0]?.question, "Research topic/goal");
 			assert.deepEqual(askedQuestions[0]?.options, []);
@@ -417,7 +417,7 @@ describe("runAutoresearchNoviceBridge", () => {
 			);
 
 			const draftContent = await readFile(
-				join(repo, ".omx", "specs", "deep-interview-autoresearch-ux-eval.md"),
+				join(repo, ".omcp", "specs", "deep-interview-autoresearch-ux-eval.md"),
 				"utf-8",
 			);
 			const resultContent = await readFile(result.resultPath, "utf-8");
@@ -432,7 +432,7 @@ describe("runAutoresearchNoviceBridge", () => {
 
 			assert.equal(
 				result.artifactDir,
-				join(repo, ".omx", "specs", "autoresearch-ux-eval"),
+				join(repo, ".omcp", "specs", "autoresearch-ux-eval"),
 			);
 			assert.equal(result.slug, "ux-eval");
 			assert.match(draftContent, /Launch-ready: yes/);
@@ -464,7 +464,7 @@ describe("runAutoresearchNoviceBridge", () => {
 			const draftContent = await readFile(
 				join(
 					repo,
-					".omx",
+					".omcp",
 					"specs",
 					"deep-interview-autoresearch-seeded-topic.md",
 				),
@@ -472,7 +472,7 @@ describe("runAutoresearchNoviceBridge", () => {
 			);
 			assert.equal(
 				result.resultPath,
-				join(repo, ".omx", "specs", "autoresearch-seeded-topic", "result.json"),
+				join(repo, ".omcp", "specs", "autoresearch-seeded-topic", "result.json"),
 			);
 			assert.equal(result.slug, "seeded-topic");
 			assert.match(draftContent, /- topic: Seeded topic/);

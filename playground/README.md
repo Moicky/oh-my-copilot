@@ -1,13 +1,13 @@
 # Autoresearch Research Showcase
 
-This folder collects **small, reproducible research-style demos** used to showcase `omx autoresearch` on harder optimization problems.
+This folder collects **small, reproducible research-style demos** used to showcase `omcp autoresearch` on harder optimization problems.
 
 Design goals:
 - deterministic or seed-controlled evaluations
 - small code footprint
 - no large datasets checked into git
 - no heavyweight runtime artifacts committed
-- evaluator-driven keep/discard loops that are easy to inspect under `.omx/logs/autoresearch/`
+- evaluator-driven keep/discard loops that are easy to inspect under `.omcp/logs/autoresearch/`
 
 ## Layout
 
@@ -80,16 +80,16 @@ Use `scripts/run-autoresearch-showcase.sh --list` to see the bundled launch targ
 Example:
 
 ```bash
-omx autoresearch missions/noisy-bayesopt-highdim
+omcp autoresearch missions/noisy-bayesopt-highdim
 ```
 
 Then inspect:
 
 ```bash
-RUN_ID=$(find .omx/logs/autoresearch -maxdepth 1 -mindepth 1 -type d -printf '%f\n' | sort | tail -n 1)
-cat .omx/logs/autoresearch/$RUN_ID/manifest.json
-cat .omx/logs/autoresearch/$RUN_ID/candidate.json
-cat .omx/logs/autoresearch/$RUN_ID/iteration-ledger.json
+RUN_ID=$(find .omcp/logs/autoresearch -maxdepth 1 -mindepth 1 -type d -printf '%f\n' | sort | tail -n 1)
+cat .omcp/logs/autoresearch/$RUN_ID/manifest.json
+cat .omcp/logs/autoresearch/$RUN_ID/candidate.json
+cat .omcp/logs/autoresearch/$RUN_ID/iteration-ledger.json
 ```
 
 You can also run evaluators directly without the supervisor:
@@ -111,6 +111,6 @@ Please avoid committing:
 - large model artifacts
 - benchmark output dumps
 - generated caches like `__pycache__/`
-- runtime autoresearch logs under `.omx/logs/`
+- runtime autoresearch logs under `.omcp/logs/`
 
 Keep research state in code, configs, missions, and evaluator scripts; keep bulky runtime outputs local.

@@ -495,7 +495,7 @@ export function resolveEffectiveAutoNudgeResponse(response) {
 
 export async function loadAutoNudgeConfig() {
   const codexHomePath = process.env.CODEX_HOME || join(homedir(), '.codex');
-  const configPath = join(codexHomePath, '.omx-config.json');
+  const configPath = join(codexHomePath, '.omcp-config.json');
   const raw = await readJsonIfExists(configPath, null);
   if (!raw || typeof raw !== 'object') return normalizeAutoNudgeConfig(null);
   return normalizeAutoNudgeConfig(raw.autoNudge);
@@ -504,7 +504,7 @@ export async function loadAutoNudgeConfig() {
 async function localTmuxInjectionDisabled(cwd) {
   const normalizedCwd = safeString(cwd).trim();
   if (!normalizedCwd) return false;
-  const raw = await readJsonIfExists(join(normalizedCwd, '.omx', 'tmux-hook.json'), null);
+  const raw = await readJsonIfExists(join(normalizedCwd, '.omcp', 'tmux-hook.json'), null);
   return tmuxHookExplicitlyDisablesInjection(raw);
 }
 

@@ -67,7 +67,7 @@ export function resolveOmxEntryPath(
 function isOmxCliEntryPath(value: string | null | undefined): boolean {
   if (typeof value !== "string") return false;
   const normalized = value.trim().replace(/\\/g, "/");
-  return normalized.endsWith('/dist/cli/omx.js') || normalized.endsWith('/omx.js')
+  return normalized.endsWith('/dist/cli/omcp.js') || normalized.endsWith('/omcp.js')
 }
 
 export function resolveOmxCliEntryPath(
@@ -82,7 +82,7 @@ export function resolveOmxCliEntryPath(
   if (isOmxCliEntryPath(entry)) return entry;
 
   const packageRootDir = options.packageRootDir || packageRoot();
-  const fallback = resolveLauncherPath(join(packageRootDir, 'dist', 'cli', 'omx.js'), options.cwd || process.cwd());
+  const fallback = resolveLauncherPath(join(packageRootDir, 'dist', 'cli', 'omcp.js'), options.cwd || process.cwd());
   return existsSync(fallback) ? fallback : entry;
 }
 
@@ -271,39 +271,39 @@ async function hashSkillDirectory(
   return hashes;
 }
 
-/** oh-my-copilot state directory (.omx/state/) */
+/** oh-my-copilot state directory (.omcp/state/) */
 export function omxStateDir(projectRoot?: string): string {
-  return join(projectRoot || process.cwd(), ".omx", "state");
+  return join(projectRoot || process.cwd(), ".omcp", "state");
 }
 
-/** oh-my-copilot project memory file (.omx/project-memory.json) */
+/** oh-my-copilot project memory file (.omcp/project-memory.json) */
 export function omxProjectMemoryPath(projectRoot?: string): string {
-  return join(projectRoot || process.cwd(), ".omx", "project-memory.json");
+  return join(projectRoot || process.cwd(), ".omcp", "project-memory.json");
 }
 
-/** oh-my-copilot notepad file (.omx/notepad.md) */
+/** oh-my-copilot notepad file (.omcp/notepad.md) */
 export function omxNotepadPath(projectRoot?: string): string {
-  return join(projectRoot || process.cwd(), ".omx", "notepad.md");
+  return join(projectRoot || process.cwd(), ".omcp", "notepad.md");
 }
 
-/** oh-my-copilot wiki directory (.omx/wiki/) */
+/** oh-my-copilot wiki directory (.omcp/wiki/) */
 export function omxWikiDir(projectRoot?: string): string {
-  return join(projectRoot || process.cwd(), ".omx", "wiki");
+  return join(projectRoot || process.cwd(), ".omcp", "wiki");
 }
 
-/** oh-my-copilot plans directory (.omx/plans/) */
+/** oh-my-copilot plans directory (.omcp/plans/) */
 export function omxPlansDir(projectRoot?: string): string {
-  return join(projectRoot || process.cwd(), ".omx", "plans");
+  return join(projectRoot || process.cwd(), ".omcp", "plans");
 }
 
-/** oh-my-copilot adapters directory (.omx/adapters/) */
+/** oh-my-copilot adapters directory (.omcp/adapters/) */
 export function omxAdaptersDir(projectRoot?: string): string {
-  return join(projectRoot || process.cwd(), ".omx", "adapters");
+  return join(projectRoot || process.cwd(), ".omcp", "adapters");
 }
 
-/** oh-my-copilot logs directory (.omx/logs/) */
+/** oh-my-copilot logs directory (.omcp/logs/) */
 export function omxLogsDir(projectRoot?: string): string {
-  return join(projectRoot || process.cwd(), ".omx", "logs");
+  return join(projectRoot || process.cwd(), ".omcp", "logs");
 }
 
 /** Get the package root directory (where agents/, skills/, prompts/ live) */

@@ -44,7 +44,7 @@ Outdated contributor text.
 
 describe('generate-release-body', () => {
   it('preserves custom sections while refreshing contributors and compare metadata from git', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'omx-generate-release-body-'));
+    const root = await mkdtemp(join(tmpdir(), 'omcp-generate-release-body-'));
     const originalGitHubRepository = process.env.GITHUB_REPOSITORY;
     try {
       git(root, ['init']);
@@ -92,7 +92,7 @@ describe('generate-release-body', () => {
   });
 
   it('prefers GitHub contributor handles when compare metadata is available', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'omx-generate-release-body-gh-'));
+    const root = await mkdtemp(join(tmpdir(), 'omcp-generate-release-body-gh-'));
     try {
       await writeFile(join(root, 'RELEASE_BODY.md'), TEMPLATE);
       const originalFetch = global.fetch;
@@ -127,7 +127,7 @@ describe('generate-release-body', () => {
 
 
   it('fails validation when the template is missing required metadata anchors', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'omx-generate-release-body-invalid-'));
+    const root = await mkdtemp(join(tmpdir(), 'omcp-generate-release-body-invalid-'));
     try {
       await writeFile(join(root, 'RELEASE_BODY.md'), `# oh-my-copilot v0.0.0
 

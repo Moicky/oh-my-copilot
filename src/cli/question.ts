@@ -9,11 +9,11 @@ import { launchQuestionRenderer } from '../question/renderer.js';
 import { normalizeQuestionInput } from '../question/types.js';
 import { runQuestionUi } from '../question/ui.js';
 
-export const QUESTION_HELP = `omx question - OMCP-owned blocking user question entrypoint
+export const QUESTION_HELP = `omcp question - OMCP-owned blocking user question entrypoint
 
 Usage:
-  omx question --input '<json>' [--json]
-  omx question --ui --state-path <absolute-or-relative-record-path>
+  omcp question --input '<json>' [--json]
+  omcp question --ui --state-path <absolute-or-relative-record-path>
 
 Options:
   --help, -h           Show this help message
@@ -118,7 +118,7 @@ export async function questionCommand(args: string[]): Promise<void> {
     return;
   }
 
-  if (!parsed.input) throw new Error('omx question requires --input in normal mode');
+  if (!parsed.input) throw new Error('omcp question requires --input in normal mode');
 
   let rawInput: unknown;
   try {

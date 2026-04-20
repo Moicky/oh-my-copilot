@@ -7,12 +7,12 @@ import { getPackageRoot } from '../utils/package.js';
 import { codexPromptsDir } from '../utils/paths.js';
 
 export const ASK_USAGE = [
-  'Usage: omx ask <claude|gemini> <question or task>',
-  '   or: omx ask <claude|gemini> -p "<prompt>"',
-  '   or: omx ask claude --print "<prompt>"',
-  '   or: omx ask gemini --prompt "<prompt>"',
-  '   or: omx ask <claude|gemini> --agent-prompt <role> "<prompt>"',
-  '   or: omx ask <claude|gemini> --agent-prompt=<role> --prompt "<prompt>"',
+  'Usage: omcp ask <claude|gemini> <question or task>',
+  '   or: omcp ask <claude|gemini> -p "<prompt>"',
+  '   or: omcp ask claude --print "<prompt>"',
+  '   or: omcp ask gemini --prompt "<prompt>"',
+  '   or: omcp ask <claude|gemini> --agent-prompt <role> "<prompt>"',
+  '   or: omcp ask <claude|gemini> --agent-prompt=<role> --prompt "<prompt>"',
 ].join('\n');
 
 const ASK_PROVIDERS = ['claude', 'gemini'] as const;
@@ -40,7 +40,7 @@ function resolveAskPromptsDir(cwd: string, env: NodeJS.ProcessEnv = process.env)
   }
 
   try {
-    const scopePath = join(cwd, '.omx', 'setup-scope.json');
+    const scopePath = join(cwd, '.omcp', 'setup-scope.json');
     if (existsSync(scopePath)) {
       const parsed = JSON.parse(readFileSync(scopePath, 'utf-8')) as Partial<{ scope: string }>;
       if (parsed.scope === 'project' || parsed.scope === 'project-local') {
@@ -64,7 +64,7 @@ async function resolveAgentPromptContent(
   }
 
   if (!existsSync(promptsDir)) {
-    throw new Error(`[ask] prompts directory not found: ${promptsDir}. Run "omx setup" to install prompts.`);
+    throw new Error(`[ask] prompts directory not found: ${promptsDir}. Run "omcp setup" to install prompts.`);
   }
 
   const promptPath = join(promptsDir, `${normalizedRole}.md`);

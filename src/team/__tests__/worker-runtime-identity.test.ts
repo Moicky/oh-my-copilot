@@ -75,7 +75,7 @@ describe('worker runtime identity contract', () => {
   });
 
   it('startTeam preserves low-complexity assigned roles as outer runtime identities', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-identity-start-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-identity-start-'));
     const binDir = join(cwd, 'bin');
     const fakeCodexPath = join(binDir, 'codex');
     const captureDir = join(cwd, 'captures');
@@ -133,8 +133,8 @@ process.on('SIGTERM', () => process.exit(0));
       assert.equal(runtime.config.workers[0]?.role, 'explore');
       assert.equal(runtime.config.workers[1]?.role, 'style-reviewer');
 
-      const worker1Instructions = await readFile(join(cwd, '.omx', 'state', 'team', runtime.teamName, 'workers', 'worker-1', 'AGENTS.md'), 'utf-8');
-      const worker2Instructions = await readFile(join(cwd, '.omx', 'state', 'team', runtime.teamName, 'workers', 'worker-2', 'AGENTS.md'), 'utf-8');
+      const worker1Instructions = await readFile(join(cwd, '.omcp', 'state', 'team', runtime.teamName, 'workers', 'worker-1', 'AGENTS.md'), 'utf-8');
+      const worker2Instructions = await readFile(join(cwd, '.omcp', 'state', 'team', runtime.teamName, 'workers', 'worker-2', 'AGENTS.md'), 'utf-8');
       assert.match(worker1Instructions, /You are operating as the \*\*explore\*\* role/);
       assert.match(worker1Instructions, /You are Explorer\./);
       assert.doesNotMatch(worker1Instructions, /Sisyphus-lite/);
@@ -185,8 +185,8 @@ process.on('SIGTERM', () => process.exit(0));
   });
 
   it('scaleUp preserves low-complexity assigned roles as outer runtime identities', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-identity-scale-'));
-    const fakeBinDir = await mkdtemp(join(tmpdir(), 'omx-runtime-identity-scale-bin-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-runtime-identity-scale-'));
+    const fakeBinDir = await mkdtemp(join(tmpdir(), 'omcp-runtime-identity-scale-bin-'));
     const tmuxStubPath = join(fakeBinDir, 'tmux');
     const tmuxLogPath = join(fakeBinDir, 'tmux.log');
     const previousPath = process.env.PATH;
@@ -222,13 +222,13 @@ process.on('SIGTERM', () => process.exit(0));
       await mkdir(join(cwd, '.codex', 'prompts'), { recursive: true });
       await writeFile(join(cwd, '.codex', 'prompts', 'explore.md'), '<identity>You are Explorer.</identity>');
       await writeFile(join(cwd, '.codex', 'prompts', 'sisyphus-lite.md'), '<identity>You are Sisyphus-lite.</identity>');
-      await mkdir(join(cwd, '.omx', 'state', 'team', 'low-role-scale'), { recursive: true });
-      await writeFile(join(cwd, '.omx', 'state', 'team', 'low-role-scale', 'worker-agents.md'), '# Base worker instructions\n');
+      await mkdir(join(cwd, '.omcp', 'state', 'team', 'low-role-scale'), { recursive: true });
+      await writeFile(join(cwd, '.omcp', 'state', 'team', 'low-role-scale', 'worker-agents.md'), '# Base worker instructions\n');
 
       await initTeamState('low-role-scale', 'task', 'executor', 1, cwd, undefined, process.env, {
         workspace_mode: 'single',
         leader_cwd: cwd,
-        team_state_root: join(cwd, '.omx', 'state'),
+        team_state_root: join(cwd, '.omcp', 'state'),
       });
       await createTask('low-role-scale', {
         subject: 'existing task',
@@ -240,12 +240,12 @@ process.on('SIGTERM', () => process.exit(0));
       const config = await readTeamConfig('low-role-scale', cwd);
       assert.ok(config);
       if (!config) return;
-      config.tmux_session = 'omx-team-low-role-scale';
+      config.tmux_session = 'omcp-team-low-role-scale';
       config.leader_pane_id = '%11';
       config.workers[0]!.pane_id = '%21';
       await saveTeamConfig(config, cwd);
 
-      const manifestPath = join(cwd, '.omx', 'state', 'team', 'low-role-scale', 'manifest.v2.json');
+      const manifestPath = join(cwd, '.omcp', 'state', 'team', 'low-role-scale', 'manifest.v2.json');
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as { policy?: Record<string, unknown> };
       manifest.policy = {
         ...(manifest.policy ?? {}),
@@ -264,7 +264,7 @@ process.on('SIGTERM', () => process.exit(0));
       assert.equal(result.ok, true);
       if (!result.ok) return;
 
-      const workerAgents = await readFile(join(cwd, '.omx', 'state', 'team', 'low-role-scale', 'workers', 'worker-2', 'AGENTS.md'), 'utf-8');
+      const workerAgents = await readFile(join(cwd, '.omcp', 'state', 'team', 'low-role-scale', 'workers', 'worker-2', 'AGENTS.md'), 'utf-8');
       assert.match(workerAgents, /You are operating as the \*\*explore\*\* role/);
       assert.match(workerAgents, /You are Explorer\./);
       assert.doesNotMatch(workerAgents, /Sisyphus-lite/);

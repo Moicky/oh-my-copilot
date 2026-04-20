@@ -165,7 +165,7 @@ export function getBaseStateDir(workingDirectory?: string): string {
       return resolveWorkingDirectoryForState(process.env.OMX_TEAM_STATE_ROOT.trim());
     } catch {}
   }
-  return join(resolveWorkingDirectoryForState(workingDirectory), '.omx', 'state');
+  return join(resolveWorkingDirectoryForState(workingDirectory), '.omcp', 'state');
 }
 
 export function getStateDir(workingDirectory?: string, sessionId?: string): string {

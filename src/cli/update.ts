@@ -50,7 +50,7 @@ export function shouldCheckForUpdates(
 }
 
 function updateStatePath(cwd: string): string {
-  return join(cwd, '.omx', 'state', 'update-check.json');
+  return join(cwd, '.omcp', 'state', 'update-check.json');
 }
 
 async function readUpdateState(cwd: string): Promise<UpdateState | null> {
@@ -65,7 +65,7 @@ async function readUpdateState(cwd: string): Promise<UpdateState | null> {
 }
 
 async function writeUpdateState(cwd: string, state: UpdateState): Promise<void> {
-  const stateDir = join(cwd, '.omx', 'state');
+  const stateDir = join(cwd, '.omcp', 'state');
   await mkdir(stateDir, { recursive: true });
   await writeFile(updateStatePath(cwd), JSON.stringify(state, null, 2));
 }
@@ -166,17 +166,17 @@ export async function maybeCheckAndPromptUpdate(
   if (!current || !latest || !isNewerVersion(current, latest)) return;
 
   const approved = await updateDependencies.askYesNo(
-    `[omx] Update available: v${current} → v${latest}. Update now? [Y/n] `,
+    `[omcp] Update available: v${current} → v${latest}. Update now? [Y/n] `,
   );
   if (!approved) return;
 
-  console.log(`[omx] Running: npm install -g ${PACKAGE_NAME}@latest`);
+  console.log(`[omcp] Running: npm install -g ${PACKAGE_NAME}@latest`);
   const result = updateDependencies.runGlobalUpdate();
 
   if (result.ok) {
     await updateDependencies.setup();
-    console.log(`[omx] Updated to v${latest}. Restart to use new code.`);
+    console.log(`[omcp] Updated to v${latest}. Restart to use new code.`);
   } else {
-    console.log('[omx] Update failed. Run manually: npm install -g oh-my-copilot@latest');
+    console.log('[omcp] Update failed. Run manually: npm install -g oh-my-copilot@latest');
   }
 }

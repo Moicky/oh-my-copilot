@@ -20,9 +20,9 @@ export function buildExpectedManagedTmuxSessionName(cwd: string, sessionId: stri
   const dirName = basename(cwd);
   const grandparentPath = dirname(parentPath);
   const grandparentDir = basename(grandparentPath);
-  const repoDir = parentDir.endsWith('.omx-worktrees')
-    ? parentDir.slice(0, -'.omx-worktrees'.length)
-    : parentDir === 'worktrees' && grandparentDir === '.omx'
+  const repoDir = parentDir.endsWith('.omcp-worktrees')
+    ? parentDir.slice(0, -'.omcp-worktrees'.length)
+    : parentDir === 'worktrees' && grandparentDir === '.omcp'
       ? basename(dirname(grandparentPath))
       : null;
   const dirToken = repoDir
@@ -41,8 +41,8 @@ export function buildExpectedManagedTmuxSessionName(cwd: string, sessionId: stri
   } catch {
     // best effort only
   }
-  const sessionToken = sanitizeTmuxToken(sessionId.replace(/^omx-/, ''));
-  const name = `omx-${dirToken}-${branchToken}-${sessionToken}`;
+  const sessionToken = sanitizeTmuxToken(sessionId.replace(/^omcp-/, ''));
+  const name = `omcp-${dirToken}-${branchToken}-${sessionToken}`;
   return name.length > 120 ? name.slice(0, 120) : name;
 }
 

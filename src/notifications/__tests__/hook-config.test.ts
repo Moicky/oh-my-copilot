@@ -18,7 +18,7 @@ import type { HookNotificationConfig } from '../hook-config-types.js';
 import type { FullNotificationConfig } from '../types.js';
 
 function makeTmpDir(): string {
-  const dir = join(tmpdir(), `omx-hook-cfg-test-${Math.random().toString(36).slice(2)}`);
+  const dir = join(tmpdir(), `omcp-hook-cfg-test-${Math.random().toString(36).slice(2)}`);
   mkdirSync(dir, { recursive: true });
   return dir;
 }

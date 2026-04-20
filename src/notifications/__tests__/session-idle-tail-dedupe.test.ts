@@ -26,12 +26,12 @@ describe('session-idle tmux tail dedupe integration', () => {
 
   beforeEach(async () => {
     clearEnv();
-    const root = await mkdtemp(join(tmpdir(), 'omx-session-idle-tail-'));
+    const root = await mkdtemp(join(tmpdir(), 'omcp-session-idle-tail-'));
     tempCodexHome = join(root, '.codex');
     projectPath = join(root, 'project');
     await mkdir(tempCodexHome, { recursive: true });
     await mkdir(projectPath, { recursive: true });
-    await writeFile(join(tempCodexHome, '.omx-config.json'), JSON.stringify({
+    await writeFile(join(tempCodexHome, '.omcp-config.json'), JSON.stringify({
       notifications: {
         enabled: true,
         events: {

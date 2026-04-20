@@ -126,7 +126,7 @@ function resolveDefaultHermesSiblingRoot(cwd: string): string {
   return resolve(
     cwd,
     "..",
-    "hermes-codex-skill-omx-aware-prd",
+    "hermes-codex-skill-omcp-aware-prd",
     "external",
     "hermes-agent",
   );

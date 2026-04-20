@@ -30,7 +30,7 @@ async function importConfigFresh(): Promise<typeof import('../config.js')> {
 describe('getReplyConfig validation', () => {
   beforeEach(async () => {
     clearReplyEnv();
-    codexHomeDir = await mkdtemp(join(tmpdir(), 'omx-reply-config-'));
+    codexHomeDir = await mkdtemp(join(tmpdir(), 'omcp-reply-config-'));
     await mkdir(codexHomeDir, { recursive: true });
     process.env.CODEX_HOME = codexHomeDir;
   });
@@ -58,7 +58,7 @@ describe('getReplyConfig validation', () => {
   });
 
   it('normalizes invalid config file reply values', async () => {
-    const configFile = join(codexHomeDir, '.omx-config.json');
+    const configFile = join(codexHomeDir, '.omcp-config.json');
     const raw = {
       notifications: {
         enabled: true,

@@ -1,5 +1,5 @@
 /**
- * omx uninstall - Remove oh-my-copilot configuration and installed artifacts
+ * omcp uninstall - Remove oh-my-copilot configuration and installed artifacts
  */
 
 import { readFile, writeFile, readdir, rm } from "fs/promises";
@@ -328,7 +328,7 @@ async function removeCacheDirectory(
   projectRoot: string,
   options: Pick<UninstallOptions, "dryRun" | "verbose">,
 ): Promise<boolean> {
-  const omxDir = join(projectRoot, ".omx");
+  const omxDir = join(projectRoot, ".omcp");
   if (!existsSync(omxDir)) return false;
 
   if (!options.dryRun) {
@@ -352,7 +352,7 @@ async function detectLegacySkillRootWarning(
   if (overlap.overlappingSkillNames.length === 0) {
     return (
       `legacy ~/.agents/skills still exists (${overlap.legacySkillCount} skills). ` +
-      "omx uninstall does not remove that historical root automatically; " +
+      "omcp uninstall does not remove that historical root automatically; " +
       "archive or remove ~/.agents/skills if Codex still shows stale or duplicate skills"
     );
   }
@@ -364,7 +364,7 @@ async function detectLegacySkillRootWarning(
   return (
     `${overlap.overlappingSkillNames.length} overlapping skill names remain between ` +
     `${overlap.canonicalDir} and ${overlap.legacyDir}${mismatchMessage}. ` +
-    "omx uninstall only removes the active canonical skill root; " +
+    "omcp uninstall only removes the active canonical skill root; " +
     "archive or remove ~/.agents/skills if Codex still shows duplicates"
   );
 }
@@ -416,7 +416,7 @@ function printSummary(summary: UninstallSummary, dryRun: boolean): void {
     console.log(`  ${prefix} AGENTS.md`);
   }
   if (summary.cacheDirectoryRemoved) {
-    console.log(`  ${prefix} .omx/ cache directory`);
+    console.log(`  ${prefix} .omcp/ cache directory`);
   }
   if (summary.legacySkillRootWarning) {
     console.log(`  Warning: ${summary.legacySkillRootWarning}`);
@@ -537,7 +537,7 @@ export async function uninstall(options: UninstallOptions = {}): Promise<void> {
   );
   console.log();
 
-  // Step 6: Remove AGENTS.md and optionally .omx/ cache directory
+  // Step 6: Remove AGENTS.md and optionally .omcp/ cache directory
   console.log("[6/6] Cleaning up...");
   const agentsMdPath =
     scope === "project"
@@ -554,8 +554,8 @@ export async function uninstall(options: UninstallOptions = {}): Promise<void> {
     });
   } else {
     // Always clean up setup-scope.json and hud-config.json
-    const scopeFile = join(projectRoot, ".omx", "setup-scope.json");
-    const hudConfig = join(projectRoot, ".omx", "hud-config.json");
+    const scopeFile = join(projectRoot, ".omcp", "setup-scope.json");
+    const hudConfig = join(projectRoot, ".omcp", "hud-config.json");
     for (const f of [scopeFile, hudConfig]) {
       if (existsSync(f)) {
         if (!dryRun) await rm(f, { force: true });
@@ -572,7 +572,7 @@ export async function uninstall(options: UninstallOptions = {}): Promise<void> {
 
   if (!dryRun) {
     console.log(
-      '\noh-my-copilot has been uninstalled. Run "omx setup" to reinstall.',
+      '\noh-my-copilot has been uninstalled. Run "omcp setup" to reinstall.',
     );
   } else {
     console.log("\nRun without --dry-run to apply changes.");

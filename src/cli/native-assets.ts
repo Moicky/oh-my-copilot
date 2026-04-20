@@ -8,7 +8,7 @@ import { Readable } from 'node:stream';
 import { spawnPlatformCommandSync } from '../utils/platform-command.js';
 import { getPackageRoot } from '../utils/package.js';
 
-export type NativeProduct = 'omx-explore-harness' | 'omx-sparkshell';
+export type NativeProduct = 'omcp-explore-harness' | 'omcp-sparkshell';
 export type NativeLibc = 'musl' | 'glibc';
 
 export interface NativeReleaseAsset {

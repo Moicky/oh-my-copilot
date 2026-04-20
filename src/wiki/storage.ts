@@ -80,7 +80,7 @@ export function getWikiDir(root: string): string {
 export function ensureWikiDir(root: string): string {
   const wikiDir = getWikiDir(root);
   mkdirSync(wikiDir, { recursive: true });
-  const omxRoot = join(root, '.omx');
+  const omxRoot = join(root, '.omcp');
   mkdirSync(omxRoot, { recursive: true });
   const gitignorePath = join(omxRoot, '.gitignore');
   if (existsSync(gitignorePath)) {

@@ -279,11 +279,11 @@ async function assertTeamStartupIsNonDestructive(
   const currentPhase = existingPhase?.current_phase;
   if (currentPhase && isTerminalPhase(currentPhase)) return;
 
-  const tmuxSession = existingConfig?.tmux_session ?? existingManifest?.tmux_session ?? `omx-team-${teamName}`;
+  const tmuxSession = existingConfig?.tmux_session ?? existingManifest?.tmux_session ?? `omcp-team-${teamName}`;
   const renderedPhase = currentPhase ?? 'team-exec';
   throw new Error(
     `team_name_conflict: active team state already exists for "${teamName}" (phase: ${renderedPhase}, tmux: ${tmuxSession}). `
-    + `Use "omx team status ${teamName}", "omx team resume ${teamName}", or "omx team shutdown ${teamName}" instead of launching a duplicate team.`,
+    + `Use "omcp team status ${teamName}", "omcp team resume ${teamName}", or "omcp team shutdown ${teamName}" instead of launching a duplicate team.`,
   );
 }
 
@@ -481,7 +481,7 @@ function getWorktreeDiffText(worktreePath: string): string {
 
 function summarizeWorktreeDiffWithSparkShell(worktreePath: string): string | null {
   const shellCommand = `git diff --cached --stat --patch || git diff --stat --patch || git diff HEAD --stat --patch`;
-  const result = runCommand('omx', ['sparkshell', 'sh', '-lc', shellCommand], worktreePath);
+  const result = runCommand('omcp', ['sparkshell', 'sh', '-lc', shellCommand], worktreePath);
   if (!result.ok || !result.stdout) return null;
   return result.stdout;
 }
@@ -596,7 +596,7 @@ function autoCommitDirtyWorktree(
   const addResult = runGitCommand(repoRoot, ['add', '-A'], worktreePath);
   if (!addResult.ok) return { committed: false, commitHash: null };
 
-  const msg = `omx(team): auto-checkpoint ${worker.name} [${taskId}]`;
+  const msg = `omcp(team): auto-checkpoint ${worker.name} [${taskId}]`;
   const commitResult = runGitCommand(repoRoot, ['commit', '--no-verify', '-m', msg], worktreePath);
   if (!commitResult.ok) return { committed: false, commitHash: null };
 
@@ -704,7 +704,7 @@ async function integrateWorkerCommitsIntoLeader(params: {
       // Worker is cleanly ahead → merge --no-ff -X theirs
       const workerBranch = runGitCommand(repoRoot, ['rev-parse', '--abbrev-ref', 'HEAD'], worktreePath);
       const branchRef = resolveWorkerMergeRef(workerBranch, workerHead);
-      const merge = runGitCommand(repoRoot, ['merge', '--no-ff', '-X', 'theirs', '-m', `omx(team): merge ${worker.name}`, branchRef], cwd);
+      const merge = runGitCommand(repoRoot, ['merge', '--no-ff', '-X', 'theirs', '-m', `omcp(team): merge ${worker.name}`, branchRef], cwd);
 
       if (merge.ok) {
         const newLeaderHead = resolveLeaderHead(repoRoot, cwd) ?? leaderHead;
@@ -1047,7 +1047,7 @@ async function prepareShutdownMergeReport(
       return {
         workerName: worker.name,
         worktreePath,
-        reportPath: join(worktreePath, '.omx', 'diff.md'),
+        reportPath: join(worktreePath, '.omcp', 'diff.md'),
         sourceRef: null,
         syntheticCommit: null,
         diffText: getWorktreeDiffText(worktreePath),
@@ -1060,7 +1060,7 @@ async function prepareShutdownMergeReport(
     }
     const commitResult = runGitCommand(
       repoRoot,
-      ['commit', '--no-verify', '-m', `omx(team): checkpoint ${worker.name} shutdown changes`],
+      ['commit', '--no-verify', '-m', `omcp(team): checkpoint ${worker.name} shutdown changes`],
       worktreePath,
     );
     if (commitResult.ok) {
@@ -1070,7 +1070,7 @@ async function prepareShutdownMergeReport(
       return {
         workerName: worker.name,
         worktreePath,
-        reportPath: join(worktreePath, '.omx', 'diff.md'),
+        reportPath: join(worktreePath, '.omcp', 'diff.md'),
         sourceRef: null,
         syntheticCommit: null,
         diffText: getWorktreeDiffText(worktreePath),
@@ -1087,7 +1087,7 @@ async function prepareShutdownMergeReport(
   const sourceRef = sourceRefResult.ok && sourceRefResult.stdout ? sourceRefResult.stdout : null;
   const diffText = getWorktreeDiffText(worktreePath);
   const summaryText = summarizeWorktreeDiffWithSparkShell(worktreePath);
-  const reportPath = join(worktreePath, '.omx', 'diff.md');
+  const reportPath = join(worktreePath, '.omcp', 'diff.md');
   const leaderHeadBefore = resolveLeaderHead(repoRoot, leaderCwd);
 
   let mergeOutcome: WorkerShutdownMergeReport['mergeOutcome'] = 'skipped';
@@ -1127,7 +1127,7 @@ async function prepareShutdownMergeReport(
     leaderHeadAfter,
   };
 
-  await mkdir(join(worktreePath, '.omx'), { recursive: true });
+  await mkdir(join(worktreePath, '.omcp'), { recursive: true });
   await writeFile(reportPath, renderWorktreeMergeReport(report), 'utf-8');
   process.stdout.write(`${renderWorktreeMergeReport(report)}\n`);
   return report;
@@ -1142,7 +1142,7 @@ async function prepareWorkerWorktreeShutdownReports(config: TeamConfig, leaderCw
       if (report) reports.push(report);
     } catch (error) {
       const worktreePath = resolve(worker.worktree_path);
-      const reportPath = join(worktreePath, '.omx', 'diff.md');
+      const reportPath = join(worktreePath, '.omcp', 'diff.md');
       const fallback = [
         `# Worker ${worker.name} shutdown report`,
         '',
@@ -1152,7 +1152,7 @@ async function prepareWorkerWorktreeShutdownReports(config: TeamConfig, leaderCw
         `- merge_detail: ${String(error)}`,
         '',
       ].join('\n');
-      await mkdir(join(worktreePath, '.omx'), { recursive: true }).catch(() => {});
+      await mkdir(join(worktreePath, '.omcp'), { recursive: true }).catch(() => {});
       await writeFile(reportPath, fallback, 'utf-8').catch(() => {});
       process.stdout.write(`${fallback}\n`);
     }
@@ -1880,11 +1880,11 @@ export function resolveWorkerLaunchArgsFromEnv(
     : (preferredReasoning ? 'role-default' : 'none/default-none');
   const effectiveWorkerCli = workerCliOverride ?? resolveEffectiveWorkerCliForStartupLog(resolved, env);
   if (effectiveWorkerCli === 'claude') {
-    console.log('[omx:team] worker startup resolution: model=claude source=local-settings');
+    console.log('[omcp:team] worker startup resolution: model=claude source=local-settings');
   } else if (effectiveWorkerCli === 'gemini') {
-    console.log('[omx:team] worker startup resolution: model=gemini source=local-settings');
+    console.log('[omcp:team] worker startup resolution: model=gemini source=local-settings');
   } else {
-    console.log(`[omx:team] worker startup resolution: model=${resolvedModel} thinking_level=${thinkingLevel} source=${source}`);
+    console.log(`[omcp:team] worker startup resolution: model=${resolvedModel} thinking_level=${thinkingLevel} source=${source}`);
   }
 
   return resolved;
@@ -1998,7 +1998,7 @@ export async function startTeam(
   }
 
   // 2. Team name is already sanitized above.
-  let sessionName = `omx-team-${sanitized}`;
+  let sessionName = `omcp-team-${sanitized}`;
   const overlay = generateWorkerOverlay(sanitized);
   let workerInstructionsPath: string | null = null;
   let sessionCreated = false;
@@ -2299,7 +2299,7 @@ export async function startTeam(
       };
 
       if (workerTasks.map(t => t.role).filter(Boolean).length > 0 && new Set(workerTasks.map(t => t.role).filter(Boolean)).size > 1) {
-        console.log(`[omx:team] ${workerName}: mixed task roles [${[...new Set(workerTasks.map(t => t.role).filter(Boolean))].join(', ')}], falling back to ${agentType}`);
+        console.log(`[omcp:team] ${workerName}: mixed task roles [${[...new Set(workerTasks.map(t => t.role).filter(Boolean))].join(', ')}], falling back to ${agentType}`);
       }
 
       // Wait for worker readiness
@@ -2898,7 +2898,7 @@ export async function shutdownTeam(teamName: string, cwd: string, options: Shutd
   if (!config) {
     // No config -- just try to kill tmux session and clean up
     try {
-      destroyTeamSession(`omx-team-${sanitized}`);
+      destroyTeamSession(`omcp-team-${sanitized}`);
     } catch (err) {
       process.stderr.write(`[team/runtime] operation failed: ${err}\n`);
     }
@@ -2939,7 +2939,7 @@ export async function shutdownTeam(teamName: string, cwd: string, options: Shutd
     if (!gate.allowed) {
       if (requiresIssueConfirmation) {
         throw new Error(
-          `shutdown_confirm_issues_required:failed=${gate.failed}:rerun=omx team shutdown ${sanitized} --confirm-issues`,
+          `shutdown_confirm_issues_required:failed=${gate.failed}:rerun=omcp team shutdown ${sanitized} --confirm-issues`,
         );
       }
       throw new Error(
@@ -3289,7 +3289,7 @@ export async function resumeTeam(teamName: string, cwd: string): Promise<TeamRun
 }
 
 async function findActiveTeams(cwd: string, leaderSessionId: string): Promise<string[]> {
-  const root = join(cwd, '.omx', 'state', 'team');
+  const root = join(cwd, '.omcp', 'state', 'team');
   if (!existsSync(root)) return [];
   const sessions = new Set(listTeamSessions());
   const entries = await readdir(root, { withFileTypes: true });
@@ -3304,7 +3304,7 @@ async function findActiveTeams(cwd: string, leaderSessionId: string): Promise<st
     const workerLaunchMode = cfg?.worker_launch_mode
       ?? manifest?.policy?.worker_launch_mode
       ?? 'interactive';
-    const tmuxSession = (manifest?.tmux_session || cfg?.tmux_session || `omx-team-${teamName}`).split(':')[0];
+    const tmuxSession = (manifest?.tmux_session || cfg?.tmux_session || `omcp-team-${teamName}`).split(':')[0];
     if (leaderSessionId) {
       const ownerSessionId = manifest?.leader?.session_id?.trim() ?? '';
       if (ownerSessionId && ownerSessionId !== leaderSessionId) continue;
@@ -3326,11 +3326,11 @@ async function detectAndCleanStaleTeam(
   workerCount: number,
   confirmFn?: (summary: StaleTeamSummary) => Promise<boolean>,
 ): Promise<void> {
-  const stateDir = join(leaderCwd, '.omx', 'state', 'team', teamName);
+  const stateDir = join(leaderCwd, '.omcp', 'state', 'team', teamName);
   if (!existsSync(stateDir)) return;
 
   const sessions = new Set(listTeamSessions());
-  if (sessions.has(`omx-team-${teamName}`)) return;
+  if (sessions.has(`omcp-team-${teamName}`)) return;
 
   const repoRootResult = spawnSync('git', ['rev-parse', '--show-toplevel'], {
     cwd: leaderCwd, encoding: 'utf-8', windowsHide: true,
@@ -3340,7 +3340,7 @@ async function detectAndCleanStaleTeam(
 
   const worktreePaths: string[] = [];
   for (let i = 1; i <= workerCount; i++) {
-    const wtPath = join(repoRoot, '.omx', 'team', teamName, 'worktrees', `worker-${i}`);
+    const wtPath = join(repoRoot, '.omcp', 'team', teamName, 'worktrees', `worker-${i}`);
     if (existsSync(wtPath)) worktreePaths.push(wtPath);
   }
 
@@ -3380,7 +3380,7 @@ async function resolveLeaderSessionId(cwd: string): Promise<string> {
   const fromEnv = process.env.OMX_SESSION_ID || process.env.CODEX_SESSION_ID || process.env.SESSION_ID;
   if (fromEnv && fromEnv.trim() !== '') return fromEnv.trim();
 
-  const p = join(cwd, '.omx', 'state', 'session.json');
+  const p = join(cwd, '.omcp', 'state', 'session.json');
   if (!existsSync(p)) return '';
   try {
     const raw = await readFile(p, 'utf-8');

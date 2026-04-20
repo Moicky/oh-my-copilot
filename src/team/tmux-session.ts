@@ -1897,7 +1897,7 @@ export function destroyTeamSession(sessionName: string): void {
   }
 }
 
-// List all tmux sessions matching omx-team-* pattern
+// List all tmux sessions matching omcp-team-* pattern
 export function listTeamSessions(): string[] {
   const result = runTmux(['list-sessions', '-F', '#{session_name}']);
   if (!result.ok) return [];
@@ -1913,7 +1913,7 @@ export function listTeamSessions(): string[] {
  * Notify the leader through durable mailbox state only.
  *
  * Team leaders are a coordination endpoint, not a direct tmux control target:
- * workers and runtime paths may message `leader-fixed` via `omx team api`
+ * workers and runtime paths may message `leader-fixed` via `omcp team api`
  * / mailbox persistence, but team code must not inject text or control keys
  * into the leader pane. This is the async mailbox-based replacement for
  * `notifyLeaderStatus()`.

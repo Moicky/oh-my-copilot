@@ -11,7 +11,7 @@ import { handleTmuxInjection, resolvePaneTarget } from '../../scripts/notify-hoo
 const NOTIFY_HOOK_SCRIPT = new URL('../../../dist/scripts/notify-hook.js', import.meta.url);
 
 async function withTempWorkingDir(run: (cwd: string) => Promise<void>): Promise<void> {
-  const cwd = await mkdtemp(join(tmpdir(), 'omx-notify-tmux-heal-'));
+  const cwd = await mkdtemp(join(tmpdir(), 'omcp-notify-tmux-heal-'));
   try {
     await run(cwd);
   } finally {
@@ -100,10 +100,10 @@ async function writeManagedSessionState(stateDir: string, cwd: string, sessionId
 describe('notify-hook tmux target healing', () => {
   it('falls back to global mode state when scoped session has no allowed active mode', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
+      const omxDir = join(cwd, '.omcp');
       const stateDir = join(omxDir, 'state');
       const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
@@ -204,10 +204,10 @@ exit 1
 
   it('does not revive a legacy root Ralph fallback when canonical skill state excludes Ralph', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
+      const omxDir = join(cwd, '.omcp');
       const stateDir = join(omxDir, 'state');
       const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const configPath = join(omxDir, 'tmux-hook.json');
       const hookStatePath = join(stateDir, 'tmux-hook-state.json');
@@ -330,10 +330,10 @@ exit 1
 
   it('falls back to current tmux pane and heals stale session target', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
+      const omxDir = join(cwd, '.omcp');
       const stateDir = join(omxDir, 'state');
       const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
@@ -467,10 +467,10 @@ exit 1
 
   it('skips injection when fallback pane cwd does not match hook cwd', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
+      const omxDir = join(cwd, '.omcp');
       const stateDir = join(omxDir, 'state');
       const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
@@ -601,9 +601,9 @@ exit 1
   it('accepts alias and canonical twin paths when resolving managed pane ownership', async () => {
     await withTempWorkingDir(async (cwd) => {
       const aliasCwd = `${cwd}-alias`;
-      const omxDir = join(cwd, '.omx');
+      const omxDir = join(cwd, '.omcp');
       const stateDir = join(omxDir, 'state');
-      const sessionId = 'omx-abc123';
+      const sessionId = 'omcp-abc123';
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const managedSessionName = buildTmuxSessionName(cwd, sessionId);
@@ -690,10 +690,10 @@ exit 1
 
   it('resolves the explicit managed session target without shared-cwd guessing', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
+      const omxDir = join(cwd, '.omcp');
       const stateDir = join(omxDir, 'state');
       const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
@@ -811,10 +811,10 @@ exit 1
 
   it('heals a stale HUD pane target back to the canonical codex pane', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
+      const omxDir = join(cwd, '.omcp');
       const stateDir = join(omxDir, 'state');
       const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-hud-stale';
+      const sessionId = 'omcp-hud-stale';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
@@ -863,7 +863,7 @@ if [[ "$cmd" == "display-message" ]]; then
     exit 0
   fi
   if [[ "$format" == "#{pane_start_command}" && "$target" == "%77" ]]; then
-    echo "node dist/cli/omx.js hud --watch"
+    echo "node dist/cli/omcp.js hud --watch"
     exit 0
   fi
   if [[ "$format" == "#S" && "$target" == "%77" ]]; then
@@ -897,7 +897,7 @@ if [[ "$cmd" == "list-panes" ]]; then
     esac
   done
   if [[ "$target" == "${managedSessionName}" ]]; then
-    printf "%%77\t1\tnode\tnode dist/cli/omx.js hud --watch\n%%99\t0\tcodex\tcodex\n"
+    printf "%%77\t1\tnode\tnode dist/cli/omcp.js hud --watch\n%%99\t0\tcodex\tcodex\n"
     exit 0
   fi
   exit 1
@@ -949,10 +949,10 @@ exit 1
 
   it('prefers active mode state tmux_pane_id when present', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
+      const omxDir = join(cwd, '.omcp');
       const stateDir = join(omxDir, 'state');
       const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
@@ -1060,10 +1060,10 @@ exit 1
 
   it('does not heal the repo-scoped target when a preGuard skip returns early', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
+      const omxDir = join(cwd, '.omcp');
       const stateDir = join(omxDir, 'state');
       const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-preguard-heal';
+      const sessionId = 'omcp-preguard-heal';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
@@ -1164,10 +1164,10 @@ exit 1
   });
   it('prefers scoped active mode state over global mode state for tmux pane selection', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
+      const omxDir = join(cwd, '.omcp');
       const stateDir = join(omxDir, 'state');
       const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-abc123';
+      const sessionId = 'omcp-abc123';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
@@ -1288,10 +1288,10 @@ exit 1
 
   it('skips injection when the resolved pane is still busy', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omx');
+      const omxDir = join(cwd, '.omcp');
       const stateDir = join(omxDir, 'state');
       const logsDir = join(omxDir, 'logs');
-      const sessionId = 'omx-busy-pane';
+      const sessionId = 'omcp-busy-pane';
       const sessionStateDir = join(stateDir, 'sessions', sessionId);
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');

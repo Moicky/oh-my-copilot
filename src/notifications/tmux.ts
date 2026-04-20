@@ -153,13 +153,13 @@ function detectTmuxSessionByPid(): string | null {
 }
 
 /**
- * List active omx-team tmux sessions for a given team.
+ * List active omcp-team tmux sessions for a given team.
  */
 export function getTeamTmuxSessions(teamName: string): string[] {
   const sanitized = teamName.replace(/[^a-zA-Z0-9-]/g, "");
   if (!sanitized) return [];
 
-  const prefix = `omx-team-${sanitized}`;
+  const prefix = `omcp-team-${sanitized}`;
   try {
     const output = execTmux(["list-sessions", "-F", "#{session_name}"]);
     return output

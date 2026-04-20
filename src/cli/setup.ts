@@ -1,5 +1,5 @@
 /**
- * omx setup - Automated installation of oh-my-copilot
+ * omcp setup - Automated installation of oh-my-copilot
  * Installs skills, prompts, MCP servers config, and AGENTS.md
  */
 
@@ -132,7 +132,7 @@ export interface SkillFrontmatterMetadata {
 }
 
 const PROJECT_GITIGNORE_ENTRIES = [
-  ".omx/",
+  ".omcp/",
   ".codex/*",
   "!.codex/agents/",
   "!.codex/agents/**",
@@ -201,12 +201,12 @@ function getBackupContext(
   const timestamp = new Date().toISOString().replace(/[:]/g, "-");
   if (scope === "project") {
     return {
-      backupRoot: join(projectRoot, ".omx", "backups", "setup", timestamp),
+      backupRoot: join(projectRoot, ".omcp", "backups", "setup", timestamp),
       baseRoot: projectRoot,
     };
   }
   return {
-    backupRoot: join(homedir(), ".omx", "backups", "setup", timestamp),
+    backupRoot: join(homedir(), ".omcp", "backups", "setup", timestamp),
     baseRoot: homedir(),
   };
 }
@@ -405,7 +405,7 @@ function isSetupScope(value: string): value is SetupScope {
   return SETUP_SCOPES.includes(value as SetupScope);
 }
 function getScopeFilePath(projectRoot: string): string {
-  return join(projectRoot, ".omx", "setup-scope.json");
+  return join(projectRoot, ".omcp", "setup-scope.json");
 }
 
 export function resolveScopeDirectories(
@@ -451,7 +451,7 @@ async function readPersistedSetupPreferences(
       const migrated = LEGACY_SCOPE_MIGRATION[parsed.scope];
       if (migrated) {
         console.warn(
-          `[omx] Migrating persisted setup scope "${parsed.scope}" → "${migrated}" ` +
+          `[omcp] Migrating persisted setup scope "${parsed.scope}" → "${migrated}" ` +
             `(see issue #243: simplified to user/project).`,
         );
         persisted.scope = migrated;
@@ -692,7 +692,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   const resolvedScope = await resolveSetupScope(projectRoot, requestedScope);
   const scopeDirs = resolveScopeDirectories(resolvedScope.scope, projectRoot);
   const scopeSourceMessage =
-    resolvedScope.source === "persisted" ? " (from .omx/setup-scope.json)" : "";
+    resolvedScope.source === "persisted" ? " (from .omcp/setup-scope.json)" : "";
   const backupContext = getBackupContext(resolvedScope.scope, projectRoot);
 
   console.log("oh-my-copilot setup");
@@ -894,10 +894,10 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   console.log("[5.5/8] Verifying Team CLI API interop...");
   const teamToolsCheck = await verifyTeamCliApiInterop(pkgRoot);
   if (teamToolsCheck.ok) {
-    console.log("  omx team api command detected (CLI-first interop ready)");
+    console.log("  omcp team api command detected (CLI-first interop ready)");
   } else {
     console.log(`  WARNING: ${teamToolsCheck.message}`);
-    console.log("  Run `npm run build` and then re-run `omx setup`.");
+    console.log("  Run `npm run build` and then re-run `omcp setup`.");
   }
   console.log();
 
@@ -951,7 +951,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     ) {
       summary.agentsMd.skipped += 1;
       console.log(
-        "  WARNING: Active omx session detected (pid " +
+        "  WARNING: Active omcp session detected (pid " +
           activeSession?.pid +
           ").",
       );
@@ -1021,13 +1021,13 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
 
   // Step 8: Configure HUD
   console.log("[8/8] Configuring HUD...");
-  const hudConfigPath = join(projectRoot, ".omx", "hud-config.json");
+  const hudConfigPath = join(projectRoot, ".omcp", "hud-config.json");
   if (force || !existsSync(hudConfigPath)) {
     if (!dryRun) {
       const defaultHudConfig = { preset: "focused" };
       await writeFile(hudConfigPath, JSON.stringify(defaultHudConfig, null, 2));
     }
-    if (verbose) console.log("  Wrote .omx/hud-config.json");
+    if (verbose) console.log("  Wrote .omcp/hud-config.json");
     console.log("  HUD config created (preset: focused).");
   } else {
     console.log("  HUD config already exists (use --force to overwrite).");
@@ -1060,7 +1060,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     console.log();
   }
 
-  console.log('Setup complete! Run "omx doctor" to verify installation.');
+  console.log('Setup complete! Run "omcp doctor" to verify installation.');
   console.log("\nNext steps:");
   console.log("  1. Start Codex CLI in your project directory");
   console.log(
@@ -1072,7 +1072,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     "  5. Native agent defaults configured in config.toml [agents] and TOML files written to .codex/agents/",
   );
   console.log(
-    '  6. "omx explore" and "omx sparkshell" can hydrate native release binaries on first use; source installs still allow repo-local fallbacks and OMX_EXPLORE_BIN / OMX_SPARKSHELL_BIN overrides',
+    '  6. "omcp explore" and "omcp sparkshell" can hydrate native release binaries on first use; source installs still allow repo-local fallbacks and OMX_EXPLORE_BIN / OMX_SPARKSHELL_BIN overrides',
   );
   if (isGitHubCliConfigured()) {
     console.log("\nSupport the project: gh repo star Moicky/oh-my-copilot");

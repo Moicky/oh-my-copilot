@@ -3,7 +3,7 @@ import {
   OMX_MODELS_START_MARKER,
 } from './agents-model-table.js'
 
-export const OMX_GENERATED_AGENTS_MARKER = '<!-- omx:generated:agents-md -->'
+export const OMX_GENERATED_AGENTS_MARKER = '<!-- omcp:generated:agents-md -->'
 const AUTONOMY_DIRECTIVE_END_MARKER = '<!-- END AUTONOMY DIRECTIVE -->'
 
 export function isOmxGeneratedAgentsMd(content: string): boolean {

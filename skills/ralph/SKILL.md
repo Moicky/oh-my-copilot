@@ -43,7 +43,7 @@ Complex tasks often fail silently: partial implementations get declared "done", 
 
 <Steps>
 0. **Pre-context intake (required before planning/execution loop starts)**:
-   - Assemble or load a context snapshot at `.omx/context/{task-slug}-{timestamp}.md` (UTC `YYYYMMDDTHHMMSSZ`).
+   - Assemble or load a context snapshot at `.omcp/context/{task-slug}-{timestamp}.md` (UTC `YYYYMMDDTHHMMSSZ`).
    - Minimum snapshot fields:
      - task statement
      - desired outcome
@@ -52,7 +52,7 @@ Complex tasks often fail silently: partial implementations get declared "done", 
      - unknowns/open questions
      - likely codebase touchpoints
    - If an existing relevant snapshot is available, reuse it and record the path in Ralph state.
-   - If request ambiguity is high, gather brownfield facts first. When session guidance enables `USE_OMX_EXPLORE_CMD`, prefer `omx explore` for simple read-only repository lookups with narrow, concrete prompts; otherwise use the richer normal explore path. Then run `$deep-interview --quick <task>` to close critical gaps.
+   - If request ambiguity is high, gather brownfield facts first. When session guidance enables `USE_OMX_EXPLORE_CMD`, prefer `omcp explore` for simple read-only repository lookups with narrow, concrete prompts; otherwise use the richer normal explore path. Then run `$deep-interview --quick <task>` to close critical gaps.
    - Do not begin Ralph execution work (delegation, implementation, or verification loops) until snapshot grounding exists. If forced to proceed quickly, note explicit risk tradeoffs.
 1. **Review progress**: Check TODO list and any prior iteration state
 2. **Continue from where you left off**: Pick up incomplete tasks
@@ -65,7 +65,7 @@ Complex tasks often fail silently: partial implementations get declared "done", 
 5. **Visual task gate (when screenshot/reference images are present)**:
    - Run `$visual-verdict` **before every next edit**.
    - Require structured JSON output: `score`, `verdict`, `category_match`, `differences[]`, `suggestions[]`, `reasoning`.
-   - Persist verdict to `.omx/state/{scope}/ralph-progress.json` including numeric + qualitative feedback.
+   - Persist verdict to `.omcp/state/{scope}/ralph-progress.json` including numeric + qualitative feedback.
    - Default pass threshold: `score >= 90`.
    - **URL-based cloning tasks**: When the task description contains a target URL (e.g., "clone https://example.com"), invoke `$web-clone` instead of `$visual-verdict`. The web-clone skill handles the full extraction → generation → verification pipeline and uses `$visual-verdict` internally for visual scoring.
 6. **Verify completion with fresh evidence**:
@@ -192,9 +192,9 @@ When the user provides the `--prd` flag, initialize a Product Requirements Docum
 ### Detecting PRD Mode
 Check if `{{PROMPT}}` contains `--prd` or `--PRD`.
 
-Prompt-side `$ralph` workflow activation is lighter-weight than `omx ralph --prd ...`.
+Prompt-side `$ralph` workflow activation is lighter-weight than `omcp ralph --prd ...`.
 It seeds Ralph workflow state and guidance, but it does not implicitly launch the
-CLI entrypoint or apply the PRD startup gate. Treat `omx ralph --prd ...` as the
+CLI entrypoint or apply the PRD startup gate. Treat `omcp ralph --prd ...` as the
 explicit PRD-gated path.
 
 ### Detecting `--no-deslop`
@@ -213,10 +213,10 @@ Example:
 1. Run deep-interview in quick mode before creating PRD artifacts:
    - Execute: `$deep-interview --quick <task>`
    - Complete a compact requirements pass (context, goals, scope, constraints, validation)
-   - Persist interview output to `.omx/interviews/{slug}-{timestamp}.md`
+   - Persist interview output to `.omcp/interviews/{slug}-{timestamp}.md`
 2. Create canonical PRD/progress artifacts:
-   - PRD: `.omx/plans/prd-{slug}.md`
-   - Progress ledger: `.omx/state/{scope}/ralph-progress.json` (session scope when available, else root scope)
+   - PRD: `.omcp/plans/prd-{slug}.md`
+   - Progress ledger: `.omcp/state/{scope}/ralph-progress.json` (session scope when available, else root scope)
 3. Parse the task (everything after `--prd` flag)
 4. Break down into user stories:
 
@@ -238,19 +238,19 @@ Example:
 }
 ```
 
-5. Initialize canonical progress ledger at `.omx/state/{scope}/ralph-progress.json`
+5. Initialize canonical progress ledger at `.omcp/state/{scope}/ralph-progress.json`
 6. Guidelines: right-sized stories (one session each), verifiable criteria, independent stories, priority order (foundational work first)
 7. Proceed to normal ralph loop using user stories as the task list
 
 ### Example
 User input: `--prd build a todo app with React and TypeScript`
-Workflow: Detect flag, extract task, create `.omx/plans/prd-{slug}.md`, create `.omx/state/{scope}/ralph-progress.json`, begin ralph loop.
+Workflow: Detect flag, extract task, create `.omcp/plans/prd-{slug}.md`, create `.omcp/state/{scope}/ralph-progress.json`, begin ralph loop.
 
 ### Legacy compatibility
-- During the compatibility window, Ralph `--prd` startup still validates machine-readable story state from `.omx/prd.json`.
-- `.omx/plans/prd-{slug}.md` remains the canonical storage/documentation artifact, but it is not yet the startup validation source.
-- If `.omx/prd.json` exists and canonical PRD is absent, migrate one-way into `.omx/plans/prd-{slug}.md`.
-- If `.omx/progress.txt` exists and canonical progress ledger is absent, import one-way into `.omx/state/{scope}/ralph-progress.json`.
+- During the compatibility window, Ralph `--prd` startup still validates machine-readable story state from `.omcp/prd.json`.
+- `.omcp/plans/prd-{slug}.md` remains the canonical storage/documentation artifact, but it is not yet the startup validation source.
+- If `.omcp/prd.json` exists and canonical PRD is absent, migrate one-way into `.omcp/plans/prd-{slug}.md`.
+- If `.omcp/progress.txt` exists and canonical progress ledger is absent, import one-way into `.omcp/state/{scope}/ralph-progress.json`.
 - Keep legacy files unchanged for one release cycle.
 
 ## Background Execution Rules

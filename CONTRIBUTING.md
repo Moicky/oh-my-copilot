@@ -18,8 +18,8 @@ For local CLI testing:
 
 ```bash
 npm link
-omx setup
-omx doctor
+omcp setup
+omcp doctor
 ```
 
 ### Team/state coverage gate (issue #454)
@@ -58,7 +58,7 @@ unset OMX_TEAM_WORKER OMX_TEAM_STATE_ROOT OMX_TEAM_LEADER_CWD OMX_TEAM_WORKER_CL
 ### Adding a new agent prompt
 
 1. Create `prompts/my-agent.md` with the agent's system prompt
-2. Run `omx setup --force` to install it to `~/.codex/prompts/`
+2. Run `omcp setup --force` to install it to `~/.codex/prompts/`
 3. Use `/prompts:my-agent` in Codex CLI
 
 ### Prompt guidance contract
@@ -70,7 +70,7 @@ That document defines the GPT-5.4 behavior contract contributors should preserve
 ### Adding a new skill
 
 1. Create `skills/my-skill/SKILL.md` with the skill workflow
-2. Run `omx setup --force` to install it to `~/.codex/skills/`
+2. Run `omcp setup --force` to install it to `~/.codex/skills/`
 3. Use `$my-skill` in Codex CLI
 
 ## Workflow

@@ -45,12 +45,12 @@ function sha256(buffer: Buffer): string {
 describe('native asset helpers', () => {
   it('infers Linux libc variants from manifest metadata', () => {
     assert.equal(inferNativeAssetLibc({
-      archive: 'omx-sparkshell-x86_64-unknown-linux-musl.tar.gz',
+      archive: 'omcp-sparkshell-x86_64-unknown-linux-musl.tar.gz',
       target: 'x86_64-unknown-linux-musl',
       libc: undefined,
     }), 'musl');
     assert.equal(inferNativeAssetLibc({
-      archive: 'omx-sparkshell-x86_64-unknown-linux-gnu.tar.gz',
+      archive: 'omcp-sparkshell-x86_64-unknown-linux-gnu.tar.gz',
       target: 'x86_64-unknown-linux-gnu',
       libc: undefined,
     }), 'glibc');
@@ -58,15 +58,15 @@ describe('native asset helpers', () => {
 
   it('prefers musl cache paths before glibc and legacy Linux cache paths', () => {
     assert.deepEqual(
-      resolveCachedNativeBinaryCandidatePaths('omx-sparkshell', '0.8.15', 'linux', 'x64', {
-        OMX_NATIVE_CACHE_DIR: '/tmp/omx-native-cache',
+      resolveCachedNativeBinaryCandidatePaths('omcp-sparkshell', '0.8.15', 'linux', 'x64', {
+        OMX_NATIVE_CACHE_DIR: '/tmp/omcp-native-cache',
       }, {
         linuxLibcPreference: ['musl', 'glibc'],
       }),
       [
-        '/tmp/omx-native-cache/0.8.15/linux-x64-musl/omx-sparkshell/omx-sparkshell',
-        '/tmp/omx-native-cache/0.8.15/linux-x64-glibc/omx-sparkshell/omx-sparkshell',
-        '/tmp/omx-native-cache/0.8.15/linux-x64/omx-sparkshell/omx-sparkshell',
+        '/tmp/omcp-native-cache/0.8.15/linux-x64-musl/omcp-sparkshell/omcp-sparkshell',
+        '/tmp/omcp-native-cache/0.8.15/linux-x64-glibc/omcp-sparkshell/omcp-sparkshell',
+        '/tmp/omcp-native-cache/0.8.15/linux-x64/omcp-sparkshell/omcp-sparkshell',
       ],
     );
   });
@@ -76,48 +76,48 @@ describe('native asset helpers', () => {
       version: '0.8.15',
       assets: [
         {
-          product: 'omx-sparkshell',
+          product: 'omcp-sparkshell',
           version: '0.8.15',
           platform: 'linux',
           arch: 'x64',
           target: 'x86_64-unknown-linux-gnu',
           libc: 'glibc',
-          archive: 'omx-sparkshell-x86_64-unknown-linux-gnu.tar.gz',
-          binary: 'omx-sparkshell',
-          binary_path: 'omx-sparkshell',
+          archive: 'omcp-sparkshell-x86_64-unknown-linux-gnu.tar.gz',
+          binary: 'omcp-sparkshell',
+          binary_path: 'omcp-sparkshell',
           sha256: 'glibc',
           download_url: 'https://example.invalid/glibc',
         },
         {
-          product: 'omx-sparkshell',
+          product: 'omcp-sparkshell',
           version: '0.8.15',
           platform: 'linux',
           arch: 'x64',
           target: 'x86_64-unknown-linux-musl',
           libc: 'musl',
-          archive: 'omx-sparkshell-x86_64-unknown-linux-musl.tar.gz',
-          binary: 'omx-sparkshell',
-          binary_path: 'omx-sparkshell',
+          archive: 'omcp-sparkshell-x86_64-unknown-linux-musl.tar.gz',
+          binary: 'omcp-sparkshell',
+          binary_path: 'omcp-sparkshell',
           sha256: 'musl',
           download_url: 'https://example.invalid/musl',
         },
       ],
     };
 
-    const ordered = resolveNativeReleaseAssetCandidates(manifest, 'omx-sparkshell', '0.8.15', 'linux', 'x64', {
+    const ordered = resolveNativeReleaseAssetCandidates(manifest, 'omcp-sparkshell', '0.8.15', 'linux', 'x64', {
       linuxLibcPreference: ['musl', 'glibc'],
     });
     assert.deepEqual(
       ordered.map((asset) => asset.archive),
       [
-        'omx-sparkshell-x86_64-unknown-linux-musl.tar.gz',
-        'omx-sparkshell-x86_64-unknown-linux-gnu.tar.gz',
+        'omcp-sparkshell-x86_64-unknown-linux-musl.tar.gz',
+        'omcp-sparkshell-x86_64-unknown-linux-gnu.tar.gz',
       ],
     );
   });
 
   it('derives GitHub release base url from package.json repository + version', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-native-base-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-native-base-'));
     try {
       await writeFile(join(wd, 'package.json'), JSON.stringify({
         version: '0.8.15',
@@ -131,7 +131,7 @@ describe('native asset helpers', () => {
   });
 
   it('hydrates a native binary from the release manifest into the cache', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-native-hydrate-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-native-hydrate-'));
     const cacheDir = join(wd, 'cache');
     const assetRoot = join(wd, 'assets');
     try {
@@ -143,12 +143,12 @@ describe('native asset helpers', () => {
 
       const stagingDir = join(wd, 'staging');
       await mkdir(stagingDir, { recursive: true });
-      const binaryPath = join(stagingDir, 'omx-sparkshell');
+      const binaryPath = join(stagingDir, 'omcp-sparkshell');
       await writeFile(binaryPath, '#!/bin/sh\necho hydrated\n');
       await chmod(binaryPath, 0o755);
 
-      const archivePath = join(assetRoot, 'omx-sparkshell-x86_64-unknown-linux-musl.tar.gz');
-      const archive = spawnSync('tar', ['-czf', archivePath, '-C', stagingDir, 'omx-sparkshell'], { encoding: 'utf-8' });
+      const archivePath = join(assetRoot, 'omcp-sparkshell-x86_64-unknown-linux-musl.tar.gz');
+      const archive = spawnSync('tar', ['-czf', archivePath, '-C', stagingDir, 'omcp-sparkshell'], { encoding: 'utf-8' });
       assert.equal(archive.status, 0, archive.stderr || archive.stdout);
       const archiveBuffer = await readFile(archivePath);
 
@@ -157,13 +157,13 @@ describe('native asset helpers', () => {
         tag: 'v0.8.15',
         assets: [
           {
-            product: 'omx-sparkshell',
+            product: 'omcp-sparkshell',
             version: '0.8.15',
             platform: 'linux',
             arch: 'x64',
-            archive: 'omx-sparkshell-x86_64-unknown-linux-musl.tar.gz',
-            binary: 'omx-sparkshell',
-            binary_path: 'omx-sparkshell',
+            archive: 'omcp-sparkshell-x86_64-unknown-linux-musl.tar.gz',
+            binary: 'omcp-sparkshell',
+            binary_path: 'omcp-sparkshell',
             sha256: sha256(archiveBuffer),
             size: archiveBuffer.length,
             download_url: '',
@@ -176,7 +176,7 @@ describe('native asset helpers', () => {
         manifest.assets[0].download_url = `${server.baseUrl}/${manifest.assets[0].archive}`;
         await writeFile(join(assetRoot, 'native-release-manifest.json'), JSON.stringify(manifest, null, 2));
 
-        const hydrated = await hydrateNativeBinary('omx-sparkshell', {
+        const hydrated = await hydrateNativeBinary('omcp-sparkshell', {
           packageRoot: wd,
           env: {
             OMX_NATIVE_MANIFEST_URL: `${server.baseUrl}/native-release-manifest.json`,
@@ -186,7 +186,7 @@ describe('native asset helpers', () => {
           arch: 'x64',
         });
 
-        assert.equal(hydrated, resolveCachedNativeBinaryPath('omx-sparkshell', '0.8.15', 'linux', 'x64', {
+        assert.equal(hydrated, resolveCachedNativeBinaryPath('omcp-sparkshell', '0.8.15', 'linux', 'x64', {
           OMX_NATIVE_CACHE_DIR: cacheDir,
         }, 'musl'));
         assert.equal(await readFile(hydrated!, 'utf-8'), '#!/bin/sh\necho hydrated\n');
@@ -199,7 +199,7 @@ describe('native asset helpers', () => {
   });
 
   it('hydrates a native binary when the archive wraps files in a top-level directory', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-native-hydrate-nested-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-native-hydrate-nested-'));
     const cacheDir = join(wd, 'cache');
     const assetRoot = join(wd, 'assets');
     try {
@@ -209,14 +209,14 @@ describe('native asset helpers', () => {
         repository: { url: 'git+https://github.com/Moicky/oh-my-copilot.git' },
       }));
 
-      const stagingDir = join(wd, 'staging', 'omx-sparkshell-x86_64-unknown-linux-musl');
+      const stagingDir = join(wd, 'staging', 'omcp-sparkshell-x86_64-unknown-linux-musl');
       await mkdir(stagingDir, { recursive: true });
-      const binaryPath = join(stagingDir, 'omx-sparkshell');
+      const binaryPath = join(stagingDir, 'omcp-sparkshell');
       await writeFile(binaryPath, '#!/bin/sh\necho hydrated-nested\n');
       await chmod(binaryPath, 0o755);
 
-      const archivePath = join(assetRoot, 'omx-sparkshell-x86_64-unknown-linux-musl.tar.gz');
-      const archive = spawnSync('tar', ['-czf', archivePath, '-C', join(wd, 'staging'), 'omx-sparkshell-x86_64-unknown-linux-musl'], { encoding: 'utf-8' });
+      const archivePath = join(assetRoot, 'omcp-sparkshell-x86_64-unknown-linux-musl.tar.gz');
+      const archive = spawnSync('tar', ['-czf', archivePath, '-C', join(wd, 'staging'), 'omcp-sparkshell-x86_64-unknown-linux-musl'], { encoding: 'utf-8' });
       assert.equal(archive.status, 0, archive.stderr || archive.stdout);
       const archiveBuffer = await readFile(archivePath);
 
@@ -225,13 +225,13 @@ describe('native asset helpers', () => {
         tag: 'v0.8.15',
         assets: [
           {
-            product: 'omx-sparkshell',
+            product: 'omcp-sparkshell',
             version: '0.8.15',
             platform: 'linux',
             arch: 'x64',
-            archive: 'omx-sparkshell-x86_64-unknown-linux-musl.tar.gz',
-            binary: 'omx-sparkshell',
-            binary_path: 'omx-sparkshell',
+            archive: 'omcp-sparkshell-x86_64-unknown-linux-musl.tar.gz',
+            binary: 'omcp-sparkshell',
+            binary_path: 'omcp-sparkshell',
             sha256: sha256(archiveBuffer),
             size: archiveBuffer.length,
             download_url: '',
@@ -244,7 +244,7 @@ describe('native asset helpers', () => {
         manifest.assets[0].download_url = `${server.baseUrl}/${manifest.assets[0].archive}`;
         await writeFile(join(assetRoot, 'native-release-manifest.json'), JSON.stringify(manifest, null, 2));
 
-        const hydrated = await hydrateNativeBinary('omx-sparkshell', {
+        const hydrated = await hydrateNativeBinary('omcp-sparkshell', {
           packageRoot: wd,
           env: {
             OMX_NATIVE_MANIFEST_URL: `${server.baseUrl}/native-release-manifest.json`,
@@ -254,7 +254,7 @@ describe('native asset helpers', () => {
           arch: 'x64',
         });
 
-        assert.equal(hydrated, resolveCachedNativeBinaryPath('omx-sparkshell', '0.8.15', 'linux', 'x64', {
+        assert.equal(hydrated, resolveCachedNativeBinaryPath('omcp-sparkshell', '0.8.15', 'linux', 'x64', {
           OMX_NATIVE_CACHE_DIR: cacheDir,
         }, 'musl'));
         assert.equal(await readFile(hydrated!, 'utf-8'), '#!/bin/sh\necho hydrated-nested\n');
@@ -267,7 +267,7 @@ describe('native asset helpers', () => {
   });
 
   it('returns undefined when the native release manifest is unavailable', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-native-hydrate-missing-manifest-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-native-hydrate-missing-manifest-'));
     try {
       await writeFile(join(wd, 'package.json'), JSON.stringify({
         version: '0.8.15',
@@ -278,7 +278,7 @@ describe('native asset helpers', () => {
       await mkdir(missingRoot, { recursive: true });
       const server = await startStaticServer(missingRoot);
       try {
-        const hydrated = await hydrateNativeBinary('omx-sparkshell', {
+        const hydrated = await hydrateNativeBinary('omcp-sparkshell', {
           packageRoot: wd,
           env: {
             OMX_NATIVE_MANIFEST_URL: `${server.baseUrl}/native-release-manifest.json`,

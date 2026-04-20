@@ -22,7 +22,7 @@ describe('agents-md helpers', () => {
 
     assert.match(
       result,
-      /<!-- END AUTONOMY DIRECTIVE -->\n<!-- omx:generated:agents-md -->\n# oh-my-copilot - Intelligent Multi-Agent Orchestration/,
+      /<!-- END AUTONOMY DIRECTIVE -->\n<!-- omcp:generated:agents-md -->\n# oh-my-copilot - Intelligent Multi-Agent Orchestration/,
     );
   });
 

@@ -796,7 +796,7 @@ function getSharedMcpRegistryBlock(
   const lines = [
     "# ============================================================",
     `# ${SHARED_MCP_REGISTRY_MARKER}`,
-    "# Managed by omx setup - edit the registry file instead",
+    "# Managed by omcp setup - edit the registry file instead",
   ];
   if (sourcePath) {
     lines.push(`# Source: ${sourcePath}`);
@@ -852,7 +852,7 @@ function getOmxTablesBlock(pkgRoot: string, includeTui = true): string {
     "",
     "# ============================================================",
     "# oh-my-copilot (OMCP) Configuration",
-    "# Managed by omx setup - manual edits preserved on next setup",
+    "# Managed by omcp setup - manual edits preserved on next setup",
     "# ============================================================",
     "",
     "# OMCP State Management MCP Server",
@@ -978,7 +978,7 @@ export function buildMergedConfig(
 /**
  * Detect and repair upgrade-era managed config incompatibilities in config.toml.
  *
- * After an omx version upgrade the OLD setup code (still loaded in memory)
+ * After an omcp version upgrade the OLD setup code (still loaded in memory)
  * may leave a config with duplicate [tui] sections or the retired
  * [mcp_servers.omx_team_run] table. Codex rejects duplicate tables and newer
  * OMCP builds no longer ship the team MCP entrypoint, so we repair both before

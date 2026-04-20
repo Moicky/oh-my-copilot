@@ -27,7 +27,7 @@ async function loadModule(rel: string) {
 }
 
 async function withTempWorkingDir(run: (cwd: string) => Promise<void>): Promise<void> {
-  const cwd = await mkdtemp(join(tmpdir(), 'omx-regression-205-'));
+  const cwd = await mkdtemp(join(tmpdir(), 'omcp-regression-205-'));
   try {
     await run(cwd);
   } finally {
@@ -206,8 +206,8 @@ describe('regression-205: notify-hook ignores "if you want" for default auto-nud
 
   it('does not record pending stall state for permission-seeking "if you want" text', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const stateDir = join(cwd, '.omx', 'state');
-      const logsDir = join(cwd, '.omx', 'logs');
+      const stateDir = join(cwd, '.omcp', 'state');
+      const logsDir = join(cwd, '.omcp', 'logs');
       const codexHome = join(cwd, 'codex-home');
       const fakeBinDir = join(cwd, 'fake-bin');
       const tmuxLogPath = join(cwd, 'tmux.log');
@@ -217,7 +217,7 @@ describe('regression-205: notify-hook ignores "if you want" for default auto-nud
       await mkdir(codexHome, { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
 
-      await writeJson(join(codexHome, '.omx-config.json'), {
+      await writeJson(join(codexHome, '.omcp-config.json'), {
         autoNudge: { enabled: true, delaySec: 0 },
       });
       await writeSessionStart(cwd, 'sess-managed-regression');
@@ -274,7 +274,7 @@ describe('regression-205: resolveTeamStateDirForWorker is exported from team-wor
     }
   });
 
-  it('falls back to {cwd}/.omx/state when no env var and no team dir exists', async () => {
+  it('falls back to {cwd}/.omcp/state when no env var and no team dir exists', async () => {
     const { resolveTeamStateDirForWorker } = await loadModule('notify-hook/team-worker.js');
     const savedRoot = process.env.OMX_TEAM_STATE_ROOT;
     const savedLeader = process.env.OMX_TEAM_LEADER_CWD;
@@ -286,7 +286,7 @@ describe('regression-205: resolveTeamStateDirForWorker is exported from team-wor
         cwd,
         { teamName: 'fix-ts', workerName: 'worker-1' },
       );
-      assert.equal(result, join(cwd, '.omx', 'state'));
+      assert.equal(result, join(cwd, '.omcp', 'state'));
     } finally {
       if (savedRoot === undefined) {
         delete process.env.OMX_TEAM_STATE_ROOT;

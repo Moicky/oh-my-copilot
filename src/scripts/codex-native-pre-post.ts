@@ -185,7 +185,7 @@ function buildOmxParityFallbackCommand(payload: CodexHookPayload, toolName: stri
   const target = resolveOmxParityTarget(toolName);
   if (!target) return null;
   const input = safeObject(payload.tool_input) ?? {};
-  return `omx ${target.command} ${target.tool} --input ${shellSingleQuote(JSON.stringify(input))} --json`;
+  return `omcp ${target.command} ${target.tool} --input ${shellSingleQuote(JSON.stringify(input))} --json`;
 }
 
 const LORE_TRAILER_PREFIXES = [
@@ -200,7 +200,7 @@ const LORE_TRAILER_PREFIXES = [
   "Related:",
 ] as const;
 
-const OMX_COAUTHOR_TRAILER = "Co-authored-by: OmX <omx@oh-my-copilot.dev>";
+const OMX_COAUTHOR_TRAILER = "Co-authored-by: OmX <omcp@oh-my-copilot.dev>";
 
 function isDoubleQuotedShellEscapeTarget(char: string | undefined): boolean {
   return char === "\"" || char === "\\" || char === "$" || char === "`" || char === "\n";
@@ -556,7 +556,7 @@ function buildGitCommitEnforcementOutput(commandText: string): Record<string, un
       ].join("\n"),
     },
     systemMessage: [
-      "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omx@oh-my-copilot.dev>`.",
+      "git commit is blocked until the inline commit message follows the Lore protocol and includes `Co-authored-by: OmX <omcp@oh-my-copilot.dev>`.",
       ...errors.map((error) => `- ${error}`),
     ].join("\n"),
   };
@@ -599,7 +599,7 @@ export function buildNativePostToolUseOutput(
       hookSpecificOutput: {
         hookEventName: "PostToolUse",
         additionalContext:
-          `Clear MCP transport-death signal detected. Preserve current team/runtime state. ${fallbackText} OMCP MCP servers are plain Node stdio processes, so they still shut down when stdin/transport closes. If this happened during team runtime, inspect first with \`omx team status <team>\` or \`omx team api read-stall-state --input '{"team_name":"<team>"}' --json\`, and only force cleanup after capturing needed state. For root-cause debugging, rerun with \`OMX_MCP_TRANSPORT_DEBUG=1\` to log why the stdio transport closed.`,
+          `Clear MCP transport-death signal detected. Preserve current team/runtime state. ${fallbackText} OMCP MCP servers are plain Node stdio processes, so they still shut down when stdin/transport closes. If this happened during team runtime, inspect first with \`omcp team status <team>\` or \`omcp team api read-stall-state --input '{"team_name":"<team>"}' --json\`, and only force cleanup after capturing needed state. For root-cause debugging, rerun with \`OMX_MCP_TRANSPORT_DEBUG=1\` to log why the stdio transport closed.`,
       },
     };
   }

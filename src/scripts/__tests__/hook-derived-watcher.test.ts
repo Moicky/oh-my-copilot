@@ -20,17 +20,17 @@ function todaySessionDir(baseHome: string): string {
 
 describe('hook-derived-watcher', () => {
   it('dispatches needs-input for assistant_message content arrays', async () => {
-    const base = await mkdtemp(join(tmpdir(), 'omx-hook-derived-array-'));
+    const base = await mkdtemp(join(tmpdir(), 'omcp-hook-derived-array-'));
     const homeDir = join(base, 'home');
     const cwd = join(base, 'cwd');
-    const hookLogPath = join(cwd, '.omx', 'hook-events.jsonl');
+    const hookLogPath = join(cwd, '.omcp', 'hook-events.jsonl');
 
     try {
       await mkdir(todaySessionDir(homeDir), { recursive: true });
-      await mkdir(join(cwd, '.omx', 'hooks'), { recursive: true });
+      await mkdir(join(cwd, '.omcp', 'hooks'), { recursive: true });
 
       await writeFile(
-        join(cwd, '.omx', 'hooks', 'capture-needs-input.mjs'),
+        join(cwd, '.omcp', 'hooks', 'capture-needs-input.mjs'),
         `import { appendFile, mkdir } from 'node:fs/promises';
 import { dirname } from 'node:path';
 

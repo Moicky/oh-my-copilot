@@ -10,12 +10,12 @@ import {
 } from "../mcp-registry.js";
 
 describe("unified MCP registry loader", () => {
-  it("prefers ~/.omx/mcp-registry.json over ~/.omc/mcp-registry.json", async () => {
-    const wd = await mkdtemp(join(tmpdir(), "omx-mcp-registry-"));
+  it("prefers ~/.omcp/mcp-registry.json over ~/.omc/mcp-registry.json", async () => {
+    const wd = await mkdtemp(join(tmpdir(), "omcp-mcp-registry-"));
     try {
-      const omxPath = join(wd, ".omx", "mcp-registry.json");
+      const omxPath = join(wd, ".omcp", "mcp-registry.json");
       const omcPath = join(wd, ".omc", "mcp-registry.json");
-      await mkdir(join(wd, ".omx"), { recursive: true });
+      await mkdir(join(wd, ".omcp"), { recursive: true });
       await mkdir(join(wd, ".omc"), { recursive: true });
 
       await writeFile(
@@ -41,7 +41,7 @@ describe("unified MCP registry loader", () => {
   });
 
   it("loads a legacy registry when it is passed explicitly as a candidate", async () => {
-    const wd = await mkdtemp(join(tmpdir(), "omx-mcp-registry-"));
+    const wd = await mkdtemp(join(tmpdir(), "omcp-mcp-registry-"));
     try {
       const omcPath = join(wd, ".omc", "mcp-registry.json");
       await mkdir(join(wd, ".omc"), { recursive: true });
@@ -63,7 +63,7 @@ describe("unified MCP registry loader", () => {
   });
 
   it("skips invalid entries but keeps valid entries from the same file", async () => {
-    const wd = await mkdtemp(join(tmpdir(), "omx-mcp-registry-"));
+    const wd = await mkdtemp(join(tmpdir(), "omcp-mcp-registry-"));
     try {
       const registryPath = join(wd, "registry.json");
       await writeFile(
@@ -88,7 +88,7 @@ describe("unified MCP registry loader", () => {
   });
 
   it("preserves string approval_mode values and warns on non-string ones", async () => {
-    const wd = await mkdtemp(join(tmpdir(), "omx-mcp-registry-"));
+    const wd = await mkdtemp(join(tmpdir(), "omcp-mcp-registry-"));
     try {
       const registryPath = join(wd, "registry.json");
       await writeFile(
@@ -136,7 +136,7 @@ describe("unified MCP registry loader", () => {
 
   it("returns canonical home-based registry candidates", () => {
     const candidates = getUnifiedMcpRegistryCandidates("/tmp/home");
-    assert.deepEqual(candidates, ["/tmp/home/.omx/mcp-registry.json"]);
+    assert.deepEqual(candidates, ["/tmp/home/.omcp/mcp-registry.json"]);
   });
   it("plans Claude settings sync by adding only missing shared servers", () => {
     const plan = planClaudeCodeMcpSettingsSync(

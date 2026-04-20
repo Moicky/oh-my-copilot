@@ -43,7 +43,7 @@ slugify() {
     | cut -c1-30
 }
 
-require_bin omx
+require_bin omcp
 require_bin jq
 require_bin tmux
 
@@ -79,9 +79,9 @@ TEAM_STARTED=0
 cleanup() {
   if ((TEAM_STARTED == 1)); then
     echo "[cleanup] shutting down team: $TEAM_NAME"
-    omx team shutdown "$TEAM_NAME" >/dev/null 2>&1 || true
+    omcp team shutdown "$TEAM_NAME" >/dev/null 2>&1 || true
     echo "[cleanup] cleaning state for team: $TEAM_NAME"
-    omx team api cleanup --input "{\"team_name\":\"$TEAM_NAME\"}" --json >/dev/null 2>&1 || true
+    omcp team api cleanup --input "{\"team_name\":\"$TEAM_NAME\"}" --json >/dev/null 2>&1 || true
   fi
 }
 trap cleanup EXIT
@@ -98,12 +98,12 @@ echo "coordinated through the OMCP team orchestration system."
 echo ""
 
 echo "[1/10] Starting team with ${WORKER_COUNT} Claude workers..."
-omx team "${WORKER_COUNT}:executor" "$TEAM_TASK"
+omcp team "${WORKER_COUNT}:executor" "$TEAM_TASK"
 TEAM_STARTED=1
 echo ""
 
 echo "[2/10] Checking team status..."
-omx team status "$TEAM_NAME"
+omcp team status "$TEAM_NAME"
 echo ""
 
 echo "[3/10] Creating distributed tasks for workers..."
@@ -116,7 +116,7 @@ for i in $(seq 1 "$WORKER_COUNT"); do
     --arg description "$TASK_DESC" \
     --arg owner "worker-$i" \
     '{team_name:$team,subject:$subject,description:$description,owner:$owner}')"
-  CREATE_JSON="$(omx team api create-task --input "$CREATE_INPUT" --json)"
+  CREATE_JSON="$(omcp team api create-task --input "$CREATE_INPUT" --json)"
   TASK_ID="$(echo "$CREATE_JSON" | jq -r '.data.task.id // empty')"
   if [[ -n "$TASK_ID" ]]; then
     echo "  Created task $TASK_ID for worker-$i"
@@ -126,14 +126,14 @@ echo ""
 
 echo "[4/10] Listing all tasks..."
 LIST_INPUT="$(jq -nc --arg team "$TEAM_NAME" '{team_name:$team}')"
-omx team api list-tasks --input "$LIST_INPUT" --json | jq -r '.data.tasks[] | "  Task \(.id): \(.subject) [\(.status)]"'
+omcp team api list-tasks --input "$LIST_INPUT" --json | jq -r '.data.tasks[] | "  Task \(.id): \(.subject) [\(.status)]"'
 echo ""
 
 echo "[5/10] Workers claiming their assigned tasks..."
 for i in $(seq 1 "$WORKER_COUNT"); do
   WORKER_NAME="worker-$i"
   # Find task assigned to this worker
-  TASK_ID="$(omx team api list-tasks --input "$(jq -nc --arg team "$TEAM_NAME" '{team_name:$team}')" --json | \
+  TASK_ID="$(omcp team api list-tasks --input "$(jq -nc --arg team "$TEAM_NAME" '{team_name:$team}')" --json | \
     jq -r --arg owner "$WORKER_NAME" '.data.tasks[] | select(.owner == $owner) | .id' | head -1)"
 
   if [[ -n "$TASK_ID" ]]; then
@@ -142,7 +142,7 @@ for i in $(seq 1 "$WORKER_COUNT"); do
       --arg task "$TASK_ID" \
       --arg worker "$WORKER_NAME" \
       '{team_name:$team,task_id:$task,worker:$worker,expected_version:1}')"
-    CLAIM_JSON="$(omx team api claim-task --input "$CLAIM_INPUT" --json)"
+    CLAIM_JSON="$(omcp team api claim-task --input "$CLAIM_INPUT" --json)"
     if echo "$CLAIM_JSON" | jq -e '.ok' >/dev/null; then
       echo "  $WORKER_NAME claimed task $TASK_ID"
     fi
@@ -154,7 +154,7 @@ echo "[6/10] Simulating work completion - transitioning tasks to completed..."
 for i in $(seq 1 "$WORKER_COUNT"); do
   WORKER_NAME="worker-$i"
   # Get the claimed task for this worker
-  TASK_INFO="$(omx team api list-tasks --input "$(jq -nc --arg team "$TEAM_NAME" '{team_name:$team}')" --json | \
+  TASK_INFO="$(omcp team api list-tasks --input "$(jq -nc --arg team "$TEAM_NAME" '{team_name:$team}')" --json | \
     jq -r --arg owner "$WORKER_NAME" '.data.tasks[] | select(.owner == $owner and .status == "in_progress") | [.id, .claim.token] | @tsv' | head -1)"
 
   if [[ -n "$TASK_INFO" ]]; then
@@ -166,7 +166,7 @@ for i in $(seq 1 "$WORKER_COUNT"); do
       --arg task "$TASK_ID" \
       --arg token "$CLAIM_TOKEN" \
       '{team_name:$team,task_id:$task,from:"in_progress",to:"completed",claim_token:$token}')"
-    omx team api transition-task-status --input "$TRANSITION_INPUT" --json >/dev/null
+    omcp team api transition-task-status --input "$TRANSITION_INPUT" --json >/dev/null
     echo "  $WORKER_NAME completed task $TASK_ID"
   fi
 done
@@ -180,7 +180,7 @@ for i in $(seq 1 "$WORKER_COUNT"); do
     --arg to "worker-$i" \
     --arg body "Hello from leader! Great work on the demo task." \
     '{team_name:$team,from_worker:"leader-fixed",to_worker:$to,body:$body}')"
-  omx team api send-message --input "$SEND_INPUT" --json >/dev/null
+  omcp team api send-message --input "$SEND_INPUT" --json >/dev/null
   echo "  Sent message to worker-$i"
 done
 
@@ -188,7 +188,7 @@ done
 for i in $(seq 1 "$WORKER_COUNT"); do
   WORKER_NAME="worker-$i"
   MAILBOX_INPUT="$(jq -nc --arg team "$TEAM_NAME" --arg worker "$WORKER_NAME" '{team_name:$team,worker:$worker}')"
-  MAILBOX_JSON="$(omx team api mailbox-list --input "$MAILBOX_INPUT" --json)"
+  MAILBOX_JSON="$(omcp team api mailbox-list --input "$MAILBOX_INPUT" --json)"
   MESSAGE_COUNT="$(echo "$MAILBOX_JSON" | jq -r '.data.messages | length')"
   echo "  $WORKER_NAME has $MESSAGE_COUNT messages in mailbox"
 done
@@ -199,14 +199,14 @@ BROADCAST_INPUT="$(jq -nc \
   --arg team "$TEAM_NAME" \
   --arg body "Sync checkpoint: All workers verify tmux coordination complete" \
   '{team_name:$team,from_worker:"leader-fixed",body:$body}')"
-BROADCAST_RESULT="$(omx team api broadcast --input "$BROADCAST_INPUT" --json)"
+BROADCAST_RESULT="$(omcp team api broadcast --input "$BROADCAST_INPUT" --json)"
 BROADCAST_COUNT="$(echo "$BROADCAST_RESULT" | jq -r '.data.count')"
 echo "  Broadcasted to $BROADCAST_COUNT workers"
 echo ""
 
 echo "[9/10] Verifying team summary..."
 SUMMARY_INPUT="$(jq -nc --arg team "$TEAM_NAME" '{team_name:$team}')"
-SUMMARY_JSON="$(omx team api get-summary --input "$SUMMARY_INPUT" --json)"
+SUMMARY_JSON="$(omcp team api get-summary --input "$SUMMARY_INPUT" --json)"
 echo "$SUMMARY_JSON" | jq -e '.schema_version == "1.0" and .operation == "get-summary" and .ok == true' >/dev/null
 
 # Extract and display summary stats
@@ -219,8 +219,8 @@ echo "  Alive workers: $ALIVE_WORKERS"
 echo ""
 
 echo "[10/10] Shutting down team and cleaning up..."
-omx team shutdown "$TEAM_NAME"
-omx team api cleanup --input "{\"team_name\":\"$TEAM_NAME\"}" --json >/dev/null
+omcp team shutdown "$TEAM_NAME"
+omcp team api cleanup --input "{\"team_name\":\"$TEAM_NAME\"}" --json >/dev/null
 TEAM_STARTED=0
 echo ""
 

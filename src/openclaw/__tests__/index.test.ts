@@ -15,7 +15,7 @@ describe("wakeOpenClaw", () => {
 
   beforeEach(() => {
     originalEnv = { ...process.env };
-    tmpDir = join(tmpdir(), `omx-openclaw-index-test-${Date.now()}`);
+    tmpDir = join(tmpdir(), `omcp-openclaw-index-test-${Date.now()}`);
     mkdirSync(tmpDir, { recursive: true });
   });
 

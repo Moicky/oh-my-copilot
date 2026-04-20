@@ -15,7 +15,7 @@ function runOmx(
 ): { status: number | null; stdout: string; stderr: string; error?: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omx.js');
+  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
   const r = spawnSync(process.execPath, [omxBin, ...argv], {
     cwd,
     encoding: 'utf-8',
@@ -101,9 +101,9 @@ describe('parseAskArgs', () => {
   });
 });
 
-describe('omx ask', () => {
+describe('omcp ask', () => {
   it('script usage documents provider-specific long flags from CLI help', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-ask-usage-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-ask-usage-'));
     try {
       const res = runProviderAdvisorScript(wd, []);
       if (shouldSkipForSpawnPermissions(res.error)) return;
@@ -117,7 +117,7 @@ describe('omx ask', () => {
   });
 
   it('preserves child stdout/stderr and exact non-zero exit code', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-ask-contract-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-ask-contract-'));
     try {
       const res = runOmx(wd, ['ask', 'claude', 'pass-through'], {
         OMX_ASK_ADVISOR_SCRIPT: 'dist/scripts/fixtures/ask-advisor-stub.js',
@@ -136,7 +136,7 @@ describe('omx ask', () => {
   });
 
   it('resolves relative advisor override path from package root even on non-root cwd', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-ask-relative-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-ask-relative-'));
     try {
       const res = runOmx(wd, ['ask', 'gemini', 'relative-check'], {
         OMX_ASK_ADVISOR_SCRIPT: 'dist/scripts/fixtures/ask-advisor-stub.js',
@@ -153,7 +153,7 @@ describe('omx ask', () => {
   });
 
   it('uses package-root advisor script path from non-package cwd and still writes artifact', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-ask-nonroot-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-ask-nonroot-'));
     try {
       const fakeBin = join(wd, 'bin');
       await mkdir(fakeBin, { recursive: true });
@@ -170,7 +170,7 @@ describe('omx ask', () => {
 
       assert.equal(res.status, 0, res.stderr || res.stdout);
       const artifactPath = res.stdout.trim();
-      assert.ok(artifactPath.startsWith(join(wd, '.omx', 'artifacts', 'claude-')));
+      assert.ok(artifactPath.startsWith(join(wd, '.omcp', 'artifacts', 'claude-')));
       assert.equal(existsSync(artifactPath), true);
       const artifact = await readFile(artifactPath, 'utf-8');
       assert.match(artifact, /NONROOT_DEFAULT_OK/);
@@ -179,8 +179,8 @@ describe('omx ask', () => {
     }
   });
 
-  it('supports claude --print and gemini --prompt end-to-end through omx ask', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-ask-provider-flags-'));
+  it('supports claude --print and gemini --prompt end-to-end through omcp ask', async () => {
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-ask-provider-flags-'));
     try {
       const fakeBin = join(wd, 'bin');
       await mkdir(fakeBin, { recursive: true });
@@ -219,7 +219,7 @@ describe('omx ask', () => {
   });
 
   it('adds Claude skip-permissions for issue-work prompts only', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-ask-issue-permissions-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-ask-issue-permissions-'));
     try {
       const fakeBin = join(wd, 'bin');
       await mkdir(fakeBin, { recursive: true });
@@ -251,7 +251,7 @@ describe('omx ask', () => {
   });
 
   it('injects --agent-prompt content into final prompt while keeping Original task raw', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-ask-agent-prompt-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-ask-agent-prompt-'));
     try {
       const fakeBin = join(wd, 'bin');
       const codexHome = join(wd, '.codex-home');
@@ -291,7 +291,7 @@ describe('omx ask', () => {
   });
 
   it('fails clearly when --agent-prompt role is missing from prompts directory', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-ask-agent-prompt-missing-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-ask-agent-prompt-missing-'));
     try {
       const fakeBin = join(wd, 'bin');
       const codexHome = join(wd, '.codex-home');

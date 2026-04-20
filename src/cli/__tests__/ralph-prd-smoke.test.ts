@@ -16,7 +16,7 @@ function runOmx(
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omx.js');
+  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
   const result = spawnSync(process.execPath, [omxBin, ...argv], {
     cwd,
     encoding: 'utf-8',
@@ -77,13 +77,13 @@ async function writePrdJson(
   cwd: string,
   payload: Record<string, unknown>,
 ): Promise<void> {
-  await mkdir(join(cwd, '.omx'), { recursive: true });
-  await writeFile(join(cwd, '.omx', 'prd.json'), JSON.stringify(payload, null, 2));
+  await mkdir(join(cwd, '.omcp'), { recursive: true });
+  await writeFile(join(cwd, '.omcp', 'prd.json'), JSON.stringify(payload, null, 2));
 }
 
-describe('omx ralph --prd smoke gate', () => {
-  it('aborts before Codex launch when .omx/prd.json is missing', async () => {
-    const cwd = await initRepo('omx-ralph-prd-smoke-');
+describe('omcp ralph --prd smoke gate', () => {
+  it('aborts before Codex launch when .omcp/prd.json is missing', async () => {
+    const cwd = await initRepo('omcp-ralph-prd-smoke-');
     const home = join(cwd, 'home');
     const fakeBin = join(cwd, 'bin');
     const launchLog = join(cwd, 'codex-launch.log');
@@ -95,7 +95,7 @@ describe('omx ralph --prd smoke gate', () => {
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
       assert.notEqual(result.status, 0, result.error || result.stderr || result.stdout);
-      assert.match(`${result.stderr}\n${result.stdout}`, /Missing required PRD\.json at \.omx\/prd\.json/);
+      assert.match(`${result.stderr}\n${result.stdout}`, /Missing required PRD\.json at \.omcp\/prd\.json/);
       assert.equal(existsSync(launchLog), false, 'expected no Codex launch log when PRD gate fails');
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -103,21 +103,21 @@ describe('omx ralph --prd smoke gate', () => {
   });
 
   it('aborts before Codex launch when only canonical PRD markdown exists', async () => {
-    const cwd = await initRepo('omx-ralph-prd-smoke-');
+    const cwd = await initRepo('omcp-ralph-prd-smoke-');
     const home = join(cwd, 'home');
     const fakeBin = join(cwd, 'bin');
     const launchLog = join(cwd, 'codex-launch.log');
     try {
       await mkdir(home, { recursive: true });
       await installFakeCodex(fakeBin, launchLog);
-      await mkdir(join(cwd, '.omx', 'plans'), { recursive: true });
-      await writeFile(join(cwd, '.omx', 'plans', 'prd-existing.md'), '# Existing canonical PRD\n', 'utf-8');
+      await mkdir(join(cwd, '.omcp', 'plans'), { recursive: true });
+      await writeFile(join(cwd, '.omcp', 'plans', 'prd-existing.md'), '# Existing canonical PRD\n', 'utf-8');
 
       const result = runOmx(cwd, ['ralph', '--prd', 'ship release checklist'], buildEnv(home, fakeBin));
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
       assert.notEqual(result.status, 0, result.error || result.stderr || result.stdout);
-      assert.match(`${result.stderr}\n${result.stdout}`, /Missing required PRD\.json at \.omx\/prd\.json/);
+      assert.match(`${result.stderr}\n${result.stdout}`, /Missing required PRD\.json at \.omcp\/prd\.json/);
       assert.equal(existsSync(launchLog), false, 'expected no Codex launch log when only canonical markdown exists');
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -125,7 +125,7 @@ describe('omx ralph --prd smoke gate', () => {
   });
 
   it('aborts before Codex launch when a completed story lacks architect approval', async () => {
-    const cwd = await initRepo('omx-ralph-prd-smoke-');
+    const cwd = await initRepo('omcp-ralph-prd-smoke-');
     const home = join(cwd, 'home');
     const fakeBin = join(cwd, 'bin');
     const launchLog = join(cwd, 'codex-launch.log');
@@ -152,8 +152,8 @@ describe('omx ralph --prd smoke gate', () => {
     }
   });
 
-  it('launches Codex exactly once when .omx/prd.json is valid', async () => {
-    const cwd = await initRepo('omx-ralph-prd-smoke-');
+  it('launches Codex exactly once when .omcp/prd.json is valid', async () => {
+    const cwd = await initRepo('omcp-ralph-prd-smoke-');
     const home = join(cwd, 'home');
     const fakeBin = join(cwd, 'bin');
     const launchLog = join(cwd, 'codex-launch.log');

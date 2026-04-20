@@ -5,7 +5,7 @@ description: Stateful validator-gated research loop with native-hook persistence
 
 # Autoresearch
 
-Autoresearch is the skill-first replacement for the deprecated `omx autoresearch` command.
+Autoresearch is the skill-first replacement for the deprecated `omcp autoresearch` command.
 It keeps the useful measured-research loop, but it now runs as a native-hook stateful workflow instead of a direct CLI or tmux launch surface.
 
 ## Use when
@@ -14,7 +14,7 @@ It keeps the useful measured-research loop, but it now runs as a native-hook sta
 - You want init-time choice between script validation and prompt+architect validation
 
 ## Do not use when
-- You want the old `omx autoresearch` command surface (hard-deprecated)
+- You want the old `omcp autoresearch` command surface (hard-deprecated)
 - You want detached tmux or split-pane launch parity
 - You have not decided the validation regime yet
 
@@ -22,7 +22,7 @@ It keeps the useful measured-research loop, but it now runs as a native-hook sta
 1. **Init chooses validation mode.** Pick exactly one:
    - `mission-validator-script`
    - `prompt-architect-artifact`
-2. **Persist mode state** in `.omx/state/.../autoresearch-state.json` including:
+2. **Persist mode state** in `.omcp/state/.../autoresearch-state.json` including:
    - `validation_mode`
    - `completion_artifact_path`
    - `mission_validator_command` **or** `validator_prompt`
@@ -50,19 +50,19 @@ The completion artifact must include both an architect approval verdict and an o
 {
   "validator_prompt": "Review the research output against the mission.",
   "architect_review": { "verdict": "approved" },
-  "output_artifact_path": ".omx/specs/autoresearch-demo/report.md"
+  "output_artifact_path": ".omcp/specs/autoresearch-demo/report.md"
 }
 ```
 
 ## Recommended flow
 1. Run `$deep-interview --autoresearch` to clarify mission + evaluator.
-2. Materialize `.omx/specs/autoresearch-{slug}/mission.md`, `sandbox.md`, and `result.json`.
+2. Materialize `.omcp/specs/autoresearch-{slug}/mission.md`, `sandbox.md`, and `result.json`.
 3. Start `$autoresearch` with the chosen validation mode stored in mode state.
 4. Let stop-hook / auto-nudge continue until the completion artifact satisfies the chosen validation mode.
 5. Finish only after the validator artifact is complete.
 
 ## Migration note
-- `omx autoresearch` is hard-deprecated.
+- `omcp autoresearch` is hard-deprecated.
 - No direct CLI launch.
 - No tmux split-pane launch.
 - No noop-count completion gate.

@@ -19,7 +19,7 @@ import {
 } from '../idle-cooldown.js';
 
 function makeTmpStateDir(): string {
-  const dir = join(tmpdir(), `omx-cooldown-test-${Math.random().toString(36).slice(2)}`);
+  const dir = join(tmpdir(), `omcp-cooldown-test-${Math.random().toString(36).slice(2)}`);
   mkdirSync(dir, { recursive: true });
   return dir;
 }

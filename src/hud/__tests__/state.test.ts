@@ -49,7 +49,7 @@ async function withTempRepo(prefix: string, run: (cwd: string) => Promise<void>)
 }
 
 async function writeModeState(cwd: string, mode: string, state: unknown): Promise<void> {
-  const stateDir = join(cwd, '.omx', 'state');
+  const stateDir = join(cwd, '.omcp', 'state');
   await mkdir(stateDir, { recursive: true });
   await writeFile(join(stateDir, mode + '-state.json'), JSON.stringify(state));
 }
@@ -82,7 +82,7 @@ async function createWorktreePointerFixture(cwd: string, options: { withOrigin?:
 
 describe('readGitBranch', () => {
   it('returns null in a non-git directory without printing git fatal noise', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-hud-state-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-hud-state-'));
     const stderrChunks: string[] = [];
     const originalWrite = process.stderr.write.bind(process.stderr);
 
@@ -107,7 +107,7 @@ describe('readGitBranch', () => {
   });
 
   it('uses the Windows fast path for worktree .git file pointers', async () => {
-    await withTempRepo('omx-hud-worktree-branch-', async (cwd) => {
+    await withTempRepo('omcp-hud-worktree-branch-', async (cwd) => {
       await createWorktreePointerFixture(cwd);
       await withWindowsPlatform(() => {
         assert.equal(readGitBranch(cwd), 'worktree-branch');
@@ -196,7 +196,7 @@ describe('buildGitBranchLabel', () => {
   });
 
   it('does not execute shell metacharacters from config.git.remoteName in the non-Windows fallback path', { skip: process.platform === 'win32' }, async () => {
-    await withTempRepo('omx-hud-remote-name-shell-', async (cwd) => {
+    await withTempRepo('omcp-hud-remote-name-shell-', async (cwd) => {
       initGitRepo(cwd);
       const markerPath = join(cwd, 'remote-name-injected');
       const maliciousRemoteName = `origin; touch ${markerPath}`;
@@ -212,7 +212,7 @@ describe('buildGitBranchLabel', () => {
   });
 
   it('resolves remote config from the git common dir for worktree pointers on Windows', async () => {
-    await withTempRepo('omx-hud-worktree-remote-', async (cwd) => {
+    await withTempRepo('omcp-hud-worktree-remote-', async (cwd) => {
       await createWorktreePointerFixture(cwd);
       await withWindowsPlatform(() => {
         assert.equal(buildGitBranchLabel(cwd), 'worktree-repo/worktree-branch');
@@ -221,7 +221,7 @@ describe('buildGitBranchLabel', () => {
   });
 
   it('keeps the worktree root for --show-toplevel fallback on Windows worktrees', async () => {
-    await withTempRepo('omx-hud-worktree-top-', async (cwd) => {
+    await withTempRepo('omcp-hud-worktree-top-', async (cwd) => {
       await createWorktreePointerFixture(cwd, { withOrigin: false });
       await withWindowsPlatform(() => {
         assert.equal(buildGitBranchLabel(cwd), `${basename(cwd)}/worktree-branch`);
@@ -232,8 +232,8 @@ describe('buildGitBranchLabel', () => {
 
 describe('readRalphState scope precedence', () => {
   it('prefers session-scoped Ralph state when session.json points to a session', async () => {
-    await withTempRepo('omx-hud-ralph-session-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-ralph-session-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-hud';
       const sessionStateDir = join(rootStateDir, 'sessions', sessionId);
       await mkdir(sessionStateDir, { recursive: true });
@@ -248,8 +248,8 @@ describe('readRalphState scope precedence', () => {
   });
 
   it('does not fall back to root Ralph state when current session has no Ralph state file', async () => {
-    await withTempRepo('omx-hud-ralph-fallback-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-ralph-fallback-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-fallback';
       await mkdir(join(rootStateDir, 'sessions', sessionId), { recursive: true });
       await writeFile(join(rootStateDir, 'session.json'), JSON.stringify({ session_id: sessionId }));
@@ -261,8 +261,8 @@ describe('readRalphState scope precedence', () => {
   });
 
   it('ignores session.json authority when it points at another worktree cwd', async () => {
-    await withTempRepo('omx-hud-ralph-cwd-mismatch-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-ralph-cwd-mismatch-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-mismatch';
       await mkdir(join(rootStateDir, 'sessions', sessionId), { recursive: true });
       await writeFile(join(rootStateDir, 'session.json'), JSON.stringify({
@@ -278,8 +278,8 @@ describe('readRalphState scope precedence', () => {
   });
 
   it('treats session-scoped inactive Ralph state as authoritative over active root fallback', async () => {
-    await withTempRepo('omx-hud-ralph-authority-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-ralph-authority-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-authority';
       const sessionStateDir = join(rootStateDir, 'sessions', sessionId);
       await mkdir(sessionStateDir, { recursive: true });
@@ -293,8 +293,8 @@ describe('readRalphState scope precedence', () => {
   });
 
   it('does not treat another session-scoped Ralph state as active for the current session', async () => {
-    await withTempRepo('omx-hud-ralph-other-session-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-ralph-other-session-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const currentSessionId = 'sess-current';
       const otherSessionId = 'sess-other';
       await mkdir(join(rootStateDir, 'sessions', currentSessionId), { recursive: true });
@@ -314,7 +314,7 @@ describe('readRalphState scope precedence', () => {
 
 describe('additional HUD mode state readers', () => {
   it('reads active ralplan state', async () => {
-    await withTempRepo('omx-hud-ralplan-', async (cwd) => {
+    await withTempRepo('omcp-hud-ralplan-', async (cwd) => {
       await writeModeState(cwd, 'ralplan', { active: true, current_phase: 'review', iteration: 2, planning_complete: false });
       const state = await readRalplanState(cwd);
       assert.deepEqual(state, { active: true, current_phase: 'review', iteration: 2, planning_complete: false });
@@ -322,15 +322,15 @@ describe('additional HUD mode state readers', () => {
   });
 
   it('returns null for inactive ralplan state', async () => {
-    await withTempRepo('omx-hud-ralplan-inactive-', async (cwd) => {
+    await withTempRepo('omcp-hud-ralplan-inactive-', async (cwd) => {
       await writeModeState(cwd, 'ralplan', { active: false, current_phase: 'complete' });
       assert.equal(await readRalplanState(cwd), null);
     });
   });
 
   it('prefers session-scoped ralplan state over root fallback', async () => {
-    await withTempRepo('omx-hud-ralplan-session-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-ralplan-session-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-ralplan-authority';
       const sessionStateDir = join(rootStateDir, 'sessions', sessionId);
       await mkdir(sessionStateDir, { recursive: true });
@@ -344,7 +344,7 @@ describe('additional HUD mode state readers', () => {
   });
 
   it('reads deep-interview input lock from nested state payload', async () => {
-    await withTempRepo('omx-hud-interview-', async (cwd) => {
+    await withTempRepo('omcp-hud-interview-', async (cwd) => {
       await writeModeState(cwd, 'deep-interview', { active: true, current_phase: 'intent-first', input_lock: { active: true } });
       const state = await readDeepInterviewState(cwd);
       assert.deepEqual(state, { active: true, current_phase: 'intent-first', input_lock: { active: true }, input_lock_active: true });
@@ -352,22 +352,22 @@ describe('additional HUD mode state readers', () => {
   });
 
   it('reads active autoresearch state', async () => {
-    await withTempRepo('omx-hud-autoresearch-', async (cwd) => {
+    await withTempRepo('omcp-hud-autoresearch-', async (cwd) => {
       await writeModeState(cwd, 'autoresearch', { active: true, current_phase: 'running' });
       assert.deepEqual(await readAutoresearchState(cwd), { active: true, current_phase: 'running' });
     });
   });
 
   it('reads active ultraqa state', async () => {
-    await withTempRepo('omx-hud-ultraqa-', async (cwd) => {
+    await withTempRepo('omcp-hud-ultraqa-', async (cwd) => {
       await writeModeState(cwd, 'ultraqa', { active: true, current_phase: 'diagnose' });
       assert.deepEqual(await readUltraqaState(cwd), { active: true, current_phase: 'diagnose' });
     });
   });
 
   it('reads hud notify state from the current session scope', async () => {
-    await withTempRepo('omx-hud-notify-session-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-notify-session-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-hud-notify';
       const sessionStateDir = join(rootStateDir, 'sessions', sessionId);
       await mkdir(sessionStateDir, { recursive: true });
@@ -381,9 +381,9 @@ describe('additional HUD mode state readers', () => {
   });
 
   it('keeps hud notify pinned to the canonical OMCP session when session metadata also carries a native session id', async () => {
-    await withTempRepo('omx-hud-notify-native-meta-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
-      const canonicalSessionId = 'omx-canonical-session';
+    await withTempRepo('omcp-hud-notify-native-meta-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
+      const canonicalSessionId = 'omcp-canonical-session';
       const nativeSessionId = 'codex-native-session';
       const canonicalDir = join(rootStateDir, 'sessions', canonicalSessionId);
       const nativeDir = join(rootStateDir, 'sessions', nativeSessionId);
@@ -402,8 +402,8 @@ describe('additional HUD mode state readers', () => {
   });
 
   it('prefers OMX_SESSION_ID over stale session.json for hud notify state', async () => {
-    await withTempRepo('omx-hud-notify-env-session-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-notify-env-session-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const activeSessionId = 'sess-active';
       const staleSessionId = 'sess-stale';
       const activeDir = join(rootStateDir, 'sessions', activeSessionId);
@@ -433,8 +433,8 @@ describe('additional HUD mode state readers', () => {
 
 describe('readAllState canonical skill precedence', () => {
   it('does not surface stale session mode detail when canonical skill state is inactive in legacy shape', async () => {
-    await withTempRepo('omx-hud-canonical-inactive-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-canonical-inactive-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-canonical-off';
       const sessionDir = join(rootStateDir, 'sessions', sessionId);
       await mkdir(sessionDir, { recursive: true });
@@ -458,8 +458,8 @@ describe('readAllState canonical skill precedence', () => {
   });
 
   it('uses canonical session skill state to suppress stale root fallback while preserving session detail', async () => {
-    await withTempRepo('omx-hud-canonical-session-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-canonical-session-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-current';
       const sessionDir = join(rootStateDir, 'sessions', sessionId);
       await mkdir(sessionDir, { recursive: true });
@@ -489,8 +489,8 @@ describe('readAllState canonical skill precedence', () => {
   });
 
   it('prefers canonical team phase over stale team detail current_phase', async () => {
-    await withTempRepo('omx-hud-canonical-team-phase-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-canonical-team-phase-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-team-phase';
       const sessionDir = join(rootStateDir, 'sessions', sessionId);
       const teamDir = join(rootStateDir, 'team', 'alpha');
@@ -523,8 +523,8 @@ describe('readAllState canonical skill precedence', () => {
   });
 
   it('surfaces approved combined workflow state from canonical multi-skill data', async () => {
-    await withTempRepo('omx-hud-canonical-combined-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-canonical-combined-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-combined';
       const sessionDir = join(rootStateDir, 'sessions', sessionId);
       await mkdir(sessionDir, { recursive: true });
@@ -561,8 +561,8 @@ describe('readAllState canonical skill precedence', () => {
   });
 
   it('suppresses stale autoresearch detail when canonical session skill state excludes it', async () => {
-    await withTempRepo('omx-hud-canonical-autoresearch-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-canonical-autoresearch-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-autoresearch-off';
       const sessionDir = join(rootStateDir, 'sessions', sessionId);
       await mkdir(sessionDir, { recursive: true });
@@ -590,8 +590,8 @@ describe('readAllState canonical skill precedence', () => {
   });
 
   it('binds canonical HUD state to OMX_SESSION_ID instead of stale session.json/root fallback', async () => {
-    await withTempRepo('omx-hud-canonical-env-session-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-canonical-env-session-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       const activeSessionId = 'sess-active';
       const staleSessionId = 'sess-stale';
       const activeDir = join(rootStateDir, 'sessions', activeSessionId);
@@ -638,8 +638,8 @@ describe('readAllState canonical skill precedence', () => {
   });
 
   it('preserves root fallback when no usable session or OMX_SESSION_ID exists', async () => {
-    await withTempRepo('omx-hud-canonical-root-fallback-', async (cwd) => {
-      const rootStateDir = join(cwd, '.omx', 'state');
+    await withTempRepo('omcp-hud-canonical-root-fallback-', async (cwd) => {
+      const rootStateDir = join(cwd, '.omcp', 'state');
       await mkdir(rootStateDir, { recursive: true });
       await writeFile(join(rootStateDir, 'session.json'), JSON.stringify({
         session_id: 'sess-stale',

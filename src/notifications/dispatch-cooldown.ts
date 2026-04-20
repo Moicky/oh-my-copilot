@@ -5,9 +5,9 @@
  * minimum interval between dispatches. Similar to idle-cooldown.ts but
  * specifically for dispatch-related notifications.
  *
- * Config key : notifications.dispatchCooldownSeconds in ~/.codex/.omx-config.json
+ * Config key : notifications.dispatchCooldownSeconds in ~/.codex/.omcp-config.json
  * Env var    : OMX_DISPATCH_COOLDOWN_SECONDS  (overrides config)
- * State file : .omx/state/dispatch-notif-cooldown.json
+ * State file : .omcp/state/dispatch-notif-cooldown.json
  *              (session-scoped when sessionId is available)
  *
  * A cooldown value of 0 disables throttling entirely.
@@ -25,7 +25,7 @@ const SESSION_ID_SAFE_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9_-]{0,255}$/;
  *
  * Resolution order:
  *   1. OMX_DISPATCH_COOLDOWN_SECONDS env var
- *   2. notifications.dispatchCooldownSeconds in ~/.codex/.omx-config.json
+ *   2. notifications.dispatchCooldownSeconds in ~/.codex/.omcp-config.json
  *   3. Default: 60 seconds
  */
 export function getDispatchNotificationCooldownSeconds(): number {
@@ -40,7 +40,7 @@ export function getDispatchNotificationCooldownSeconds(): number {
 
   // 2. Config file
   try {
-    const configPath = join(codexHome(), '.omx-config.json');
+    const configPath = join(codexHome(), '.omcp-config.json');
     if (existsSync(configPath)) {
       const raw = JSON.parse(readFileSync(configPath, 'utf-8')) as Record<string, unknown>;
       const notifications = raw?.notifications as Record<string, unknown> | undefined;

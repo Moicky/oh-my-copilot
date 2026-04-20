@@ -8,7 +8,7 @@
  * Usage (from notify hook via wakeOpenClaw):
  *   wakeOpenClaw("session-start", { sessionId, projectPath: directory });
  *
- * Activation requires OMX_OPENCLAW=1 env var and config in .omx-config.json.
+ * Activation requires OMX_OPENCLAW=1 env var and config in .omcp-config.json.
  */
 
 export type {

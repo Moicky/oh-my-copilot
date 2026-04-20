@@ -7,14 +7,14 @@ import { runHudAuthorityTick } from '../authority.js';
 
 describe('runHudAuthorityTick', () => {
   it('writes a live HUD authority owner lease before ticking', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-hud-authority-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-hud-authority-'));
     try {
       await runHudAuthorityTick(
         { cwd, nodePath: '/node', packageRoot: '/pkg' },
         { runProcess: async () => {} },
       );
 
-      const lease = JSON.parse(await readFile(join(cwd, '.omx', 'state', 'notify-fallback-authority-owner.json'), 'utf-8'));
+      const lease = JSON.parse(await readFile(join(cwd, '.omcp', 'state', 'notify-fallback-authority-owner.json'), 'utf-8'));
       assert.equal(lease.owner, 'hud');
       assert.equal(lease.pid, process.pid);
       assert.equal(lease.cwd, cwd);

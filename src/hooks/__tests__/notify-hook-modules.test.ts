@@ -152,7 +152,7 @@ describe('notify-hook/operational-events – parseCommandResult', () => {
 describe('notify-hook/operational-events – buildOperationalContext', () => {
   it('resolves a stable session_name from cwd + session id', async () => {
     const { buildOperationalContext } = await loadModule('notify-hook/operational-events.js');
-    const sessionId = 'omx-issue-663-session';
+    const sessionId = 'omcp-issue-663-session';
     const originalTmux = process.env.TMUX;
     delete process.env.TMUX;
     try {
@@ -165,7 +165,7 @@ describe('notify-hook/operational-events – buildOperationalContext', () => {
 
       assert.equal(typeof context.session_name, 'string');
       assert.notEqual(context.session_name, sessionId);
-      assert.match(context.session_name || '', /^omx-/);
+      assert.match(context.session_name || '', /^omcp-/);
       assert.match(context.session_name || '', /issue-663-session/);
     } finally {
       if (originalTmux === undefined) delete process.env.TMUX;
@@ -180,7 +180,7 @@ describe('notify-hook/operational-events – buildOperationalContext', () => {
     const { join } = await import('node:path');
     const { execFileSync } = await import('node:child_process');
 
-    const repo = await mkdtemp(join(tmpdir(), 'omx-opctx-baseline-'));
+    const repo = await mkdtemp(join(tmpdir(), 'omcp-opctx-baseline-'));
     try {
       execFileSync('git', ['init'], { cwd: repo, stdio: 'ignore' });
       execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: repo, stdio: 'ignore' });
@@ -198,7 +198,7 @@ describe('notify-hook/operational-events – buildOperationalContext', () => {
       });
 
       assert.equal(context.branch, 'feature/opctx-pr');
-      const baseline = JSON.parse(await readFile(join(repo, '.omx', 'state', 'current-task-baseline.json'), 'utf-8'));
+      const baseline = JSON.parse(await readFile(join(repo, '.omcp', 'state', 'current-task-baseline.json'), 'utf-8'));
       const entry = baseline.tasks.find((item: { branch_name: string }) => item.branch_name === 'feature/opctx-pr');
       assert.equal(entry.issue_number, 1407);
       assert.equal(entry.pr_number, 1416);

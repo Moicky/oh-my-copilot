@@ -23,7 +23,7 @@ import {
 import type { WikiCategory } from '../wiki/types.js';
 
 const server = new Server(
-  { name: 'omx-wiki', version: '0.1.0' },
+  { name: 'omcp-wiki', version: '0.1.0' },
   { capabilities: { tools: {} } },
 );
 

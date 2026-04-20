@@ -111,7 +111,7 @@ export interface HudGitConfig {
   repoLabel?: string;
 }
 
-/** HUD configuration stored in .omx/hud-config.json */
+/** HUD configuration stored in .omcp/hud-config.json */
 export interface HudConfig {
   preset?: HudPreset;
   git?: HudGitConfig;
@@ -136,7 +136,7 @@ export const DEFAULT_HUD_CONFIG: ResolvedHudConfig = {
   },
 };
 
-/** CLI flags for omx hud */
+/** CLI flags for omcp hud */
 export interface HudFlags {
   watch: boolean;
   json: boolean;

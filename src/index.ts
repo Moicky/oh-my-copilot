@@ -6,7 +6,7 @@
  * - 35+ workflow skills as SKILL.md files
  * - AGENTS.md orchestration brain
  * - MCP servers for state management, project memory, and notepad
- * - CLI tool (omx) for setup, diagnostics, and management
+ * - CLI tool (omcp) for setup, diagnostics, and management
  * - Notification hooks for workflow tracking
  */
 

@@ -1,6 +1,6 @@
 oh-my-copilot doctor --team
 =========================
 
-  [XX] resume_blocker: alpha references missing tmux session omx-team-alpha
+  [XX] resume_blocker: alpha references missing tmux session omcp-team-alpha
 
 Results: 0 warnings, 1 failed

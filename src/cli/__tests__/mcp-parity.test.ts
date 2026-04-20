@@ -22,7 +22,7 @@ function captureLogs(): string[] {
 
 describe("mcpParityCommand", () => {
   it("supports state write/read parity via CLI", async () => {
-    const cwd = await mkdtemp(join(tmpdir(), "omx-mcp-parity-state-"));
+    const cwd = await mkdtemp(join(tmpdir(), "omcp-mcp-parity-state-"));
     const logs = captureLogs();
 
     try {
@@ -50,7 +50,7 @@ describe("mcpParityCommand", () => {
   });
 
   it("supports notepad and project-memory parity via CLI", async () => {
-    const cwd = await mkdtemp(join(tmpdir(), "omx-mcp-parity-memory-"));
+    const cwd = await mkdtemp(join(tmpdir(), "omcp-mcp-parity-memory-"));
     const logs = captureLogs();
 
     try {
@@ -97,11 +97,11 @@ describe("mcpParityCommand", () => {
   });
 
   it("supports trace summary parity via CLI", async () => {
-    const cwd = await mkdtemp(join(tmpdir(), "omx-mcp-parity-trace-"));
+    const cwd = await mkdtemp(join(tmpdir(), "omcp-mcp-parity-trace-"));
     const logs = captureLogs();
 
     try {
-      const logsDir = join(cwd, ".omx", "logs");
+      const logsDir = join(cwd, ".omcp", "logs");
       await mkdir(logsDir, { recursive: true });
       await writeFile(
         join(logsDir, "turns-2026-04-08.jsonl"),
@@ -125,7 +125,7 @@ describe("mcpParityCommand", () => {
   });
 
   it("supports wiki parity via CLI", async () => {
-    const cwd = await mkdtemp(join(tmpdir(), "omx-mcp-parity-wiki-"));
+    const cwd = await mkdtemp(join(tmpdir(), "omcp-mcp-parity-wiki-"));
     const logs = captureLogs();
 
     try {

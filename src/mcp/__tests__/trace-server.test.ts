@@ -10,10 +10,10 @@ describe('trace-server session-scoped mode discovery', () => {
     process.env.OMX_TRACE_SERVER_DISABLE_AUTO_START = '1';
     const { readModeEvents } = await import('../trace-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-trace-test-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-trace-test-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
-      const sessionDir = join(wd, '.omx', 'state', 'sessions', 'sess1');
+      const stateDir = join(wd, '.omcp', 'state');
+      const sessionDir = join(wd, '.omcp', 'state', 'sessions', 'sess1');
       await mkdir(sessionDir, { recursive: true });
       await writeFile(join(stateDir, 'session.json'), JSON.stringify({ session_id: 'sess1' }));
 
@@ -37,9 +37,9 @@ describe('trace-server session-scoped mode discovery', () => {
     process.env.OMX_TRACE_SERVER_DISABLE_AUTO_START = '1';
     const { readModeEvents } = await import('../trace-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-trace-test-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-trace-test-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const sessionA = join(stateDir, 'sessions', 'sessA');
       const sessionB = join(stateDir, 'sessions', 'sessB');
       await mkdir(sessionA, { recursive: true });
@@ -71,9 +71,9 @@ describe('trace-server log readers', () => {
     process.env.OMX_TRACE_SERVER_DISABLE_AUTO_START = '1';
     const { readLogFiles } = await import('../trace-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-trace-test-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-trace-test-'));
     try {
-      const logsDir = join(wd, '.omx', 'logs');
+      const logsDir = join(wd, '.omcp', 'logs');
       await mkdir(logsDir, { recursive: true });
 
       const entries = Array.from({ length: 5000 }, (_, i) => ({
@@ -102,9 +102,9 @@ describe('trace-server log readers', () => {
     process.env.OMX_TRACE_SERVER_DISABLE_AUTO_START = '1';
     const { summarizeLogFiles } = await import('../trace-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-trace-test-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-trace-test-'));
     try {
-      const logsDir = join(wd, '.omx', 'logs');
+      const logsDir = join(wd, '.omcp', 'logs');
       await mkdir(logsDir, { recursive: true });
 
       await writeFile(join(logsDir, 'turns-2020-01-01.jsonl'), [

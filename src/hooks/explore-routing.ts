@@ -35,14 +35,14 @@ export function buildExploreRoutingGuidance(env: NodeJS.ProcessEnv = process.env
   if (!isExploreCommandRoutingEnabled(env)) return '';
   return [
     `**Explore Command Preference:** enabled via \`${OMX_EXPLORE_CMD_ENV}\` (default-on; opt out with \`0\`, \`false\`, \`no\`, or \`off\`)`,
-    '- Advisory steering only: agents SHOULD treat `omx explore` as the default first stop for direct inspection and SHOULD reserve `omx sparkshell` for qualifying read-only shell-native tasks.',
-    '- For simple file/symbol lookups, use `omx explore` FIRST before attempting full code analysis.',
-    '- When the user asks for a simple read-only exploration task (file/symbol/pattern/relationship lookup), strongly prefer `omx explore` as the default surface.',
-    '- Explore examples: `omx explore --prompt "which files define TeamPolicy"`, `omx explore --prompt "find usages of buildExploreRoutingGuidance"`.',
-    '- SparkShell examples: use `omx sparkshell -- rg -n "TeamPolicy" src`, `omx sparkshell -- npm test`, or `omx sparkshell --tmux-pane %12` for noisy verification, bounded shell output, or tmux-pane summaries.',
-    '- Keep `omx explore` prompts narrow and concrete; prefer a single lookup goal or a small related cluster, using `--prompt` for quick asks and `--prompt-file` for longer reusable briefs.',
-    '- Treat `omx explore` as a shell-only allowlisted read-only path; keep edits, tests, diagnostics, MCP/web needs, and complex shell composition on the richer normal path.',
+    '- Advisory steering only: agents SHOULD treat `omcp explore` as the default first stop for direct inspection and SHOULD reserve `omcp sparkshell` for qualifying read-only shell-native tasks.',
+    '- For simple file/symbol lookups, use `omcp explore` FIRST before attempting full code analysis.',
+    '- When the user asks for a simple read-only exploration task (file/symbol/pattern/relationship lookup), strongly prefer `omcp explore` as the default surface.',
+    '- Explore examples: `omcp explore --prompt "which files define TeamPolicy"`, `omcp explore --prompt "find usages of buildExploreRoutingGuidance"`.',
+    '- SparkShell examples: use `omcp sparkshell -- rg -n "TeamPolicy" src`, `omcp sparkshell -- npm test`, or `omcp sparkshell --tmux-pane %12` for noisy verification, bounded shell output, or tmux-pane summaries.',
+    '- Keep `omcp explore` prompts narrow and concrete; prefer a single lookup goal or a small related cluster, using `--prompt` for quick asks and `--prompt-file` for longer reusable briefs.',
+    '- Treat `omcp explore` as a shell-only allowlisted read-only path; keep edits, tests, diagnostics, MCP/web needs, and complex shell composition on the richer normal path.',
     '- Keep implementation, refactor, test, or ambiguous broad requests on the normal Codex path.',
-    '- If `omx explore` is unavailable, stalls, or fails, retry with a narrower prompt or gracefully fall back to the normal path.',
+    '- If `omcp explore` is unavailable, stalls, or fails, retry with a narrower prompt or gracefully fall back to the normal path.',
   ].join("\n");
 }

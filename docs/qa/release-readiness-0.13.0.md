@@ -5,12 +5,12 @@ Target version: **0.13.0**
 Comparison base: **`v0.12.6..origin/dev`**
 Verdict: **GO** ✅
 
-`0.13.0` packages the broad post-`0.12.6` release train: `omx adapt` foundations for OpenClaw and Hermes, Ralph/native Stop/session-authority hardening, safer explore and platform launch behavior, reduced repeated macOS stale-polling git probes, HUD/notification cleanup, setup and release workflow hygiene, and dependency refreshes.
+`0.13.0` packages the broad post-`0.12.6` release train: `omcp adapt` foundations for OpenClaw and Hermes, Ralph/native Stop/session-authority hardening, safer explore and platform launch behavior, reduced repeated macOS stale-polling git probes, HUD/notification cleanup, setup and release workflow hygiene, and dependency refreshes.
 
 ## Scope reviewed
 
 ### Adapt foundations
-- `src/cli/adapt.ts`, `src/cli/index.ts` — `omx adapt` CLI routing and help surface
+- `src/cli/adapt.ts`, `src/cli/index.ts` — `omcp adapt` CLI routing and help surface
 - `src/adapt/*` — adapter contracts, pathing, target registry, OpenClaw/Hermes probe/status/init/envelope/doctor behavior
 - `docs/adapt.md` — user-facing adapter contract and examples
 
@@ -20,7 +20,7 @@ Verdict: **GO** ✅
 - `src/scripts/notify-hook/team-leader-nudge.ts`, `src/scripts/notify-hook/team-dispatch.ts` — tmux Ralph nudge authority and startup inbox/dispatch regression coverage
 
 ### Launch / platform / worktree safety
-- `src/cli/explore.ts`, `crates/omx-explore/*` — explore harness resolution and Windows/POSIX fail-closed behavior
+- `src/cli/explore.ts`, `crates/omcp-explore/*` — explore harness resolution and Windows/POSIX fail-closed behavior
 - `src/cli/index.ts`, `src/cli/tmux-hook.ts`, `src/scripts/tmux-hook-engine.ts` — detached leader child cleanup and native tmux hook behavior
 - `src/team/worktree.ts`, `src/cli/cleanup.ts`, `src/notifications/tmux.ts` — stale worktree and Windows cleanup resilience
 
@@ -51,7 +51,7 @@ Verdict: **GO** ✅
 
 ## Risk assessment
 
-- **Adapt foundations** are new user-facing surfaces but intentionally thin: they report local evidence and keep writes under `.omx/adapters/<target>/...`; downstream OpenClaw/Hermes runtime acknowledgement remains outside this release's local proof.
+- **Adapt foundations** are new user-facing surfaces but intentionally thin: they report local evidence and keep writes under `.omcp/adapters/<target>/...`; downstream OpenClaw/Hermes runtime acknowledgement remains outside this release's local proof.
 - **Ralph/native Stop/session authority** changed across several seams at once; monitor long-running concurrent sessions and prompt-side vs CLI-side Ralph activation after release.
 - **Explore/platform launch paths** include Windows and POSIX-shim guardrails; local Linux verification should be complemented by the release workflow and cross-platform CI matrix.
 - **HUD/notification changes** reduce stale/noisy signals but depend on real tmux/session environments; post-release observation should focus on mixed tmux/non-tmux operators and the new macOS leader stale-polling behavior.

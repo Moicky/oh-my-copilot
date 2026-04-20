@@ -33,7 +33,7 @@ import {
 } from '../state.js';
 
 async function setupTeam(name: string): Promise<{ cwd: string; cleanup: () => Promise<void> }> {
-  const cwd = await mkdtemp(join(tmpdir(), `omx-interop-${name}-`));
+  const cwd = await mkdtemp(join(tmpdir(), `omcp-interop-${name}-`));
   const previousTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
   delete process.env.OMX_TEAM_STATE_ROOT;
   await initTeamState(name, 'test task', 'executor', 2, cwd);
@@ -49,7 +49,7 @@ async function setupTeam(name: string): Promise<{ cwd: string; cleanup: () => Pr
 
 async function withMailboxCompatHoleRuntime<T>(cwd: string, fn: () => Promise<T>): Promise<T> {
   const fakeBin = join(cwd, 'runtime-bin');
-  const runtimePath = join(fakeBin, 'omx-runtime');
+  const runtimePath = join(fakeBin, 'omcp-runtime');
   const previousPath = process.env.PATH;
   const previousBinary = process.env.OMX_RUNTIME_BINARY;
   const previousBridge = process.env.OMX_RUNTIME_BRIDGE;
@@ -109,7 +109,7 @@ process.stdout.write(JSON.stringify({ event: 'ok' }) + '\\n');
 }
 
 async function readTeamDeliveryLog(cwd: string): Promise<Array<Record<string, unknown>>> {
-  const path = join(cwd, '.omx', 'logs', `team-delivery-${new Date().toISOString().slice(0, 10)}.jsonl`);
+  const path = join(cwd, '.omcp', 'logs', `team-delivery-${new Date().toISOString().slice(0, 10)}.jsonl`);
   const raw = await readFile(path, 'utf-8').catch(() => '');
   return raw
     .split('\n')
@@ -157,13 +157,13 @@ describe('resolveTeamApiOperation', () => {
 describe('buildLegacyTeamDeprecationHint', () => {
   it('produces CLI hint with resolved operation name', () => {
     const hint = buildLegacyTeamDeprecationHint('team_send_message', { team_name: 'alpha' });
-    assert.match(hint, /omx team api send-message/);
+    assert.match(hint, /omcp team api send-message/);
     assert.match(hint, /"team_name":"alpha"/);
   });
 
   it('falls back to generic hint for unresolvable legacy name', () => {
     const hint = buildLegacyTeamDeprecationHint('team_nonexistent', { foo: 'bar' });
-    assert.match(hint, /omx team api <operation>/);
+    assert.match(hint, /omcp team api <operation>/);
   });
 
   it('uses empty JSON when no args provided', () => {
@@ -286,29 +286,29 @@ describe('executeTeamApiOperation: send-message', () => {
 
   it('returns the persisted leader mailbox message when hook-targeted sends are deduped from a worker worktree', async () => {
     const teamName = 'msg-team-leader-dedupe';
-    const repoCwd = await mkdtemp(join(tmpdir(), 'omx-interop-send-root-'));
-    const workerCwd = await mkdtemp(join(tmpdir(), 'omx-interop-send-worktree-'));
+    const repoCwd = await mkdtemp(join(tmpdir(), 'omcp-interop-send-root-'));
+    const workerCwd = await mkdtemp(join(tmpdir(), 'omcp-interop-send-worktree-'));
     const prevTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
     delete process.env.OMX_TEAM_STATE_ROOT;
 
     try {
       await initTeamState(teamName, 'leader mailbox dedupe', 'executor', 2, repoCwd);
 
-      const configPath = join(repoCwd, '.omx', 'state', 'team', teamName, 'config.json');
+      const configPath = join(repoCwd, '.omcp', 'state', 'team', teamName, 'config.json');
       const config = JSON.parse(await readFile(configPath, 'utf-8')) as {
         leader_pane_id?: string;
       };
       config.leader_pane_id = '%55';
       await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
 
-      const manifestPath = join(repoCwd, '.omx', 'state', 'team', teamName, 'manifest.v2.json');
+      const manifestPath = join(repoCwd, '.omcp', 'state', 'team', teamName, 'manifest.v2.json');
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as {
         leader_pane_id?: string;
       };
       manifest.leader_pane_id = '%55';
       await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 
-      process.env.OMX_TEAM_STATE_ROOT = join(repoCwd, '.omx', 'state');
+      process.env.OMX_TEAM_STATE_ROOT = join(repoCwd, '.omcp', 'state');
 
       const first = await executeTeamApiOperation('send-message', {
         team_name: teamName,
@@ -335,7 +335,7 @@ describe('executeTeamApiOperation: send-message', () => {
       assert.equal(secondMessage.body, 'ACK: worker-1 initialized');
 
       const mailbox = JSON.parse(await readFile(
-        join(repoCwd, '.omx', 'state', 'team', teamName, 'mailbox', 'leader-fixed.json'),
+        join(repoCwd, '.omcp', 'state', 'team', teamName, 'mailbox', 'leader-fixed.json'),
         'utf-8',
       )) as { messages?: Array<Record<string, unknown>> };
       const workerMessages = (mailbox.messages ?? []).filter((message) =>
@@ -363,7 +363,7 @@ describe('executeTeamApiOperation: send-message', () => {
 
   it('returns the persisted mailbox message when bridge compat omits the mailbox row under an explicit shared state root', async () => {
     const teamName = 'msg-team-shared-root';
-    const root = await mkdtemp(join(tmpdir(), 'omx-interop-shared-root-'));
+    const root = await mkdtemp(join(tmpdir(), 'omcp-interop-shared-root-'));
     const leaderCwd = join(root, 'leader');
     const workerCwd = join(root, 'worker-worktree');
     const sharedStateRoot = join(root, 'shared-state');
@@ -493,7 +493,7 @@ describe('executeTeamApiOperation: mailbox-mark-delivered', () => {
     const { cwd, cleanup } = await setupTeam('mark-dlv');
     try {
       // Ensure the worker-2 mailbox directory exists so sendDirectMessage can write
-      await mkdir(join(cwd, '.omx', 'state', 'team', 'mark-dlv', 'mailbox', 'worker-2'), { recursive: true });
+      await mkdir(join(cwd, '.omcp', 'state', 'team', 'mark-dlv', 'mailbox', 'worker-2'), { recursive: true });
       const sendResult = await executeTeamApiOperation('send-message', {
         team_name: 'mark-dlv', from_worker: 'worker-1', to_worker: 'worker-2', body: 'ack',
       }, cwd);
@@ -538,14 +538,14 @@ describe('executeTeamApiOperation: mailbox-mark-delivered', () => {
 
   it('marks leader-fixed mailbox delivery from a worker worktree and resolves the matching dispatch receipt', async () => {
     const teamName = 'mark-dlv-leader-worktree';
-    const repoCwd = await mkdtemp(join(tmpdir(), 'omx-interop-mark-dlv-root-'));
-    const workerCwd = await mkdtemp(join(tmpdir(), 'omx-interop-mark-dlv-worktree-'));
+    const repoCwd = await mkdtemp(join(tmpdir(), 'omcp-interop-mark-dlv-root-'));
+    const workerCwd = await mkdtemp(join(tmpdir(), 'omcp-interop-mark-dlv-worktree-'));
     const prevTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
     delete process.env.OMX_TEAM_STATE_ROOT;
 
     try {
       await initTeamState(teamName, 'leader mailbox delivery receipt', 'executor', 2, repoCwd);
-      process.env.OMX_TEAM_STATE_ROOT = join(repoCwd, '.omx', 'state');
+      process.env.OMX_TEAM_STATE_ROOT = join(repoCwd, '.omcp', 'state');
 
       const sendResult = await executeTeamApiOperation('send-message', {
         team_name: teamName,
@@ -580,7 +580,7 @@ describe('executeTeamApiOperation: mailbox-mark-delivered', () => {
       assert.ok(updatedDispatch?.delivered_at, 'leader dispatch receipt should record delivered_at');
 
       const leaderMailbox = JSON.parse(await readFile(
-        join(repoCwd, '.omx', 'state', 'team', teamName, 'mailbox', 'leader-fixed.json'),
+        join(repoCwd, '.omcp', 'state', 'team', teamName, 'mailbox', 'leader-fixed.json'),
         'utf-8',
       )) as { messages?: Array<Record<string, unknown>> };
       const deliveredMessage = (leaderMailbox.messages ?? []).find((entry) => entry.message_id === messageId);
@@ -628,7 +628,7 @@ describe('executeTeamApiOperation: mailbox-mark-notified', () => {
     const { cwd, cleanup } = await setupTeam('mark-ntf');
     try {
       // Ensure the worker-2 mailbox directory exists so sendDirectMessage can write
-      await mkdir(join(cwd, '.omx', 'state', 'team', 'mark-ntf', 'mailbox', 'worker-2'), { recursive: true });
+      await mkdir(join(cwd, '.omcp', 'state', 'team', 'mark-ntf', 'mailbox', 'worker-2'), { recursive: true });
       const sendResult = await executeTeamApiOperation('send-message', {
         team_name: 'mark-ntf', from_worker: 'worker-1', to_worker: 'worker-2', body: 'notify me',
       }, cwd);
@@ -760,8 +760,8 @@ describe('executeTeamApiOperation: list-tasks', () => {
 
   it('resolves team working directory from manifest metadata over worker identity/config fallbacks', async () => {
     const teamName = 'list-tsk-meta';
-    const cwdA = await mkdtemp(join(tmpdir(), 'omx-interop-meta-a-'));
-    const cwdB = await mkdtemp(join(tmpdir(), 'omx-interop-meta-b-'));
+    const cwdA = await mkdtemp(join(tmpdir(), 'omcp-interop-meta-a-'));
+    const cwdB = await mkdtemp(join(tmpdir(), 'omcp-interop-meta-b-'));
     const prevTeamWorker = process.env.OMX_TEAM_WORKER;
     const prevTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
     delete process.env.OMX_TEAM_STATE_ROOT;
@@ -772,15 +772,15 @@ describe('executeTeamApiOperation: list-tasks', () => {
       await initTeamState(teamName, 'metadata precedence', 'executor', 2, cwdB);
       await createTask(teamName, { subject: 'From manifest root', description: 'B lane', status: 'pending' }, cwdB);
 
-      const teamRootA = join(cwdA, '.omx', 'state', 'team', teamName);
+      const teamRootA = join(cwdA, '.omcp', 'state', 'team', teamName);
       const configPath = join(teamRootA, 'config.json');
       const manifestPath = join(teamRootA, 'manifest.v2.json');
 
       const config = JSON.parse(await readFile(configPath, 'utf-8')) as Record<string, unknown>;
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as Record<string, unknown>;
 
-      config.team_state_root = join(cwdA, '.omx', 'state');
-      manifest.team_state_root = join(cwdB, '.omx', 'state');
+      config.team_state_root = join(cwdA, '.omcp', 'state');
+      manifest.team_state_root = join(cwdB, '.omcp', 'state');
 
       await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
       await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
@@ -801,8 +801,8 @@ describe('executeTeamApiOperation: list-tasks', () => {
 
   it('prefers OMX_TEAM_STATE_ROOT over manifest metadata when resolving the team working directory', async () => {
     const teamName = 'list-tsk-env-root';
-    const cwdA = await mkdtemp(join(tmpdir(), 'omx-interop-env-a-'));
-    const cwdB = await mkdtemp(join(tmpdir(), 'omx-interop-env-b-'));
+    const cwdA = await mkdtemp(join(tmpdir(), 'omcp-interop-env-a-'));
+    const cwdB = await mkdtemp(join(tmpdir(), 'omcp-interop-env-b-'));
     const prevTeamWorker = process.env.OMX_TEAM_WORKER;
     const prevTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
     delete process.env.OMX_TEAM_STATE_ROOT;
@@ -814,13 +814,13 @@ describe('executeTeamApiOperation: list-tasks', () => {
       await createTask(teamName, { subject: 'From env root', description: 'A lane', status: 'pending' }, cwdA);
       await createTask(teamName, { subject: 'From manifest root', description: 'B lane', status: 'pending' }, cwdB);
 
-      const teamRootA = join(cwdA, '.omx', 'state', 'team', teamName);
+      const teamRootA = join(cwdA, '.omcp', 'state', 'team', teamName);
       const manifestPath = join(teamRootA, 'manifest.v2.json');
       const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as Record<string, unknown>;
-      manifest.team_state_root = join(cwdB, '.omx', 'state');
+      manifest.team_state_root = join(cwdB, '.omcp', 'state');
       await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, 'utf8');
 
-      process.env.OMX_TEAM_STATE_ROOT = join(cwdA, '.omx', 'state');
+      process.env.OMX_TEAM_STATE_ROOT = join(cwdA, '.omcp', 'state');
 
       const result = await executeTeamApiOperation('list-tasks', { team_name: teamName }, cwdB);
       assert.equal(result.ok, true);
@@ -1141,7 +1141,7 @@ describe('executeTeamApiOperation: read-config', () => {
   });
 
   it('returns team_not_found for nonexistent team', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-interop-cfg-nf-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-interop-cfg-nf-'));
     try {
       const result = await executeTeamApiOperation('read-config', {
         team_name: 'nonexistent-cfg',
@@ -1646,7 +1646,7 @@ describe('executeTeamApiOperation: read-stall-state', () => {
         work_remaining: false,
         stalled_for_ms: null,
       }, cwd);
-      await writeFile(join(cwd, '.omx', 'state', 'leader-runtime-activity.json'), JSON.stringify({
+      await writeFile(join(cwd, '.omcp', 'state', 'leader-runtime-activity.json'), JSON.stringify({
         last_activity_at: '2026-03-10T10:06:00.000Z',
         last_source: 'team_status',
         last_team_name: 'stall-state-resume',
@@ -1671,7 +1671,7 @@ describe('executeTeamApiOperation: read-stall-state', () => {
     const { cwd, cleanup } = await setupTeam('stall-state-detached-progress');
     try {
       const workerWorktree = join(cwd, 'worktrees', 'worker-1');
-      await mkdir(join(workerWorktree, '.omx', 'state'), { recursive: true });
+      await mkdir(join(workerWorktree, '.omcp', 'state'), { recursive: true });
 
       const manifest = await readTeamManifestV2('stall-state-detached-progress', cwd);
       assert.ok(manifest);
@@ -1700,7 +1700,7 @@ describe('executeTeamApiOperation: read-stall-state', () => {
         work_remaining: false,
         stalled_for_ms: null,
       }, cwd);
-      await writeFile(join(workerWorktree, '.omx', 'state', 'current-task-baseline.json'), JSON.stringify({
+      await writeFile(join(workerWorktree, '.omcp', 'state', 'current-task-baseline.json'), JSON.stringify({
         version: 1,
         tasks: [],
       }, null, 2));
@@ -1822,7 +1822,7 @@ describe('executeTeamApiOperation: get-summary', () => {
   });
 
   it('returns team_not_found for nonexistent team', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-interop-sum-nf-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-interop-sum-nf-'));
     try {
       const result = await executeTeamApiOperation('get-summary', {
         team_name: 'nonexistent-sum',
@@ -1862,7 +1862,7 @@ describe('executeTeamApiOperation: cleanup', () => {
   it('deactivates lingering team mode state after cleanup removes canonical team state', async () => {
     const { cwd, cleanup } = await setupTeam('cleanup-mode-sync');
     try {
-      const stateDir = join(cwd, '.omx', 'state');
+      const stateDir = join(cwd, '.omcp', 'state');
       const sessionId = 'sess-cleanup-mode-sync';
       await mkdir(join(stateDir, 'sessions', sessionId), { recursive: true });
       await writeFile(join(stateDir, 'session.json'), JSON.stringify({ session_id: sessionId }, null, 2));
@@ -2188,10 +2188,10 @@ describe('executeTeamApiOperation: write-task-approval', () => {
 
 describe('executeTeamApiOperation: error handling', () => {
   it('wraps thrown errors in an error envelope', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-interop-err-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-interop-err-'));
     try {
-      await mkdir(join(cwd, '.omx', 'state', 'team', 'err-team'), { recursive: true });
-      await writeFile(join(cwd, '.omx', 'state', 'team', 'err-team', 'config.json'), '{}', 'utf8');
+      await mkdir(join(cwd, '.omcp', 'state', 'team', 'err-team'), { recursive: true });
+      await writeFile(join(cwd, '.omcp', 'state', 'team', 'err-team', 'config.json'), '{}', 'utf8');
 
       const result = await executeTeamApiOperation('claim-task', {
         team_name: 'err-team', task_id: '1', worker: 'w1',

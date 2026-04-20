@@ -1,8 +1,8 @@
 /**
  * Hook Notification Config Reader
  *
- * Reads hookTemplates from .omx-config.json for user-customizable message templates.
- * Config is stored under the notifications.hookTemplates key in codexHome()/.omx-config.json.
+ * Reads hookTemplates from .omcp-config.json for user-customizable message templates.
+ * Config is stored under the notifications.hookTemplates key in codexHome()/.omcp-config.json.
  * Env var OMX_HOOK_CONFIG overrides to a separate file path.
  */
 
@@ -22,7 +22,7 @@ let cachedConfig: HookNotificationConfig | null | undefined;
 /**
  * Read and cache the hook notification config.
  *
- * Primary source: notifications.hookTemplates key in codexHome()/.omx-config.json
+ * Primary source: notifications.hookTemplates key in codexHome()/.omcp-config.json
  * Env var override: OMX_HOOK_CONFIG points to a separate file containing the
  *   HookNotificationConfig JSON directly (used for testing and advanced overrides).
  *
@@ -55,8 +55,8 @@ export function getHookConfig(): HookNotificationConfig | null {
     }
   }
 
-  // Primary: read from notifications.hookTemplates in .omx-config.json
-  const OMX_CONFIG_PATH = join(codexHome(), ".omx-config.json");
+  // Primary: read from notifications.hookTemplates in .omcp-config.json
+  const OMX_CONFIG_PATH = join(codexHome(), ".omcp-config.json");
   if (!existsSync(OMX_CONFIG_PATH)) {
     cachedConfig = null;
     return null;
@@ -122,8 +122,8 @@ export function resolveEventTemplate(
  * Merge hook config event enabled/disabled flags into a FullNotificationConfig.
  *
  * Hook config takes precedence for event gating:
- * - hook event `enabled: false` overrides .omx-config.json event `enabled: true`
- * - Platform credentials are NOT affected (they stay in .omx-config.json)
+ * - hook event `enabled: false` overrides .omcp-config.json event `enabled: true`
+ * - Platform credentials are NOT affected (they stay in .omcp-config.json)
  */
 export function mergeHookConfigIntoNotificationConfig(
   hookConfig: HookNotificationConfig,

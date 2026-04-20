@@ -13,7 +13,7 @@ import {
 
 const CURRENT_SESSION_PROCESSES: ProcessEntry[] = [
   { pid: 700, ppid: 500, command: 'codex' },
-  { pid: 701, ppid: 700, command: 'node /repo/bin/omx.js cleanup --dry-run' },
+  { pid: 701, ppid: 700, command: 'node /repo/bin/omcp.js cleanup --dry-run' },
   {
     pid: 710,
     ppid: 700,
@@ -42,7 +42,7 @@ const CURRENT_SESSION_PROCESSES: ProcessEntry[] = [
   {
     pid: 830,
     ppid: 50,
-    command: 'node /repo/bin/omx.js autoresearch --topic launch',
+    command: 'node /repo/bin/omcp.js autoresearch --topic launch',
   },
   {
     pid: 831,
@@ -52,7 +52,7 @@ const CURRENT_SESSION_PROCESSES: ProcessEntry[] = [
   {
     pid: 900,
     ppid: 1,
-    command: 'node /tmp/not-omx/other-server.js',
+    command: 'node /tmp/not-omcp/other-server.js',
   },
 ];
 
@@ -115,7 +115,7 @@ describe('findCleanupCandidates', () => {
 
   it('keeps detached MCP candidates whose ancestor chain is live but unrelated to Codex or OMCP launchers', () => {
     const unrelatedAncestorProcesses: ProcessEntry[] = [
-      { pid: 701, ppid: 700, command: 'node /repo/bin/omx.js' },
+      { pid: 701, ppid: 700, command: 'node /repo/bin/omcp.js' },
       { pid: 840, ppid: 841, command: 'node /tmp/unrelated/dist/mcp/state-server.js' },
       { pid: 841, ppid: 842, command: 'node worker.js' },
       { pid: 842, ppid: 1, command: 'bash' },
@@ -134,7 +134,7 @@ describe('findCleanupCandidates', () => {
   it('always preserves ppid=1 orphan candidates even if pid 1 matches a protected ancestor predicate', () => {
     const reparentedProcesses: ProcessEntry[] = [
       { pid: 1, ppid: 0, command: 'codex' },
-      { pid: 701, ppid: 700, command: 'node /repo/bin/omx.js' },
+      { pid: 701, ppid: 700, command: 'node /repo/bin/omcp.js' },
       { pid: 840, ppid: 1, command: 'node /tmp/reparented/dist/mcp/state-server.js' },
     ];
 
@@ -192,11 +192,11 @@ describe('listOmxProcesses', () => {
     try {
       const parsed = listOmxProcesses(() => [
         JSON.stringify({ pid: 700, ppid: 500, command: 'codex' }),
-        JSON.stringify({ pid: 701, ppid: 700, command: 'node C:/repo/bin/omx.js cleanup --dry-run' }),
+        JSON.stringify({ pid: 701, ppid: 700, command: 'node C:/repo/bin/omcp.js cleanup --dry-run' }),
         JSON.stringify({ pid: 710, ppid: 700, command: 'node C:/repo/dist/mcp/state-server.js' }),
         JSON.stringify({ pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-copilot/dist/mcp/memory-server.js' }),
         JSON.stringify({ pid: 810, ppid: 42, command: 'node C:/tmp/worktree/dist/mcp/trace-server.js' }),
-        JSON.stringify({ pid: 900, ppid: 1, command: 'node C:/tmp/not-omx/other-server.js' }),
+        JSON.stringify({ pid: 900, ppid: 1, command: 'node C:/tmp/not-omcp/other-server.js' }),
       ].join('\n'));
 
       assert.deepEqual(findCleanupCandidates(parsed, 701), [
@@ -319,7 +319,7 @@ describe('cleanupOmxMcpProcesses', () => {
 
 describe('cleanupStaleTmpDirectories', () => {
   const tmpEntries = [
-    { name: 'omx-stale-a', isDirectory: () => true },
+    { name: 'omcp-stale-a', isDirectory: () => true },
     { name: 'omc-stale-b', isDirectory: () => true },
     { name: 'oh-my-copilot-fresh', isDirectory: () => true },
     { name: 'oh-my-copilot-file', isDirectory: () => false },
@@ -354,7 +354,7 @@ describe('cleanupStaleTmpDirectories', () => {
       /Dry run: would remove 2 stale OMCP \/tmp directories:/,
     );
     assert.match(lines.join('\n'), /\/tmp\/omc-stale-b/);
-    assert.match(lines.join('\n'), /\/tmp\/omx-stale-a/);
+    assert.match(lines.join('\n'), /\/tmp\/omcp-stale-a/);
     assert.doesNotMatch(lines.join('\n'), /oh-my-copilot-fresh/);
     assert.doesNotMatch(lines.join('\n'), /other-stale/);
   });
@@ -381,9 +381,9 @@ describe('cleanupStaleTmpDirectories', () => {
     });
 
     assert.equal(removedCount, 2);
-    assert.deepEqual(removedPaths, ['/tmp/omc-stale-b', '/tmp/omx-stale-a']);
+    assert.deepEqual(removedPaths, ['/tmp/omc-stale-b', '/tmp/omcp-stale-a']);
     assert.match(lines.join('\n'), /Removed stale \/tmp directory: \/tmp\/omc-stale-b/);
-    assert.match(lines.join('\n'), /Removed stale \/tmp directory: \/tmp\/omx-stale-a/);
+    assert.match(lines.join('\n'), /Removed stale \/tmp directory: \/tmp\/omcp-stale-a/);
     assert.match(lines.join('\n'), /Removed 2 stale OMCP \/tmp directories\./);
   });
 });

@@ -4,24 +4,24 @@ OMCP Wiki is a compiled markdown knowledge layer for agents.
 
 ## What it is
 
-- local project knowledge stored under `.omx/wiki/`
+- local project knowledge stored under `.omcp/wiki/`
 - markdown-first and search-first
 - designed for agentic retrieval workflows, not vector-first RAG
 
 ## Core user surfaces
 
-- `omx wiki add`
-- `omx wiki query`
-- `omx wiki lint`
-- `omx wiki refresh`
-- `omx wiki list`
-- `omx wiki read`
-- `omx wiki delete`
+- `omcp wiki add`
+- `omcp wiki query`
+- `omcp wiki lint`
+- `omcp wiki refresh`
+- `omcp wiki list`
+- `omcp wiki read`
+- `omcp wiki delete`
 
 ## Retrieval model
 
 - Wiki pages are queried first when useful
-- `omx explore` can inject wiki-first context before broader repository search
+- `omcp explore` can inject wiki-first context before broader repository search
 - repository search remains the fallback when wiki evidence is weak or missing
 
 ## Lifecycle model

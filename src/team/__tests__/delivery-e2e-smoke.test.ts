@@ -177,9 +177,9 @@ switch (command.command) {
 }
 
 async function setupTeam(name: string, workerCount: number = 2): Promise<{ cwd: string; cleanup: () => Promise<void> }> {
-  const cwd = await mkdtemp(join(tmpdir(), `omx-delivery-e2e-${name}-`));
+  const cwd = await mkdtemp(join(tmpdir(), `omcp-delivery-e2e-${name}-`));
   const previousTeamStateRoot = process.env.OMX_TEAM_STATE_ROOT;
-  process.env.OMX_TEAM_STATE_ROOT = join(cwd, '.omx', 'state');
+  process.env.OMX_TEAM_STATE_ROOT = join(cwd, '.omcp', 'state');
   await initTeamState(name, 'delivery smoke test', 'executor', workerCount, cwd);
   return {
     cwd,
@@ -209,7 +209,7 @@ async function withFakeTmux<T>(cwd: string, fn: (tmuxLogPath: string) => Promise
 
 async function withBridgeFixture<T>(cwd: string, fn: (runtimePath: string) => Promise<T>): Promise<T> {
   const fakeBin = join(cwd, 'runtime-bin');
-  const runtimePath = join(fakeBin, 'omx-runtime');
+  const runtimePath = join(fakeBin, 'omcp-runtime');
   const previousPath = process.env.PATH;
   const previousBinary = process.env.OMX_RUNTIME_BINARY;
   const previousBridge = process.env.OMX_RUNTIME_BRIDGE;
@@ -301,12 +301,12 @@ describe('team message delivery end-to-end smoke tests', () => {
         await sendWorkerMessage('worker-leader-fallback', 'worker-1', 'leader-fixed', 'please read mailbox', cwd);
         await configurePaneIds('worker-leader-fallback', cwd, '%95', { 'worker-1': '%10' });
 
-        await writeFile(join(cwd, '.omx', 'state', 'team-state.json'), JSON.stringify({
+        await writeFile(join(cwd, '.omcp', 'state', 'team-state.json'), JSON.stringify({
           active: true,
           team_name: 'worker-leader-fallback',
           current_phase: 'team-exec',
         }, null, 2));
-        await writeFile(join(cwd, '.omx', 'state', 'hud-state.json'), JSON.stringify({
+        await writeFile(join(cwd, '.omcp', 'state', 'hud-state.json'), JSON.stringify({
           last_turn_at: new Date(Date.now() - 300_000).toISOString(),
           turn_count: 9,
         }, null, 2));
@@ -481,7 +481,7 @@ describe('team message delivery end-to-end smoke tests', () => {
           injector: async () => ({ ok: true, transport: 'hook', reason: 'injected_for_test' }),
         });
 
-        const mailboxCompat = JSON.parse(await readFile(join(cwd, '.omx', 'state', 'mailbox.json'), 'utf-8')) as { records: Array<{ message_id: string }> };
+        const mailboxCompat = JSON.parse(await readFile(join(cwd, '.omcp', 'state', 'mailbox.json'), 'utf-8')) as { records: Array<{ message_id: string }> };
         assert.equal(mailboxCompat.records.some((record) => record.message_id === messageId), true);
 
         const mailbox = await listMailboxMessages('cli-bridge-send', 'worker-1', cwd);
@@ -522,16 +522,16 @@ describe('team message delivery end-to-end smoke tests', () => {
           last_turn_at: new Date(Date.now() - 60_000).toISOString(),
         }, cwd);
 
-        await writeFile(join(cwd, '.omx', 'state', 'team-state.json'), JSON.stringify({
+        await writeFile(join(cwd, '.omcp', 'state', 'team-state.json'), JSON.stringify({
           active: true,
           team_name: 'stalled-worker-fresh-leader',
           current_phase: 'team-exec',
         }, null, 2));
-        await writeFile(join(cwd, '.omx', 'state', 'hud-state.json'), JSON.stringify({
+        await writeFile(join(cwd, '.omcp', 'state', 'hud-state.json'), JSON.stringify({
           last_turn_at: new Date().toISOString(),
           turn_count: 2,
         }, null, 2));
-        await writeFile(join(cwd, '.omx', 'state', 'team-leader-nudge.json'), JSON.stringify({
+        await writeFile(join(cwd, '.omcp', 'state', 'team-leader-nudge.json'), JSON.stringify({
           last_nudged_by_team: {},
           last_idle_nudged_by_team: {},
           progress_by_team: {
@@ -708,7 +708,7 @@ describe('team message delivery end-to-end smoke tests', () => {
 
         const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
         assert.match(tmuxLog, /send-keys -t %10/);
-        assert.equal(existsSync(join(cwd, '.omx', 'state', 'mailbox.json')), false, 'bridge compat mailbox should not be created when bridge is disabled');
+        assert.equal(existsSync(join(cwd, '.omcp', 'state', 'mailbox.json')), false, 'bridge compat mailbox should not be created when bridge is disabled');
       });
     } finally {
       if (typeof previousBridge === 'string') process.env.OMX_RUNTIME_BRIDGE = previousBridge;

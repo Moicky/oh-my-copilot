@@ -188,7 +188,7 @@ export function buildOpenClawEnvelope(
 		capabilities,
 		constraints: [
 			"Status reflects local OMCP/OpenClaw adapter evidence only; it does not claim downstream OpenClaw acknowledgement.",
-			"Bootstrap output stays under .omx/adapters/openclaw/... and does not mutate .omx/state or upstream OpenClaw config.",
+			"Bootstrap output stays under .omcp/adapters/openclaw/... and does not mutate .omcp/state or upstream OpenClaw config.",
 			"Command gateways remain gated by OMX_OPENCLAW_COMMAND=1 even when OMX_OPENCLAW=1 is enabled.",
 		],
 		openclaw,
@@ -224,7 +224,7 @@ export function buildOpenClawProbeReport(
 			blockedHooks.length > 0
 				? blockedHooks.map((hook) => `${hook.event}: ${hook.detail}`)
 				: [
-						"Run omx adapt openclaw init --write to materialize adapter-owned OpenClaw artifacts.",
+						"Run omcp adapt openclaw init --write to materialize adapter-owned OpenClaw artifacts.",
 						"Confirm downstream OpenClaw behavior separately; this probe reports local wiring evidence only.",
 					],
 	};
@@ -245,12 +245,12 @@ export function buildOpenClawStatusReport(
 		target: "openclaw",
 		phase: "foundation",
 		summary: initialized
-			? `OpenClaw adapter artifacts exist under .omx/adapters/openclaw/... and local runtime evidence is ${openclaw.observedState}.`
+			? `OpenClaw adapter artifacts exist under .omcp/adapters/openclaw/... and local runtime evidence is ${openclaw.observedState}.`
 			: `OpenClaw adapter artifacts have not been written yet; local runtime evidence is ${openclaw.observedState}.`,
 		adapter: {
 			state: initialized ? "initialized" : "not-initialized",
 			detail: initialized
-				? "Adapter-owned OpenClaw artifacts are present under .omx/adapters/openclaw/..."
+				? "Adapter-owned OpenClaw artifacts are present under .omcp/adapters/openclaw/..."
 				: "Run init --write to create adapter-owned OpenClaw artifacts.",
 			configPath: paths.configPath,
 			envelopePath: paths.envelopePath,
@@ -278,7 +278,7 @@ export function buildOpenClawDoctorReport(
 		issues.push({
 			code: "adapter_not_initialized",
 			message:
-				"No OpenClaw adapter artifacts exist under .omx/adapters/openclaw.",
+				"No OpenClaw adapter artifacts exist under .omcp/adapters/openclaw.",
 		});
 	}
 
@@ -329,8 +329,8 @@ export function buildOpenClawDoctorReport(
 			"OpenClaw doctor reports local adapter readiness and local gateway wiring evidence only.",
 		issues,
 		nextSteps: [
-			"Run omx adapt openclaw init --write.",
-			"Set OMX_OPENCLAW=1 and configure notifications.openclaw or compatible aliases in ~/.codex/.omx-config.json.",
+			"Run omcp adapt openclaw init --write.",
+			"Set OMX_OPENCLAW=1 and configure notifications.openclaw or compatible aliases in ~/.codex/.omcp-config.json.",
 			"If command gateways are configured, also set OMX_OPENCLAW_COMMAND=1 before expecting command mappings to be locally ready.",
 		],
 	};
@@ -388,7 +388,7 @@ export function initOpenClawFoundation(
 		target: "openclaw",
 		write,
 		summary: write
-			? "OpenClaw adapter metadata was written under .omx/adapters/openclaw/..."
+			? "OpenClaw adapter metadata was written under .omcp/adapters/openclaw/..."
 			: "OpenClaw adapter bootstrap preview is ready; rerun with --write to materialize it.",
 		previewPaths,
 		wrotePaths,

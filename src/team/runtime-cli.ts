@@ -17,7 +17,7 @@ import { resolveCanonicalTeamStateRoot } from './state-root.js';
 
 async function promptStaleCleanup(summary: StaleTeamSummary): Promise<boolean> {
   process.stderr.write(
-    `\n[omx] Stale artifacts from previous team "${summary.teamName}":\n` +
+    `\n[omcp] Stale artifacts from previous team "${summary.teamName}":\n` +
     `  Worktrees: ${summary.worktreePaths.join(', ')}\n` +
     `  State dir: ${summary.statePath}\n` +
     (summary.hasDirtyWorktrees
@@ -181,8 +181,8 @@ export function buildTerminalCliResult(
     exitCode: status === 'completed' ? 0 : 1,
     notice:
       `[runtime-cli] phase=${phase} reached terminal state; preserving team state for inspection. `
-      + `Inspect with "omx team status ${teamName} --json" or "omx team api read-stall-state --input '{\"team_name\":\"${teamName}\"}' --json". `
-      + `Run "omx team shutdown ${teamName}" (or --force after state capture) when explicit cleanup is desired.\n`,
+      + `Inspect with "omcp team status ${teamName} --json" or "omcp team api read-stall-state --input '{\"team_name\":\"${teamName}\"}' --json". `
+      + `Run "omcp team shutdown ${teamName}" (or --force after state capture) when explicit cleanup is desired.\n`,
   };
 }
 

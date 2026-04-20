@@ -4,22 +4,22 @@ Use this page when OMCP appears installed but real Codex execution still fails.
 
 ## Install success vs real execution success
 
-`omx setup` and `omx doctor` validate OMCP's local install surface: prompts, skills, AGENTS scaffolding, config files, hooks, and runtime prerequisites. They do not guarantee that the active Codex profile can authenticate and complete a model request.
+`omcp setup` and `omcp doctor` validate OMCP's local install surface: prompts, skills, AGENTS scaffolding, config files, hooks, and runtime prerequisites. They do not guarantee that the active Codex profile can authenticate and complete a model request.
 
-After `omx doctor`, run a real smoke test from the same shell, HOME, and project directory you will use for OMCP:
+After `omcp doctor`, run a real smoke test from the same shell, HOME, and project directory you will use for OMCP:
 
 ```bash
 codex login status
-omx exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"
+omcp exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"
 ```
 
 Treat the boundary this way:
 
-- `omx doctor` green: install and local runtime wiring look sane.
+- `omcp doctor` green: install and local runtime wiring look sane.
 - `codex login status` green: the active Codex profile can see login state.
-- `omx exec ...` returns `OMCP-EXEC-OK`: real execution, auth, provider routing, and current working-directory assumptions are working together.
+- `omcp exec ...` returns `OMCP-EXEC-OK`: real execution, auth, provider routing, and current working-directory assumptions are working together.
 
-## Green doctor, but `omx exec` fails with auth errors
+## Green doctor, but `omcp exec` fails with auth errors
 
 Common failure strings include `401 Unauthorized`, `Missing bearer or basic authentication in header`, or `Incorrect API key provided`.
 
@@ -43,17 +43,17 @@ Use your actual proxy URL. If the profile-local `~/.codex/config.toml` is missin
 
 ## Stale `doctor --team` or dead tmux session state
 
-`omx doctor --team`, `omx team resume`, or startup diagnostics can fail when a previous team state references a tmux session that no longer exists. The state may mention `resume_blocker`, or the dead session may be recorded under `.omx/state/team/<team-name>/config.json` or `manifest.v2.json`.
+`omcp doctor --team`, `omcp team resume`, or startup diagnostics can fail when a previous team state references a tmux session that no longer exists. The state may mention `resume_blocker`, or the dead session may be recorded under `.omcp/state/team/<team-name>/config.json` or `manifest.v2.json`.
 
 If the team is intentionally abandoned and no live tmux session remains, clean it up with:
 
 ```bash
-omx team shutdown <team-name> --force --confirm-issues
-omx cancel
-omx doctor --team
+omcp team shutdown <team-name> --force --confirm-issues
+omcp cancel
+omcp doctor --team
 ```
 
-Do not force-shutdown a team that may still have useful live panes or worker state. Prefer `omx team status <team-name>` and `tmux ls` first when unsure.
+Do not force-shutdown a team that may still have useful live panes or worker state. Prefer `omcp team status <team-name>` and `tmux ls` first when unsure.
 
 ## Shift+Enter submits instead of inserting a newline in tmux-backed OMCP sessions
 

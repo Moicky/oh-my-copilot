@@ -17,7 +17,7 @@ const ISSUE_WORK_PROMPT_PATTERNS = [
 ];
 
 function usage(): void {
-  console.error('Usage: omx ask <claude|gemini> "<prompt>"');
+  console.error('Usage: omcp ask <claude|gemini> "<prompt>"');
   console.error('Legacy direct usage: node scripts/run-provider-advisor.js <claude|gemini> <prompt...>');
   console.error('                 or: node scripts/run-provider-advisor.js claude --print "<prompt>"');
   console.error('                 or: node scripts/run-provider-advisor.js gemini --prompt "<prompt>"');
@@ -114,7 +114,7 @@ async function writeArtifact({ provider, originalTask, finalPrompt, rawOutput, e
   exitCode: number;
 }): Promise<string> {
   const root = process.cwd();
-  const artifactDir = join(root, '.omx', 'artifacts');
+  const artifactDir = join(root, '.omcp', 'artifacts');
   const slug = slugify(originalTask);
   const timestamp = timestampToken();
   const artifactPath = join(artifactDir, `${provider}-${slug}-${timestamp}.md`);

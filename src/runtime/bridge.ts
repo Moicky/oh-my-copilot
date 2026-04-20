@@ -1,5 +1,5 @@
 /**
- * TS Runtime Bridge — thin wrapper over omx-runtime binary.
+ * TS Runtime Bridge — thin wrapper over omcp-runtime binary.
  *
  * All semantic state mutations route through `execCommand()`.
  * All state queries read Rust-authored compatibility JSON files.
@@ -121,13 +121,13 @@ export function resolveRuntimeBinaryPath(options: RuntimeBinaryDiscoveryOptions 
   const envOverride = process.env.OMX_RUNTIME_BINARY?.trim();
   if (envOverride) return envOverride;
 
-  const workspaceDebug = options.debugPath ?? resolve(__bridge_dirname, '../../target/debug/omx-runtime');
+  const workspaceDebug = options.debugPath ?? resolve(__bridge_dirname, '../../target/debug/omcp-runtime');
   if (exists(workspaceDebug)) return workspaceDebug;
 
-  const workspaceRelease = options.releasePath ?? resolve(__bridge_dirname, '../../target/release/omx-runtime');
+  const workspaceRelease = options.releasePath ?? resolve(__bridge_dirname, '../../target/release/omcp-runtime');
   if (exists(workspaceRelease)) return workspaceRelease;
 
-  return options.fallbackBinary ?? 'omx-runtime';
+  return options.fallbackBinary ?? 'omcp-runtime';
 }
 
 export function resolveBridgeStateDir(cwd: string, env: NodeJS.ProcessEnv = process.env): string {
@@ -236,7 +236,7 @@ export class RuntimeBridge {
       );
       if (missing.length > 0) {
         throw new Error(
-          `omx-runtime schema missing commands: ${missing.join(', ')}. ` +
+          `omcp-runtime schema missing commands: ${missing.join(', ')}. ` +
           `Bridge types may be out of sync with the Rust binary.`,
         );
       }
@@ -260,7 +260,7 @@ export class RuntimeBridge {
     } catch (err: unknown) {
       const execErr = err as { stderr?: string; message?: string };
       const stderr = execErr.stderr?.trim() ?? execErr.message ?? 'unknown error';
-      throw new Error(`omx-runtime ${args[0]} failed: ${stderr}`);
+      throw new Error(`omcp-runtime ${args[0]} failed: ${stderr}`);
     }
   }
 }

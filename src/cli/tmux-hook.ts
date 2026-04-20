@@ -58,10 +58,10 @@ const DEFAULT_CONFIG: TmuxHookConfig = {
 
 const HELP = `
 Usage:
-  omx tmux-hook init       Create .omx/tmux-hook.json
-  omx tmux-hook status     Show config + runtime state summary
-  omx tmux-hook validate   Validate config and tmux target reachability
-  omx tmux-hook test       Run a synthetic notify-hook turn (end-to-end)
+  omcp tmux-hook init       Create .omcp/tmux-hook.json
+  omcp tmux-hook status     Show config + runtime state summary
+  omcp tmux-hook validate   Validate config and tmux target reachability
+  omcp tmux-hook test       Run a synthetic notify-hook turn (end-to-end)
 `;
 
 export async function tmuxHookCommand(args: string[]): Promise<void> {
@@ -90,7 +90,7 @@ export async function tmuxHookCommand(args: string[]): Promise<void> {
 }
 
 function omxDir(cwd = process.cwd()): string {
-  return join(cwd, '.omx');
+  return join(cwd, '.omcp');
 }
 
 function tmuxHookConfigPath(cwd = process.cwd()): string {
@@ -175,7 +175,7 @@ function parseConfig(raw: unknown): TmuxHookConfig {
 async function readValidatedConfig(cwd = process.cwd()): Promise<TmuxHookConfig> {
   const configPath = tmuxHookConfigPath(cwd);
   if (!existsSync(configPath)) {
-    throw new Error('tmux-hook config missing. Run: omx tmux-hook init');
+    throw new Error('tmux-hook config missing. Run: omcp tmux-hook init');
   }
   const content = await readFile(configPath, 'utf-8');
   return parseConfig(JSON.parse(content));
@@ -196,7 +196,7 @@ async function loadConfigForCommand(
         console.log(`Detected tmux session: ${initResult.detectedSession}`);
       }
       if (initResult.usedPlaceholderTarget) {
-        console.log('Could not auto-detect a tmux target. Edit `.omx/tmux-hook.json` when ready.');
+        console.log('Could not auto-detect a tmux target. Edit `.omcp/tmux-hook.json` when ready.');
         if (commandName === 'validate') {
           console.log('Validation skipped until `target.value` is configured.');
         }
@@ -443,7 +443,7 @@ async function testTmuxHook(args: string[]): Promise<void> {
     cwd,
     'thread-id': threadId,
     'turn-id': turnId,
-    'input-messages': ['omx tmux-hook test'],
+    'input-messages': ['omcp tmux-hook test'],
     'last-assistant-message': message,
   };
 
@@ -462,5 +462,5 @@ async function testTmuxHook(args: string[]): Promise<void> {
   console.log('tmux-hook test: notify-hook executed.');
   console.log(`thread_id=${threadId}`);
   console.log(`turn_id=${turnId}`);
-  console.log('Check: .omx/logs/tmux-hook-YYYY-MM-DD.jsonl for skip/reason codes.');
+  console.log('Check: .omcp/logs/tmux-hook-YYYY-MM-DD.jsonl for skip/reason codes.');
 }

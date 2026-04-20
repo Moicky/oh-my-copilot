@@ -19,8 +19,8 @@ import {
 import { getWikiDir, queryWiki } from '../wiki/index.js';
 
 export const EXPLORE_USAGE = [
-  'Usage: omx explore --prompt "<prompt>"',
-  '   or: omx explore --prompt-file <file>',
+  'Usage: omcp explore --prompt "<prompt>"',
+  '   or: omcp explore --prompt-file <file>',
 ].join('\n');
 
 const PROMPT_FLAG = '--prompt';
@@ -28,7 +28,7 @@ const PROMPT_FILE_FLAG = '--prompt-file';
 export const EXPLORE_BIN_ENV = EXPLORE_BIN_ENV_SHARED;
 const EXPLORE_SPARK_MODEL_ENV = 'OMX_EXPLORE_SPARK_MODEL';
 const WINDOWS_BUILTIN_EXPLORE_HARNESS_REASON =
-  'the built-in explore harness is not ready on Windows because its allowlist runtime relies on POSIX sh/bash wrappers. Set OMX_EXPLORE_BIN to a compatible custom harness, prefer `omx sparkshell` for shell-native read-only lookups, or run `omx doctor` for readiness details.';
+  'the built-in explore harness is not ready on Windows because its allowlist runtime relies on POSIX sh/bash wrappers. Set OMX_EXPLORE_BIN to a compatible custom harness, prefer `omcp sparkshell` for shell-native read-only lookups, or run `omcp doctor` for readiness details.';
 
 export interface ParsedExploreArgs {
   prompt?: string;
@@ -84,7 +84,7 @@ export interface ExploreSparkShellRoute {
 
 const MAX_WIKI_CONTEXT_RESULTS = 5;
 const WEAK_WIKI_NOTE =
-  'Wiki evidence is weak or missing. Fall back to broader repository search and recommend that the user build an initial project wiki under .omx/wiki/ if this repo benefits from persistent project knowledge.';
+  'Wiki evidence is weak or missing. Fall back to broader repository search and recommend that the user build an initial project wiki under .omcp/wiki/ if this repo benefits from persistent project knowledge.';
 
 function formatWikiContextBlock(prompt: string, cwd: string): string | null {
   const wikiDir = getWikiDir(cwd);
@@ -223,7 +223,7 @@ async function runExploreViaSparkShell(route: ExploreSparkShellRoute, env: NodeJ
 }
 
 export function packagedExploreHarnessBinaryName(platform: NodeJS.Platform = process.platform): string {
-  return platform === 'win32' ? 'omx-explore-harness.exe' : 'omx-explore-harness';
+  return platform === 'win32' ? 'omcp-explore-harness.exe' : 'omcp-explore-harness';
 }
 
 export function resolvePackagedExploreHarnessCommand(
@@ -231,7 +231,7 @@ export function resolvePackagedExploreHarnessCommand(
   platform: NodeJS.Platform = process.platform,
   arch = process.arch,
 ): ExploreHarnessCommand | undefined {
-  const metadataPath = join(packageRoot, 'bin', 'omx-explore-harness.meta.json');
+  const metadataPath = join(packageRoot, 'bin', 'omcp-explore-harness.meta.json');
   if (!existsSync(metadataPath)) return undefined;
   try {
     const metadata = JSON.parse(readFileSync(metadataPath, 'utf-8')) as ExploreHarnessMetadata;
@@ -351,7 +351,7 @@ export function resolveExploreHarnessCommand(
   const repoBuilt = repoBuiltExploreHarnessCommand(packageRoot);
   if (repoBuilt) return repoBuilt;
 
-  const manifestPath = join(packageRoot, 'crates', 'omx-explore', 'Cargo.toml');
+  const manifestPath = join(packageRoot, 'crates', 'omcp-explore', 'Cargo.toml');
   if (!existsSync(manifestPath)) {
     throw new Error(`[explore] neither a compatible packaged harness binary nor Rust manifest was found (${manifestPath})`);
   }
@@ -372,7 +372,7 @@ export async function resolveExploreHarnessCommandWithHydration(
   }
 
   const version = await getPackageVersion(packageRoot);
-  for (const cached of resolveCachedNativeBinaryCandidatePaths('omx-explore-harness', version, process.platform, process.arch, env)) {
+  for (const cached of resolveCachedNativeBinaryCandidatePaths('omcp-explore-harness', version, process.platform, process.arch, env)) {
     if (existsSync(cached)) {
       return { command: cached, args: [] };
     }
@@ -385,7 +385,7 @@ export async function resolveExploreHarnessCommandWithHydration(
   if (repoBuilt) return repoBuilt;
 
   if (!isRepositoryCheckout(packageRoot)) {
-    const hydrated = await hydrateNativeBinary('omx-explore-harness', { packageRoot, env });
+    const hydrated = await hydrateNativeBinary('omcp-explore-harness', { packageRoot, env });
     if (hydrated) return { command: hydrated, args: [] };
     throw new Error('[explore] no compatible native harness is available for this install. Reconnect to the network so OMCP can fetch the release asset, or set OMX_EXPLORE_BIN to a prebuilt harness binary.');
   }
@@ -429,7 +429,7 @@ export async function exploreCommand(args: string[]): Promise<void> {
       return;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      process.stderr.write(`[omx explore] sparkshell backend unavailable (${message}). Falling back to the explore harness.\n`);
+      process.stderr.write(`[omcp explore] sparkshell backend unavailable (${message}). Falling back to the explore harness.\n`);
     }
   }
 
@@ -451,7 +451,7 @@ export async function exploreCommand(args: string[]): Promise<void> {
   if (result.error) {
     const errno = result.error as NodeJS.ErrnoException;
     if (harness.command === 'cargo' && errno.code === 'ENOENT') {
-      throw new Error('[explore] cargo was not found. Install a Rust toolchain, use a compatible packaged omx-explore prebuilt, or set OMX_EXPLORE_BIN to a prebuilt harness binary.');
+      throw new Error('[explore] cargo was not found. Install a Rust toolchain, use a compatible packaged omcp-explore prebuilt, or set OMX_EXPLORE_BIN to a prebuilt harness binary.');
     }
     throw new Error(`[explore] failed to launch harness: ${result.error.message}`);
   }
@@ -460,7 +460,7 @@ export async function exploreCommand(args: string[]): Promise<void> {
     if (harness.command === 'cargo' && result.stderr?.includes('rustup could not choose')) {
       throw new Error(
         '[explore] cargo is a rustup shim but no default toolchain is configured. ' +
-        'Run `rustup default stable`, set OMX_EXPLORE_BIN to a prebuilt binary, or run `omx doctor` for guidance.',
+        'Run `rustup default stable`, set OMX_EXPLORE_BIN to a prebuilt binary, or run `omcp doctor` for guidance.',
       );
     }
     process.exitCode = result.status ?? 1;

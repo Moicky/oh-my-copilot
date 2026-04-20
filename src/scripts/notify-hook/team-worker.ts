@@ -44,9 +44,9 @@ export async function resolveTeamStateDirForWorker(cwd, parsedTeamWorker) {
 
   const candidateStateDirs = [];
   if (leaderCwd) {
-    candidateStateDirs.push(join(resolvePath(leaderCwd), '.omx', 'state'));
+    candidateStateDirs.push(join(resolvePath(leaderCwd), '.omcp', 'state'));
   }
-  candidateStateDirs.push(join(cwd, '.omx', 'state'));
+  candidateStateDirs.push(join(cwd, '.omcp', 'state'));
 
   for (const candidateStateDir of candidateStateDirs) {
     const teamRoot = join(candidateStateDir, 'team', teamName);
@@ -66,7 +66,7 @@ export async function resolveTeamStateDirForWorker(cwd, parsedTeamWorker) {
     return candidateStateDir;
   }
 
-  return join(cwd, '.omx', 'state');
+  return join(cwd, '.omcp', 'state');
 }
 
 export function parseTeamWorkerEnv(rawValue) {
@@ -458,7 +458,7 @@ export async function maybeNotifyLeaderAllWorkersIdle({ cwd, stateDir, logsDir, 
   }
 
   const N = workers.length;
-  const nextAction = `Run \`omx team status ${teamName}\` now, read unread worker messages, then assign the next concrete task, reconcile results, or shut the team down.`;
+  const nextAction = `Run \`omcp team status ${teamName}\` now, read unread worker messages, then assign the next concrete task, reconcile results, or shut the team down.`;
   const message = `[OMCP] All ${N} worker${N === 1 ? '' : 's'} idle. ${nextAction} ${DEFAULT_MARKER}`;
   const tmuxTarget = canonicalLeaderPaneId;
   const paneGuard = await checkLeaderPaneReadyForWorkerStateReminder(tmuxTarget);

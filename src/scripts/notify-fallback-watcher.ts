@@ -128,7 +128,7 @@ const maxLifetimeMs = runOnce
     )
   );
 
-const omxDir = join(cwd, '.omx');
+const omxDir = join(cwd, '.omcp');
 const logsDir = join(omxDir, 'logs');
 const stateDir = join(omxDir, 'state');
 const statePath = join(stateDir, 'notify-fallback-state.json');

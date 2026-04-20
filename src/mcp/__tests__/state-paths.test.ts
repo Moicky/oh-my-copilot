@@ -89,8 +89,8 @@ describe('state paths', () => {
   });
 
   it('enforces OMX_MCP_WORKDIR_ROOTS allowlist when configured', async () => {
-    const allowedRoot = await mkdtemp(join(tmpdir(), 'omx-allowed-root-'));
-    const disallowedRoot = await mkdtemp(join(tmpdir(), 'omx-disallowed-root-'));
+    const allowedRoot = await mkdtemp(join(tmpdir(), 'omcp-allowed-root-'));
+    const disallowedRoot = await mkdtemp(join(tmpdir(), 'omcp-disallowed-root-'));
     const prev = process.env.OMX_MCP_WORKDIR_ROOTS;
     process.env.OMX_MCP_WORKDIR_ROOTS = allowedRoot;
     try {
@@ -112,20 +112,20 @@ describe('state paths', () => {
 
   it('builds global state paths', () => {
     const base = getBaseStateDir('/repo');
-    assert.equal(base, '/repo/.omx/state');
-    assert.equal(getStateDir('/repo'), '/repo/.omx/state');
-    assert.equal(getStatePath('team', '/repo'), '/repo/.omx/state/team-state.json');
+    assert.equal(base, '/repo/.omcp/state');
+    assert.equal(getStateDir('/repo'), '/repo/.omcp/state');
+    assert.equal(getStatePath('team', '/repo'), '/repo/.omcp/state/team-state.json');
   });
 
   it('builds session state paths', () => {
-    assert.equal(getStateDir('/repo', 'sess1'), '/repo/.omx/state/sessions/sess1');
+    assert.equal(getStateDir('/repo', 'sess1'), '/repo/.omcp/state/sessions/sess1');
     assert.equal(
       getStatePath('ralph', '/repo', 'sess1'),
-      '/repo/.omx/state/sessions/sess1/ralph-state.json'
+      '/repo/.omcp/state/sessions/sess1/ralph-state.json'
     );
     assert.equal(
       getStateFilePath('hud-state.json', '/repo', 'sess1'),
-      '/repo/.omx/state/sessions/sess1/hud-state.json'
+      '/repo/.omcp/state/sessions/sess1/hud-state.json'
     );
   });
 
@@ -134,7 +134,7 @@ describe('state paths', () => {
   });
 
   it('enumerates global-only path', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-paths-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-paths-'));
     try {
       const paths = await getAllScopedStatePaths('team', wd);
       assert.deepEqual(paths, [getStatePath('team', wd)]);
@@ -144,7 +144,7 @@ describe('state paths', () => {
   });
 
   it('enumerates session-scoped paths', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-paths-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-paths-'));
     try {
       const sessionsRoot = join(getBaseStateDir(wd), 'sessions');
       await mkdir(join(sessionsRoot, 'sess1'), { recursive: true });
@@ -161,7 +161,7 @@ describe('state paths', () => {
   });
 
   it('enumerates state directories across all scopes', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-paths-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-paths-'));
     try {
       const sessionsRoot = join(getBaseStateDir(wd), 'sessions');
       await mkdir(join(sessionsRoot, 'sess1'), { recursive: true });
@@ -178,7 +178,7 @@ describe('state paths', () => {
   });
 
   it('enumerates global and session-scoped paths together', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-paths-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-paths-'));
     try {
       const sessionsRoot = join(getBaseStateDir(wd), 'sessions');
       await mkdir(join(sessionsRoot, 'sess1'), { recursive: true });
@@ -196,7 +196,7 @@ describe('state paths', () => {
   });
 
   it('ignores invalid session directory names', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-paths-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-paths-'));
     try {
       const sessionsRoot = join(getBaseStateDir(wd), 'sessions');
       await mkdir(join(sessionsRoot, 'valid-session'), { recursive: true });
@@ -211,7 +211,7 @@ describe('state paths', () => {
   });
 
   it('reads session-sensitive runtime files from the current session without root fallback when requested', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-paths-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-paths-'));
     try {
       const stateDir = getBaseStateDir(wd);
       await mkdir(join(stateDir, 'sessions', 'sess-current'), { recursive: true });
@@ -228,7 +228,7 @@ describe('state paths', () => {
   });
 
   it('prefers OMX_SESSION_ID over stale session.json when resolving current session id', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-paths-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-paths-'));
     const previousSessionId = process.env.OMX_SESSION_ID;
     try {
       const stateDir = getBaseStateDir(wd);

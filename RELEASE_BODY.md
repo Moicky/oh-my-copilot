@@ -2,17 +2,17 @@
 
 ## Summary
 
-`0.14.0` is a minor release after `v0.13.2` focused on interactive orchestration. It introduces the new `omx question` blocking-question entrypoint, routes deep-interview rounds through structured question state, hard-deprecates direct `omx autoresearch` in favor of the skill-first validator-gated flow, adds advisory triage routing, and normalizes runtime run outcomes so Stop/continuation behavior stays consistent across execution surfaces.
+`0.14.0` is a minor release after `v0.13.2` focused on interactive orchestration. It introduces the new `omcp question` blocking-question entrypoint, routes deep-interview rounds through structured question state, hard-deprecates direct `omcp autoresearch` in favor of the skill-first validator-gated flow, adds advisory triage routing, and normalizes runtime run outcomes so Stop/continuation behavior stays consistent across execution surfaces.
 
 ## Added
 
-- **`omx question` structured interactive entrypoint** — OMCP now has a first-party blocking-question command for agent-invoked user questions, with JSON input, tmux/native renderer selection, persistent question records, and structured answer output.
+- **`omcp question` structured interactive entrypoint** — OMCP now has a first-party blocking-question command for agent-invoked user questions, with JSON input, tmux/native renderer selection, persistent question records, and structured answer output.
 - **Question-obligation tracking for deep-interview** — deep-interview can now mark a question as pending/required, satisfy it, and clear it explicitly so interactive progress is durable instead of inferred from free-form prompt text.
 - **Advisory triage classifier** — non-keyword prompts now get PASS/LIGHT/HEAVY advisory routing backed by persisted triage state and follow-up suppression.
 
 ## Changed
 
-- **Deep-interview now depends on `omx question`** — each interview round uses the OMCP-owned question surface rather than plain-text fallback, making interactive clarification lifecycle and Stop semantics explicit.
+- **Deep-interview now depends on `omcp question`** — each interview round uses the OMCP-owned question surface rather than plain-text fallback, making interactive clarification lifecycle and Stop semantics explicit.
 - **Autoresearch is now validator-gated and skill-first** — the direct CLI entrypoint is hard-deprecated, users are steered to `$deep-interview --autoresearch` / `$autoresearch`, and completion now requires validator evidence.
 - **Runtime stop/continue semantics are shared** — run outcomes are normalized into one contract so persistent loops and state writers agree on terminal versus non-terminal execution states.
 - **Specialist routing boundaries are clearer** — `explore`, `researcher`, and `dependency-expert` paths now have narrower role ownership in both prompts and role routing.
@@ -39,7 +39,7 @@
 ## Remaining risk
 
 - This is a local release-readiness pass, not a full GitHub Actions matrix rerun.
-- `omx question` and advisory triage touch interactive/operator-facing surfaces that are best further observed in real tmux and multi-session environments after release.
+- `omcp question` and advisory triage touch interactive/operator-facing surfaces that are best further observed in real tmux and multi-session environments after release.
 - The release changes prompt routing, runtime stop semantics, and validator gating together, so post-release monitoring should focus on deep-interview/autoresearch flows and long-running OMCP sessions.
 
 ## Contributors

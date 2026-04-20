@@ -304,13 +304,13 @@ function resolveSeedStateFilePath(
   if (scope !== 'root' && sessionId?.trim()) {
     return {
       absolutePath: join(stateDir, 'sessions', sessionId, `${mode}-state.json`),
-      relativePath: `.omx/state/sessions/${sessionId}/${mode}-state.json`,
+      relativePath: `.omcp/state/sessions/${sessionId}/${mode}-state.json`,
     };
   }
 
   return {
     absolutePath: join(stateDir, `${mode}-state.json`),
-    relativePath: `.omx/state/${mode}-state.json`,
+    relativePath: `.omcp/state/${mode}-state.json`,
   };
 }
 
@@ -699,7 +699,7 @@ export async function recordSkillActivation(input: RecordSkillActivationInput): 
       );
       await persistDeepInterviewModeState(input.stateDir, state, nowIso, previous, input);
     } catch (error) {
-      console.warn('[omx] warning: failed to persist keyword activation state', error);
+      console.warn('[omcp] warning: failed to persist keyword activation state', error);
     }
 
     return state;
@@ -872,7 +872,7 @@ export async function recordSkillActivation(input: RecordSkillActivationInput): 
       await persistDeepInterviewModeState(input.stateDir, nextState, nowIso, previous, input);
       return nextState;
     } catch (error) {
-      console.warn('[omx] warning: failed to persist keyword activation state', error);
+      console.warn('[omcp] warning: failed to persist keyword activation state', error);
     }
 
     return workflowState;
@@ -915,7 +915,7 @@ export async function recordSkillActivation(input: RecordSkillActivationInput): 
     await persistDeepInterviewModeState(input.stateDir, nextState, nowIso, previous, input);
     return nextState;
   } catch (error) {
-    console.warn('[omx] warning: failed to persist keyword activation state', error);
+    console.warn('[omcp] warning: failed to persist keyword activation state', error);
   }
 
   return state;

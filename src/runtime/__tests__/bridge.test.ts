@@ -10,7 +10,7 @@ describe('resolveRuntimeBinaryPath', () => {
       const actual = resolveRuntimeBinaryPath({
         debugPath: '/debug/runtime',
         releasePath: '/release/runtime',
-        fallbackBinary: 'omx-runtime',
+        fallbackBinary: 'omcp-runtime',
         exists: () => false,
       });
       assert.equal(actual, '/custom/runtime');
@@ -24,7 +24,7 @@ describe('resolveRuntimeBinaryPath', () => {
     const actual = resolveRuntimeBinaryPath({
       debugPath: '/debug/runtime',
       releasePath: '/release/runtime',
-      fallbackBinary: 'omx-runtime',
+      fallbackBinary: 'omcp-runtime',
       exists: (candidate) => candidate === '/debug/runtime' || candidate === '/release/runtime',
     });
     assert.equal(actual, '/debug/runtime');
@@ -34,7 +34,7 @@ describe('resolveRuntimeBinaryPath', () => {
     const actual = resolveRuntimeBinaryPath({
       debugPath: '/debug/runtime',
       releasePath: '/release/runtime',
-      fallbackBinary: 'omx-runtime',
+      fallbackBinary: 'omcp-runtime',
       exists: (candidate) => candidate === '/release/runtime',
     });
     assert.equal(actual, '/release/runtime');
@@ -44,9 +44,9 @@ describe('resolveRuntimeBinaryPath', () => {
     const actual = resolveRuntimeBinaryPath({
       debugPath: '/debug/runtime',
       releasePath: '/release/runtime',
-      fallbackBinary: 'omx-runtime',
+      fallbackBinary: 'omcp-runtime',
       exists: () => false,
     });
-    assert.equal(actual, 'omx-runtime');
+    assert.equal(actual, 'omcp-runtime');
   });
 });

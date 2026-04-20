@@ -19,7 +19,7 @@ let originalEnv: NodeJS.ProcessEnv;
 
 beforeEach(async () => {
 	originalEnv = { ...process.env };
-	tempDir = await mkdtemp(join(tmpdir(), "omx-adapt-foundation-"));
+	tempDir = await mkdtemp(join(tmpdir(), "omcp-adapt-foundation-"));
 	process.env.HOME = tempDir;
 	process.env.CODEX_HOME = join(tempDir, ".codex");
 	delete process.env.OMX_OPENCLAW;
@@ -43,38 +43,38 @@ async function writeOpenClawOmxConfig(config: unknown): Promise<void> {
 	const configDir = join(tempDir, ".codex");
 	await mkdir(configDir, { recursive: true });
 	await writeFile(
-		join(configDir, ".omx-config.json"),
+		join(configDir, ".omcp-config.json"),
 		`${JSON.stringify(config, null, 2)}\n`,
 	);
 }
 
 describe("adapt foundation", () => {
-	it("resolves OMCP-owned adapter paths under .omx/adapters/<target>", () => {
+	it("resolves OMCP-owned adapter paths under .omcp/adapters/<target>", () => {
 		const paths = resolveAdaptPaths(tempDir, "openclaw");
 		assert.equal(
 			paths.adapterRoot,
-			join(tempDir, ".omx", "adapters", "openclaw"),
+			join(tempDir, ".omcp", "adapters", "openclaw"),
 		);
 		assert.equal(
 			paths.configPath,
-			join(tempDir, ".omx", "adapters", "openclaw", "adapter.json"),
+			join(tempDir, ".omcp", "adapters", "openclaw", "adapter.json"),
 		);
 		assert.equal(
 			paths.envelopePath,
-			join(tempDir, ".omx", "adapters", "openclaw", "envelope.json"),
+			join(tempDir, ".omcp", "adapters", "openclaw", "envelope.json"),
 		);
 		assert.equal(
 			paths.probeReportPath,
-			join(tempDir, ".omx", "adapters", "openclaw", "reports", "probe.json"),
+			join(tempDir, ".omcp", "adapters", "openclaw", "reports", "probe.json"),
 		);
 		assert.equal(
 			paths.statusReportPath,
-			join(tempDir, ".omx", "adapters", "openclaw", "reports", "status.json"),
+			join(tempDir, ".omcp", "adapters", "openclaw", "reports", "status.json"),
 		);
 	});
 
 	it("links the latest canonical PRD/test-spec artifacts into the envelope", async () => {
-		const plansDir = join(tempDir, ".omx", "plans");
+		const plansDir = join(tempDir, ".omcp", "plans");
 		await mkdir(plansDir, { recursive: true });
 		await writeFile(join(plansDir, "prd-alpha.md"), "# Alpha\n");
 		await writeFile(
@@ -106,7 +106,7 @@ describe("adapt foundation", () => {
 			envelope.capabilities.map((capability) => capability.ownership),
 		);
 		assert.deepEqual([...ownerships].sort(), [
-			"omx-owned",
+			"omcp-owned",
 			"shared-contract",
 			"target-observed",
 		]);
@@ -123,7 +123,7 @@ describe("adapt foundation", () => {
 		assert.equal(result.write, false);
 		assert.deepEqual(result.wrotePaths, []);
 		assert.equal(existsSync(paths.configPath), false);
-		assert.equal(existsSync(join(tempDir, ".omx", "state")), false);
+		assert.equal(existsSync(join(tempDir, ".omcp", "state")), false);
 	});
 
 	it("writes OpenClaw adapter artifacts only under adapter-owned paths", async () => {
@@ -161,7 +161,7 @@ describe("adapt foundation", () => {
 		assert.deepEqual(result.wrotePaths, [paths.configPath, paths.envelopePath]);
 		assert.equal(existsSync(paths.configPath), true);
 		assert.equal(existsSync(paths.envelopePath), true);
-		assert.equal(existsSync(join(tempDir, ".omx", "state")), false);
+		assert.equal(existsSync(join(tempDir, ".omcp", "state")), false);
 
 		const envelope = JSON.parse(readFileSync(paths.envelopePath, "utf-8")) as {
 			target: string;

@@ -848,7 +848,7 @@ function buildDispatchAttemptEvidence(result, fallback = {}) {
 export async function drainPendingTeamDispatch({
   cwd,
   stateDir = resolveBridgeStateDir(cwd),
-  logsDir = join(cwd, '.omx', 'logs'),
+  logsDir = join(cwd, '.omcp', 'logs'),
   maxPerTick = 5,
   injector = injectDispatchRequest,
 }: {

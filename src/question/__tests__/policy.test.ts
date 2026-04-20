@@ -8,9 +8,9 @@ import { evaluateQuestionPolicy } from '../policy.js';
 const tempDirs: string[] = [];
 
 async function makeRepo(): Promise<string> {
-  const cwd = await mkdtemp(join(tmpdir(), 'omx-question-policy-'));
+  const cwd = await mkdtemp(join(tmpdir(), 'omcp-question-policy-'));
   tempDirs.push(cwd);
-  await mkdir(join(cwd, '.omx', 'state'), { recursive: true });
+  await mkdir(join(cwd, '.omcp', 'state'), { recursive: true });
   return cwd;
 }
 
@@ -21,7 +21,7 @@ afterEach(async () => {
 describe('evaluateQuestionPolicy', () => {
   it('allows non-team leader sessions with no blocked modes', async () => {
     const cwd = await makeRepo();
-    await writeFile(join(cwd, '.omx', 'state', 'session.json'), JSON.stringify({ session_id: 'sess-1' }));
+    await writeFile(join(cwd, '.omcp', 'state', 'session.json'), JSON.stringify({ session_id: 'sess-1' }));
     const result = await evaluateQuestionPolicy({ cwd, explicitSessionId: 'sess-1', env: { ...process.env, OMX_TEAM_WORKER: '' } });
     assert.equal(result.allowed, true);
   });
@@ -36,7 +36,7 @@ describe('evaluateQuestionPolicy', () => {
 
   it('blocks canonical active team ownership for the current session', async () => {
     const cwd = await makeRepo();
-    const teamRoot = join(cwd, '.omx', 'state', 'team', 'alpha');
+    const teamRoot = join(cwd, '.omcp', 'state', 'team', 'alpha');
     await mkdir(teamRoot, { recursive: true });
     await writeFile(join(teamRoot, 'manifest.v2.json'), JSON.stringify({
       schema_version: 2,
@@ -66,7 +66,7 @@ describe('evaluateQuestionPolicy', () => {
 
   it('blocks active execution-like workflows for the current session', async () => {
     const cwd = await makeRepo();
-    const sessionDir = join(cwd, '.omx', 'state', 'sessions', 'sess-ralph');
+    const sessionDir = join(cwd, '.omcp', 'state', 'sessions', 'sess-ralph');
     await mkdir(sessionDir, { recursive: true });
     await writeFile(join(sessionDir, 'ralph-state.json'), JSON.stringify({ mode: 'ralph', active: true }));
     const result = await evaluateQuestionPolicy({ cwd, explicitSessionId: 'sess-ralph', env: { ...process.env, OMX_TEAM_WORKER: '' } });
@@ -77,7 +77,7 @@ describe('evaluateQuestionPolicy', () => {
 
   it('does not falsely block from another session team state', async () => {
     const cwd = await makeRepo();
-    const teamRoot = join(cwd, '.omx', 'state', 'team', 'beta');
+    const teamRoot = join(cwd, '.omcp', 'state', 'team', 'beta');
     await mkdir(teamRoot, { recursive: true });
     await writeFile(join(teamRoot, 'manifest.v2.json'), JSON.stringify({
       schema_version: 2,
@@ -105,7 +105,7 @@ describe('evaluateQuestionPolicy', () => {
 
   it('allows deep-interview state when no execution-like workflow is active', async () => {
     const cwd = await makeRepo();
-    const sessionDir = join(cwd, '.omx', 'state', 'sessions', 'sess-di');
+    const sessionDir = join(cwd, '.omcp', 'state', 'sessions', 'sess-di');
     await mkdir(sessionDir, { recursive: true });
     await writeFile(join(sessionDir, 'deep-interview-state.json'), JSON.stringify({ mode: 'deep-interview', active: true }));
     const result = await evaluateQuestionPolicy({ cwd, explicitSessionId: 'sess-di', env: { ...process.env, OMX_TEAM_WORKER: '' } });

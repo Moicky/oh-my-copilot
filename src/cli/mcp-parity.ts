@@ -57,7 +57,7 @@ function buildDescriptorHelp(descriptor: McpCliDescriptor): string {
     .join("\n");
 
   return [
-    `Usage: omx ${descriptor.commandName} <tool-name> [--input <json>] [--json]`,
+    `Usage: omcp ${descriptor.commandName} <tool-name> [--input <json>] [--json]`,
     "",
     descriptor.title,
     "",
@@ -65,7 +65,7 @@ function buildDescriptorHelp(descriptor: McpCliDescriptor): string {
     toolLines,
     "",
     "Examples:",
-    `  omx ${descriptor.commandName} ${descriptor.tools[0]?.name ?? "<tool>"} --input '{}' --json`,
+    `  omcp ${descriptor.commandName} ${descriptor.tools[0]?.name ?? "<tool>"} --input '{}' --json`,
   ].join("\n");
 }
 

@@ -9,7 +9,7 @@ import { readTeamConfig, saveTeamConfig } from '../state.js';
 import { shutdownTeam, startTeam, type TeamRuntime } from '../runtime.js';
 
 async function initRepo(): Promise<string> {
-  const cwd = await mkdtemp(join(tmpdir(), 'omx-shutdown-fallback-'));
+  const cwd = await mkdtemp(join(tmpdir(), 'omcp-shutdown-fallback-'));
   execFileSync('git', ['init'], { cwd, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd, stdio: 'ignore' });
   execFileSync('git', ['config', 'user.name', 'Test User'], { cwd, stdio: 'ignore' });
@@ -40,7 +40,7 @@ function withMockPromptModeCodexAllowed<T>(fn: () => Promise<T>): Promise<T> {
 describe('shutdown fallback worktree reports', () => {
   it('shutdownTeam checkpoints dirty detached worker worktrees, merges them, and writes a report', async () => {
     const repo = await initRepo();
-    const binDir = await mkdtemp(join(tmpdir(), 'omx-shutdown-fallback-bin-'));
+    const binDir = await mkdtemp(join(tmpdir(), 'omcp-shutdown-fallback-bin-'));
     const fakeCodexPath = join(binDir, 'codex');
     await writeFile(
       fakeCodexPath,
@@ -95,15 +95,15 @@ process.on('SIGTERM', () => process.exit(0));
       assert.ok(preservedWorktreePath, 'preserved worktree path should be captured');
       assert.equal(existsSync(preservedWorktreePath as string), true);
 
-      const reportPath = join(preservedWorktreePath as string, '.omx', 'diff.md');
+      const reportPath = join(preservedWorktreePath as string, '.omcp', 'diff.md');
       assert.equal(existsSync(reportPath), true);
       const report = await readFile(reportPath, 'utf-8');
       assert.match(report, /merge_outcome: merged/);
       assert.doesNotMatch(report, /synthetic_commit: none/);
       assert.match(report, /worker-note\.txt/);
 
-      const commitHygieneJsonPath = join(repo, '.omx', 'reports', 'team-commit-hygiene', 'team-shutdown-fallback-report.context.json');
-      const commitHygieneMarkdownPath = join(repo, '.omx', 'reports', 'team-commit-hygiene', 'team-shutdown-fallback-report.md');
+      const commitHygieneJsonPath = join(repo, '.omcp', 'reports', 'team-commit-hygiene', 'team-shutdown-fallback-report.context.json');
+      const commitHygieneMarkdownPath = join(repo, '.omcp', 'reports', 'team-commit-hygiene', 'team-shutdown-fallback-report.md');
       assert.equal(existsSync(commitHygieneJsonPath), true, 'shutdown should preserve a structured commit hygiene context artifact');
       assert.equal(existsSync(commitHygieneMarkdownPath), true, 'shutdown should preserve a human-readable commit hygiene guide');
 

@@ -32,7 +32,7 @@ import { getAdaptTargetDescriptor, listAdaptTargets } from "./registry.js";
 
 const FOUNDATION_CONSTRAINTS = [
 	"Thin adapter surface only; no bidirectional control plane is claimed in this foundation PR.",
-	"No direct writes to .omx/state/... or target runtime internals.",
+	"No direct writes to .omcp/state/... or target runtime internals.",
 	"Capability reporting is asymmetric: OMCP-owned, shared-contract, and target-observed surfaces are reported separately.",
 ];
 
@@ -148,7 +148,7 @@ export function buildAdaptProbeReport(
 			detail: descriptor.followupHint,
 		},
 		nextSteps: [
-			`Run omx adapt ${target} init --write to materialize OMCP-owned adapter artifacts.`,
+			`Run omcp adapt ${target} init --write to materialize OMCP-owned adapter artifacts.`,
 			descriptor.followupHint,
 		],
 	};
@@ -202,7 +202,7 @@ export function buildAdaptStatusReport(
 		adapter: {
 			state: initialized ? "initialized" : "not-initialized",
 			detail: initialized
-				? "Adapter foundation artifacts exist under .omx/adapters/<target>/..."
+				? "Adapter foundation artifacts exist under .omcp/adapters/<target>/..."
 				: "Run init --write to create OMCP-owned adapter artifacts.",
 			configPath: paths.configPath,
 			envelopePath: paths.envelopePath,
@@ -254,7 +254,7 @@ export function buildAdaptDoctorReport(
 	if (status.adapter.state === "not-initialized") {
 		issues.push({
 			code: "adapter_not_initialized",
-			message: `No adapter foundation artifacts exist for ${target} under ${join(".omx", "adapters", target)}.`,
+			message: `No adapter foundation artifacts exist for ${target} under ${join(".omcp", "adapters", target)}.`,
 		});
 	}
 
@@ -279,8 +279,8 @@ export function buildAdaptDoctorReport(
 		summary: `Foundation doctor for ${descriptor.displayName} reports only OMCP-owned adapter readiness and shared planning linkage.`,
 		issues,
 		nextSteps: [
-			`Run omx adapt ${target} init --write.`,
-			"Keep follow-on integration work out of .omx/state/... and target runtime internals unless a reviewed contract exists.",
+			`Run omcp adapt ${target} init --write.`,
+			"Keep follow-on integration work out of .omcp/state/... and target runtime internals unless a reviewed contract exists.",
 			descriptor.followupHint,
 		],
 	};

@@ -15,7 +15,7 @@ import {
 } from '../dispatch-cooldown.js';
 
 function makeTmpStateDir(): string {
-  const dir = join(tmpdir(), `omx-dispatch-cooldown-test-${Math.random().toString(36).slice(2)}`);
+  const dir = join(tmpdir(), `omcp-dispatch-cooldown-test-${Math.random().toString(36).slice(2)}`);
   mkdirSync(dir, { recursive: true });
   return dir;
 }

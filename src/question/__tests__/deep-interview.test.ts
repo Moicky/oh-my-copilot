@@ -9,15 +9,15 @@ import { runDeepInterviewQuestion } from '../deep-interview.js';
 const tempDirs: string[] = [];
 
 async function makeRepo(): Promise<string> {
-  const cwd = await mkdtemp(join(tmpdir(), 'omx-deep-interview-question-'));
+  const cwd = await mkdtemp(join(tmpdir(), 'omcp-deep-interview-question-'));
   tempDirs.push(cwd);
-  await mkdir(join(cwd, '.omx', 'state', 'sessions', 'sess-di'), { recursive: true });
+  await mkdir(join(cwd, '.omcp', 'state', 'sessions', 'sess-di'), { recursive: true });
   await writeFile(
-    join(cwd, '.omx', 'state', 'session.json'),
+    join(cwd, '.omcp', 'state', 'session.json'),
     JSON.stringify({ session_id: 'sess-di' }, null, 2),
   );
   await writeFile(
-    join(cwd, '.omx', 'state', 'sessions', 'sess-di', 'deep-interview-state.json'),
+    join(cwd, '.omcp', 'state', 'sessions', 'sess-di', 'deep-interview-state.json'),
     JSON.stringify({
       active: true,
       mode: 'deep-interview',
@@ -35,9 +35,9 @@ afterEach(async () => {
 });
 
 describe('runDeepInterviewQuestion', () => {
-  it('tracks a pending obligation before omx question returns and satisfies it afterward', async () => {
+  it('tracks a pending obligation before omcp question returns and satisfies it afterward', async () => {
     const cwd = await makeRepo();
-    const statePath = join(cwd, '.omx', 'state', 'sessions', 'sess-di', 'deep-interview-state.json');
+    const statePath = join(cwd, '.omcp', 'state', 'sessions', 'sess-di', 'deep-interview-state.json');
     let inFlightQuestionStatus = '';
 
     const runner: OmxQuestionProcessRunner = async () => {
@@ -78,7 +78,7 @@ describe('runDeepInterviewQuestion', () => {
       },
       {
         cwd,
-        argv1: '/repo/dist/cli/omx.js',
+        argv1: '/repo/dist/cli/omcp.js',
         runner,
       },
     );
@@ -100,9 +100,9 @@ describe('runDeepInterviewQuestion', () => {
     assert.ok(finalState.question_enforcement?.satisfied_at);
   });
 
-  it('clears the pending obligation when omx question fails after being attempted', async () => {
+  it('clears the pending obligation when omcp question fails after being attempted', async () => {
     const cwd = await makeRepo();
-    const statePath = join(cwd, '.omx', 'state', 'sessions', 'sess-di', 'deep-interview-state.json');
+    const statePath = join(cwd, '.omcp', 'state', 'sessions', 'sess-di', 'deep-interview-state.json');
 
     await assert.rejects(
       runDeepInterviewQuestion(
@@ -113,14 +113,14 @@ describe('runDeepInterviewQuestion', () => {
         },
         {
           cwd,
-          argv1: '/repo/dist/cli/omx.js',
+          argv1: '/repo/dist/cli/omcp.js',
           runner: async () => ({
             code: 1,
             stdout: JSON.stringify({
               ok: false,
               error: {
                 code: 'team_blocked',
-                message: 'omx question is unavailable while this session owns active team mode.',
+                message: 'omcp question is unavailable while this session owns active team mode.',
               },
             }),
             stderr: '',

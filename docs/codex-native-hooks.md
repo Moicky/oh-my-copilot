@@ -6,32 +6,32 @@ This page is the canonical answer to:
 
 ## Install surface
 
-`omx setup` now owns both of these native Codex artifacts:
+`omcp setup` now owns both of these native Codex artifacts:
 
 - `.codex/config.toml` → enables `[features].codex_hooks = true`
 - `.codex/hooks.json` → registers the OMCP-managed native hook command while preserving non-OMCP hook entries already in the file
 
 For project scope, `.gitignore` keeps generated `.codex/hooks.json` out of source control.
-`omx uninstall` removes only the OMCP-managed wrapper entries from `.codex/hooks.json`; if user hooks remain, the file stays in place.
+`omcp uninstall` removes only the OMCP-managed wrapper entries from `.codex/hooks.json`; if user hooks remain, the file stays in place.
 
-`omx doctor` can confirm that these files exist and are shaped correctly. It does not prove that the same shell/profile can complete an authenticated Codex request; use `codex login status` plus a real `omx exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"` smoke test for that boundary.
+`omcp doctor` can confirm that these files exist and are shaped correctly. It does not prove that the same shell/profile can complete an authenticated Codex request; use `codex login status` plus a real `omcp exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"` smoke test for that boundary.
 
 ## Ownership split
 
 - **Native Codex hooks**: `.codex/hooks.json`
-- **OMCP plugin hooks**: `.omx/hooks/*.mjs`
-- **tmux/runtime fallbacks**: `omx tmux-hook`, notify-hook, derived watcher, idle/session-end reporters
+- **OMCP plugin hooks**: `.omcp/hooks/*.mjs`
+- **tmux/runtime fallbacks**: `omcp tmux-hook`, notify-hook, derived watcher, idle/session-end reporters
 
-OMCP only owns the wrapper entries that invoke `dist/scripts/codex-native-hook.js`. User-managed hook entries in the same `.codex/hooks.json` file are preserved across `omx setup` refreshes and `omx uninstall`.
+OMCP only owns the wrapper entries that invoke `dist/scripts/codex-native-hook.js`. User-managed hook entries in the same `.codex/hooks.json` file are preserved across `omcp setup` refreshes and `omcp uninstall`.
 
 ## Mapping matrix
 
 | OMC / OMCP surface | Native Codex source | OMCP runtime target | Status | Notes |
 | --- | --- | --- | --- | --- |
-| `session-start` | `SessionStart` | `session-start` | native | Native adapter refreshes session bookkeeping, restores startup developer context, and ensures `.omx/` is gitignored at the repo root |
-| wiki startup context | `SessionStart` | `session-start` | native | Wiki session-start context can append a compact `.omx/wiki/` summary when wiki pages exist; startup writes stay config-gated |
-| `keyword-detector` | `UserPromptSubmit` | `keyword-detector` | native | Persists skill activation state and can add prompt-side developer context; `$ralph` prompt routing seeds workflow state only and does not launch `omx ralph --prd ...` |
-| `pre-tool-use` | `PreToolUse` (`Bash`) | `pre-tool-use` | native-partial | Current native scope is Bash-only; built-in native behavior cautions on `rm -rf dist` and blocks inspectable inline `git commit` commands until Lore-format structure + the required `Co-authored-by: OmX <omx@oh-my-copilot.dev>` trailer are present |
+| `session-start` | `SessionStart` | `session-start` | native | Native adapter refreshes session bookkeeping, restores startup developer context, and ensures `.omcp/` is gitignored at the repo root |
+| wiki startup context | `SessionStart` | `session-start` | native | Wiki session-start context can append a compact `.omcp/wiki/` summary when wiki pages exist; startup writes stay config-gated |
+| `keyword-detector` | `UserPromptSubmit` | `keyword-detector` | native | Persists skill activation state and can add prompt-side developer context; `$ralph` prompt routing seeds workflow state only and does not launch `omcp ralph --prd ...` |
+| `pre-tool-use` | `PreToolUse` (`Bash`) | `pre-tool-use` | native-partial | Current native scope is Bash-only; built-in native behavior cautions on `rm -rf dist` and blocks inspectable inline `git commit` commands until Lore-format structure + the required `Co-authored-by: OmX <omcp@oh-my-copilot.dev>` trailer are present |
 | `post-tool-use` | `PostToolUse` (`Bash`) | `post-tool-use` | native-partial | Current native scope is Bash-only; built-in native behavior covers command-not-found / permission-denied / missing-path guidance and informative non-zero-output review |
 | Ralph/persistence stop handling | `Stop` | `stop` | native-partial | Native adapter uses the documented native Stop continuation contract (`decision: "block"` + `reason`) for active Ralph runs and avoids re-blocking once `stop_hook_active` is set |
 | Autopilot continuation | `Stop` | `stop` | native-partial | Native adapter continues non-terminal autopilot sessions from active session/root mode state |
@@ -54,9 +54,9 @@ OMCP only owns the wrapper entries that invoke `dist/scripts/codex-native-hook.j
 
 The approved OMCP-native wiki backport keeps lifecycle ownership intentionally narrow:
 
-- **Storage** lives under `.omx/wiki/`, not `.omc/wiki/`.
-- **SessionStart** may surface bounded wiki context from `.omx/wiki/` when the wiki already exists, but it should stay read-mostly and must not block the native hook path on expensive writes or index rebuilds.
-- **SessionEnd** remains a runtime/notify-path responsibility for best-effort, non-blocking session capture into `.omx/wiki/`.
+- **Storage** lives under `.omcp/wiki/`, not `.omc/wiki/`.
+- **SessionStart** may surface bounded wiki context from `.omcp/wiki/` when the wiki already exists, but it should stay read-mostly and must not block the native hook path on expensive writes or index rebuilds.
+- **SessionEnd** remains a runtime/notify-path responsibility for best-effort, non-blocking session capture into `.omcp/wiki/`.
 - **PreCompact parity is intentionally deferred** in v1 unless a clearly OMCP-native compaction seam exists.
 - **Routing should stay explicit**: prefer `$wiki` or task verbs like `wiki query` / `wiki add`, and avoid implicit bare `wiki` noun activation.
 
@@ -70,7 +70,7 @@ For the first-pass multi-state rollout, the approved overlaps are:
 - `team + ultrawork`
 
 Unsupported overlaps should preserve the current state unchanged and direct the
-operator to clear incompatible state explicitly via `omx state ...` or the
+operator to clear incompatible state explicitly via `omcp state ...` or the
 `omx_state.*` MCP tools before retrying. See
 `docs/contracts/multi-state-transition-contract.md`.
 
@@ -83,10 +83,10 @@ operator to clear incompatible state explicitly via `omx state ...` or the
 When validating hooks, keep the proof boundary explicit:
 
 1. **Native Codex hook proof**
-   - `omx setup` wrote `.codex/hooks.json`
+   - `omcp setup` wrote `.codex/hooks.json`
    - native Codex event invoked `dist/scripts/codex-native-hook.js`
 2. **OMCP plugin proof**
-   - plugin dispatch/log evidence exists under `.omx/logs/hooks-*.jsonl`
+   - plugin dispatch/log evidence exists under `.omcp/logs/hooks-*.jsonl`
 3. **Fallback proof**
    - behavior came from notify-hook / derived watcher / tmux runtime, not native Codex hooks
 

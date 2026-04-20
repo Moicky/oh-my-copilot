@@ -78,14 +78,14 @@ exit 1
 }
 
 describe('state-server directory initialization', () => {
-  it('creates .omx/state for state tools without setup', async () => {
+  it('creates .omcp/state for state tools without setup', async () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-test-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-test-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
-      const tmuxHookConfig = join(wd, '.omx', 'tmux-hook.json');
+      const stateDir = join(wd, '.omcp', 'state');
+      const tmuxHookConfig = join(wd, '.omcp', 'tmux-hook.json');
       assert.equal(existsSync(stateDir), false);
       assert.equal(existsSync(tmuxHookConfig), false);
 
@@ -111,9 +111,9 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-test-live-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-test-live-'));
     try {
-      const tmuxHookConfig = join(wd, '.omx', 'tmux-hook.json');
+      const tmuxHookConfig = join(wd, '.omcp', 'tmux-hook.json');
       const fakeBin = await createFakeTmuxBin(wd);
 
       await withAmbientTmuxEnv(
@@ -146,7 +146,7 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-test-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-test-'));
     try {
       const writeResponse = await handleStateToolCall({
         params: {
@@ -170,7 +170,7 @@ describe('state-server directory initialization', () => {
         {
           success: true,
           mode: 'deep-interview',
-          path: join(wd, '.omx', 'state', 'deep-interview-state.json'),
+          path: join(wd, '.omcp', 'state', 'deep-interview-state.json'),
         },
       );
 
@@ -199,9 +199,9 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-test-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-test-'));
     try {
-      const sessionDir = join(wd, '.omx', 'state', 'sessions', 'sess1');
+      const sessionDir = join(wd, '.omcp', 'state', 'sessions', 'sess1');
       assert.equal(existsSync(sessionDir), false);
 
       const response = await handleStateToolCall({
@@ -225,7 +225,7 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-test-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-test-'));
     try {
       const writes = Array.from({ length: 16 }, (_, i) => handleStateToolCall({
         params: {
@@ -243,7 +243,7 @@ describe('state-server directory initialization', () => {
         assert.equal(response.isError, undefined);
       }
 
-      const filePath = join(wd, '.omx', 'state', 'team-state.json');
+      const filePath = join(wd, '.omcp', 'state', 'team-state.json');
       const state = JSON.parse(await readFile(filePath, 'utf-8')) as Record<string, unknown>;
       for (let i = 0; i < 16; i++) {
         assert.equal(state[`k${i}`], i);
@@ -257,7 +257,7 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-canonical-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-canonical-'));
     try {
       await handleStateToolCall({
         params: {
@@ -274,7 +274,7 @@ describe('state-server directory initialization', () => {
         },
       });
 
-      const canonicalPath = join(wd, '.omx', 'state', 'sessions', 'sess-sync', 'skill-active-state.json');
+      const canonicalPath = join(wd, '.omcp', 'state', 'sessions', 'sess-sync', 'skill-active-state.json');
       const canonical = JSON.parse(await readFile(canonicalPath, 'utf-8')) as {
         active_skills?: Array<{ skill: string; session_id?: string; activated_at?: string; updated_at?: string }>;
       };
@@ -313,7 +313,7 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-overlap-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-overlap-'));
     try {
       await handleStateToolCall({
         params: {
@@ -342,7 +342,7 @@ describe('state-server directory initialization', () => {
         },
       });
 
-      const canonicalPath = join(wd, '.omx', 'state', 'sessions', 'sess-overlap', 'skill-active-state.json');
+      const canonicalPath = join(wd, '.omcp', 'state', 'sessions', 'sess-overlap', 'skill-active-state.json');
       const canonical = JSON.parse(await readFile(canonicalPath, 'utf-8')) as {
         active_skills?: Array<{ skill: string }>;
       };
@@ -376,7 +376,7 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-deny-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-deny-'));
     try {
       await handleStateToolCall({
         params: {
@@ -406,10 +406,10 @@ describe('state-server directory initialization', () => {
 
       assert.equal(denied.isError, true);
       assert.match(denied.content[0]?.text || '', /Unsupported workflow overlap: team \+ autopilot\./);
-      assert.equal(existsSync(join(wd, '.omx', 'state', 'sessions', 'sess-deny', 'autopilot-state.json')), false);
+      assert.equal(existsSync(join(wd, '.omcp', 'state', 'sessions', 'sess-deny', 'autopilot-state.json')), false);
 
       const canonical = JSON.parse(
-        await readFile(join(wd, '.omx', 'state', 'sessions', 'sess-deny', 'skill-active-state.json'), 'utf-8'),
+        await readFile(join(wd, '.omcp', 'state', 'sessions', 'sess-deny', 'skill-active-state.json'), 'utf-8'),
       ) as { active_skills?: Array<{ skill: string }> };
       assert.deepEqual(canonical.active_skills?.map((entry) => entry.skill), ['team']);
     } finally {
@@ -421,15 +421,15 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-canonical-prevalidate-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-canonical-prevalidate-'));
     try {
-      await mkdir(join(wd, '.omx', 'state', 'sessions', 'sess-canonical-deny'), { recursive: true });
+      await mkdir(join(wd, '.omcp', 'state', 'sessions', 'sess-canonical-deny'), { recursive: true });
       await writeFile(
-        join(wd, '.omx', 'state', 'team-state.json'),
+        join(wd, '.omcp', 'state', 'team-state.json'),
         JSON.stringify({ active: true, mode: 'team', current_phase: 'running' }, null, 2),
       );
       await writeFile(
-        join(wd, '.omx', 'state', 'skill-active-state.json'),
+        join(wd, '.omcp', 'state', 'skill-active-state.json'),
         JSON.stringify({
           version: 1,
           active: true,
@@ -438,7 +438,7 @@ describe('state-server directory initialization', () => {
         }, null, 2),
       );
       await writeFile(
-        join(wd, '.omx', 'state', 'sessions', 'sess-canonical-deny', 'skill-active-state.json'),
+        join(wd, '.omcp', 'state', 'sessions', 'sess-canonical-deny', 'skill-active-state.json'),
         JSON.stringify({
           version: 1,
           active: true,
@@ -466,7 +466,7 @@ describe('state-server directory initialization', () => {
 
       assert.equal(allowed.isError, undefined);
       assert.equal(
-        existsSync(join(wd, '.omx', 'state', 'sessions', 'sess-canonical-deny', 'ultrawork-state.json')),
+        existsSync(join(wd, '.omcp', 'state', 'sessions', 'sess-canonical-deny', 'ultrawork-state.json')),
         true,
       );
     } finally {
@@ -478,7 +478,7 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-canonical-clear-all-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-canonical-clear-all-'));
     try {
       await handleStateToolCall({
         params: {
@@ -503,7 +503,7 @@ describe('state-server directory initialization', () => {
         },
       });
 
-      const canonicalPath = join(wd, '.omx', 'state', 'skill-active-state.json');
+      const canonicalPath = join(wd, '.omcp', 'state', 'skill-active-state.json');
       const canonical = JSON.parse(await readFile(canonicalPath, 'utf-8')) as {
         active: boolean;
         active_skills?: unknown[];
@@ -519,7 +519,7 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-root-clear-propagate-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-root-clear-propagate-'));
     try {
       await handleStateToolCall({
         params: {
@@ -559,7 +559,7 @@ describe('state-server directory initialization', () => {
 
       const sessionCanonical = JSON.parse(
         await readFile(
-          join(wd, '.omx', 'state', 'sessions', 'sess-root-clear', 'skill-active-state.json'),
+          join(wd, '.omcp', 'state', 'sessions', 'sess-root-clear', 'skill-active-state.json'),
           'utf-8',
         ),
       ) as { active_skills?: Array<{ skill: string }> };
@@ -573,7 +573,7 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-team-ralph-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-team-ralph-'));
     try {
       const teamWrite = await handleStateToolCall({
         params: {
@@ -605,7 +605,7 @@ describe('state-server directory initialization', () => {
       assert.equal(ralphWrite.isError, undefined);
 
       const rootCanonical = JSON.parse(
-        await readFile(join(wd, '.omx', 'state', 'skill-active-state.json'), 'utf-8'),
+        await readFile(join(wd, '.omcp', 'state', 'skill-active-state.json'), 'utf-8'),
       ) as { active_skills?: Array<{ skill: string; phase?: string; session_id?: string }> };
       assert.deepEqual(
         rootCanonical.active_skills?.map(({ skill, phase, session_id }) => ({
@@ -618,7 +618,7 @@ describe('state-server directory initialization', () => {
 
       const sessionCanonical = JSON.parse(
         await readFile(
-          join(wd, '.omx', 'state', 'sessions', 'sess-team-ralph', 'skill-active-state.json'),
+          join(wd, '.omcp', 'state', 'sessions', 'sess-team-ralph', 'skill-active-state.json'),
           'utf-8',
         ),
       ) as { active_skills?: Array<{ skill: string; phase?: string; session_id?: string }> };
@@ -642,7 +642,7 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-standalone-overlap-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-standalone-overlap-'));
     try {
       const autopilotWrite = await handleStateToolCall({
         params: {
@@ -673,12 +673,12 @@ describe('state-server directory initialization', () => {
 
       assert.equal(invalidTeamWrite.isError, true);
       const body = JSON.parse(invalidTeamWrite.content[0]?.text || '{}') as { error?: string };
-      assert.match(body.error || '', /omx state/i);
+      assert.match(body.error || '', /omcp state/i);
       assert.match(body.error || '', /omx_state\.\*/i);
 
       const canonical = JSON.parse(
         await readFile(
-          join(wd, '.omx', 'state', 'sessions', 'sess-standalone', 'skill-active-state.json'),
+          join(wd, '.omcp', 'state', 'sessions', 'sess-standalone', 'skill-active-state.json'),
           'utf-8',
         ),
       ) as { active_skills?: Array<{ skill: string; phase?: string; session_id?: string }> };
@@ -690,7 +690,7 @@ describe('state-server directory initialization', () => {
         })),
         [{ skill: 'autopilot', phase: 'planning', session_id: 'sess-standalone' }],
       );
-      assert.equal(existsSync(join(wd, '.omx', 'state', 'sessions', 'sess-standalone', 'team-state.json')), false);
+      assert.equal(existsSync(join(wd, '.omcp', 'state', 'sessions', 'sess-standalone', 'team-state.json')), false);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -700,11 +700,11 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-handoff-interview-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-handoff-interview-'));
     try {
-      await mkdir(join(wd, '.omx', 'state', 'sessions', 'sess-handoff'), { recursive: true });
+      await mkdir(join(wd, '.omcp', 'state', 'sessions', 'sess-handoff'), { recursive: true });
       await writeFile(
-        join(wd, '.omx', 'state', 'sessions', 'sess-handoff', 'deep-interview-state.json'),
+        join(wd, '.omcp', 'state', 'sessions', 'sess-handoff', 'deep-interview-state.json'),
         JSON.stringify({ active: true, mode: 'deep-interview', current_phase: 'intent-first' }, null, 2),
       );
 
@@ -726,7 +726,7 @@ describe('state-server directory initialization', () => {
       assert.equal(body.transition, 'mode transiting: deep-interview -> ralplan');
 
       const completed = JSON.parse(
-        await readFile(join(wd, '.omx', 'state', 'sessions', 'sess-handoff', 'deep-interview-state.json'), 'utf-8'),
+        await readFile(join(wd, '.omcp', 'state', 'sessions', 'sess-handoff', 'deep-interview-state.json'), 'utf-8'),
       ) as {
         active?: boolean;
         current_phase?: string;
@@ -748,7 +748,7 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-rollback-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-rollback-'));
     try {
       await handleStateToolCall({
         params: {
@@ -789,11 +789,11 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-validate-before-transition-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-validate-before-transition-'));
     try {
-      await mkdir(join(wd, '.omx', 'state', 'sessions', 'sess-invalid'), { recursive: true });
+      await mkdir(join(wd, '.omcp', 'state', 'sessions', 'sess-invalid'), { recursive: true });
       await writeFile(
-        join(wd, '.omx', 'state', 'sessions', 'sess-invalid', 'ralplan-state.json'),
+        join(wd, '.omcp', 'state', 'sessions', 'sess-invalid', 'ralplan-state.json'),
         JSON.stringify({ active: true, mode: 'ralplan', current_phase: 'planning' }, null, 2),
       );
 
@@ -815,11 +815,11 @@ describe('state-server directory initialization', () => {
       assert.match(body.error || '', /ralph\.current_phase/i);
 
       const ralplanState = JSON.parse(
-        await readFile(join(wd, '.omx', 'state', 'sessions', 'sess-invalid', 'ralplan-state.json'), 'utf-8'),
+        await readFile(join(wd, '.omcp', 'state', 'sessions', 'sess-invalid', 'ralplan-state.json'), 'utf-8'),
       ) as Record<string, unknown>;
       assert.equal(ralplanState.active, true);
       assert.equal(ralplanState.current_phase, 'planning');
-      assert.equal(existsSync(join(wd, '.omx', 'state', 'sessions', 'sess-invalid', 'ralph-state.json')), false);
+      assert.equal(existsSync(join(wd, '.omcp', 'state', 'sessions', 'sess-invalid', 'ralph-state.json')), false);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -829,7 +829,7 @@ describe('state-server directory initialization', () => {
     process.env.OMX_STATE_SERVER_DISABLE_AUTO_START = '1';
     const { handleStateToolCall } = await import('../state-server.js');
 
-    const wd = await mkdtemp(join(tmpdir(), 'omx-state-server-ultrawork-any-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-state-server-ultrawork-any-'));
     try {
       const first = await handleStateToolCall({
         params: {

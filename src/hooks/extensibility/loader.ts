@@ -32,7 +32,7 @@ function readTimeout(raw: string | undefined, fallback: number): number {
 }
 
 export function hooksDir(cwd: string): string {
-  return join(cwd, '.omx', 'hooks');
+  return join(cwd, '.omcp', 'hooks');
 }
 
 export function isHookPluginsEnabled(env: NodeJS.ProcessEnv = process.env): boolean {

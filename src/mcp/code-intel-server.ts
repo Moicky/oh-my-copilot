@@ -316,7 +316,7 @@ async function searchWorkspaceSymbols(
 // ── MCP Server ──────────────────────────────────────────────────────────────
 
 const server = new Server(
-  { name: 'omx-code-intel', version: '0.1.0' },
+  { name: 'omcp-code-intel', version: '0.1.0' },
   { capabilities: { tools: {} } }
 );
 

@@ -11,7 +11,7 @@ describe("adaptCommand", () => {
 		await adaptCommand([], {
 			stdout: (line) => out.push(line),
 		});
-		assert.match(out.join("\n"), /Usage: omx adapt <target>/i);
+		assert.match(out.join("\n"), /Usage: omcp adapt <target>/i);
 	});
 
 	it("fails clearly for unknown targets", async () => {
@@ -24,7 +24,7 @@ describe("adaptCommand", () => {
 	});
 
 	it("emits compact JSON envelopes when --json is set", async () => {
-		const cwd = await mkdtemp(join(tmpdir(), "omx-adapt-cli-"));
+		const cwd = await mkdtemp(join(tmpdir(), "omcp-adapt-cli-"));
 		const out: string[] = [];
 		try {
 			await adaptCommand(["openclaw", "probe", "--json"], {
@@ -44,12 +44,12 @@ describe("adaptCommand", () => {
 			adaptCommand(["hermes", "status", "--write"], {
 				stdout: () => undefined,
 			}),
-			/only supported with omx adapt <target> init/i,
+			/only supported with omcp adapt <target> init/i,
 		);
 	});
 
 	it("reports OpenClaw local observation details in JSON status output", async () => {
-		const cwd = await mkdtemp(join(tmpdir(), "omx-adapt-cli-openclaw-"));
+		const cwd = await mkdtemp(join(tmpdir(), "omcp-adapt-cli-openclaw-"));
 		const out: string[] = [];
 		try {
 			process.env.CODEX_HOME = join(cwd, ".codex-home");

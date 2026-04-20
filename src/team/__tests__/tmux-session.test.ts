@@ -156,14 +156,14 @@ describe('chooseTeamLeaderPaneId', () => {
   it('keeps preferred pane when it is not HUD', () => {
     const panes = [
       { paneId: '%1', currentCommand: 'node', startCommand: "'codex'" },
-      { paneId: '%2', currentCommand: 'node', startCommand: "node omx hud --watch" },
+      { paneId: '%2', currentCommand: 'node', startCommand: "node omcp hud --watch" },
     ];
     assert.equal(chooseTeamLeaderPaneId(panes, '%1'), '%1');
   });
 
   it('switches away from HUD preferred pane to first non-HUD pane', () => {
     const panes = [
-      { paneId: '%2', currentCommand: 'node', startCommand: "node omx hud --watch" },
+      { paneId: '%2', currentCommand: 'node', startCommand: "node omcp hud --watch" },
       { paneId: '%1', currentCommand: 'node', startCommand: "'codex'" },
     ];
     assert.equal(chooseTeamLeaderPaneId(panes, '%2'), '%1');
@@ -171,8 +171,8 @@ describe('chooseTeamLeaderPaneId', () => {
 
   it('falls back to preferred pane when all panes are HUD panes', () => {
     const panes = [
-      { paneId: '%2', currentCommand: 'node', startCommand: "node omx hud --watch" },
-      { paneId: '%3', currentCommand: 'node', startCommand: "node omx hud --watch" },
+      { paneId: '%2', currentCommand: 'node', startCommand: "node omcp hud --watch" },
+      { paneId: '%3', currentCommand: 'node', startCommand: "node omcp hud --watch" },
     ];
     assert.equal(chooseTeamLeaderPaneId(panes, '%2'), '%2');
   });
@@ -278,7 +278,7 @@ describe('HUD resize hook command builders', () => {
   });
 
   it('resolves the tmux executable for win32 hook shell snippets', async () => {
-    const fakeBin = await mkdtemp(join(tmpdir(), 'omx-win32-hook-tmux-'));
+    const fakeBin = await mkdtemp(join(tmpdir(), 'omcp-win32-hook-tmux-'));
     const prevPath = process.env.PATH;
     const prevPathext = process.env.PATHEXT;
     const origPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
@@ -310,7 +310,7 @@ describe('HUD resize hook command builders', () => {
   });
 
   it('resolves the tmux executable twice for win32 client-attached one-shot hooks', async () => {
-    const fakeBin = await mkdtemp(join(tmpdir(), 'omx-win32-attached-hook-'));
+    const fakeBin = await mkdtemp(join(tmpdir(), 'omcp-win32-attached-hook-'));
     const prevPath = process.env.PATH;
     const prevPathext = process.env.PATHEXT;
     const origPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
@@ -339,28 +339,28 @@ describe('HUD resize hook command builders', () => {
 describe('sendToWorker validation', () => {
   it('rejects text over 200 chars', async () => {
     await assert.rejects(
-      sendToWorker('omx-team-x', 1, 'a'.repeat(200)),
+      sendToWorker('omcp-team-x', 1, 'a'.repeat(200)),
       /< 200/i
     );
   });
 
   it('rejects empty/whitespace text', async () => {
     await assert.rejects(
-      sendToWorker('omx-team-x', 1, '   '),
+      sendToWorker('omcp-team-x', 1, '   '),
       /non-empty/i
     );
   });
 
   it('rejects injection marker', async () => {
     await assert.rejects(
-      sendToWorker('omx-team-x', 1, `hello [OMX_TMUX_INJECT]`),
+      sendToWorker('omcp-team-x', 1, `hello [OMX_TMUX_INJECT]`),
       /marker/i
     );
   });
 
   it('auto-accepts the Claude bypass prompt before sending worker text', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-claude-bypass-send-',
+      'omcp-tmux-claude-bypass-send-',
       (logPath) => `#!/bin/sh
 set -eu
 state_dir="$(dirname "${logPath}")"
@@ -391,10 +391,10 @@ EOF
 esac
 `,
       async ({ logPath }) => {
-        await sendToWorker('omx-team-x', 1, 'check inbox');
+        await sendToWorker('omcp-team-x', 1, 'check inbox');
         const log = await readFile(logPath, 'utf-8');
-        const acceptIndex = log.indexOf('send-keys -t omx-team-x:1 -l -- 2');
-        const submitIndex = log.indexOf('send-keys -t omx-team-x:1 -l -- check inbox');
+        const acceptIndex = log.indexOf('send-keys -t omcp-team-x:1 -l -- 2');
+        const submitIndex = log.indexOf('send-keys -t omcp-team-x:1 -l -- check inbox');
         assert.notEqual(acceptIndex, -1, `expected bypass acceptance in log:\n${log}`);
         assert.notEqual(submitIndex, -1, `expected worker text submission in log:\n${log}`);
         assert.ok(acceptIndex < submitIndex, `expected bypass acceptance before worker text:\n${log}`);
@@ -404,7 +404,7 @@ esac
 
   it('ignores stale queued-next-tool-call banner text that only survives in scrollback history', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-codex-stale-queued-scrollback-',
+      'omcp-tmux-codex-stale-queued-scrollback-',
       (logPath) => `#!/bin/sh
 set -eu
 state_dir="$(dirname "${logPath}")"
@@ -441,23 +441,23 @@ EOF
 esac
 `,
       async ({ logPath }) => {
-        await sendToWorker('omx-team-x', 1, 'check inbox');
+        await sendToWorker('omcp-team-x', 1, 'check inbox');
         const log = await readFile(logPath, 'utf-8');
-        const enterCount = (log.match(/send-keys -t omx-team-x:1 C-m/g) || []).length;
+        const enterCount = (log.match(/send-keys -t omcp-team-x:1 C-m/g) || []).length;
         assert.equal(
           enterCount,
           2,
           `expected only the baseline submit presses when the queued banner is stale scrollback:\n${log}`,
         );
-        assert.match(log, /capture-pane -t omx-team-x:1 -p/);
-        assert.match(log, /capture-pane -t omx-team-x:1 -p -S -80/);
+        assert.match(log, /capture-pane -t omcp-team-x:1 -p/);
+        assert.match(log, /capture-pane -t omcp-team-x:1 -p -S -80/);
       },
     );
   });
 
   it('keeps nudging Codex when the visible pane still shows a live queued-next-tool-call banner', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-codex-visible-queued-submit-',
+      'omcp-tmux-codex-visible-queued-submit-',
       (logPath) => `#!/bin/sh
 set -eu
 state_dir="$(dirname "${logPath}")"
@@ -513,9 +513,9 @@ EOF
 esac
 `,
       async ({ logPath }) => {
-        await sendToWorker('omx-team-x', 1, 'check inbox');
+        await sendToWorker('omcp-team-x', 1, 'check inbox');
         const log = await readFile(logPath, 'utf-8');
-        const enterCount = (log.match(/send-keys -t omx-team-x:1 C-m/g) || []).length;
+        const enterCount = (log.match(/send-keys -t omcp-team-x:1 C-m/g) || []).length;
         assert.ok(
           enterCount >= 4,
           `expected extra submit nudges when Codex queues the trigger:\n${log}`,
@@ -526,7 +526,7 @@ esac
 
   it('fails closed when the visible queued-next-tool-call banner never clears after the final submit round', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-codex-stuck-queued-submit-',
+      'omcp-tmux-codex-stuck-queued-submit-',
       (logPath) => `#!/bin/sh
 set -eu
 state_dir="$(dirname "${logPath}")"
@@ -564,11 +564,11 @@ esac
 `,
       async ({ logPath }) => {
         await assert.rejects(
-          () => sendToWorker('omx-team-x', 1, 'check inbox'),
+          () => sendToWorker('omcp-team-x', 1, 'check inbox'),
           /submit_queued_after_tool_call/,
         );
         const log = await readFile(logPath, 'utf-8');
-        const enterCount = (log.match(/send-keys -t omx-team-x:1 C-m/g) || []).length;
+        const enterCount = (log.match(/send-keys -t omcp-team-x:1 C-m/g) || []).length;
         assert.ok(
           enterCount >= 4,
           `expected repeated submit nudges before failing closed on stuck queued banner:\n${log}`,
@@ -968,11 +968,11 @@ describe('buildWorkerStartupCommand', () => {
         [],
         '/tmp/worker-cwd',
         {
-          OMX_TEAM_STATE_ROOT: '/tmp/leader/.omx/state',
+          OMX_TEAM_STATE_ROOT: '/tmp/leader/.omcp/state',
           OMX_TEAM_LEADER_CWD: '/tmp/leader',
         },
       );
-      assert.match(cmd, /OMX_TEAM_STATE_ROOT=\/tmp\/leader\/\.omx\/state/);
+      assert.match(cmd, /OMX_TEAM_STATE_ROOT=\/tmp\/leader\/\.omcp\/state/);
       assert.match(cmd, /OMX_TEAM_LEADER_CWD=\/tmp\/leader/);
     } finally {
       if (typeof prevShell === 'string') process.env.SHELL = prevShell;
@@ -1050,7 +1050,7 @@ describe('buildWorkerStartupCommand', () => {
   });
 
   it('resolves POSIX leader paths before building fish worker startup commands', async () => {
-    const fakeBin = await mkdtemp(join(tmpdir(), 'omx-worker-startup-posix-'));
+    const fakeBin = await mkdtemp(join(tmpdir(), 'omcp-worker-startup-posix-'));
     const prevPath = process.env.PATH;
     const prevShell = process.env.SHELL;
     const prevBypass = process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT;
@@ -1231,12 +1231,12 @@ describe('buildWorkerStartupCommand', () => {
         1,
         ['-c', 'model_reasoning_effort="low"'],
         '/tmp/project',
-        { OMX_MODEL_INSTRUCTIONS_FILE: '/tmp/project/.omx/state/team/alpha/workers/worker-1/AGENTS.md' },
+        { OMX_MODEL_INSTRUCTIONS_FILE: '/tmp/project/.omcp/state/team/alpha/workers/worker-1/AGENTS.md' },
         'codex',
       );
       const joined = spec.args.join(' ');
       assert.match(joined, /model_reasoning_effort="low"/);
-      assert.match(joined, /model_instructions_file="\/tmp\/project\/.omx\/state\/team\/alpha\/workers\/worker-1\/AGENTS\.md"/);
+      assert.match(joined, /model_instructions_file="\/tmp\/project\/.omcp\/state\/team\/alpha\/workers\/worker-1\/AGENTS\.md"/);
     } finally {
       if (typeof prevBypass === 'string') process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT = prevBypass;
       else delete process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT;
@@ -1370,7 +1370,7 @@ describe('buildWorkerStartupCommand', () => {
   });
 
   it('uses a native PowerShell startup command on native Windows instead of /bin/sh -lc', async () => {
-    const fakeBin = await mkdtemp(join(tmpdir(), 'omx-worker-startup-win32-'));
+    const fakeBin = await mkdtemp(join(tmpdir(), 'omcp-worker-startup-win32-'));
     const prevPath = process.env.PATH;
     const prevPathext = process.env.PATHEXT;
     const prevShell = process.env.SHELL;
@@ -1431,7 +1431,7 @@ describe('buildWorkerStartupCommand', () => {
   });
 
   it('uses the resolved node-hosted Codex launcher in native Windows startup commands', async () => {
-    const fakeRoot = await mkdtemp(join(tmpdir(), 'omx-worker-startup-win32-node-hosted-'));
+    const fakeRoot = await mkdtemp(join(tmpdir(), 'omcp-worker-startup-win32-node-hosted-'));
     const fakeBin = join(fakeRoot, 'node_modules', '.bin');
     const prevPath = process.env.PATH;
     const prevPathext = process.env.PATHEXT;
@@ -1729,7 +1729,7 @@ describe('team worker launch mode helpers', () => {
         2,
         ['--model', 'gpt-5.3-codex'],
         '/tmp/workspace',
-        { OMX_TEAM_STATE_ROOT: '/tmp/workspace/.omx/state' },
+        { OMX_TEAM_STATE_ROOT: '/tmp/workspace/.omcp/state' },
         'codex',
       );
       // command is now the resolved absolute path (or bare binary if which fails)
@@ -1737,7 +1737,7 @@ describe('team worker launch mode helpers', () => {
       assert.ok(typeof spec.command === 'string' && spec.command.length > 0, 'command must be a non-empty string');
       assert.deepEqual(spec.args, ['--model', 'gpt-5.3-codex', '--dangerously-bypass-approvals-and-sandbox']);
       assert.equal(spec.env.OMX_TEAM_WORKER, 'alpha-team/worker-2');
-      assert.equal(spec.env.OMX_TEAM_STATE_ROOT, '/tmp/workspace/.omx/state');
+      assert.equal(spec.env.OMX_TEAM_STATE_ROOT, '/tmp/workspace/.omcp/state');
     } finally {
       if (typeof prevBypass === 'string') process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT = prevBypass;
       else delete process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT;
@@ -1753,7 +1753,7 @@ describe('team worker launch mode helpers', () => {
         2,
         ['--model', 'gpt-5.3-codex-spark'],
         '/tmp/workspace',
-        { OMX_TEAM_STATE_ROOT: '/tmp/workspace/.omx/state' },
+        { OMX_TEAM_STATE_ROOT: '/tmp/workspace/.omcp/state' },
         'codex',
         undefined,
         'explore',
@@ -1794,7 +1794,7 @@ describe('team worker launch mode helpers', () => {
   });
 
   it('buildWorkerProcessLaunchSpec wraps Windows PowerShell shims for prompt workers', async () => {
-    const fakeBin = await mkdtemp(join(tmpdir(), 'omx-worker-spec-win32-'));
+    const fakeBin = await mkdtemp(join(tmpdir(), 'omcp-worker-spec-win32-'));
     const prevPath = process.env.PATH;
     const prevPathext = process.env.PATHEXT;
     const prevBypass = process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT;
@@ -1851,7 +1851,7 @@ describe('team worker launch mode helpers', () => {
   });
 
   it('buildWorkerProcessLaunchSpec records the resolved node-hosted Codex launcher on native Windows', async () => {
-    const fakeRoot = await mkdtemp(join(tmpdir(), 'omx-worker-spec-win32-node-hosted-'));
+    const fakeRoot = await mkdtemp(join(tmpdir(), 'omcp-worker-spec-win32-node-hosted-'));
     const fakeBin = join(fakeRoot, 'node_modules', '.bin');
     const prevPath = process.env.PATH;
     const prevPathext = process.env.PATHEXT;
@@ -1914,7 +1914,7 @@ describe('team worker launch mode helpers', () => {
     const prevBypass = process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT;
     const prevCodexHome = process.env.CODEX_HOME;
     const prevProviderEnv = process.env.CUSTOM_PROVIDER_API_KEY;
-    const codexHome = await mkdtemp(join(tmpdir(), 'omx-team-provider-env-'));
+    const codexHome = await mkdtemp(join(tmpdir(), 'omcp-team-provider-env-'));
     process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
     process.env.CODEX_HOME = codexHome;
     process.env.CUSTOM_PROVIDER_API_KEY = 'test-secret';
@@ -1957,7 +1957,7 @@ describe('team worker launch mode helpers', () => {
     const prevBypass = process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT;
     const prevCodexHome = process.env.CODEX_HOME;
     const prevProviderEnv = process.env.CUSTOM_PROVIDER_API_KEY;
-    const codexHome = await mkdtemp(join(tmpdir(), 'omx-team-provider-env-'));
+    const codexHome = await mkdtemp(join(tmpdir(), 'omcp-team-provider-env-'));
     process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
     process.env.CODEX_HOME = codexHome;
     process.env.CUSTOM_PROVIDER_API_KEY = 'test-secret';
@@ -2002,8 +2002,8 @@ describe('team worker launch mode helpers', () => {
     const prevCodexHome = process.env.CODEX_HOME;
     const prevPrimaryProviderEnv = process.env.PRIMARY_PROVIDER_API_KEY;
     const prevWorkerProviderEnv = process.env.WORKER_PROVIDER_API_KEY;
-    const leaderCodexHome = await mkdtemp(join(tmpdir(), 'omx-team-provider-env-leader-'));
-    const workerCodexHome = await mkdtemp(join(tmpdir(), 'omx-team-provider-env-worker-'));
+    const leaderCodexHome = await mkdtemp(join(tmpdir(), 'omcp-team-provider-env-leader-'));
+    const workerCodexHome = await mkdtemp(join(tmpdir(), 'omcp-team-provider-env-worker-'));
     process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
     process.env.CODEX_HOME = leaderCodexHome;
     process.env.PRIMARY_PROVIDER_API_KEY = 'leader-secret';
@@ -2089,8 +2089,8 @@ describe('team worker launch mode helpers', () => {
     const prevLeaderProviderEnv = process.env.LEADER_PROVIDER_API_KEY;
     const prevWorkerProviderEnv = process.env.WORKER_PROVIDER_API_KEY;
     const originalCwd = process.cwd();
-    const leaderCwd = await mkdtemp(join(tmpdir(), 'omx-team-provider-relative-leader-'));
-    const workerCwd = await mkdtemp(join(tmpdir(), 'omx-team-provider-relative-worker-'));
+    const leaderCwd = await mkdtemp(join(tmpdir(), 'omcp-team-provider-relative-leader-'));
+    const workerCwd = await mkdtemp(join(tmpdir(), 'omcp-team-provider-relative-worker-'));
     const leaderCodexHome = join(leaderCwd, '.codex');
     const workerCodexHome = join(workerCwd, '.codex');
     process.env.OMX_BYPASS_DEFAULT_SYSTEM_PROMPT = '0';
@@ -2199,7 +2199,7 @@ describe('tmux-dependent functions when tmux is unavailable', () => {
 
   it('waitForWorkerReady uses visible capture-pane argv without tail flags', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-worker-ready-visible-capture-',
+      'omcp-tmux-worker-ready-visible-capture-',
       (logPath) => `#!/bin/sh
 set -eu
 printf '%s\n' "$*" >> "${logPath}"
@@ -2216,17 +2216,17 @@ EOF
 esac
 `,
       async ({ logPath }) => {
-        assert.equal(waitForWorkerReady('omx-team-x', 1, 1_000), true);
+        assert.equal(waitForWorkerReady('omcp-team-x', 1, 1_000), true);
         const log = await readFile(logPath, 'utf-8');
-        assert.match(log, /capture-pane -t omx-team-x:1 -p/);
-        assert.doesNotMatch(log, /capture-pane -t omx-team-x:1 -p -S/);
+        assert.match(log, /capture-pane -t omcp-team-x:1 -p/);
+        assert.doesNotMatch(log, /capture-pane -t omcp-team-x:1 -p -S/);
       },
     );
   });
 
   it('waitForWorkerReady accepts Codex 0.114.0-style welcome helper text', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-worker-ready-hello-',
+      'omcp-tmux-worker-ready-hello-',
       (logPath) => `#!/bin/sh
 set -eu
 printf '%s\n' "$*" >> "${logPath}"
@@ -2250,14 +2250,14 @@ EOF
 esac
 `,
       async () => {
-        assert.equal(waitForWorkerReady('omx-team-x', 1, 1_000), true);
+        assert.equal(waitForWorkerReady('omcp-team-x', 1, 1_000), true);
       },
     );
   });
 
   it('waitForWorkerReady falls back to recent scrollback when a live Codex viewport pushes the prompt below the visible slice', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-worker-ready-scrollback-fallback-',
+      'omcp-tmux-worker-ready-scrollback-fallback-',
       (logPath) => `#!/bin/sh
 set -eu
 printf '%s\n' "$*" >> "${logPath}"
@@ -2280,17 +2280,17 @@ EOF
 esac
 `,
       async ({ logPath }) => {
-        assert.equal(waitForWorkerReady('omx-team-x', 1, 1_000), true);
+        assert.equal(waitForWorkerReady('omcp-team-x', 1, 1_000), true);
         const log = await readFile(logPath, 'utf-8');
-        assert.match(log, /capture-pane -t omx-team-x:1 -p/);
-        assert.match(log, /capture-pane -t omx-team-x:1 -p -S -80/);
+        assert.match(log, /capture-pane -t omcp-team-x:1 -p/);
+        assert.match(log, /capture-pane -t omcp-team-x:1 -p -S -80/);
       },
     );
   });
 
   it('waitForWorkerReady does not consult scrollback when the visible slice is only status text', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-worker-ready-no-scrollback-status-',
+      'omcp-tmux-worker-ready-no-scrollback-status-',
       (logPath) => `#!/bin/sh
 set -eu
 printf '%s\n' "$*" >> "${logPath}"
@@ -2307,17 +2307,17 @@ EOF
 esac
 `,
       async ({ logPath }) => {
-        assert.equal(waitForWorkerReady('omx-team-x', 1, 250), false);
+        assert.equal(waitForWorkerReady('omcp-team-x', 1, 250), false);
         const log = await readFile(logPath, 'utf-8');
-        assert.match(log, /capture-pane -t omx-team-x:1 -p/);
-        assert.doesNotMatch(log, /capture-pane -t omx-team-x:1 -p -S -80/);
+        assert.match(log, /capture-pane -t omcp-team-x:1 -p/);
+        assert.doesNotMatch(log, /capture-pane -t omcp-team-x:1 -p -S -80/);
       },
     );
   });
 
   it('waitForWorkerReady auto-accepts the Claude bypass prompt', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-claude-bypass-ready-',
+      'omcp-tmux-claude-bypass-ready-',
       (logPath) => `#!/bin/sh
 set -eu
 state_dir="$(dirname "${logPath}")"
@@ -2348,10 +2348,10 @@ EOF
 esac
 `,
       async ({ logPath }) => {
-        assert.equal(waitForWorkerReady('omx-team-x', 1, 1_000), true);
+        assert.equal(waitForWorkerReady('omcp-team-x', 1, 1_000), true);
         const log = await readFile(logPath, 'utf-8');
-        assert.match(log, /send-keys -t omx-team-x:1 -l -- 2/);
-        assert.match(log, /send-keys -t omx-team-x:1 C-m/);
+        assert.match(log, /send-keys -t omcp-team-x:1 -l -- 2/);
+        assert.match(log, /send-keys -t omcp-team-x:1 C-m/);
       },
     );
   });
@@ -2361,7 +2361,7 @@ esac
     process.env.OMX_TEAM_AUTO_ACCEPT_BYPASS = '0';
     try {
       await withMockTmuxFixture(
-        'omx-tmux-claude-bypass-blocked-',
+        'omcp-tmux-claude-bypass-blocked-',
         (logPath) => `#!/bin/sh
 set -eu
 printf '%s\n' "$*" >> "${logPath}"
@@ -2378,7 +2378,7 @@ EOF
 esac
 `,
         async ({ logPath }) => {
-          assert.equal(waitForWorkerReady('omx-team-x', 1, 250), false);
+          assert.equal(waitForWorkerReady('omcp-team-x', 1, 250), false);
           const log = await readFile(logPath, 'utf-8');
           assert.doesNotMatch(log, /send-keys/);
         },
@@ -2391,14 +2391,14 @@ esac
 
   it('waitForWorkerReady returns false on timeout', () => {
     withEmptyPath(() => {
-      assert.equal(waitForWorkerReady('omx-team-x', 1, 1), false);
+      assert.equal(waitForWorkerReady('omcp-team-x', 1, 1), false);
     });
   });
 });
 
 describe('native Windows HUD reconciliation', () => {
   it('allows team startup on native Windows when current tmux client is reachable without TMUX env vars', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-team-win32-no-env-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-team-win32-no-env-'));
     const prevTmux = process.env.TMUX;
     const prevTmuxPane = process.env.TMUX_PANE;
     const prevWorkerCli = process.env.OMX_TEAM_WORKER_CLI;
@@ -2410,7 +2410,7 @@ describe('native Windows HUD reconciliation', () => {
 
     try {
       await withMockTmuxFixture(
-        'omx-tmux-win32-no-env-',
+        'omcp-tmux-win32-no-env-',
         (logPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${logPath}"
@@ -2501,7 +2501,7 @@ esac
   });
 
   it('avoids nested tmux run-shell hooks during team HUD startup on native Windows', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-team-win32-hud-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-team-win32-hud-'));
     const prevTmux = process.env.TMUX;
     const prevTmuxPane = process.env.TMUX_PANE;
     const prevWorkerCli = process.env.OMX_TEAM_WORKER_CLI;
@@ -2513,7 +2513,7 @@ esac
 
     try {
       await withMockTmuxFixture(
-        'omx-tmux-win32-hud-reconcile-',
+        'omcp-tmux-win32-hud-reconcile-',
         (logPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${logPath}"
@@ -2608,7 +2608,7 @@ esac
   });
 
   it('restores standalone HUD panes with direct resize on native Windows', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-standalone-win32-hud-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-standalone-win32-hud-'));
     const prevLeaderNodePath = process.env.OMX_LEADER_NODE_PATH;
     const prevMsystem = process.env.MSYSTEM;
     const prevOstype = process.env.OSTYPE;
@@ -2618,7 +2618,7 @@ esac
 
     try {
       await withMockTmuxFixture(
-        'omx-tmux-win32-standalone-hud-',
+        'omcp-tmux-win32-standalone-hud-',
         (logPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${logPath}"
@@ -2675,20 +2675,20 @@ esac
   });
 
   it('restores standalone HUD panes with an absolute OMCP entry path after cwd drift', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-standalone-relative-hud-'));
-    const startupCwd = await mkdtemp(join(tmpdir(), 'omx-standalone-relative-start-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-standalone-relative-hud-'));
+    const startupCwd = await mkdtemp(join(tmpdir(), 'omcp-standalone-relative-start-'));
     const previousEntryPath = process.env[OMX_ENTRY_PATH_ENV];
     const previousStartupCwd = process.env[OMX_STARTUP_CWD_ENV];
     const previousArgv = process.argv;
 
     try {
       const launcherDir = join(startupCwd, 'dist', 'cli');
-      const launcherPath = join(launcherDir, 'omx.js');
+      const launcherPath = join(launcherDir, 'omcp.js');
       await mkdir(launcherDir, { recursive: true });
       await writeFile(launcherPath, '#!/usr/bin/env node\n');
 
       await withMockTmuxFixture(
-        'omx-tmux-relative-standalone-hud-',
+        'omcp-tmux-relative-standalone-hud-',
         (logPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${logPath}"
@@ -2708,14 +2708,14 @@ esac
         async ({ logPath }) => {
           delete process.env[OMX_ENTRY_PATH_ENV];
           process.env[OMX_STARTUP_CWD_ENV] = startupCwd;
-          process.argv = [previousArgv[0] || 'node', 'dist/cli/omx.js'];
+          process.argv = [previousArgv[0] || 'node', 'dist/cli/omcp.js'];
 
           const paneId = restoreStandaloneHudPane('%11', cwd);
           assert.equal(paneId, '%44');
 
           const tmuxLog = await readFile(logPath, 'utf-8');
           assert.match(tmuxLog, new RegExp(escapeRegExp(launcherPath)));
-          assert.doesNotMatch(tmuxLog, /'dist\/cli\/omx\.js' hud --watch/);
+          assert.doesNotMatch(tmuxLog, /'dist\/cli\/omcp\.js' hud --watch/);
         },
       );
     } finally {
@@ -2730,12 +2730,12 @@ esac
   });
 
   it('restores standalone HUD panes with the packaged CLI entry when argv1 is not the OMCP CLI', async () => {
-    const cwd = await mkdtemp(join(tmpdir(), 'omx-standalone-noncli-hud-'));
+    const cwd = await mkdtemp(join(tmpdir(), 'omcp-standalone-noncli-hud-'));
     const previousArgv = process.argv;
 
     try {
       await withMockTmuxFixture(
-        'omx-tmux-noncli-standalone-hud-',
+        'omcp-tmux-noncli-standalone-hud-',
         (logPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${logPath}"
@@ -2759,7 +2759,7 @@ esac
           assert.equal(paneId, '%44');
 
           const tmuxLog = await readFile(logPath, 'utf-8');
-          assert.match(tmuxLog, /dist\/cli\/omx\.js' hud --watch/);
+          assert.match(tmuxLog, /dist\/cli\/omcp\.js' hud --watch/);
           assert.doesNotMatch(tmuxLog, /\/tmp\/codex-host-binary' hud --watch/);
         },
       );
@@ -2776,7 +2776,7 @@ describe('dismissTrustPromptIfPresent capture shape', () => {
     delete process.env.OMX_TEAM_AUTO_TRUST;
     try {
       await withMockTmuxFixture(
-        'omx-tmux-dismiss-trust-visible-capture-',
+        'omcp-tmux-dismiss-trust-visible-capture-',
         (logPath) => `#!/bin/sh
 set -eu
 printf '%s\n' "$*" >> "${logPath}"
@@ -2797,10 +2797,10 @@ EOF
 esac
 `,
         async ({ logPath }) => {
-          assert.equal(dismissTrustPromptIfPresent('omx-team-x', 1), true);
+          assert.equal(dismissTrustPromptIfPresent('omcp-team-x', 1), true);
           const log = await readFile(logPath, 'utf-8');
-          assert.match(log, /capture-pane -t omx-team-x:1 -p/);
-          assert.doesNotMatch(log, /capture-pane -t omx-team-x:1 -p -S/);
+          assert.match(log, /capture-pane -t omcp-team-x:1 -p/);
+          assert.doesNotMatch(log, /capture-pane -t omcp-team-x:1 -p -S/);
         },
       );
     } finally {
@@ -2813,7 +2813,7 @@ esac
 describe('dismissTrustPromptIfPresent', () => {
   it('returns false when tmux is unavailable', () => {
     withEmptyPath(() => {
-      assert.equal(dismissTrustPromptIfPresent('omx-team-x', 1), false);
+      assert.equal(dismissTrustPromptIfPresent('omcp-team-x', 1), false);
     });
   });
 
@@ -2821,7 +2821,7 @@ describe('dismissTrustPromptIfPresent', () => {
     const prev = process.env.OMX_TEAM_AUTO_TRUST;
     process.env.OMX_TEAM_AUTO_TRUST = '0';
     try {
-      assert.equal(dismissTrustPromptIfPresent('omx-team-x', 1), false);
+      assert.equal(dismissTrustPromptIfPresent('omcp-team-x', 1), false);
     } finally {
       if (typeof prev === 'string') process.env.OMX_TEAM_AUTO_TRUST = prev;
       else delete process.env.OMX_TEAM_AUTO_TRUST;
@@ -2833,7 +2833,7 @@ describe('dismissTrustPromptIfPresent', () => {
     delete process.env.OMX_TEAM_AUTO_TRUST;
     try {
       withEmptyPath(() => {
-        assert.equal(dismissTrustPromptIfPresent('omx-team-x', 1), false);
+        assert.equal(dismissTrustPromptIfPresent('omcp-team-x', 1), false);
       });
     } finally {
       if (typeof prev === 'string') process.env.OMX_TEAM_AUTO_TRUST = prev;
@@ -2846,7 +2846,7 @@ describe('isWorkerAlive', () => {
     // This was a real failure mode: tmux reports pane_current_command=node for the Codex TUI,
     // which caused workers to be treated as dead and the leader to clean up state too early.
     withEmptyPath(() => {
-      assert.equal(isWorkerAlive('omx-team-x', 1), false);
+      assert.equal(isWorkerAlive('omcp-team-x', 1), false);
     });
   });
 });
@@ -3008,7 +3008,7 @@ describe('enableMouseScrolling', () => {
     // When tmux is not on PATH, enableMouseScrolling should gracefully return false
     // rather than throwing, so callers do not need to guard against errors.
     withEmptyPath(() => {
-      assert.equal(enableMouseScrolling('omx-team-x'), false);
+      assert.equal(enableMouseScrolling('omcp-team-x'), false);
     });
   });
 
@@ -3025,7 +3025,7 @@ describe('enableMouseScrolling', () => {
     process.env.WSL_DISTRO_NAME = 'Ubuntu-22.04';
     try {
       withEmptyPath(() => {
-        assert.equal(enableMouseScrolling('omx-team-x'), false);
+        assert.equal(enableMouseScrolling('omcp-team-x'), false);
       });
     } finally {
       if (typeof prev === 'string') process.env.WSL_DISTRO_NAME = prev;
@@ -3099,7 +3099,7 @@ describe('enableMouseScrolling scroll and copy setup (issue #206)', () => {
     // With empty PATH the initial "mouse on" call fails, so the function returns
     // false before any binding calls are made. No throw must occur.
     withEmptyPath(() => {
-      assert.equal(enableMouseScrolling('omx-team-x'), false);
+      assert.equal(enableMouseScrolling('omcp-team-x'), false);
     });
   });
 
@@ -3108,7 +3108,7 @@ describe('enableMouseScrolling scroll and copy setup (issue #206)', () => {
     process.env.WSL_DISTRO_NAME = 'Ubuntu-22.04';
     try {
       withEmptyPath(() => {
-        assert.doesNotThrow(() => enableMouseScrolling('omx-team-x'));
+        assert.doesNotThrow(() => enableMouseScrolling('omcp-team-x'));
       });
     } finally {
       if (typeof prev === 'string') process.env.WSL_DISTRO_NAME = prev;
@@ -3121,12 +3121,12 @@ describe('enableMouseScrolling scroll and copy setup (issue #206)', () => {
 describe('enableMouseScrolling session scoping (issue #817)', () => {
   it('only applies session-scoped tmux options and does not mutate global bindings or terminal-overrides', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-enable-mouse-scope-',
+      'omcp-tmux-enable-mouse-scope-',
       (tmuxLogPath) => `#!/bin/sh
 printf '%s\n' "$*" >> "${tmuxLogPath}"
 case "$1" in
   show-options)
-    if [ "$2" = "-gv" ] && [ "$3" = "-t" ] && [ "$4" = "omx-team-x" ] && [ "$5" = "mode-style" ]; then
+    if [ "$2" = "-gv" ] && [ "$3" = "-t" ] && [ "$4" = "omcp-team-x" ] && [ "$5" = "mode-style" ]; then
       printf '%s\n' 'bg=yellow,fg=black,underscore'
       exit 0
     fi
@@ -3144,13 +3144,13 @@ case "$1" in
 esac
 `,
       async ({ logPath }) => {
-        assert.equal(enableMouseScrolling('omx-team-x'), true);
+        assert.equal(enableMouseScrolling('omcp-team-x'), true);
         const tmuxLog = await readFile(logPath, 'utf-8');
-        assert.match(tmuxLog, /set-option -t omx-team-x mouse on/);
-        assert.match(tmuxLog, /set-option -t omx-team-x set-clipboard on/);
+        assert.match(tmuxLog, /set-option -t omcp-team-x mouse on/);
+        assert.match(tmuxLog, /set-option -t omcp-team-x set-clipboard on/);
         assert.match(
           tmuxLog,
-          /set-option -t omx-team-x mode-style bg=yellow,fg=black,underscore,nounderscore,nodouble-underscore,nocurly-underscore,nodotted-underscore,nodashed-underscore/,
+          /set-option -t omcp-team-x mode-style bg=yellow,fg=black,underscore,nounderscore,nodouble-underscore,nocurly-underscore,nodotted-underscore,nodashed-underscore/,
         );
         assert.doesNotMatch(tmuxLog, /bind-key/);
         assert.doesNotMatch(tmuxLog, /terminal-overrides/);
@@ -3162,16 +3162,16 @@ esac
 describe('mitigateCopyModeUnderlineArtifacts', () => {
   it('best-effort sanitizes copy-mode style options without requiring global tmux changes', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-sanitize-copy-style-',
+      'omcp-tmux-sanitize-copy-style-',
       (tmuxLogPath) => `#!/bin/sh
 printf '%s\n' "$*" >> "${tmuxLogPath}"
 case "$1" in
   show-options)
-    if [ "$2" = "-gv" ] && [ "$3" = "-t" ] && [ "$4" = "omx-team-x" ] && [ "$5" = "mode-style" ]; then
+    if [ "$2" = "-gv" ] && [ "$3" = "-t" ] && [ "$4" = "omcp-team-x" ] && [ "$5" = "mode-style" ]; then
       printf '%s\n' 'bg=yellow,fg=black,underscore'
       exit 0
     fi
-    if [ "$2" = "-gv" ] && [ "$3" = "-t" ] && [ "$4" = "omx-team-x" ] && [ "$5" = "copy-mode-selection-style" ]; then
+    if [ "$2" = "-gv" ] && [ "$3" = "-t" ] && [ "$4" = "omcp-team-x" ] && [ "$5" = "copy-mode-selection-style" ]; then
       printf '%s\n' 'fg=white,bg=blue,curly-underscore'
       exit 0
     fi
@@ -3189,15 +3189,15 @@ case "$1" in
 esac
 `,
       async ({ logPath }) => {
-        assert.equal(mitigateCopyModeUnderlineArtifacts('omx-team-x'), true);
+        assert.equal(mitigateCopyModeUnderlineArtifacts('omcp-team-x'), true);
         const tmuxLog = await readFile(logPath, 'utf-8');
         assert.match(
           tmuxLog,
-          /set-option -t omx-team-x mode-style bg=yellow,fg=black,underscore,nounderscore,nodouble-underscore,nocurly-underscore,nodotted-underscore,nodashed-underscore/,
+          /set-option -t omcp-team-x mode-style bg=yellow,fg=black,underscore,nounderscore,nodouble-underscore,nocurly-underscore,nodotted-underscore,nodashed-underscore/,
         );
         assert.match(
           tmuxLog,
-          /set-option -t omx-team-x copy-mode-selection-style fg=white,bg=blue,curly-underscore,nounderscore,nodouble-underscore,nocurly-underscore,nodotted-underscore,nodashed-underscore/,
+          /set-option -t omcp-team-x copy-mode-selection-style fg=white,bg=blue,curly-underscore,nounderscore,nodouble-underscore,nocurly-underscore,nodotted-underscore,nodashed-underscore/,
         );
         assert.doesNotMatch(tmuxLog, /set-option -g/);
       },
@@ -3209,20 +3209,20 @@ describe('killWorker leader pane guard', () => {
   it('returns immediately when workerPaneId matches leaderPaneId', () => {
     // Guard fires before any tmux send-keys call, so no error even with empty PATH.
     withEmptyPath(() => {
-      assert.doesNotThrow(() => killWorker('omx-team-x:0', 1, '%5', '%5'));
+      assert.doesNotThrow(() => killWorker('omcp-team-x:0', 1, '%5', '%5'));
     });
   });
 
   it('proceeds (gracefully) when pane ids differ', () => {
     // Guard does not fire; tmux calls fail gracefully with empty PATH.
     withEmptyPath(() => {
-      assert.doesNotThrow(() => killWorker('omx-team-x:0', 1, '%5', '%6'));
+      assert.doesNotThrow(() => killWorker('omcp-team-x:0', 1, '%5', '%6'));
     });
   });
 
   it('proceeds when leaderPaneId is not provided', () => {
     withEmptyPath(() => {
-      assert.doesNotThrow(() => killWorker('omx-team-x:0', 1, '%5'));
+      assert.doesNotThrow(() => killWorker('omcp-team-x:0', 1, '%5'));
     });
   });
 });
@@ -3230,7 +3230,7 @@ describe('killWorker leader pane guard', () => {
 describe('teardownWorkerPanes shared primitive', () => {
   it('excludes leader and hud panes in shared pane-kill primitive', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-teardown-',
+      'omcp-tmux-teardown-',
       (logPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${logPath}"
@@ -3264,7 +3264,7 @@ exit 0
 
   it('continues best-effort when a pane target is missing', async () => {
     await withMockTmuxFixture(
-      'omx-tmux-teardown-missing-',
+      'omcp-tmux-teardown-missing-',
       (logPath) => `#!/bin/sh
 set -eu
 printf '%s\\n' "$*" >> "${logPath}"

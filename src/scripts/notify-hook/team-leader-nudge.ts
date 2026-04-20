@@ -93,15 +93,15 @@ export function resolveWorkerTurnStallThresholdMs() {
 }
 
 function buildStatusCheckReminder(teamName) {
-  return `Next: check messages; keep orchestrating; if done, gracefully shut down: omx team shutdown ${teamName}.`;
+  return `Next: check messages; keep orchestrating; if done, gracefully shut down: omcp team shutdown ${teamName}.`;
 }
 
 function buildMailboxCheckReminder(teamName) {
-  return `Next: read messages; keep orchestrating; if done, gracefully shut down: omx team shutdown ${teamName}.`;
+  return `Next: read messages; keep orchestrating; if done, gracefully shut down: omcp team shutdown ${teamName}.`;
 }
 
 function buildWorkerStartEvidenceReminder(teamName, workerName) {
-  return `Next: check ${workerName} msg/output, confirm task in omx team status ${teamName}, then reassign/nudge.`;
+  return `Next: check ${workerName} msg/output, confirm task in omcp team status ${teamName}, then reassign/nudge.`;
 }
 
 function classifyLeaderActionState({
@@ -142,10 +142,10 @@ function buildLeaderActionGuidance(teamName, {
       : 'Next: launch a new team for the next task set.';
   }
   if (leaderActionState === 'done_waiting_on_leader') {
-    return `Next: decide whether to reconcile/merge results or gracefully shut down: omx team shutdown ${teamName}.`;
+    return `Next: decide whether to reconcile/merge results or gracefully shut down: omcp team shutdown ${teamName}.`;
   }
   if (leaderActionState === 'stuck_waiting_on_leader') {
-    return `Next: omx team status ${teamName}; read worker messages; unblock/reassign or shutdown.`;
+    return `Next: omcp team status ${teamName}; read worker messages; unblock/reassign or shutdown.`;
   }
   return buildStatusCheckReminder(teamName);
 }
@@ -533,7 +533,7 @@ async function getAckWithoutStartEvidence(stateDir, teamName, msg) {
 }
 
 export async function emitTeamNudgeEvent(cwd, teamName, reason, orchestrationIntent, nowIso) {
-  const eventsDir = join(cwd, '.omx', 'state', 'team', teamName, 'events');
+  const eventsDir = join(cwd, '.omcp', 'state', 'team', teamName, 'events');
   const eventsPath = join(eventsDir, 'events.ndjson');
   try {
     await mkdir(eventsDir, { recursive: true });
@@ -553,7 +553,7 @@ export async function emitTeamNudgeEvent(cwd, teamName, reason, orchestrationInt
 }
 
 async function emitLeaderNudgeDeferredEvent(cwd, teamName, reason, orchestrationIntent, nowIso, { tmuxSession = '', leaderPaneId = '', paneCurrentCommand = '', sourceType = 'leader_nudge' } = {}) {
-  const eventsDir = join(cwd, '.omx', 'state', 'team', teamName, 'events');
+  const eventsDir = join(cwd, '.omcp', 'state', 'team', teamName, 'events');
   const eventsPath = join(eventsDir, 'events.ndjson');
   try {
     await mkdir(eventsDir, { recursive: true });
@@ -592,7 +592,7 @@ export async function maybeNudgeTeamLeader({
   const workerTurnStallThresholdMs = resolveWorkerTurnStallThresholdMs();
   const nowMs = Date.now();
   const nowIso = new Date().toISOString();
-  const omxDir = join(cwd, '.omx');
+  const omxDir = join(cwd, '.omcp');
   const nudgeStatePath = join(stateDir, 'team-leader-nudge.json');
 
   let nudgeState = await readJsonIfExists(nudgeStatePath, null);

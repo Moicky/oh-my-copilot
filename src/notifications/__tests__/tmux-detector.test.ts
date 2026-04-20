@@ -18,8 +18,8 @@ describe('analyzePaneContent', () => {
     assert.ok(result.confidence >= 0.5);
   });
 
-  it('detects "omx" keyword', () => {
-    const result = analyzePaneContent('omx session started');
+  it('detects "omcp" keyword', () => {
+    const result = analyzePaneContent('omcp session started');
     assert.equal(result.hasCodex, true);
   });
 
@@ -81,7 +81,7 @@ describe('analyzePaneContent', () => {
   });
 
   it('caps confidence at 1.0', () => {
-    const result = analyzePaneContent('Codex $ > agent task running omx');
+    const result = analyzePaneContent('Codex $ > agent task running omcp');
     assert.ok(result.confidence <= 1.0);
   });
 

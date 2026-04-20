@@ -1,7 +1,7 @@
 /**
  * Model Configuration
  *
- * Reads per-mode model overrides and default-env overrides from .omx-config.json.
+ * Reads per-mode model overrides and default-env overrides from .omcp-config.json.
  *
  * Config format:
  * {
@@ -48,7 +48,7 @@ export const OMX_DEFAULT_SPARK_MODEL_ENV = 'OMX_DEFAULT_SPARK_MODEL';
 export const OMX_SPARK_MODEL_ENV = 'OMX_SPARK_MODEL';
 
 function readOmxConfigFile(codexHomeOverride?: string): OmxConfigFile | null {
-  const configPath = join(codexHomeOverride || codexHome(), '.omx-config.json');
+  const configPath = join(codexHomeOverride || codexHome(), '.omcp-config.json');
   if (!existsSync(configPath)) return null;
   try {
     const raw = JSON.parse(readFileSync(configPath, 'utf-8'));

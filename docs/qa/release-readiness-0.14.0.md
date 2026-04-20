@@ -5,7 +5,7 @@ Target version: **0.14.0**
 Comparison base: **`v0.13.2..origin/dev`**
 Verdict: **GO** ✅
 
-`0.14.0` packages the current `dev` release train as a minor release: the new `omx question` interactive entrypoint, deep-interview question-obligation enforcement, skill-first validator-gated autoresearch, advisory triage routing, explicit runtime run outcomes, specialist-routing cleanup, and release-gating hardening for the shipped package.
+`0.14.0` packages the current `dev` release train as a minor release: the new `omcp question` interactive entrypoint, deep-interview question-obligation enforcement, skill-first validator-gated autoresearch, advisory triage routing, explicit runtime run outcomes, specialist-routing cleanup, and release-gating hardening for the shipped package.
 
 ## Scope reviewed
 

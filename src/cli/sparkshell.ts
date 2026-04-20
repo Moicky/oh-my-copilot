@@ -21,9 +21,9 @@ import {
 const OMX_SPARKSHELL_BIN_ENV = SPARKSHELL_BIN_ENV_SHARED;
 
 export const SPARKSHELL_USAGE = [
-  'Usage: omx sparkshell <command> [args...]',
-  '   or: omx sparkshell --tmux-pane <pane-id> [--tail-lines <100-1000>]',
-  'Runs the native omx-sparkshell sidecar with direct argv execution or explicit tmux pane summarization.',
+  'Usage: omcp sparkshell <command> [args...]',
+  '   or: omcp sparkshell --tmux-pane <pane-id> [--tail-lines <100-1000>]',
+  'Runs the native omcp-sparkshell sidecar with direct argv execution or explicit tmux pane summarization.',
   'Shell metacharacters such as pipes and redirects are not interpreted in v1.',
   'Tmux pane mode is explicit opt-in and captures a larger pane tail before applying raw-vs-summary behavior.',
 ].join('\n');
@@ -54,7 +54,7 @@ function resolveSignalExitCode(signal: NodeJS.Signals | null): number {
 }
 
 export function sparkshellBinaryName(platform: NodeJS.Platform = process.platform): string {
-  return platform === 'win32' ? 'omx-sparkshell.exe' : 'omx-sparkshell';
+  return platform === 'win32' ? 'omcp-sparkshell.exe' : 'omcp-sparkshell';
 }
 
 export function packagedSparkShellBinaryPath(
@@ -95,7 +95,7 @@ export function nestedRepoLocalSparkShellBinaryPath(
   packageRoot = getPackageRoot(),
   platform: NodeJS.Platform = process.platform,
 ): string {
-  return join(packageRoot, 'native', 'omx-sparkshell', 'target', 'release', sparkshellBinaryName(platform));
+  return join(packageRoot, 'native', 'omcp-sparkshell', 'target', 'release', sparkshellBinaryName(platform));
 }
 
 export function resolveSparkShellBinaryPath(options: ResolveSparkShellBinaryPathOptions = {}): string {
@@ -150,7 +150,7 @@ export async function resolveSparkShellBinaryPathWithHydration(
   }
 
   const version = await getPackageVersion(packageRoot);
-  for (const cached of resolveCachedNativeBinaryCandidatePaths('omx-sparkshell', version, platform, arch, env, {
+  for (const cached of resolveCachedNativeBinaryCandidatePaths('omcp-sparkshell', version, platform, arch, env, {
     linuxLibcPreference: platform === 'linux'
       ? (linuxLibcPreference ?? resolveLinuxNativeLibcPreference({ env }))
       : undefined,
@@ -168,7 +168,7 @@ export async function resolveSparkShellBinaryPathWithHydration(
   const nestedRepoLocal = nestedRepoLocalSparkShellBinaryPath(packageRoot, platform);
   if (exists(nestedRepoLocal)) return nestedRepoLocal;
 
-  const hydrated = await hydrateNativeBinary('omx-sparkshell', { packageRoot, env, platform, arch });
+  const hydrated = await hydrateNativeBinary('omcp-sparkshell', { packageRoot, env, platform, arch });
   if (hydrated) return hydrated;
 
   throw new Error(

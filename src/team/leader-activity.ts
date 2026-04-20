@@ -128,7 +128,7 @@ async function statMsIfExists(path: string | null): Promise<number> {
 function stateDirToProjectRoot(stateDir: string): string {
   let current = resolve(stateDir);
   while (current !== dirname(current)) {
-    if (basename(current) === '.omx') return dirname(current);
+    if (basename(current) === '.omcp') return dirname(current);
     current = dirname(current);
   }
   return dirname(dirname(stateDir));

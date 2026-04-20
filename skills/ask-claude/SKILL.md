@@ -19,7 +19,7 @@ Use the locally installed Claude CLI as a direct external advisor for focused qu
 Run Claude through the canonical OMCP CLI command path (no MCP routing):
 
 ```bash
-omx ask claude "{{ARGUMENTS}}"
+omcp ask claude "{{ARGUMENTS}}"
 ```
 
 Exact non-interactive Claude CLI command from `claude --help`:
@@ -48,7 +48,7 @@ claude --version
 After local execution, save a markdown artifact to:
 
 ```text
-.omx/artifacts/claude-<slug>-<timestamp>.md
+.omcp/artifacts/claude-<slug>-<timestamp>.md
 ```
 
 Minimum artifact sections:

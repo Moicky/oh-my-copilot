@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 
 const testDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(testDir, '..', '..', '..');
-const omxBin = join(repoRoot, 'dist', 'cli', 'omx.js');
+const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
 
 function runOmx(cwd: string, ...args: string[]) {
   return spawnSync(process.execPath, [omxBin, ...args], {
@@ -19,11 +19,11 @@ function runOmx(cwd: string, ...args: string[]) {
 
 describe('CLI session-scoped state parity', () => {
   it('status and cancel include session-scoped states', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-cli-session-scope-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-cli-session-scope-'));
     try {
-      await mkdir(join(wd, '.omx', 'state'), { recursive: true });
-      await writeFile(join(wd, '.omx', 'state', 'session.json'), JSON.stringify({ session_id: 'sess1' }));
-      const scopedDir = join(wd, '.omx', 'state', 'sessions', 'sess1');
+      await mkdir(join(wd, '.omcp', 'state'), { recursive: true });
+      await writeFile(join(wd, '.omcp', 'state', 'session.json'), JSON.stringify({ session_id: 'sess1' }));
+      const scopedDir = join(wd, '.omcp', 'state', 'sessions', 'sess1');
       await mkdir(scopedDir, { recursive: true });
       await writeFile(join(scopedDir, 'team-state.json'), JSON.stringify({
         active: true,
@@ -49,9 +49,9 @@ describe('CLI session-scoped state parity', () => {
   });
 
   it('cancels linked ultrawork when Ralph is active', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-cli-ralph-link-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-cli-ralph-link-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const sessionId = 'sess-link';
       const sessionDir = join(stateDir, 'sessions', sessionId);
       await mkdir(sessionDir, { recursive: true });
@@ -89,9 +89,9 @@ describe('CLI session-scoped state parity', () => {
   });
 
   it('does not mutate unrelated sessions when cancelling current session mode', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-cli-cross-session-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-cli-cross-session-'));
     try {
-      const stateDir = join(wd, '.omx', 'state');
+      const stateDir = join(wd, '.omcp', 'state');
       const sessionA = join(stateDir, 'sessions', 'sessA');
       const sessionB = join(stateDir, 'sessions', 'sessB');
       await mkdir(sessionA, { recursive: true });

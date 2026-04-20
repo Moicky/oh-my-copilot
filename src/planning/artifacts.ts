@@ -52,7 +52,7 @@ function readMatchingPaths(dir: string, pattern: RegExp): string[] {
 
 export function readPlanningArtifacts(cwd: string): PlanningArtifacts {
   const plansDir = omxPlansDir(cwd);
-  const specsDir = join(cwd, '.omx', 'specs');
+  const specsDir = join(cwd, '.omcp', 'specs');
 
   return {
     plansDir,
@@ -151,7 +151,7 @@ export function readApprovedExecutionLaunchHint(
   if (!approvedPlan) return null;
 
   if (mode === 'team') {
-    const teamPattern = /(?<command>(?:omx\s+team|\$team)\s+(?<ralph>ralph\s+)?(?<count>\d+)(?::(?<role>[a-z][a-z0-9-]*))?\s+(?<task>"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'))/gi;
+    const teamPattern = /(?<command>(?:omcp\s+team|\$team)\s+(?<ralph>ralph\s+)?(?<count>\d+)(?::(?<role>[a-z][a-z0-9-]*))?\s+(?<task>"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'))/gi;
     const matches = [...approvedPlan.content.matchAll(teamPattern)];
     const last = matches.at(-1);
     if (!last?.groups) return null;
@@ -168,7 +168,7 @@ export function readApprovedExecutionLaunchHint(
     };
   }
 
-  const ralphPattern = /(?<command>(?:omx\s+ralph|\$ralph)\s+(?<task>"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'))/gi;
+  const ralphPattern = /(?<command>(?:omcp\s+ralph|\$ralph)\s+(?<task>"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'))/gi;
   const matches = [...approvedPlan.content.matchAll(ralphPattern)];
   const last = matches.at(-1);
   if (!last?.groups) return null;

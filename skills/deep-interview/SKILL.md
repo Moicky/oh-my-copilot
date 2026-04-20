@@ -30,12 +30,12 @@ Execution quality is usually bottlenecked by intent clarity, not just missing im
 - **Quick (`--quick`)**: fast pre-PRD pass; target threshold `<= 0.30`; max rounds 5
 - **Standard (`--standard`, default)**: full requirement interview; target threshold `<= 0.20`; max rounds 12
 - **Deep (`--deep`)**: high-rigor exploration; target threshold `<= 0.15`; max rounds 20
-- **Autoresearch (`--autoresearch`)**: same interview rigor as Standard, but specialized for `$autoresearch` mission readiness and `.omx/specs/` artifact handoff
+- **Autoresearch (`--autoresearch`)**: same interview rigor as Standard, but specialized for `$autoresearch` mission readiness and `.omcp/specs/` artifact handoff
 
 If no flag is provided, use **Standard**.
 
 <Mode_Flags>
-- **`--autoresearch`**: switch the interview into autoresearch-intake mode for `$autoresearch` handoff. In this mode, the interview should converge on a validator-ready research mission, write canonical artifacts under `.omx/specs/`, and preserve the explicit `refine further` vs `launch` boundary for downstream skill intake.
+- **`--autoresearch`**: switch the interview into autoresearch-intake mode for `$autoresearch` handoff. In this mode, the interview should converge on a validator-ready research mission, write canonical artifacts under `.omcp/specs/`, and preserve the explicit `refine further` vs `launch` boundary for downstream skill intake.
 </Mode_Flags>
 </Depth_Profiles>
 
@@ -47,12 +47,12 @@ If no flag is provided, use **Standard**.
 - Do not rotate to a new clarity dimension just for coverage when the current answer is still vague; stay on the same thread until one layer deeper, one assumption clearer, or one boundary tighter
 - Before crystallizing, complete at least one explicit pressure pass that revisits an earlier answer with a deeper, assumption-focused, or tradeoff-focused follow-up
 - Gather codebase facts via `explore` before asking user about internals
-- When session guidance enables `USE_OMX_EXPLORE_CMD`, prefer `omx explore` for simple read-only brownfield fact gathering; keep prompts narrow and concrete, and keep ambiguous or non-shell-only investigation on the richer normal path and fall back normally if `omx explore` is unavailable.
+- When session guidance enables `USE_OMX_EXPLORE_CMD`, prefer `omcp explore` for simple read-only brownfield fact gathering; keep prompts narrow and concrete, and keep ambiguous or non-shell-only investigation on the richer normal path and fall back normally if `omcp explore` is unavailable.
 - Always run a preflight context intake before the first interview question
 - Reduce user effort: ask only the highest-leverage unresolved question, and never ask the user for codebase facts that can be discovered directly
 - For brownfield work, prefer evidence-backed confirmation questions such as "I found X in Y. Should this change follow that pattern?"
-- In Codex CLI, deep-interview uses `omx question` as the required OMCP-owned structured questioning path for every interview round
-- If `omx question` is unavailable in the current runtime, treat that as a blocker/error for deep-interview rather than falling back to `request_user_input` or plain-text questioning
+- In Codex CLI, deep-interview uses `omcp question` as the required OMCP-owned structured questioning path for every interview round
+- If `omcp question` is unavailable in the current runtime, treat that as a blocker/error for deep-interview rather than falling back to `request_user_input` or plain-text questioning
 - Re-score ambiguity after each answer and show progress transparently
 - Do not hand off to execution while ambiguity remains above threshold unless user explicitly opts to proceed with warning
 - Do not crystallize or hand off while `Non-goals` or `Decision Boundaries` remain unresolved, even if the weighted ambiguity threshold is met
@@ -65,7 +65,7 @@ If no flag is provided, use **Standard**.
 ## Phase 0: Preflight Context Intake
 
 1. Parse `{{ARGUMENTS}}` and derive a short task slug.
-2. Attempt to load the latest relevant context snapshot from `.omx/context/{slug}-*.md`.
+2. Attempt to load the latest relevant context snapshot from `.omcp/context/{slug}-*.md`.
 3. If no snapshot exists, create a minimum context snapshot with:
    - Task statement
    - Desired outcome
@@ -76,7 +76,7 @@ If no flag is provided, use **Standard**.
    - Unknowns/open questions
    - Decision-boundary unknowns
    - Likely codebase touchpoints
-4. Save snapshot to `.omx/context/{slug}-{timestamp}.md` (UTC `YYYYMMDDTHHMMSSZ`) and reference it in mode state.
+4. Save snapshot to `.omcp/context/{slug}-{timestamp}.md` (UTC `YYYYMMDDTHHMMSSZ`) and reference it in mode state.
 
 ## Phase 1: Initialize
 
@@ -103,7 +103,7 @@ If no flag is provided, use **Standard**.
     "codebase_context": null,
     "current_stage": "intent-first",
     "current_focus": "intent",
-    "context_snapshot_path": ".omx/context/<slug>-<timestamp>.md"
+    "context_snapshot_path": ".omcp/context/<slug>-<timestamp>.md"
   }
 }
 ```
@@ -146,7 +146,7 @@ Detailed dimensions:
 `Non-goals` and `Decision Boundaries` are mandatory readiness gates. Ask about them early and keep revisiting them until they are explicit.
 
 ### 2b) Ask the question
-Use OMCP-owned structured questioning via `omx question` for every interview round (this is the required `AskUserQuestion` equivalent for deep-interview) and present:
+Use OMCP-owned structured questioning via `omcp question` for every interview round (this is the required `AskUserQuestion` equivalent for deep-interview) and present:
 
 ```
 Round {n} | Target: {weakest_dimension} | Ambiguity: {score}%
@@ -194,10 +194,10 @@ Track used modes in state to prevent repetition.
 When threshold is met (or user exits with warning / hard cap):
 
 1. Write interview transcript summary to:
-   - `.omx/interviews/{slug}-{timestamp}.md`  
+   - `.omcp/interviews/{slug}-{timestamp}.md`  
      (kept for ralph PRD compatibility)
 2. Write execution-ready spec to:
-   - `.omx/specs/deep-interview-{slug}.md`
+   - `.omcp/specs/deep-interview-{slug}.md`
 
 Spec should include:
 - Metadata (profile, rounds, final ambiguity, threshold, context type)
@@ -222,16 +222,16 @@ When the clarified task is specifically about `$autoresearch`, or the skill is i
 
 - **Accepted seed inputs:** `topic`, `evaluator`, `keep-policy`, `slug`, existing mission draft text, and prior evaluator examples/templates
 - **Required interview focus:** mission clarity, evaluator readiness, keep policy, slug/session naming, and whether the draft is ready to launch now or should refine further
-- **Canonical artifact path:** `.omx/specs/deep-interview-autoresearch-{slug}.md`
-- **Launch artifact bundle:** `.omx/specs/autoresearch-{slug}/mission.md`, `.omx/specs/autoresearch-{slug}/sandbox.md`, and `.omx/specs/autoresearch-{slug}/result.json`
-- **Launch artifact directory:** `.omx/specs/autoresearch-{slug}/`
+- **Canonical artifact path:** `.omcp/specs/deep-interview-autoresearch-{slug}.md`
+- **Launch artifact bundle:** `.omcp/specs/autoresearch-{slug}/mission.md`, `.omcp/specs/autoresearch-{slug}/sandbox.md`, and `.omcp/specs/autoresearch-{slug}/result.json`
+- **Launch artifact directory:** `.omcp/specs/autoresearch-{slug}/`
 - **Required artifact sections:**
   - `Mission Draft`
   - `Evaluator Draft`
   - `Launch Readiness`
   - `Seed Inputs`
   - `Confirmation Bridge`
-- **Required launch artifacts under `.omx/specs/autoresearch-{slug}/`:**
+- **Required launch artifacts under `.omcp/specs/autoresearch-{slug}/`:**
   - `mission.md`
   - `sandbox.md`
   - `result.json`
@@ -245,16 +245,16 @@ When the clarified task is specifically about `$autoresearch`, or the skill is i
 Present execution options after artifact generation using explicit handoff contracts. Treat the deep-interview spec as the current requirements source of truth and preserve intent, non-goals, decision boundaries, acceptance criteria, and any residual-risk warnings across the handoff.
 
 ### 1. **`$ralplan` (Recommended)**
-- **Input Artifact:** `.omx/specs/deep-interview-{slug}.md` (optionally accompanied by the transcript/context snapshot for traceability)
+- **Input Artifact:** `.omcp/specs/deep-interview-{slug}.md` (optionally accompanied by the transcript/context snapshot for traceability)
 - **Invocation:** `$plan --consensus --direct <spec-path>`
 - **Consumer Behavior:** Treat the deep-interview spec as the requirements source of truth. Do not repeat the interview by default; refine architecture/feasibility around the clarified intent and boundaries instead.
 - **Skipped / Already-Satisfied Stages:** Requirements discovery, ambiguity clarification, and early intent-boundary elicitation
-- **Expected Output:** Canonical planning artifacts under `.omx/plans/`, especially `prd-*.md` and `test-spec-*.md`
+- **Expected Output:** Canonical planning artifacts under `.omcp/plans/`, especially `prd-*.md` and `test-spec-*.md`
 - **Best When:** Requirements are clear enough to stop interviewing, but architectural validation / consensus planning is still desirable
 - **Next Recommended Step:** Use the approved planning artifacts with `$autopilot`, `$ralph`, or `$team` depending on the desired execution style
 
 ### 2. **`$autopilot`**
-- **Input Artifact:** `.omx/specs/deep-interview-{slug}.md`
+- **Input Artifact:** `.omcp/specs/deep-interview-{slug}.md`
 - **Invocation:** `$autopilot <spec-path>`
 - **Consumer Behavior:** Use the deep-interview spec as the clarified execution brief. Preserve intent, non-goals, decision boundaries, and acceptance criteria as binding context for planning/execution.
 - **Skipped / Already-Satisfied Stages:** Initial requirement discovery and ambiguity reduction
@@ -263,7 +263,7 @@ Present execution options after artifact generation using explicit handoff contr
 - **Next Recommended Step:** Continue through autopilot's execution/QA/validation flow; if coordination-heavy execution emerges, prefer a follow-up `$team` or `$ralph` lane as appropriate
 
 ### 3. **`$ralph`**
-- **Input Artifact:** `.omx/specs/deep-interview-{slug}.md`
+- **Input Artifact:** `.omcp/specs/deep-interview-{slug}.md`
 - **Invocation:** `$ralph <spec-path>`
 - **Consumer Behavior:** Use the spec's acceptance criteria and boundary constraints as the persistence target. Do not reopen requirements discovery unless the user explicitly asks to refine further.
 - **Skipped / Already-Satisfied Stages:** Requirement interview, ambiguity clarification, and initial scope-definition work
@@ -272,7 +272,7 @@ Present execution options after artifact generation using explicit handoff contr
 - **Next Recommended Step:** Continue Ralph's persistence loop; if work expands into coordination-heavy lanes, hand off to `$team` and keep Ralph for verification continuity
 
 ### 4. **`$team`**
-- **Input Artifact:** `.omx/specs/deep-interview-{slug}.md`
+- **Input Artifact:** `.omcp/specs/deep-interview-{slug}.md`
 - **Invocation:** `$team <spec-path>`
 - **Consumer Behavior:** Treat the spec as shared execution context for coordinated parallel work. Preserve the clarified intent, non-goals, decision boundaries, and acceptance criteria as common lane constraints.
 - **Skipped / Already-Satisfied Stages:** Requirement clarification and early ambiguity reduction
@@ -297,11 +297,11 @@ Present execution options after artifact generation using explicit handoff contr
 
 <Tool_Usage>
 - Use `explore` for codebase fact gathering
-- Use `omx question` as the OMCP-native structured user-input tool for each interview round
-- If `omx question` is unavailable in the current runtime, stop and surface that deep-interview requires the OMCP question tool rather than falling back to another questioning path
+- Use `omcp question` as the OMCP-native structured user-input tool for each interview round
+- If `omcp question` is unavailable in the current runtime, stop and surface that deep-interview requires the OMCP question tool rather than falling back to another questioning path
 - Use `state_write` / `state_read` for resumable mode state
-- Read/write context snapshots under `.omx/context/`
-- Save transcript/spec artifacts under `.omx/interviews/` and `.omx/specs/`
+- Read/write context snapshots under `.omcp/context/`
+- Save transcript/spec artifacts under `.omcp/interviews/` and `.omcp/specs/`
 </Tool_Usage>
 
 <Escalation_And_Stop_Conditions>
@@ -312,15 +312,15 @@ Present execution options after artifact generation using explicit handoff contr
 </Escalation_And_Stop_Conditions>
 
 <Final_Checklist>
-- [ ] Preflight context snapshot exists under `.omx/context/{slug}-{timestamp}.md`
+- [ ] Preflight context snapshot exists under `.omcp/context/{slug}-{timestamp}.md`
 - [ ] Ambiguity score shown each round
 - [ ] Intent-first stage priority used before implementation detail
 - [ ] Weakest-dimension targeting used within the active stage
 - [ ] At least one explicit assumption probe happened before crystallization
 - [ ] At least one persistent follow-up / pressure pass deepened a prior answer
 - [ ] Challenge modes triggered at thresholds (when applicable)
-- [ ] Transcript written to `.omx/interviews/{slug}-{timestamp}.md`
-- [ ] Spec written to `.omx/specs/deep-interview-{slug}.md`
+- [ ] Transcript written to `.omcp/interviews/{slug}-{timestamp}.md`
+- [ ] Spec written to `.omcp/specs/deep-interview-{slug}.md`
 - [ ] Brownfield questions use evidence-backed confirmation when applicable
 - [ ] Handoff options provided (`$ralplan`, `$autopilot`, `$ralph`, `$team`)
 - [ ] No direct implementation performed in this mode
@@ -330,7 +330,7 @@ Present execution options after artifact generation using explicit handoff contr
 ## Suggested Config (optional)
 
 ```toml
-[omx.deepInterview]
+[omcp.deepInterview]
 defaultProfile = "standard"
 quickThreshold = 0.30
 standardThreshold = 0.20

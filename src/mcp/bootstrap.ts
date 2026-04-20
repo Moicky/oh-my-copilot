@@ -225,7 +225,7 @@ export function autoStartStdioMcpServer(
   const logLifecycle = (message: string, error?: unknown) => {
     if (!lifecycleDebugEnabled) return;
     const detail = error ? ` ${error instanceof Error ? error.message : String(error)}` : '';
-    process.stderr.write(`[omx-${serverName}-server] ${message}${detail}\n`);
+    process.stderr.write(`[omcp-${serverName}-server] ${message}${detail}\n`);
   };
 
   const parentWatchdog = trackedParentPid > 1
@@ -295,7 +295,7 @@ export function autoStartStdioMcpServer(
     try {
       await server.close();
     } catch (error) {
-      console.error(`[omx-${serverName}-server] shutdown failed`, error);
+      console.error(`[omcp-${serverName}-server] shutdown failed`, error);
     }
 
     logLifecycle('transport shutdown: exit');

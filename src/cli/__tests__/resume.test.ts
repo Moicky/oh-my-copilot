@@ -13,7 +13,7 @@ function runOmx(
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omx.js');
+  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
   const result = spawnSync(process.execPath, [omxBin, ...argv], {
     cwd,
     encoding: 'utf-8',
@@ -30,9 +30,9 @@ function runOmx(
   };
 }
 
-describe('omx resume', () => {
+describe('omcp resume', () => {
   it('forwards --last to codex resume through the normal launch wrapper', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-resume-cli-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-resume-cli-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
@@ -61,8 +61,8 @@ describe('omx resume', () => {
     }
   });
 
-  it('passes resume --help through to codex instead of printing top-level omx help', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-resume-cli-'));
+  it('passes resume --help through to codex instead of printing top-level omcp help', async () => {
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-resume-cli-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');

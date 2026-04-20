@@ -111,7 +111,7 @@ Use this profile when you want detailed but quickly scannable notifications:
 ### Quick update command (jq)
 
 ```bash
-CONFIG_FILE="$HOME/.codex/.omx-config.json"
+CONFIG_FILE="$HOME/.codex/.omcp-config.json"
 
 jq '.notifications.verbosity = "verbose" |
     .notifications.openclaw.hooks["session-start"].instruction = "[session-start|exec]\\nproject={{projectName}} session={{sessionId}} tmux={{tmuxSession}}\\n요약: 시작 맥락 1문장\\n우선순위: 지금 할 일 1~2개\\n주의사항: 리스크/의존성(없으면 없음)" |
@@ -230,7 +230,7 @@ For Korean-first tmux follow-up operations in `#omc-dev`, see the dev guide sect
       "gateways": {
         "local": {
           "type": "command",
-          "command": "(clawdbot agent --session-id omx-hooks --message {{instruction}} --thinking minimal --deliver --reply-channel discord --reply-to 'channel:1468539002985644084' --timeout 120 --json >>/tmp/omx-openclaw-agent.jsonl 2>&1 || true)",
+          "command": "(clawdbot agent --session-id omcp-hooks --message {{instruction}} --thinking minimal --deliver --reply-channel discord --reply-to 'channel:1468539002985644084' --timeout 120 --json >>/tmp/omcp-openclaw-agent.jsonl 2>&1 || true)",
           "timeout": 120000
         }
       },
@@ -297,7 +297,7 @@ SOUL.md 및 #omc-dev 맥락을 참고해 필요한 후속 액션이 있으면 �
 Quick checks:
 
 ```bash
-tmux ls | grep '^omx-' || true
+tmux ls | grep '^omcp-' || true
 tmux list-panes -a -F '#{session_name}\t#{pane_id}\t#{pane_current_path}' | grep "$(basename "$PWD")" || true
 ```
 
@@ -314,13 +314,13 @@ Troubleshooting commands:
 
 ```bash
 # Inspect structured JSONL logs
-tail -n 120 /tmp/omx-openclaw-agent.jsonl | jq -s '.[] | {timestamp: (.timestamp // .time), status: (.status // .error // "ok")}'
+tail -n 120 /tmp/omcp-openclaw-agent.jsonl | jq -s '.[] | {timestamp: (.timestamp // .time), status: (.status // .error // "ok")}'
 
 # Search for errors in logs
-rg '"error"|"failed"|"timeout"' /tmp/omx-openclaw-agent.jsonl | tail -20
+rg '"error"|"failed"|"timeout"' /tmp/omcp-openclaw-agent.jsonl | tail -20
 
 # Manual retry with production-tested settings
-clawdbot agent --session-id omx-hooks \
+clawdbot agent --session-id omcp-hooks \
   --message "OMCP hook retry 점검: session={{sessionId}} tmux={{tmuxSession}}" \
   --thinking minimal --deliver --reply-channel discord --reply-to 'channel:1468539002985644084' \
   --timeout 120 --json
@@ -342,7 +342,7 @@ Expected pass signal: JSON includes `"ok":true`.
 ### B) Delivery verification (`/hooks/agent`)
 
 ```bash
-curl -sS -o /tmp/omx-openclaw-agent-check.json -w "HTTP %{http_code}\n" \
+curl -sS -o /tmp/omcp-openclaw-agent-check.json -w "HTTP %{http_code}\n" \
   -X POST http://127.0.0.1:18789/hooks/agent \
   -H "Authorization: Bearer ${HOOKS_TOKEN}" \
   -H "Content-Type: application/json" \

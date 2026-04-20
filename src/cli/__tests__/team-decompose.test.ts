@@ -128,7 +128,7 @@ describe('decomposeTaskString', () => {
   });
 
   it('keeps medium-sized coupled implementation prompts single-lane by default', () => {
-    const task = 'Implement a staffing preview in omx team so the leader can inspect decomposition, role routing, and fanout reasons before launch.';
+    const task = 'Implement a staffing preview in omcp team so the leader can inspect decomposition, role routing, and fanout reasons before launch.';
     const plan = buildTeamExecutionPlan(task, 3, 'executor', false);
     assert.equal(plan.workerCount, 1);
     assert.equal(plan.tasks.length, 1);

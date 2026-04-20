@@ -29,31 +29,31 @@
 - `.github/workflows/{ci,pr-check,release,dev-merge-issue-close}.yml` — token rename + hard-coded crate path arrays + npm-publish target
 - `.github/ISSUE_TEMPLATE/{bug_report,feature_request,config}.{md,yml}` — token rename + Discord link removal
 - `.github/PULL_REQUEST_TEMPLATE.md` — token rename
-- All TypeScript / Rust source files containing the brand tokens `omx`, `OMCP`, `oh-my-copilot`, `.omx/`, `omx-` (crate prefix), or `Moicky/oh-my-copilot`
+- All TypeScript / Rust source files containing the brand tokens `omcp`, `OMCP`, `oh-my-copilot`, `.omcp/`, `omcp-` (crate prefix), or `Moicky/oh-my-copilot`
 
 ### Files renamed (git mv)
-- `crates/omx-explore/`           → `crates/omcp-explore/`
-- `crates/omx-mux/`               → `crates/omcp-mux/`
-- `crates/omx-runtime/`           → `crates/omcp-runtime/`
-- `crates/omx-runtime-core/`      → `crates/omcp-runtime-core/`
-- `crates/omx-sparkshell/`        → `crates/omcp-sparkshell/`
-- `src/cli/omx.ts`                → `src/cli/omcp.ts`
-- `skills/omx-setup/`             → `skills/omcp-setup/`
-- `docs/shared/omx-character-spark-initiative.jpg` → **deleted** (Phase E)
+- `crates/omcp-explore/`           → `crates/omcp-explore/`
+- `crates/omcp-mux/`               → `crates/omcp-mux/`
+- `crates/omcp-runtime/`           → `crates/omcp-runtime/`
+- `crates/omcp-runtime-core/`      → `crates/omcp-runtime-core/`
+- `crates/omcp-sparkshell/`        → `crates/omcp-sparkshell/`
+- `src/cli/omcp.ts`                → `src/cli/omcp.ts`
+- `skills/omcp-setup/`             → `skills/omcp-setup/`
+- `docs/shared/omcp-character-spark-initiative.jpg` → **deleted** (Phase E)
 
 ### Files deleted
 - `docs/readme/README.{de,el,es,fr,it,ja,ko,pl,pt,ru,tr,uk,vi,zh,zh-TW}.md` (15 files)
 - `docs/release-notes-*.md`, `docs/release-body-*.md`, `docs/qa-plan-*.md`, `docs/qa-report-*.md`, `docs/migration-*.md`, `docs/prompt-migration-changelog.md` (33 files)
 - `docs/openclaw-integration.{de,es,fr,it,ja,ko,pt,ru,tr,uk,vi,zh,zh-TW}.md` (13 files; English `openclaw-integration.md` kept)
 - `docs/prs/`, `docs/issues/` (entire directories)
-- `docs/shared/omx-character-spark-initiative.jpg`
+- `docs/shared/omcp-character-spark-initiative.jpg`
 
 ### Test strategy
 This sub-project does **not** add new behavior, so we don't write new functional unit tests. Verification is:
 1. `npm run build` succeeds.
 2. `cargo build --workspace` succeeds.
 3. `cargo metadata --format-version=1` lists exactly 5 `omcp-*` packages.
-4. `node dist/cli/omcp.js --help` runs without crashing on identity-only paths and prints **no** `OMCP`/`omx`/`oh-my-copilot` strings.
+4. `node dist/cli/omcp.js --help` runs without crashing on identity-only paths and prints **no** `OMCP`/`omcp`/`oh-my-copilot` strings.
 5. Final ripgrep audit returns only the explicitly-allowed brand survivors (fork-attribution line + intentional upstream link).
 
 Existing test suites that exercise Codex integration are expected to fail after this sub-project — we don't run them. We only run the Rust + TypeScript **build** and the explicit audit greps.
@@ -80,7 +80,7 @@ npm run build
 cargo build --workspace
 ```
 
-Expected: all three succeed. If any fail, **stop and report** — the rebrand assumes a working baseline. (`cargo build` of `omx-runtime` may take several minutes on a cold cache.)
+Expected: all three succeed. If any fail, **stop and report** — the rebrand assumes a working baseline. (`cargo build` of `omcp-runtime` may take several minutes on a cold cache.)
 
 ---
 
@@ -100,16 +100,16 @@ Apply these exact edits in `package.json`:
 | `name` | `"oh-my-copilot"` | `"@moicky/oh-my-copilot"` |
 | `version` | `"0.14.0"` | `"0.1.0"` |
 | `description` | `"Multi-agent orchestration layer for OpenAI Codex CLI"` | `"Workflow layer for GitHub Copilot CLI (forked from oh-my-copilot)"` |
-| `bin.omx` | `"dist/cli/omx.js"` | rename key `omx` → `omcp`, value `"dist/cli/omcp.js"` |
+| `bin.omcp` | `"dist/cli/omcp.js"` | rename key `omcp` → `omcp`, value `"dist/cli/omcp.js"` |
 | `repository` | (whatever value is set) | `{"type":"git","url":"git+https://github.com/Moicky/oh-my-copilot.git"}` (add the field if absent) |
 
-In `scripts`, replace every literal `dist/cli/omx.js` with `dist/cli/omcp.js`. The known affected scripts (verify with `grep '"omx"\\|omx\\.js' package.json`):
+In `scripts`, replace every literal `dist/cli/omcp.js` with `dist/cli/omcp.js`. The known affected scripts (verify with `grep '"omcp"\\|omcp\\.js' package.json`):
 
-- `build`            : `... fs.chmodSync('dist/cli/omx.js', 0o755) ...` → `... fs.chmodSync('dist/cli/omcp.js', 0o755) ...`
-- `setup`            : `node dist/cli/omx.js setup` → `node dist/cli/omcp.js setup`
-- `doctor`           : `node dist/cli/omx.js doctor` → `node dist/cli/omcp.js doctor`
+- `build`            : `... fs.chmodSync('dist/cli/omcp.js', 0o755) ...` → `... fs.chmodSync('dist/cli/omcp.js', 0o755) ...`
+- `setup`            : `node dist/cli/omcp.js setup` → `node dist/cli/omcp.js setup`
+- `doctor`           : `node dist/cli/omcp.js doctor` → `node dist/cli/omcp.js doctor`
 
-In `scripts`, also replace `cargo build -p omx-explore-harness` → `cargo build -p omcp-explore-harness` and `cargo test -p omx-explore-harness` → `cargo test -p omcp-explore-harness`. And `OMX_COMPAT_TARGET=./target/debug/omx` → `OMCP_COMPAT_TARGET=./target/debug/omcp`.
+In `scripts`, also replace `cargo build -p omcp-explore-harness` → `cargo build -p omcp-explore-harness` and `cargo test -p omcp-explore-harness` → `cargo test -p omcp-explore-harness`. And `OMX_COMPAT_TARGET=./target/debug/omcp` → `OMCP_COMPAT_TARGET=./target/debug/omcp`.
 
 Do **not** change references to `@openai/codex`, `codex`, `.codex/`, or `CODEX_HOME` anywhere — those are out of scope.
 
@@ -190,10 +190,10 @@ cat dist-workspace.toml
 
 - [ ] **Step 2: Apply edits**
 
-If the file mentions `oh-my-copilot`, `Yeachan-Heo`, `omx-`, or `OMCP`, update those tokens using the rules:
+If the file mentions `oh-my-copilot`, `Yeachan-Heo`, `omcp-`, or `OMCP`, update those tokens using the rules:
 - `oh-my-copilot` → `oh-my-copilot`
 - `Moicky/oh-my-copilot` → `Moicky/oh-my-copilot`
-- `omx-` (crate name prefix only) → `omcp-`
+- `omcp-` (crate name prefix only) → `omcp-`
 
 If it doesn't mention any of these, skip the edits.
 
@@ -211,20 +211,20 @@ git diff --cached --quiet || git commit -m "chore(rebrand): update dist-workspac
 ### Task B1: Rename Cargo crate directories
 
 **Files:**
-- Rename: `crates/omx-explore` → `crates/omcp-explore`
-- Rename: `crates/omx-mux` → `crates/omcp-mux`
-- Rename: `crates/omx-runtime` → `crates/omcp-runtime`
-- Rename: `crates/omx-runtime-core` → `crates/omcp-runtime-core`
-- Rename: `crates/omx-sparkshell` → `crates/omcp-sparkshell`
+- Rename: `crates/omcp-explore` → `crates/omcp-explore`
+- Rename: `crates/omcp-mux` → `crates/omcp-mux`
+- Rename: `crates/omcp-runtime` → `crates/omcp-runtime`
+- Rename: `crates/omcp-runtime-core` → `crates/omcp-runtime-core`
+- Rename: `crates/omcp-sparkshell` → `crates/omcp-sparkshell`
 
 - [ ] **Step 1: Run `git mv` for each crate**
 
 ```bash
-git mv crates/omx-explore       crates/omcp-explore
-git mv crates/omx-mux           crates/omcp-mux
-git mv crates/omx-runtime       crates/omcp-runtime
-git mv crates/omx-runtime-core  crates/omcp-runtime-core
-git mv crates/omx-sparkshell    crates/omcp-sparkshell
+git mv crates/omcp-explore       crates/omcp-explore
+git mv crates/omcp-mux           crates/omcp-mux
+git mv crates/omcp-runtime       crates/omcp-runtime
+git mv crates/omcp-runtime-core  crates/omcp-runtime-core
+git mv crates/omcp-sparkshell    crates/omcp-sparkshell
 ```
 
 - [ ] **Step 2: Verify the directories moved and history is preserved**
@@ -239,7 +239,7 @@ Expected: `crates/` lists 5 `omcp-*` directories. `git status` shows the renames
 - [ ] **Step 3: Commit**
 
 ```bash
-git commit -m "chore(rebrand): git mv crates/omx-* -> crates/omcp-*"
+git commit -m "chore(rebrand): git mv crates/omcp-* -> crates/omcp-*"
 ```
 
 ---
@@ -256,22 +256,22 @@ git commit -m "chore(rebrand): git mv crates/omx-* -> crates/omcp-*"
 - [ ] **Step 1: Apply edits per crate**
 
 In `crates/omcp-explore/Cargo.toml`:
-- `name = "omx-explore-harness"`     → `name = "omcp-explore-harness"`  (appears twice: `[package].name` and `[[bin]].name`)
+- `name = "omcp-explore-harness"`     → `name = "omcp-explore-harness"`  (appears twice: `[package].name` and `[[bin]].name`)
 
 In `crates/omcp-mux/Cargo.toml`:
-- `name = "omx-mux"` → `name = "omcp-mux"`
+- `name = "omcp-mux"` → `name = "omcp-mux"`
 
 In `crates/omcp-runtime-core/Cargo.toml`:
-- `name = "omx-runtime-core"` → `name = "omcp-runtime-core"`
+- `name = "omcp-runtime-core"` → `name = "omcp-runtime-core"`
 
 In `crates/omcp-runtime/Cargo.toml`:
-- `name = "omx-runtime"` → `name = "omcp-runtime"`
-- `omx-mux = { path = "../omx-mux" }` → `omcp-mux = { path = "../omcp-mux" }`
-- `omx-runtime-core = { path = "../omx-runtime-core" }` → `omcp-runtime-core = { path = "../omcp-runtime-core" }`
+- `name = "omcp-runtime"` → `name = "omcp-runtime"`
+- `omcp-mux = { path = "../omcp-mux" }` → `omcp-mux = { path = "../omcp-mux" }`
+- `omcp-runtime-core = { path = "../omcp-runtime-core" }` → `omcp-runtime-core = { path = "../omcp-runtime-core" }`
 
 In `crates/omcp-sparkshell/Cargo.toml`:
-- `name = "omx-sparkshell"` → `name = "omcp-sparkshell"`  (appears twice: `[package].name` and `[[bin]].name`)
-- `omx-mux = { path = "../omx-mux" }` → `omcp-mux = { path = "../omcp-mux" }`
+- `name = "omcp-sparkshell"` → `name = "omcp-sparkshell"`  (appears twice: `[package].name` and `[[bin]].name`)
+- `omcp-mux = { path = "../omcp-mux" }` → `omcp-mux = { path = "../omcp-mux" }`
 
 - [ ] **Step 2: Regenerate `Cargo.lock` and confirm the workspace builds**
 
@@ -295,7 +295,7 @@ Expected output (exact): `['omcp-explore-harness', 'omcp-mux', 'omcp-runtime', '
 
 ```bash
 git add crates/ Cargo.lock
-git commit -m "chore(rebrand): rename Cargo packages omx-* -> omcp-* and update inter-crate deps"
+git commit -m "chore(rebrand): rename Cargo packages omcp-* -> omcp-* and update inter-crate deps"
 ```
 
 ---
@@ -303,28 +303,28 @@ git commit -m "chore(rebrand): rename Cargo packages omx-* -> omcp-* and update 
 ### Task B3: Rename TypeScript CLI entry and skill directory
 
 **Files:**
-- Rename: `src/cli/omx.ts` → `src/cli/omcp.ts`
-- Rename: `skills/omx-setup/` → `skills/omcp-setup/`
+- Rename: `src/cli/omcp.ts` → `src/cli/omcp.ts`
+- Rename: `skills/omcp-setup/` → `skills/omcp-setup/`
 
 - [ ] **Step 1: Run `git mv`**
 
 ```bash
-git mv src/cli/omx.ts src/cli/omcp.ts
-git mv skills/omx-setup skills/omcp-setup
+git mv src/cli/omcp.ts src/cli/omcp.ts
+git mv skills/omcp-setup skills/omcp-setup
 ```
 
-- [ ] **Step 2: Audit for any other `*omx*` filenames we missed**
+- [ ] **Step 2: Audit for any other `*omcp*` filenames we missed**
 
 ```bash
-find . -name '*omx*' -not -path './node_modules/*' -not -path './target/*' -not -path './dist/*' -not -path './.git/*'
+find . -name '*omcp*' -not -path './node_modules/*' -not -path './target/*' -not -path './dist/*' -not -path './.git/*'
 ```
 
-Expected output: only `docs/prs/experimental-dev-omx-sparkshell.md` (will be deleted in Phase E) and `docs/shared/omx-character-spark-initiative.jpg` (will be deleted in Phase E). If anything else appears, `git mv` it now applying the same `omx` → `omcp` rule and re-run the audit.
+Expected output: only `docs/prs/experimental-dev-omcp-sparkshell.md` (will be deleted in Phase E) and `docs/shared/omcp-character-spark-initiative.jpg` (will be deleted in Phase E). If anything else appears, `git mv` it now applying the same `omcp` → `omcp` rule and re-run the audit.
 
 - [ ] **Step 3: Commit**
 
 ```bash
-git commit -m "chore(rebrand): git mv src/cli/omx.ts src/cli/omcp.ts and skills/omx-setup -> skills/omcp-setup"
+git commit -m "chore(rebrand): git mv src/cli/omcp.ts src/cli/omcp.ts and skills/omcp-setup -> skills/omcp-setup"
 ```
 
 ---
@@ -347,7 +347,7 @@ git ls-files \
   ':!docs/prompt-migration-changelog.md' \
   ':!docs/openclaw-integration.*.md' \
   ':!docs/prs/**' ':!docs/issues/**' \
-  ':!docs/shared/omx-character-spark-initiative.jpg' \
+  ':!docs/shared/omcp-character-spark-initiative.jpg' \
   ':!docs/superpowers/specs/2026-04-20-rebrand-foundation-design.md' \
   > /tmp/omcp-rename-files.txt
 wc -l /tmp/omcp-rename-files.txt
@@ -357,7 +357,7 @@ Expected: a few thousand files. The exclusion list mirrors Phase E deletion targ
 
 The `openclaw-integration.md` (English) is **not** excluded — it gets rebranded.
 
-> **Note:** `docs/openclaw-integration.md` may contain the literal string `openclaw` (a third-party tool) and references to `omx-*` crates that no longer exist. The token rename will only flip `omx-` → `omcp-` and `OMCP`/`omx` brand tokens; it won't touch the third-party tool name.
+> **Note:** `docs/openclaw-integration.md` may contain the literal string `openclaw` (a third-party tool) and references to `omcp-*` crates that no longer exist. The token rename will only flip `omcp-` → `omcp-` and `OMCP`/`omcp` brand tokens; it won't touch the third-party tool name.
 
 ### Task C2: Rule 1 — `oh-my-copilot` → `oh-my-copilot`
 
@@ -443,7 +443,7 @@ git add -u
 git commit -m "chore(rebrand): replace OMCP brand abbreviation with OMCP"
 ```
 
-### Task C5: Rule 4 — lowercase `omx` (binary name, identifier) → `omcp`
+### Task C5: Rule 4 — lowercase `omcp` (binary name, identifier) → `omcp`
 
 This is the most invasive rule and uses a word-boundary regex to avoid touching arbitrary substrings. We deliberately handle the Rust crate prefix in a separate rule (C6) so this rule can stay narrow.
 
@@ -472,16 +472,16 @@ Expected: empty output.
 npm run build
 ```
 
-Expected: succeeds. If it fails with "cannot find module" pointing at an old `omx` path, identify the bad reference and fix it inline (it would be a hardcoded string the regex didn't catch — usually inside a template literal with hyphens, e.g. `omx-foo`, which is correct to leave alone for now). Document any extra fixes in the commit.
+Expected: succeeds. If it fails with "cannot find module" pointing at an old `omcp` path, identify the bad reference and fix it inline (it would be a hardcoded string the regex didn't catch — usually inside a template literal with hyphens, e.g. `omcp-foo`, which is correct to leave alone for now). Document any extra fixes in the commit.
 
 - [ ] **Step 4: Commit**
 
 ```bash
 git add -u
-git commit -m "chore(rebrand): replace lowercase 'omx' with 'omcp' in non-Rust source"
+git commit -m "chore(rebrand): replace lowercase 'omcp' with 'omcp' in non-Rust source"
 ```
 
-### Task C6: Rule 5 — Rust crate identifiers (`omx_*` and `omx-*`) → `omcp_*` / `omcp-*`
+### Task C6: Rule 5 — Rust crate identifiers (`omx_*` and `omcp-*`) → `omcp_*` / `omcp-*`
 
 Rust uses `_` in `use` statements and `-` in `Cargo.toml`. Apply both.
 
@@ -502,7 +502,7 @@ cargo build --workspace
 
 Expected: succeeds.
 
-- [ ] **Step 3: Verify no stray `omx` Rust identifiers remain**
+- [ ] **Step 3: Verify no stray `omcp` Rust identifiers remain**
 
 ```bash
 rg '\bomx[_-]' $(cat /tmp/omcp-rename-files-rust.txt)
@@ -515,17 +515,17 @@ Expected: both empty.
 
 ```bash
 git add -u Cargo.lock
-git commit -m "chore(rebrand): replace omx Rust identifiers with omcp"
+git commit -m "chore(rebrand): replace omcp Rust identifiers with omcp"
 ```
 
-### Task C7: Rule 6 — state directory `.omx/` → `.omcp/`
+### Task C7: Rule 6 — state directory `.omcp/` → `.omcp/`
 
 - [ ] **Step 1: Apply substitution**
 
 ```bash
 xargs -a /tmp/omcp-rename-files.txt -I{} sh -c '
-  if grep -l "\\.omx" "$1" >/dev/null 2>&1; then
-    perl -i -pe "s|\\.omx/|.omcp/|g; s|\\.omx\\b|.omcp|g" "$1"
+  if grep -l "\\.omcp" "$1" >/dev/null 2>&1; then
+    perl -i -pe "s|\\.omcp/|.omcp/|g; s|\\.omcp\\b|.omcp|g" "$1"
   fi
 ' _ {}
 ```
@@ -533,7 +533,7 @@ xargs -a /tmp/omcp-rename-files.txt -I{} sh -c '
 - [ ] **Step 2: Verify**
 
 ```bash
-rg '\.omx\b' $(cat /tmp/omcp-rename-files.txt)
+rg '\.omcp\b' $(cat /tmp/omcp-rename-files.txt)
 ```
 
 Expected: empty output.
@@ -551,7 +551,7 @@ Expected: both succeed.
 
 ```bash
 git add -u
-git commit -m "chore(rebrand): rename state directory .omx -> .omcp"
+git commit -m "chore(rebrand): rename state directory .omcp -> .omcp"
 ```
 
 ### Task C8: Rule 7 — `OMX_` env-var prefix → `OMCP_`
@@ -895,7 +895,7 @@ git commit -m "docs(rebrand): drop upstream PR write-ups and issue notes"
 - [ ] **Step 1: Remove**
 
 ```bash
-git rm docs/shared/omx-character-spark-initiative.jpg
+git rm docs/shared/omcp-character-spark-initiative.jpg
 ```
 
 If `docs/shared/` is now empty, the directory will be removed automatically by git.
@@ -929,22 +929,22 @@ The Node script inside `release.yml` has two arrays listing crate paths:
 
 ```js
 const expectedMembers = [
-  'crates/omx-explore',
+  'crates/omcp-explore',
   ...
 ];
 const manifests = [
-  'crates/omx-explore/Cargo.toml',
+  'crates/omcp-explore/Cargo.toml',
   ...
 ];
 ```
 
-Phase C should have already converted these (they are JS string literals with `omx-`, which the regex catches). Verify:
+Phase C should have already converted these (they are JS string literals with `omcp-`, which the regex catches). Verify:
 
 ```bash
-grep -n "crates/omx-" .github/workflows/release.yml
+grep -n "crates/omcp-" .github/workflows/release.yml
 ```
 
-Expected: empty output. If not, edit the file and replace `crates/omx-` with `crates/omcp-` in those arrays.
+Expected: empty output. If not, edit the file and replace `crates/omcp-` with `crates/omcp-` in those arrays.
 
 Add a top-of-file comment block to all four workflow files:
 
@@ -1023,7 +1023,7 @@ node dist/cli/omcp.js --help 2>&1 | tee /tmp/omcp-help.txt | head -40
 
 If the CLI errors immediately because some sub-command tries to talk to Codex during help rendering, capture the error message but **don't fix it here** — it belongs to sub-project #2. Only require that `--help` itself produces help text.
 
-- [ ] **Step 2: Confirm output contains no `omx`/`OMCP`/`oh-my-copilot` strings**
+- [ ] **Step 2: Confirm output contains no `omcp`/`OMCP`/`oh-my-copilot` strings**
 
 ```bash
 grep -E "\\bomx\\b|\\bOMX\\b|oh-my-copilot" /tmp/omcp-help.txt && echo "FAIL: stale brand strings in help" || echo "ok"

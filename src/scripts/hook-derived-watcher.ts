@@ -27,7 +27,7 @@ const runOnce = process.argv.includes('--once');
 const pollMs = Math.max(250, asNumber(argValue('--poll-ms', process.env.OMX_HOOK_DERIVED_POLL_MS || '800'), 800));
 const maxFileAgeMs = Math.max(10_000, asNumber(argValue('--file-age-ms', process.env.OMX_HOOK_DERIVED_FILE_AGE_MS || '90000'), 90000));
 
-const omxDir = join(cwd, '.omx');
+const omxDir = join(cwd, '.omcp');
 const logsDir = join(omxDir, 'logs');
 const stateDir = join(omxDir, 'state');
 const watcherStatePath = join(stateDir, 'hook-derived-watcher-state.json');

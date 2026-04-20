@@ -2,11 +2,11 @@
  * OMCP HUD - CLI entry point
  *
  * Usage:
- *   omx hud              Show current HUD state
- *   omx hud --watch      Poll every 1s with terminal clear
- *   omx hud --json       Output raw state as JSON
- *   omx hud --preset=X   Use preset: minimal, focused, full
- *   omx hud --tmux       Open HUD in a tmux split pane (auto-detects orientation)
+ *   omcp hud              Show current HUD state
+ *   omcp hud --watch      Poll every 1s with terminal clear
+ *   omcp hud --json       Output raw state as JSON
+ *   omcp hud --preset=X   Use preset: minimal, focused, full
+ *   omcp hud --tmux       Open HUD in a tmux split pane (auto-detects orientation)
  */
 
 import { execFileSync } from 'child_process';
@@ -20,11 +20,11 @@ import { resolveOmxCliEntryPath } from '../utils/paths.js';
 
 export const HUD_USAGE = [
   'Usage:',
-  '  omx hud              Show current HUD state',
-  '  omx hud --watch      Poll every 1s with terminal clear',
-  '  omx hud --json       Output raw state as JSON',
-  '  omx hud --preset=X   Use preset: minimal, focused, full',
-  '  omx hud --tmux       Open HUD in a tmux split pane (auto-detects orientation)',
+  '  omcp hud              Show current HUD state',
+  '  omcp hud --watch      Poll every 1s with terminal clear',
+  '  omcp hud --json       Output raw state as JSON',
+  '  omcp hud --preset=X   Use preset: minimal, focused, full',
+  '  omcp hud --tmux       Open HUD in a tmux split pane (auto-detects orientation)',
 ].join('\n');
 
 type SleepFn = (ms: number, signal?: AbortSignal) => Promise<void>;
@@ -269,7 +269,7 @@ export function buildTmuxSplitArgs(
 async function launchTmuxPane(cwd: string, flags: HudFlags): Promise<void> {
   // Check if we're inside tmux
   if (!process.env.TMUX) {
-    console.error('Not inside a tmux session. Start tmux first, then run: omx hud --tmux');
+    console.error('Not inside a tmux session. Start tmux first, then run: omcp hud --tmux');
     process.exit(1);
   }
 
@@ -281,7 +281,7 @@ async function launchTmuxPane(cwd: string, flags: HudFlags): Promise<void> {
   const args = buildTmuxSplitArgs(cwd, omxBin, flags.preset, process.env.OMX_SESSION_ID);
 
   try {
-    // Split bottom pane, 4 lines tall, running omx hud --watch.
+    // Split bottom pane, 4 lines tall, running omcp hud --watch.
     // execFileSync bypasses the shell – cwd and omxBin cannot inject commands.
     execFileSync('tmux', args, { stdio: 'inherit' });
     console.log('HUD launched in tmux pane below. Close with: Ctrl+C in that pane, or `tmux kill-pane -t bottom`');

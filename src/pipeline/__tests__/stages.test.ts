@@ -26,7 +26,7 @@ function makeCtx(overrides: Partial<StageContext> = {}): StageContext {
 }
 
 async function setup(): Promise<string> {
-  tempDir = await mkdtemp(join(tmpdir(), 'omx-stages-test-'));
+  tempDir = await mkdtemp(join(tmpdir(), 'omcp-stages-test-'));
   return tempDir;
 }
 
@@ -64,7 +64,7 @@ describe('RALPLAN Stage', () => {
   });
 
   it('canSkip returns false when plans directory is empty', async () => {
-    const plansDir = join(tempDir, '.omx', 'plans');
+    const plansDir = join(tempDir, '.omcp', 'plans');
     await mkdir(plansDir, { recursive: true });
 
     const stage = createRalplanStage();
@@ -72,7 +72,7 @@ describe('RALPLAN Stage', () => {
   });
 
   it('canSkip returns false when only a prd- plan file exists', async () => {
-    const plansDir = join(tempDir, '.omx', 'plans');
+    const plansDir = join(tempDir, '.omcp', 'plans');
     await mkdir(plansDir, { recursive: true });
     await writeFile(join(plansDir, 'prd-my-feature.md'), '# Plan\n');
 
@@ -81,7 +81,7 @@ describe('RALPLAN Stage', () => {
   });
 
   it('canSkip returns true when both prd and test spec plan files exist', async () => {
-    const plansDir = join(tempDir, '.omx', 'plans');
+    const plansDir = join(tempDir, '.omcp', 'plans');
     await mkdir(plansDir, { recursive: true });
     await writeFile(join(plansDir, 'prd-my-feature.md'), '# Plan\n');
     await writeFile(join(plansDir, 'test-spec-my-feature.md'), '# Test Spec\n');
@@ -91,7 +91,7 @@ describe('RALPLAN Stage', () => {
   });
 
   it('surfaces deep-interview specs in ralplan artifacts for downstream traceability', async () => {
-    const specsDir = join(tempDir, '.omx', 'specs');
+    const specsDir = join(tempDir, '.omcp', 'specs');
     await mkdir(specsDir, { recursive: true });
     await writeFile(join(specsDir, 'deep-interview-my-feature.md'), '# Deep Interview Spec\n');
 
@@ -107,7 +107,7 @@ describe('RALPLAN Stage', () => {
     const stage = createRalplanStage({
       executor: {
         async draft() {
-          const plansDir = join(tempDir, '.omx', 'plans');
+          const plansDir = join(tempDir, '.omcp', 'plans');
           await mkdir(plansDir, { recursive: true });
           const prdPath = join(plansDir, 'prd-runtime.md');
           await writeFile(prdPath, '# Runtime Plan\n');
@@ -134,7 +134,7 @@ describe('RALPLAN Stage', () => {
   });
 
   it('canSkip returns false for non-prd plan files', async () => {
-    const plansDir = join(tempDir, '.omx', 'plans');
+    const plansDir = join(tempDir, '.omcp', 'plans');
     await mkdir(plansDir, { recursive: true });
     await writeFile(join(plansDir, 'autopilot-spec.md'), '# Spec\n');
 
@@ -215,7 +215,7 @@ describe('Team Exec Stage', () => {
         cwd: '/tmp/test',
       });
 
-      assert.match(instruction, /^omx team 3:executor /);
+      assert.match(instruction, /^omcp team 3:executor /);
       assert.match(instruction, /implement feature/);
       assert.match(instruction, /staffing=/);
       assert.match(instruction, /verify=/);
@@ -236,7 +236,7 @@ describe('Team Exec Stage', () => {
         cwd: '/tmp',
       });
 
-      assert.match(instruction, /^omx team 1:executor /);
+      assert.match(instruction, /^omcp team 1:executor /);
       assert.match(instruction, /staffing=/);
     });
   });
@@ -301,7 +301,7 @@ describe('Ralph Verify Stage', () => {
       });
 
       assert.match(instruction, /max_iterations=15/);
-      assert.match(instruction, /^omx ralph /);
+      assert.match(instruction, /^omcp ralph /);
       assert.match(instruction, /verify feature/);
       assert.match(instruction, /staffing=/);
       assert.match(instruction, /verify=/);
@@ -319,7 +319,7 @@ describe('Ralph Verify Stage', () => {
         executionArtifacts: {},
       });
 
-      assert.match(instruction, /^omx ralph /);
+      assert.match(instruction, /^omcp ralph /);
       assert.match(instruction, /staffing=/);
     });
   });

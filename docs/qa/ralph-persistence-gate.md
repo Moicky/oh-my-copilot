@@ -52,5 +52,5 @@ Every release touching Ralph persistence MUST mention:
 
 1. session-authoritative scope policy,
 2. bounded same-Codex-session adoption behavior for empty current scope only,
-3. legacy compatibility window (`.omx/prd.json` and `.omx/progress.txt`),
+3. legacy compatibility window (`.omcp/prd.json` and `.omcp/progress.txt`),
 4. opt-in flag behavior for the current release.

@@ -70,13 +70,13 @@ function runNotifyHook(
 
 describe('notify-hook session-idle dedupe', () => {
   it('suppresses repeated unchanged post_turn_idle_notification hook events once the first hook dispatch succeeds', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-idle-dedupe-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-idle-dedupe-'));
     const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
     try {
-      const stateDir = join(wd, '.omx', 'state');
-      const hooksDir = join(wd, '.omx', 'hooks');
-      const pluginStatePath = join(wd, '.omx', 'plugin-state', 'session-idle.json');
+      const stateDir = join(wd, '.omcp', 'state');
+      const hooksDir = join(wd, '.omcp', 'hooks');
+      const pluginStatePath = join(wd, '.omcp', 'plugin-state', 'session-idle.json');
       const hookStatePath = join(stateDir, 'sessions', SESSION_ID, 'session-idle-hook-state.json');
 
       await mkdir(stateDir, { recursive: true });
@@ -101,13 +101,13 @@ describe('notify-hook session-idle dedupe', () => {
   });
 
   it('re-emits session-idle hook events when the idle fingerprint meaningfully changes', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-idle-dedupe-change-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-idle-dedupe-change-'));
     const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
     try {
-      const stateDir = join(wd, '.omx', 'state');
-      const hooksDir = join(wd, '.omx', 'hooks');
-      const pluginStatePath = join(wd, '.omx', 'plugin-state', 'session-idle.json');
+      const stateDir = join(wd, '.omcp', 'state');
+      const hooksDir = join(wd, '.omcp', 'hooks');
+      const pluginStatePath = join(wd, '.omcp', 'plugin-state', 'session-idle.json');
 
       await mkdir(stateDir, { recursive: true });
       await mkdir(hooksDir, { recursive: true });
@@ -129,13 +129,13 @@ describe('notify-hook session-idle dedupe', () => {
 
 
   it('writes session-idle hook state into the fork session scope when OMX_SESSION_ID targets a fork', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-idle-fork-scope-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-idle-fork-scope-'));
     const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
     try {
-      const stateDir = join(wd, '.omx', 'state');
-      const hooksDir = join(wd, '.omx', 'hooks');
-      const pluginStatePath = join(wd, '.omx', 'plugin-state', 'session-idle.json');
+      const stateDir = join(wd, '.omcp', 'state');
+      const hooksDir = join(wd, '.omcp', 'hooks');
+      const pluginStatePath = join(wd, '.omcp', 'plugin-state', 'session-idle.json');
       const canonicalSessionId = 'sess-canonical';
       const forkSessionId = 'sess-fork';
 
@@ -159,13 +159,13 @@ describe('notify-hook session-idle dedupe', () => {
   });
 
   it('keeps post_turn_idle_notification hook dedupe active even when lifecycle cooldown is disabled', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-notify-idle-dedupe-zero-cooldown-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-idle-dedupe-zero-cooldown-'));
     const repoRoot = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 
     try {
-      const stateDir = join(wd, '.omx', 'state');
-      const hooksDir = join(wd, '.omx', 'hooks');
-      const pluginStatePath = join(wd, '.omx', 'plugin-state', 'session-idle.json');
+      const stateDir = join(wd, '.omcp', 'state');
+      const hooksDir = join(wd, '.omcp', 'hooks');
+      const pluginStatePath = join(wd, '.omcp', 'plugin-state', 'session-idle.json');
 
       await mkdir(stateDir, { recursive: true });
       await mkdir(hooksDir, { recursive: true });

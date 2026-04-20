@@ -26,7 +26,7 @@ describe('mcp/code-intel-server module contract', () => {
     }
 
     assert.match(src, /const args = \['--noEmit', '--pretty', 'false'\]/);
-    assert.match(src, /new Server\(\s*\{ name: 'omx-code-intel', version: '0\.1\.0' \}/);
+    assert.match(src, /new Server\(\s*\{ name: 'omcp-code-intel', version: '0\.1\.0' \}/);
   });
 
   it('delegates stdio lifecycle bootstrapping to the shared MCP bootstrap helper', async () => {
@@ -54,7 +54,7 @@ describe('mcp/code-intel-server module contract', () => {
     const previous = process.env.OMX_CODE_INTEL_SERVER_DISABLE_AUTO_START;
     process.env.OMX_CODE_INTEL_SERVER_DISABLE_AUTO_START = '1';
 
-    const projectDir = await mkdtemp(join(tmpdir(), 'omx-code-intel-'));
+    const projectDir = await mkdtemp(join(tmpdir(), 'omcp-code-intel-'));
 
     try {
       const { runTscDiagnostics } = await import(`../code-intel-server.js?ts=${Date.now()}`);

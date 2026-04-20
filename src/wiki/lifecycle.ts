@@ -19,7 +19,7 @@ import {
 import { DEFAULT_WIKI_CONFIG, type WikiConfig, WIKI_SCHEMA_VERSION } from './types.js';
 
 function loadWikiConfig(root: string): WikiConfig {
-  const candidates = [join(root, '.omx-config.json'), join(codexHome(), '.omx-config.json')];
+  const candidates = [join(root, '.omcp-config.json'), join(codexHome(), '.omcp-config.json')];
 
   for (const path of candidates) {
     try {
@@ -62,7 +62,7 @@ export function onSessionStart(data: { cwd?: string }): { additionalContext?: st
     if (!index) return {};
 
     const summary = [
-      `[OMCP Wiki: ${pages.length} pages at .omx/wiki/]`,
+      `[OMCP Wiki: ${pages.length} pages at .omcp/wiki/]`,
       '',
       'Use wiki_query to search, wiki_list to browse, wiki_read to inspect pages.',
       '',

@@ -26,7 +26,7 @@ function usage(): string {
   return [
     'Usage: node scripts/smoke-packed-install.mjs',
     '',
-    'Creates an npm tarball, installs it into an isolated prefix, and smoke tests the installed omx CLI.',
+    'Creates an npm tarball, installs it into an isolated prefix, and smoke tests the installed omcp CLI.',
     'Release smoke stays intentionally minimal: install + boot + 1-2 core commands only.',
   ].join('\n');
 }
@@ -114,7 +114,7 @@ async function main(): Promise<void> {
   parseArgs(process.argv.slice(2));
 
   const repoRoot = process.cwd();
-  const tempRoot = mkdtempSync(join(tmpdir(), 'omx-packed-install-'));
+  const tempRoot = mkdtempSync(join(tmpdir(), 'omcp-packed-install-'));
   const prefixDir = join(tempRoot, 'prefix');
   mkdirSync(prefixDir, { recursive: true });
 
@@ -132,7 +132,7 @@ async function main(): Promise<void> {
 
     run('npm', ['install', '-g', tarballPath, '--prefix', prefixDir], { cwd: repoRoot });
 
-    const omxPath = join(prefixDir, process.platform === 'win32' ? '' : 'bin', npmBinName('omx'));
+    const omxPath = join(prefixDir, process.platform === 'win32' ? '' : 'bin', npmBinName('omcp'));
     for (const argv of PACKED_INSTALL_SMOKE_CORE_COMMANDS) {
       run(omxPath, argv, { cwd: repoRoot });
     }

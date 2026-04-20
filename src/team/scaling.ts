@@ -289,7 +289,7 @@ export async function scaleUp(
       }
 
       for (const taskId of createdTaskIds) {
-        await rm(join(leaderCwd, '.omx', 'state', 'team', sanitized, 'tasks', `task-${taskId}.json`), { force: true }).catch(() => {});
+        await rm(join(leaderCwd, '.omcp', 'state', 'team', sanitized, 'tasks', `task-${taskId}.json`), { force: true }).catch(() => {});
       }
 
       config.worker_count = config.workers.length;
@@ -324,7 +324,7 @@ export async function scaleUp(
       const workerName = `worker-${workerIndex}`;
 
       // Create worker directory
-      const workerDirPath = join(leaderCwd, '.omx', 'state', 'team', sanitized, 'workers', workerName);
+      const workerDirPath = join(leaderCwd, '.omcp', 'state', 'team', sanitized, 'workers', workerName);
       await mkdir(workerDirPath, { recursive: true });
 
       // Resolve per-worker role from assigned task roles before launch so reasoning effort can vary by teammate.
@@ -335,7 +335,7 @@ export async function scaleUp(
         : agentType;
       const runtimeRole = workerRole;
       if (uniqueTaskRoles.size > 1) {
-        console.log(`[omx:scaling] ${workerName}: mixed task roles [${[...uniqueTaskRoles].join(', ')}], falling back to ${agentType}`);
+        console.log(`[omcp:scaling] ${workerName}: mixed task roles [${[...uniqueTaskRoles].join(', ')}], falling back to ${agentType}`);
       }
 
       const worktreeMode = resolveScaleUpWorktreeMode(config);
@@ -360,7 +360,7 @@ export async function scaleUp(
       const rolePromptContent = rawRolePromptContent
         ? composeRoleInstructionsForRole(runtimeRole, rawRolePromptContent, resolvedWorkerModel)
         : null;
-      const teamInstructionsPath = join(leaderCwd, '.omx', 'state', 'team', sanitized, 'worker-agents.md');
+      const teamInstructionsPath = join(leaderCwd, '.omcp', 'state', 'team', sanitized, 'worker-agents.md');
       const instructionsFilePath = workerWorkspace
         ? await writeWorkerWorktreeRootAgentsFile({
             teamName: sanitized,
@@ -456,7 +456,7 @@ export async function scaleUp(
       if (!skipReadyWait) {
         const ready = waitForWorkerReady(sessionName, workerIndex, readyTimeoutMs, paneId);
         if (!ready) {
-          console.log(`[omx:scaling] Warning: worker ${workerName} did not become ready within timeout`);
+          console.log(`[omcp:scaling] Warning: worker ${workerName} did not become ready within timeout`);
         }
       }
 

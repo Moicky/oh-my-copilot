@@ -8,12 +8,12 @@ It is intentionally **not** a literal OMC port.
 - Keep the reusable wiki domain under `src/wiki/*`.
 - Expose wiki operations from a dedicated MCP server at `src/mcp/wiki-server.ts`.
 - Register the server as `omx_wiki`.
-- Keep wiki storage under `.omx/wiki/`.
+- Keep wiki storage under `.omcp/wiki/`.
 - Do **not** add vector embeddings; query stays keyword/tag based.
 
 ## Config + generator contract
 
-`omx setup` / the config generator should own the dedicated wiki MCP block:
+`omcp setup` / the config generator should own the dedicated wiki MCP block:
 
 ```toml
 [mcp_servers.omx_wiki]
@@ -29,9 +29,9 @@ alongside the existing built-ins, while keeping the diff small and idempotent.
 
 Wiki state is project-local and should live under:
 
-- `.omx/wiki/*.md` — content pages
-- `.omx/wiki/index.md` — generated catalog
-- `.omx/wiki/log.md` — append-only operation log
+- `.omcp/wiki/*.md` — content pages
+- `.omcp/wiki/index.md` — generated catalog
+- `.omcp/wiki/log.md` — append-only operation log
 
 Guardrails that must stay true:
 
@@ -47,7 +47,7 @@ The docs and code should never regress back to `.omc/wiki/`.
 ## Lifecycle + hook contract
 
 - `SessionStart` stays **native** and **bounded**.
-  - It may read `.omx/wiki/` and surface brief context when the wiki already exists.
+  - It may read `.omcp/wiki/` and surface brief context when the wiki already exists.
   - It should stay read-mostly and must not block startup on heavy writes.
 - `SessionEnd` stays **runtime-fallback** and **non-blocking**.
   - Best-effort capture is okay.
@@ -76,4 +76,4 @@ The dedicated `omx_wiki` server should expose the seven stabilized wiki tools:
 - `wiki_read`
 - `wiki_delete`
 
-These tools should operate only on `.omx/wiki/` and keep lifecycle behavior bounded.
+These tools should operate only on `.omcp/wiki/` and keep lifecycle behavior bounded.

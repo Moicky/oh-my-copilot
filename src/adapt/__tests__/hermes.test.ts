@@ -76,15 +76,15 @@ function writeHermesFixture(options: {
 }
 
 beforeEach(async () => {
-  tempDir = await mkdtemp(join(tmpdir(), "omx-adapt-hermes-"));
+  tempDir = await mkdtemp(join(tmpdir(), "omcp-adapt-hermes-"));
   suppliedCwd = join(tempDir, "sandbox", "worktree");
   hermesRoot = join(tempDir, "hermes-runtime");
   hermesHome = join(tempDir, "hermes-home");
   originalCwd = process.cwd();
-  processCwdFixtureBase = await mkdtemp(join(tmpdir(), "omx-adapt-hermes-process-cwd-"));
+  processCwdFixtureBase = await mkdtemp(join(tmpdir(), "omcp-adapt-hermes-process-cwd-"));
   processCwdFixtureRoot = join(
     processCwdFixtureBase,
-    "hermes-codex-skill-omx-aware-prd",
+    "hermes-codex-skill-omcp-aware-prd",
     "external",
     "hermes-agent",
   );
@@ -140,7 +140,7 @@ describe("hermes adapter integration", () => {
     const tempSiblingRoot = join(
       suppliedCwd,
       "..",
-      "hermes-codex-skill-omx-aware-prd",
+      "hermes-codex-skill-omcp-aware-prd",
       "external",
       "hermes-agent",
     );
@@ -161,7 +161,7 @@ describe("hermes adapter integration", () => {
     assert.match(envelope.bootstrap?.summary ?? "", /bootstrap metadata/i);
     assert.deepEqual(
       [...new Set(envelope.capabilities.map((capability) => capability.ownership))].sort(),
-      ["omx-owned", "shared-contract", "target-observed"],
+      ["omcp-owned", "shared-contract", "target-observed"],
     );
     assert.equal(
       envelope.capabilities.find((capability) => capability.id === "persistent-session-observation")?.status,
@@ -187,7 +187,7 @@ describe("hermes adapter integration", () => {
 
     assert.equal(result.write, true);
     assert.equal(result.wrotePaths.length, 2);
-    assert.equal(existsSync(join(tempDir, ".omx", "state")), false);
+    assert.equal(existsSync(join(tempDir, ".omcp", "state")), false);
     assert.equal(existsSync(join(hermesHome, "gateway_state.json")), true);
     assert.equal(existsSync(join(hermesHome, "state.db")), true);
 

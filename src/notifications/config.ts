@@ -1,7 +1,7 @@
 /**
  * Notification Configuration Reader
  *
- * Reads notification config from .omx-config.json and provides
+ * Reads notification config from .omcp-config.json and provides
  * backward compatibility with the old stopHookCallbacks format.
  */
 
@@ -27,7 +27,7 @@ import {
   readNotifyTempContractFromEnv,
 } from "./temp-contract.js";
 
-const CONFIG_FILE = join(codexHome(), ".omx-config.json");
+const CONFIG_FILE = join(codexHome(), ".omcp-config.json");
 
 function readRawConfig(): Record<string, unknown> | null {
   if (!existsSync(CONFIG_FILE)) return null;
@@ -755,7 +755,7 @@ export function getReplyConfig(): import("./types.js").ReplyConfig | null {
   if (hasDiscordBot && authorizedDiscordUserIds.length === 0) {
     console.warn(
       "[notifications] Discord reply listening disabled: authorizedDiscordUserIds is empty. " +
-      "Set OMX_REPLY_DISCORD_USER_IDS or add to .omx-config.json notifications.reply.authorizedDiscordUserIds"
+      "Set OMX_REPLY_DISCORD_USER_IDS or add to .omcp-config.json notifications.reply.authorizedDiscordUserIds"
     );
   }
 

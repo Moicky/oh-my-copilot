@@ -15,7 +15,7 @@ function runOmx(
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omx.js');
+  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
   const resolvedHome = envOverrides.HOME ?? process.env.HOME;
   const result = spawnSync(process.execPath, [omxBin, ...argv], {
     cwd,
@@ -53,7 +53,7 @@ function buildOmxConfig(): string {
     '',
     '# ============================================================',
     '# oh-my-copilot (OMCP) Configuration',
-    '# Managed by omx setup - manual edits preserved on next setup',
+    '# Managed by omcp setup - manual edits preserved on next setup',
     '# ============================================================',
     '',
     '# OMCP State Management MCP Server',
@@ -124,7 +124,7 @@ function buildConfigWithSeededModelContext(): string {
     '',
     '# ============================================================',
     '# oh-my-copilot (OMCP) Configuration',
-    '# Managed by omx setup - manual edits preserved on next setup',
+    '# Managed by omcp setup - manual edits preserved on next setup',
     '# ============================================================',
     '',
     '[mcp_servers.omx_state]',
@@ -160,7 +160,7 @@ function buildMixedConfig(): string {
     '',
     '# ============================================================',
     '# oh-my-copilot (OMCP) Configuration',
-    '# Managed by omx setup - manual edits preserved on next setup',
+    '# Managed by omcp setup - manual edits preserved on next setup',
     '# ============================================================',
     '',
     '[mcp_servers.omx_state]',
@@ -201,9 +201,9 @@ function buildMixedConfig(): string {
   ].join('\n');
 }
 
-describe('omx uninstall', () => {
+describe('omcp uninstall', () => {
   it('removes OMCP block from config.toml with --dry-run', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -232,7 +232,7 @@ describe('omx uninstall', () => {
   });
 
   it('removes OMCP block from config.toml', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -271,7 +271,7 @@ describe('omx uninstall', () => {
 
 
   it('preserves user config entries when removing OMCP', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -300,7 +300,7 @@ describe('omx uninstall', () => {
   });
 
   it('preserves user hooks while removing OMCP-managed wrappers', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -343,7 +343,7 @@ describe('omx uninstall', () => {
 
 
   it('preserves seeded model/context keys during uninstall', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -368,7 +368,7 @@ describe('omx uninstall', () => {
   });
 
   it('--keep-config skips config.toml cleanup', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -389,13 +389,13 @@ describe('omx uninstall', () => {
     }
   });
 
-  it('--purge removes .omx/ cache directory', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+  it('--purge removes .omcp/ cache directory', async () => {
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       await mkdir(home, { recursive: true });
-      // Create .omx/ directory with some files
-      const omxDir = join(wd, '.omx');
+      // Create .omcp/ directory with some files
+      const omxDir = join(wd, '.omcp');
       await mkdir(join(omxDir, 'state'), { recursive: true });
       await writeFile(join(omxDir, 'setup-scope.json'), JSON.stringify({ scope: 'user' }));
       await writeFile(join(omxDir, 'notepad.md'), '# notes');
@@ -404,22 +404,22 @@ describe('omx uninstall', () => {
       const res = runOmx(wd, ['uninstall', '--keep-config', '--purge'], { HOME: home });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
-      assert.match(res.stdout, /\.omx\/ cache directory/);
+      assert.match(res.stdout, /\.omcp\/ cache directory/);
 
-      assert.equal(existsSync(omxDir), false, '.omx/ directory should be removed');
+      assert.equal(existsSync(omxDir), false, '.omcp/ directory should be removed');
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
   it('works with project scope', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       await mkdir(home, { recursive: true });
 
       // Create project-scoped setup
-      const omxDir = join(wd, '.omx');
+      const omxDir = join(wd, '.omcp');
       const codexDir = join(wd, '.codex');
       await mkdir(omxDir, { recursive: true });
       await mkdir(join(codexDir, 'prompts'), { recursive: true });
@@ -442,7 +442,7 @@ describe('omx uninstall', () => {
   });
 
   it('handles missing config.toml gracefully', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       await mkdir(home, { recursive: true });
@@ -457,7 +457,7 @@ describe('omx uninstall', () => {
   });
 
   it('shows summary of what was removed', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -479,7 +479,7 @@ describe('omx uninstall', () => {
   });
 
   it('warns when overlapping legacy ~/.agents/skills remains after user-scope uninstall', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -495,7 +495,7 @@ describe('omx uninstall', () => {
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Warning: 1 overlapping skill names remain between .*\.codex[\\/]+skills and .*\.agents[\\/]+skills; 1 differ in SKILL\.md content\. omx uninstall only removes the active canonical skill root; archive or remove ~\/\.agents\/skills if Codex still shows duplicates/,
+        /Warning: 1 overlapping skill names remain between .*\.codex[\\/]+skills and .*\.agents[\\/]+skills; 1 differ in SKILL\.md content\. omcp uninstall only removes the active canonical skill root; archive or remove ~\/\.agents\/skills if Codex still shows duplicates/,
       );
       assert.equal(existsSync(canonicalHelp), false, 'canonical OMCP skill should be removed');
       assert.equal(existsSync(join(home, '.agents', 'skills')), true, 'legacy skill root should remain for manual cleanup');
@@ -505,7 +505,7 @@ describe('omx uninstall', () => {
   });
 
   it('warns when a distinct legacy ~/.agents/skills root remains after user-scope uninstall', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -521,7 +521,7 @@ describe('omx uninstall', () => {
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Warning: legacy ~\/\.agents\/skills still exists \(1 skills\)\. omx uninstall does not remove that historical root automatically; archive or remove ~\/\.agents\/skills if Codex still shows stale or duplicate skills/,
+        /Warning: legacy ~\/\.agents\/skills still exists \(1 skills\)\. omcp uninstall does not remove that historical root automatically; archive or remove ~\/\.agents\/skills if Codex still shows stale or duplicate skills/,
       );
       assert.equal(existsSync(canonicalHelp), false, 'canonical OMCP skill should be removed');
       assert.equal(existsSync(join(home, '.agents', 'skills')), true, 'legacy skill root should remain for manual cleanup');
@@ -531,7 +531,7 @@ describe('omx uninstall', () => {
   });
 
   it('does not warn about legacy ~/.agents/skills when none exists', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -543,38 +543,38 @@ describe('omx uninstall', () => {
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.doesNotMatch(res.stdout, /legacy ~\/\.agents\/skills still exists/);
-      assert.doesNotMatch(res.stdout, /omx uninstall does not remove legacy ~\/\.agents\/skills/);
+      assert.doesNotMatch(res.stdout, /omcp uninstall does not remove legacy ~\/\.agents\/skills/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
   it('does not warn about legacy ~/.agents/skills during project-scope uninstall', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const projectSkillsHelp = join(wd, '.codex', 'skills', 'help');
       const legacyHelp = join(home, '.agents', 'skills', 'help');
       await mkdir(projectSkillsHelp, { recursive: true });
       await mkdir(legacyHelp, { recursive: true });
-      await mkdir(join(wd, '.omx'), { recursive: true });
+      await mkdir(join(wd, '.omcp'), { recursive: true });
       await writeFile(join(projectSkillsHelp, 'SKILL.md'), '# project help\n');
       await writeFile(join(legacyHelp, 'SKILL.md'), '# legacy help\n');
-      await writeFile(join(wd, '.omx', 'setup-scope.json'), JSON.stringify({ scope: 'project' }));
+      await writeFile(join(wd, '.omcp', 'setup-scope.json'), JSON.stringify({ scope: 'project' }));
 
       const res = runOmx(wd, ['uninstall', '--keep-config'], { HOME: home });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(res.stdout, /Resolved scope: project/);
       assert.doesNotMatch(res.stdout, /legacy ~\/\.agents\/skills still exists/);
-      assert.doesNotMatch(res.stdout, /omx uninstall does not remove legacy ~\/\.agents\/skills/);
+      assert.doesNotMatch(res.stdout, /omcp uninstall does not remove legacy ~\/\.agents\/skills/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
   it('does not warn when legacy ~/.agents/skills is just a link to the canonical skills root', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-legacy-link-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-legacy-link-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -599,12 +599,12 @@ describe('omx uninstall', () => {
     }
   });
 
-  it('--dry-run --purge does not actually remove .omx/ directory', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+  it('--dry-run --purge does not actually remove .omcp/ directory', async () => {
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       await mkdir(home, { recursive: true });
-      const omxDir = join(wd, '.omx');
+      const omxDir = join(wd, '.omcp');
       await mkdir(join(omxDir, 'state'), { recursive: true });
       await writeFile(join(omxDir, 'setup-scope.json'), JSON.stringify({ scope: 'user' }));
       await writeFile(join(omxDir, 'notepad.md'), '# notes');
@@ -613,10 +613,10 @@ describe('omx uninstall', () => {
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(res.stdout, /dry-run mode/);
-      assert.match(res.stdout, /\.omx\/ cache directory/);
+      assert.match(res.stdout, /\.omcp\/ cache directory/);
 
-      // .omx/ should still exist
-      assert.equal(existsSync(omxDir), true, '.omx/ should NOT be removed in dry-run');
+      // .omcp/ should still exist
+      assert.equal(existsSync(omxDir), true, '.omcp/ should NOT be removed in dry-run');
       assert.equal(existsSync(join(omxDir, 'notepad.md')), true);
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -624,7 +624,7 @@ describe('omx uninstall', () => {
   });
 
   it('second uninstall run reports nothing to remove (idempotent)', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexDir = join(home, '.codex');
@@ -646,7 +646,7 @@ describe('omx uninstall', () => {
   });
 
   it('does not delete user AGENTS.md that merely mentions oh-my-copilot', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       await mkdir(home, { recursive: true });
@@ -667,13 +667,13 @@ describe('omx uninstall', () => {
   });
 
   it('removes managed user-scope AGENTS.md from CODEX_HOME', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       const codexHome = join(home, '.codex');
       await mkdir(codexHome, { recursive: true });
-      await mkdir(join(wd, '.omx'), { recursive: true });
-      await writeFile(join(wd, '.omx', 'setup-scope.json'), JSON.stringify({ scope: 'user' }));
+      await mkdir(join(wd, '.omcp'), { recursive: true });
+      await writeFile(join(wd, '.omcp', 'setup-scope.json'), JSON.stringify({ scope: 'user' }));
       await writeFile(
         join(codexHome, 'AGENTS.md'),
         '<!-- AUTONOMY DIRECTIVE — DO NOT REMOVE -->\n'
@@ -681,7 +681,7 @@ describe('omx uninstall', () => {
           + 'DO NOT STOP TO ASK "SHOULD I PROCEED?" — PROCEED. DO NOT WAIT FOR CONFIRMATION ON OBVIOUS NEXT STEPS.\n'
           + 'IF BLOCKED, TRY AN ALTERNATIVE APPROACH. ONLY ASK WHEN TRULY AMBIGUOUS OR DESTRUCTIVE.\n'
           + '<!-- END AUTONOMY DIRECTIVE -->\n'
-          + '<!-- omx:generated:agents-md -->\n'
+          + '<!-- omcp:generated:agents-md -->\n'
           + '# oh-my-copilot - Intelligent Multi-Agent Orchestration\n',
       );
 
@@ -695,11 +695,11 @@ describe('omx uninstall', () => {
   });
 
   it('removes setup-scope.json and hud-config.json without --purge', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-uninstall-'));
     try {
       const home = join(wd, 'home');
       await mkdir(home, { recursive: true });
-      const omxDir = join(wd, '.omx');
+      const omxDir = join(wd, '.omcp');
       await mkdir(omxDir, { recursive: true });
       await writeFile(join(omxDir, 'setup-scope.json'), JSON.stringify({ scope: 'user' }));
       await writeFile(join(omxDir, 'hud-config.json'), JSON.stringify({ preset: 'focused' }));

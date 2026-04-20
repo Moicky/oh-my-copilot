@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "omx-sparkshell"
+name = "omcp-sparkshell"
 version = "0.1.0"

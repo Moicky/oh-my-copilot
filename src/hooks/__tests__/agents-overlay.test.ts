@@ -28,8 +28,8 @@ const WORKER_START = "<!-- OMCP:TEAM:WORKER:START -->";
 const WORKER_END = "<!-- OMCP:TEAM:WORKER:END -->";
 
 async function makeTempDir(): Promise<string> {
-  const dir = await mkdtemp(join(tmpdir(), "omx-overlay-test-"));
-  await mkdir(join(dir, ".omx", "state"), { recursive: true });
+  const dir = await mkdtemp(join(tmpdir(), "omcp-overlay-test-"));
+  await mkdir(join(dir, ".omcp", "state"), { recursive: true });
   return dir;
 }
 
@@ -85,7 +85,7 @@ describe("generateOverlay", () => {
         /\*\*Explore Command Preference:\*\*/,
       );
       assert.match(defaultOverlay, /default-on; opt out/i);
-      assert.match(defaultOverlay, /omx explore` FIRST before attempting full code analysis/i);
+      assert.match(defaultOverlay, /omcp explore` FIRST before attempting full code analysis/i);
 
       process.env.USE_OMX_EXPLORE_CMD = "off";
       const disabledOverlay = await generateOverlay(
@@ -102,7 +102,7 @@ describe("generateOverlay", () => {
 
   it("generates overlay with active modes", async () => {
     const sessionId = "test-session-2";
-    const sessionDir = join(tempDir, ".omx", "state", "sessions", sessionId);
+    const sessionDir = join(tempDir, ".omcp", "state", "sessions", sessionId);
     await mkdir(sessionDir, { recursive: true });
     await writeFile(
       join(sessionDir, "ralph-state.json"),
@@ -119,11 +119,11 @@ describe("generateOverlay", () => {
   });
 
   it("generates overlay with session-scoped active modes for current session", async () => {
-    await mkdir(join(tempDir, ".omx", "state", "sessions", "sess1"), {
+    await mkdir(join(tempDir, ".omcp", "state", "sessions", "sess1"), {
       recursive: true,
     });
     await writeFile(
-      join(tempDir, ".omx", "state", "sessions", "sess1", "team-state.json"),
+      join(tempDir, ".omcp", "state", "sessions", "sess1", "team-state.json"),
       JSON.stringify({
         active: true,
         iteration: 1,
@@ -138,7 +138,7 @@ describe("generateOverlay", () => {
 
   it("does not inherit stale root active modes into a fresh session overlay", async () => {
     await writeFile(
-      join(tempDir, ".omx", "state", "ralph-state.json"),
+      join(tempDir, ".omcp", "state", "ralph-state.json"),
       JSON.stringify({
         active: true,
         iteration: 9,
@@ -153,10 +153,10 @@ describe("generateOverlay", () => {
 
   it("lists both approved combined workflow members from canonical skill state", async () => {
     const sessionId = "combined-session";
-    const sessionDir = join(tempDir, ".omx", "state", "sessions", sessionId);
+    const sessionDir = join(tempDir, ".omcp", "state", "sessions", sessionId);
     await mkdir(sessionDir, { recursive: true });
     await writeFile(
-      join(tempDir, ".omx", "state", "session.json"),
+      join(tempDir, ".omcp", "state", "session.json"),
       JSON.stringify({ session_id: sessionId }),
     );
     await writeFile(
@@ -188,7 +188,7 @@ describe("generateOverlay", () => {
 
   it("generates overlay with notepad priority content", async () => {
     await writeFile(
-      join(tempDir, ".omx", "notepad.md"),
+      join(tempDir, ".omcp", "notepad.md"),
       "## PRIORITY\nFocus on auth module refactor.\n\n## WORKING\nSome working notes.",
     );
     const overlay = await generateOverlay(tempDir, "test-session-3");
@@ -198,7 +198,7 @@ describe("generateOverlay", () => {
 
   it("generates overlay with project memory summary", async () => {
     await writeFile(
-      join(tempDir, ".omx", "project-memory.json"),
+      join(tempDir, ".omcp", "project-memory.json"),
       JSON.stringify({
         techStack: "TypeScript + Node.js",
         conventions: "ESM modules, strict mode",
@@ -218,11 +218,11 @@ describe("generateOverlay", () => {
   it("enforces size cap (overlay <= 3500 chars)", async () => {
     const longText = "A".repeat(5000);
     await writeFile(
-      join(tempDir, ".omx", "notepad.md"),
+      join(tempDir, ".omcp", "notepad.md"),
       `## PRIORITY\n${longText}`,
     );
     await writeFile(
-      join(tempDir, ".omx", "project-memory.json"),
+      join(tempDir, ".omcp", "project-memory.json"),
       JSON.stringify({
         techStack: "B".repeat(2000),
         conventions: "C".repeat(2000),
@@ -240,7 +240,7 @@ describe("generateOverlay", () => {
 
   it("uses deterministic overflow policy under size cap", async () => {
     const sessionId = "overflow-session";
-    const sessionDir = join(tempDir, ".omx", "state", "sessions", sessionId);
+    const sessionDir = join(tempDir, ".omcp", "state", "sessions", sessionId);
     await mkdir(sessionDir, { recursive: true });
     // Inflate optional sections so overflow behavior is exercised.
     // Per-section truncation limits mean the total max body (~2640 chars) fits
@@ -258,11 +258,11 @@ describe("generateOverlay", () => {
       );
     }
     await writeFile(
-      join(tempDir, ".omx", "notepad.md"),
+      join(tempDir, ".omcp", "notepad.md"),
       `## PRIORITY\n${"N".repeat(8000)}`,
     );
     await writeFile(
-      join(tempDir, ".omx", "project-memory.json"),
+      join(tempDir, ".omcp", "project-memory.json"),
       JSON.stringify({
         techStack: "T".repeat(9000),
         conventions: "C".repeat(9000),
@@ -286,7 +286,7 @@ describe("generateOverlay", () => {
 
   it("skips inactive modes", async () => {
     await writeFile(
-      join(tempDir, ".omx", "state", "autopilot-state.json"),
+      join(tempDir, ".omcp", "state", "autopilot-state.json"),
       JSON.stringify({ active: false, current_phase: "cancelled" }),
     );
     const overlay = await generateOverlay(tempDir, "test-session-6");
@@ -295,7 +295,7 @@ describe("generateOverlay", () => {
 
   it("adds blocked ralph planning gate when PRD/test spec are missing", async () => {
     const sessionId = "ralph-gate-blocked";
-    const sessionDir = join(tempDir, ".omx", "state", "sessions", sessionId);
+    const sessionDir = join(tempDir, ".omcp", "state", "sessions", sessionId);
     await mkdir(sessionDir, { recursive: true });
     await writeFile(
       join(sessionDir, "ralph-state.json"),
@@ -306,7 +306,7 @@ describe("generateOverlay", () => {
         current_phase: "starting",
       }),
     );
-    await mkdir(join(tempDir, ".omx", "plans"), { recursive: true });
+    await mkdir(join(tempDir, ".omcp", "plans"), { recursive: true });
 
     const overlay = await generateOverlay(tempDir, sessionId);
     assert.match(overlay, /\*\*Ralph Ralplan-First Gate:\*\* BLOCKED/);
@@ -316,7 +316,7 @@ describe("generateOverlay", () => {
 
   it("unlocks ralph planning gate when PRD and test spec exist", async () => {
     const sessionId = "ralph-gate-unlocked";
-    const sessionDir = join(tempDir, ".omx", "state", "sessions", sessionId);
+    const sessionDir = join(tempDir, ".omcp", "state", "sessions", sessionId);
     await mkdir(sessionDir, { recursive: true });
     await writeFile(
       join(sessionDir, "ralph-state.json"),
@@ -327,7 +327,7 @@ describe("generateOverlay", () => {
         current_phase: "starting",
       }),
     );
-    const plansDir = join(tempDir, ".omx", "plans");
+    const plansDir = join(tempDir, ".omcp", "plans");
     await mkdir(plansDir, { recursive: true });
     await writeFile(join(plansDir, "prd-issue-259.md"), "# PRD\n");
     await writeFile(join(plansDir, "test-spec-issue-259.md"), "# Test Spec\n");
@@ -359,7 +359,7 @@ describe("resolveSessionOrchestrationMode", () => {
 
   it("does not inherit root skill-active orchestration mode into a fresh session", async () => {
     await writeFile(
-      join(tempDir, ".omx", "state", "skill-active-state.json"),
+      join(tempDir, ".omcp", "state", "skill-active-state.json"),
       JSON.stringify({
         active: true,
         skill: "team",
@@ -375,7 +375,7 @@ describe("resolveSessionOrchestrationMode", () => {
 
   it("reads persisted team skill state from the current session scope", async () => {
     const sessionId = "sess-team";
-    const sessionDir = join(tempDir, ".omx", "state", "sessions", sessionId);
+    const sessionDir = join(tempDir, ".omcp", "state", "sessions", sessionId);
     await mkdir(sessionDir, { recursive: true });
     await writeFile(
       join(sessionDir, "skill-active-state.json"),
@@ -388,7 +388,7 @@ describe("resolveSessionOrchestrationMode", () => {
 
   it("falls back to default mode for non-team skill state", async () => {
     const sessionId = "sess-autopilot";
-    const sessionDir = join(tempDir, ".omx", "state", "sessions", sessionId);
+    const sessionDir = join(tempDir, ".omcp", "state", "sessions", sessionId);
     await mkdir(sessionDir, { recursive: true });
     await writeFile(
       join(sessionDir, "skill-active-state.json"),
@@ -403,11 +403,11 @@ describe("resolveSessionOrchestrationMode", () => {
     const sessionId = "sess-team-complete";
     const rootStatePath = join(
       tempDir,
-      ".omx",
+      ".omcp",
       "state",
       "skill-active-state.json",
     );
-    const sessionDir = join(tempDir, ".omx", "state", "sessions", sessionId);
+    const sessionDir = join(tempDir, ".omcp", "state", "sessions", sessionId);
     await mkdir(sessionDir, { recursive: true });
     await writeFile(
       rootStatePath,
@@ -425,7 +425,7 @@ describe("resolveSessionOrchestrationMode", () => {
   it("does not inherit root team skill state into a fresh session without session-scoped state", async () => {
     const sessionId = "sess-root-fallback";
     await writeFile(
-      join(tempDir, ".omx", "state", "skill-active-state.json"),
+      join(tempDir, ".omcp", "state", "skill-active-state.json"),
       JSON.stringify({ active: true, skill: "team" }),
     );
 
@@ -435,7 +435,7 @@ describe("resolveSessionOrchestrationMode", () => {
 
   it("active mode summary follows canonical session skill state instead of stale root mode files", async () => {
     const sessionId = "sess-active-summary";
-    const rootStateDir = join(tempDir, ".omx", "state");
+    const rootStateDir = join(tempDir, ".omcp", "state");
     const sessionDir = join(rootStateDir, "sessions", sessionId);
     await mkdir(sessionDir, { recursive: true });
     await writeFile(
@@ -464,7 +464,7 @@ describe("resolveSessionOrchestrationMode", () => {
 
   it("active mode summary suppresses stale autoresearch mode files when canonical session skill state excludes it", async () => {
     const sessionId = "sess-autoresearch-summary";
-    const rootStateDir = join(tempDir, ".omx", "state");
+    const rootStateDir = join(tempDir, ".omcp", "state");
     const sessionDir = join(rootStateDir, "sessions", sessionId);
     await mkdir(sessionDir, { recursive: true });
     await writeFile(

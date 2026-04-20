@@ -80,7 +80,7 @@ export interface TeamConfig {
   max_workers: number; // default 20, configurable up to 20
   workers: WorkerInfo[];
   created_at: string;
-  tmux_session: string; // "omx-team-{name}"
+  tmux_session: string; // "omcp-team-{name}"
   next_task_id: number;
   leader_cwd?: string;
   team_state_root?: string;
@@ -543,7 +543,7 @@ function normalizeTask(task: TeamTask): TeamTaskV2 {
   };
 }
 
-// Team state directory: .omx/state/team/{teamName}/
+// Team state directory: .omcp/state/team/{teamName}/
 function resolveTeamStateRoot(cwd: string, env: NodeJS.ProcessEnv = process.env): string {
   const explicit = env.OMX_TEAM_STATE_ROOT;
   if (typeof explicit === 'string' && explicit.trim() !== '') {
@@ -698,7 +698,7 @@ export async function writeAtomic(filePath: string, data: string): Promise<void>
 }
 
 // Initialize team state directory + config.json
-// Creates: .omx/state/team/{name}/, workers/{worker-1}..{worker-N}/, tasks/
+// Creates: .omcp/state/team/{name}/, workers/{worker-1}..{worker-N}/, tasks/
 // Throws if workerCount > maxWorkers (default 20)
 export async function initTeamState(
   teamName: string,
@@ -763,7 +763,7 @@ export async function initTeamState(
     max_workers: maxWorkers,
     workers,
     created_at: new Date().toISOString(),
-    tmux_session: `omx-team-${teamName}`,
+    tmux_session: `omcp-team-${teamName}`,
     next_task_id: 1,
     leader_cwd: workspace.leader_cwd,
     team_state_root: workspace.team_state_root,

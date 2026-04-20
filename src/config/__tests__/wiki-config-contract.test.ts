@@ -7,14 +7,14 @@ describe("project wiki config/generator documentation contract", () => {
     const doc = loadSurface("docs/reference/project-wiki.md");
     assert.match(doc, /\[mcp_servers\.omx_wiki\]/);
     assert.match(doc, /dist\/mcp\/wiki-server\.js/);
-    assert.match(doc, /`omx setup` \/ the config generator/i);
+    assert.match(doc, /`omcp setup` \/ the config generator/i);
     assert.match(doc, /bootstrap\/config path should treat `omx_wiki` as a first-party OMCP server/i);
   });
 
   it("documents the OMCP-native storage path instead of legacy OMC storage", () => {
     const doc = loadSurface("docs/reference/project-wiki.md");
     assert.match(doc, /Wiki state is project-local and should live under/i);
-    assert.match(doc, /`\.omx\/wiki\/\*\.md`/);
+    assert.match(doc, /`\.omcp\/wiki\/\*\.md`/);
     assert.match(doc, /The docs and code should never regress back to `\.omc\/wiki\/`/);
   });
 });

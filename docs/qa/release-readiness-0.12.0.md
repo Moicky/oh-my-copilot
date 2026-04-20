@@ -58,11 +58,11 @@ Verdict: **GO** ✅
 | Diff scope inventory | `git diff --name-only v0.11.13..HEAD` | PASS |
 | Commit inventory | `git rev-list --count --no-merges v0.11.13..HEAD` + `git rev-list --count --merges v0.11.13..HEAD` | PASS (`65` non-merge / `26` merge) |
 | Version sync contract | `node --test dist/cli/__tests__/version-sync-contract.test.js` | PASS |
-| CLI version smoke | `node dist/cli/omx.js version` | PASS (`oh-my-copilot v0.12.0`) |
+| CLI version smoke | `node dist/cli/omcp.js version` | PASS (`oh-my-copilot v0.12.0`) |
 | Build | `npm run build` | PASS |
 | Lint | `npm run lint` | PASS |
 | Full Node suite | `npm test` | PASS (`2949` pass / `0` fail) |
-| Rust runtime core | `cargo test -p omx-runtime-core` | PASS (`54` pass / `0` fail) |
+| Rust runtime core | `cargo test -p omcp-runtime-core` | PASS (`54` pass / `0` fail) |
 | Packed install smoke | `npm run smoke:packed-install` | PASS |
 | Working-tree whitespace check | `git diff --check origin/main...HEAD` | PASS |
 

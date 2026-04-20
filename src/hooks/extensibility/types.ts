@@ -148,7 +148,7 @@ export interface HookPluginSdk {
     delete: (key: string) => Promise<void>;
     all: <T extends Record<string, unknown> = Record<string, unknown>>() => Promise<T>;
   };
-  omx: HookPluginOmxSdk;
+  omcp: HookPluginOmxSdk;
 }
 
 export interface HookPluginModule {

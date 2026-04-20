@@ -1,7 +1,7 @@
 # oh-my-copilot (OMCP)
 
 <p align="center">
-  <img src="https://yeachan-heo.github.io/oh-my-copilot-website/omx-character-nobg.png" alt="oh-my-copilot character" width="280">
+  <img src="https://yeachan-heo.github.io/oh-my-copilot-website/omcp-character-nobg.png" alt="oh-my-copilot character" width="280">
   <br>
   <em>Start Codex stronger, then let OMCP add better prompts, workflows, and runtime help when the work grows.</em>
 </p>
@@ -27,7 +27,7 @@ It keeps Codex as the execution engine and makes it easier to:
 - start a stronger Codex session by default
 - run one consistent workflow from clarification to completion
 - invoke the canonical skills with `$deep-interview`, `$ralplan`, `$team`, and `$ralph`
-- keep project guidance, plans, logs, and state in `.omx/`
+- keep project guidance, plans, logs, and state in `.omcp/`
 
 ## Core Maintainers
 
@@ -58,8 +58,8 @@ If you want the default OMCP experience, start here:
 
 ```bash
 npm install -g @openai/codex oh-my-copilot
-omx setup
-omx --madmax --high
+omcp setup
+omcp --madmax --high
 ```
 
 Then work normally inside Codex:
@@ -72,7 +72,7 @@ $team 3:executor "execute the approved plan in parallel"
 ```
 
 That is the main path.
-Before you treat the runtime as ready, run the quick-start smoke test below: `omx doctor` verifies the install shape, while `omx exec` proves the active Codex runtime can actually authenticate and complete a model call from the current environment.
+Before you treat the runtime as ready, run the quick-start smoke test below: `omcp doctor` verifies the install shape, while `omcp exec` proves the active Codex runtime can actually authenticate and complete a model call from the current environment.
 Start OMCP strongly, clarify first when needed, approve the plan, then choose `$team` for coordinated parallel execution or `$ralph` for the persistent completion loop.
 
 ## What OMCP is for
@@ -81,7 +81,7 @@ Use OMCP if you already like Codex and want a better day-to-day runtime around i
 - a standard workflow built around `$deep-interview`, `$ralplan`, `$team`, and `$ralph`
 - specialist roles and supporting skills when the task needs them
 - project guidance through scoped `AGENTS.md`
-- durable state under `.omx/` for plans, logs, memory, and mode tracking
+- durable state under `.omcp/` for plans, logs, memory, and mode tracking
 
 If you want plain Codex with no extra workflow layer, you probably do not need OMCP.
 
@@ -100,24 +100,24 @@ If you want plain Codex with no extra workflow layer, you probably do not need O
 After install, check both boundaries:
 
 ```bash
-omx doctor
+omcp doctor
 codex login status
-omx exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"
+omcp exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"
 ```
 
-`omx doctor` catches missing OMCP files, hooks, and runtime prerequisites. The real smoke test catches auth, profile, and provider/base-URL problems that only appear when Codex performs an actual request.
+`omcp doctor` catches missing OMCP files, hooks, and runtime prerequisites. The real smoke test catches auth, profile, and provider/base-URL problems that only appear when Codex performs an actual request.
 
 Launch OMCP the recommended way:
 
 ```bash
-omx --madmax --high
+omcp --madmax --high
 ```
 
 This starts the interactive leader session directly by default.
 If you explicitly want the leader session in tmux, use:
 
 ```bash
-omx --tmux --madmax --high
+omcp --tmux --madmax --high
 ```
 
 Then try the canonical workflow:
@@ -139,16 +139,16 @@ It adds a better working layer around it:
 - **Codex** does the actual agent work
 - **OMCP role keywords** make useful roles reusable
 - **OMCP skills** make common workflows reusable
-- **`.omx/`** stores plans, logs, memory, and runtime state
+- **`.omcp/`** stores plans, logs, memory, and runtime state
 
 Most users should think of OMCP as **better task routing + better workflow + better runtime**, not as a command surface to operate manually all day.
 
 ## Start here if you are new
 
-1. Run `omx setup`
-2. Run `omx doctor`
-3. Run a real execution smoke test: `codex login status` and `omx exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"`
-4. Launch with `omx --madmax --high`
+1. Run `omcp setup`
+2. Run `omcp doctor`
+3. Run a real execution smoke test: `codex login status` and `omcp exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"`
+4. Launch with `omcp --madmax --high`
 5. Use `$deep-interview "..."` when the request or boundaries are still unclear
 6. Use `$ralplan "..."` to approve the plan and review tradeoffs
 7. Choose `$team` for coordinated parallel execution or `$ralph` for persistent completion loops
@@ -178,80 +178,80 @@ These are useful, but they are not the main onboarding path.
 Use the team runtime when you specifically need durable tmux/worktree coordination, not as the default way to begin using OMCP.
 
 ```bash
-omx team 3:executor "fix the failing tests with verification"
-omx team status <team-name>
-omx team resume <team-name>
-omx team shutdown <team-name>
+omcp team 3:executor "fix the failing tests with verification"
+omcp team status <team-name>
+omcp team resume <team-name>
+omcp team shutdown <team-name>
 ```
 
 ### Setup, doctor, and HUD
 
 These are operator/support surfaces:
-- `omx setup` installs prompts, skills, AGENTS scaffolding, `.codex/config.toml`, and OMCP-managed native Codex hooks in `.codex/hooks.json`
+- `omcp setup` installs prompts, skills, AGENTS scaffolding, `.codex/config.toml`, and OMCP-managed native Codex hooks in `.codex/hooks.json`
   - setup refresh preserves non-OMCP hook entries in `.codex/hooks.json` and only rewrites OMCP-managed wrappers
-  - `omx uninstall` removes OMCP-managed wrappers from `.codex/hooks.json` but keeps the file when user hooks remain
-- `omx doctor` verifies the install when something seems wrong; it does not prove that the active Codex profile can make an authenticated model call
-- `omx hud --watch` is a monitoring/status surface, not the primary user workflow
+  - `omcp uninstall` removes OMCP-managed wrappers from `.codex/hooks.json` but keeps the file when user hooks remain
+- `omcp doctor` verifies the install when something seems wrong; it does not prove that the active Codex profile can make an authenticated model call
+- `omcp hud --watch` is a monitoring/status surface, not the primary user workflow
 
 For non-team sessions, native Codex hooks are now the canonical lifecycle surface:
 - `.codex/hooks.json` = native Codex hook registrations
-- `.omx/hooks/*.mjs` = OMCP plugin hooks
-- `omx tmux-hook` / notify-hook / derived watcher = tmux + runtime fallback paths
+- `.omcp/hooks/*.mjs` = OMCP plugin hooks
+- `omcp tmux-hook` / notify-hook / derived watcher = tmux + runtime fallback paths
 
 See [Codex native hook mapping](./docs/codex-native-hooks.md) for the current native / fallback matrix.
 
 
 ### Troubleshooting false-green readiness
 
-A green `omx doctor` means the install and local runtime wiring look sane. If real execution still fails, check the environment Codex actually uses:
+A green `omcp doctor` means the install and local runtime wiring look sane. If real execution still fails, check the environment Codex actually uses:
 
-- Run `codex login status` and `omx exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"` from the same shell/profile that will launch OMCP.
+- Run `codex login status` and `omcp exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"` from the same shell/profile that will launch OMCP.
 - In custom HOME, profile, container, or service shells, confirm the active `~/.codex` (or `CODEX_HOME`) is the one with the expected auth and config. Do not assume your normal user `~/.codex` is visible there.
 - If you depend on a local OpenAI-compatible proxy, confirm the active `~/.codex/config.toml` includes the expected `openai_base_url`; otherwise a proxy-issued key can be sent to the default endpoint and fail with `401 Unauthorized`, `Missing bearer or basic authentication in header`, or `Incorrect API key provided`.
-- If `omx doctor --team` or resume reports a stale team such as `resume_blocker` or a missing tmux session, clean the dead runtime state before retrying:
+- If `omcp doctor --team` or resume reports a stale team such as `resume_blocker` or a missing tmux session, clean the dead runtime state before retrying:
 
 ```bash
-omx team shutdown <team-name> --force --confirm-issues
-omx cancel
-omx doctor --team
+omcp team shutdown <team-name> --force --confirm-issues
+omcp cancel
+omcp doctor --team
 ```
 
 Only use the forced team shutdown for a team you have confirmed is dead or intentionally abandoned.
 
-If `Shift+Enter` still submits instead of inserting a newline inside an OMCP-managed tmux session, see [Troubleshooting execution readiness](./docs/troubleshooting.md#shiftenter-submits-instead-of-inserting-a-newline-in-tmux-backed-omx-sessions). Current OMCP already enables tmux extended-key forwarding around its own Codex launch paths, so a persistent failure is usually a tmux terminal-capability/discoverability problem rather than a net-new OMCP feature gap.
+If `Shift+Enter` still submits instead of inserting a newline inside an OMCP-managed tmux session, see [Troubleshooting execution readiness](./docs/troubleshooting.md#shiftenter-submits-instead-of-inserting-a-newline-in-tmux-backed-omcp-sessions). Current OMCP already enables tmux extended-key forwarding around its own Codex launch paths, so a persistent failure is usually a tmux terminal-capability/discoverability problem rather than a net-new OMCP feature gap.
 
 ### Explore and sparkshell
 
-- `omx explore --prompt "..."` is for read-only repository lookup
-- `omx sparkshell <command>` is for shell-native inspection and bounded verification
-- when `.omx/wiki/` exists, `omx explore` can inject wiki-first context before falling back to broader repository search
+- `omcp explore --prompt "..."` is for read-only repository lookup
+- `omcp sparkshell <command>` is for shell-native inspection and bounded verification
+- when `.omcp/wiki/` exists, `omcp explore` can inject wiki-first context before falling back to broader repository search
 
 Examples:
 
 ```bash
-omx explore --prompt "find where team state is written"
-omx sparkshell git status
-omx sparkshell --tmux-pane %12 --tail-lines 400
+omcp explore --prompt "find where team state is written"
+omcp sparkshell git status
+omcp sparkshell --tmux-pane %12 --tail-lines 400
 ```
 
 ### Wiki
 
-- `omx wiki` is the CLI parity surface for the OMCP wiki MCP server
-- wiki data lives locally under `.omx/wiki/`
+- `omcp wiki` is the CLI parity surface for the OMCP wiki MCP server
+- wiki data lives locally under `.omcp/wiki/`
 - the wiki is markdown-first and search-first, not vector-first
 
 Examples:
 
 ```bash
-omx wiki list --json
-omx wiki query --input '{"query":"session-start lifecycle"}' --json
-omx wiki lint --json
-omx wiki refresh --json
+omcp wiki list --json
+omcp wiki query --input '{"query":"session-start lifecycle"}' --json
+omcp wiki lint --json
+omcp wiki refresh --json
 ```
 
 ### Platform notes for team mode
 
-`omx team` works best on macOS/Linux with `tmux`.
+`omcp team` works best on macOS/Linux with `tmux`.
 Native Windows remains a secondary path, and WSL2 is generally the better choice if you want a Windows-hosted setup.
 On native Windows, OMCP accepts `psmux` as the tmux-compatible binary for the existing tmux-backed paths it already uses.
 
@@ -271,7 +271,7 @@ On native Windows, OMCP accepts `psmux` as the tmux-compatible binary for the ex
 On some Intel Macs, OMCP startup — especially with `--madmax --high` — can spike `syspolicyd` / `trustd` CPU usage while macOS Gatekeeper validates many concurrent process launches.
 
 If this happens, try:
-- `xattr -dr com.apple.quarantine $(which omx)`
+- `xattr -dr com.apple.quarantine $(which omcp)`
 - adding your terminal app to the Developer Tools allowlist in macOS Security settings
 - using lower concurrency (for example, avoid `--madmax --high`)
 

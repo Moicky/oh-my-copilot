@@ -17,7 +17,7 @@ describe("getOpenClawConfig", () => {
 
 	beforeEach(() => {
 		originalEnv = { ...process.env };
-		tmpDir = join(tmpdir(), `omx-openclaw-test-${Date.now()}`);
+		tmpDir = join(tmpdir(), `omcp-openclaw-test-${Date.now()}`);
 		mkdirSync(tmpDir, { recursive: true });
 		process.env.CODEX_HOME = join(tmpDir, ".codex");
 	});
@@ -225,7 +225,7 @@ describe("getOpenClawConfig generic alias normalization", () => {
 
 	beforeEach(() => {
 		originalEnv = { ...process.env };
-		tmpDir = join(tmpdir(), `omx-openclaw-alias-test-${Date.now()}`);
+		tmpDir = join(tmpdir(), `omcp-openclaw-alias-test-${Date.now()}`);
 		mkdirSync(tmpDir, { recursive: true });
 		process.env.OMX_OPENCLAW = "1";
 		process.env.HOME = tmpDir;
@@ -248,7 +248,7 @@ describe("getOpenClawConfig generic alias normalization", () => {
 	});
 
 	it("normalizes custom_webhook_command alias to openclaw runtime config", async () => {
-		const omxConfigPath = join(tmpDir, ".codex", ".omx-config.json");
+		const omxConfigPath = join(tmpDir, ".codex", ".omcp-config.json");
 		mkdirSync(join(tmpDir, ".codex"), { recursive: true });
 		writeFileSync(
 			omxConfigPath,
@@ -277,7 +277,7 @@ describe("getOpenClawConfig generic alias normalization", () => {
 	});
 
 	it("explicit notifications.openclaw wins over generic aliases", async () => {
-		const omxConfigPath = join(tmpDir, ".codex", ".omx-config.json");
+		const omxConfigPath = join(tmpDir, ".codex", ".omcp-config.json");
 		mkdirSync(join(tmpDir, ".codex"), { recursive: true });
 		writeFileSync(
 			omxConfigPath,
@@ -327,7 +327,7 @@ describe("inspectOpenClawConfig", () => {
 
 	beforeEach(() => {
 		originalEnv = { ...process.env };
-		tmpDir = join(tmpdir(), `omx-openclaw-inspect-test-${Date.now()}`);
+		tmpDir = join(tmpdir(), `omcp-openclaw-inspect-test-${Date.now()}`);
 		mkdirSync(tmpDir, { recursive: true });
 		process.env.HOME = tmpDir;
 		process.env.CODEX_HOME = join(tmpDir, ".codex");
@@ -359,7 +359,7 @@ describe("inspectOpenClawConfig", () => {
 
 	it("reports explicit config overriding aliases", async () => {
 		process.env.OMX_OPENCLAW = "1";
-		const omxConfigPath = join(tmpDir, ".codex", ".omx-config.json");
+		const omxConfigPath = join(tmpDir, ".codex", ".omcp-config.json");
 		mkdirSync(join(tmpDir, ".codex"), { recursive: true });
 		writeFileSync(
 			omxConfigPath,

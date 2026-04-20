@@ -13,7 +13,7 @@ export const ADAPT_SUBCOMMANDS = [
 export type AdaptSubcommand = (typeof ADAPT_SUBCOMMANDS)[number];
 
 export type AdaptCapabilityOwnership =
-	| "omx-owned"
+	| "omcp-owned"
 	| "shared-contract"
 	| "target-observed";
 

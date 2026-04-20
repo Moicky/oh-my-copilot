@@ -1,34 +1,34 @@
 # Hooks Extension (Custom Plugins)
 
-OMCP supports an additive hooks extension point for user plugins under `.omx/hooks/*.mjs`.
+OMCP supports an additive hooks extension point for user plugins under `.omcp/hooks/*.mjs`.
 
 Native Codex hook ownership is documented separately in
 [Codex native hook mapping](./codex-native-hooks.md). In short:
 
-- `.codex/hooks.json` = native Codex hook registrations installed by `omx setup`
-- `.omx/hooks/*.mjs` = OMCP plugin hooks dispatched by runtime/native events
-- `omx tmux-hook` / notify-hook / derived watcher = tmux/runtime fallback surfaces
+- `.codex/hooks.json` = native Codex hook registrations installed by `omcp setup`
+- `.omcp/hooks/*.mjs` = OMCP plugin hooks dispatched by runtime/native events
+- `omcp tmux-hook` / notify-hook / derived watcher = tmux/runtime fallback surfaces
 
-`omx setup` treats `.codex/hooks.json` as a shared-ownership file: it refreshes only the OMCP-managed
+`omcp setup` treats `.codex/hooks.json` as a shared-ownership file: it refreshes only the OMCP-managed
 wrapper entries that invoke `dist/scripts/codex-native-hook.js` and preserves user hook entries in the
-same file. `omx uninstall` removes only those OMCP-managed wrappers and leaves `.codex/hooks.json` in
+same file. `omcp uninstall` removes only those OMCP-managed wrappers and leaves `.codex/hooks.json` in
 place when user hooks remain.
 
-> Compatibility guarantee: `omx tmux-hook` remains fully supported and unchanged.
-> The new `omx hooks` command group is additive and does **not** replace tmux-hook workflows.
+> Compatibility guarantee: `omcp tmux-hook` remains fully supported and unchanged.
+> The new `omcp hooks` command group is additive and does **not** replace tmux-hook workflows.
 
 ## Quick start
 
 ```bash
-omx hooks init
-omx hooks status
-omx hooks validate
-omx hooks test
+omcp hooks init
+omcp hooks status
+omcp hooks validate
+omcp hooks test
 ```
 
 This creates a scaffold plugin at:
 
-- `.omx/hooks/sample-plugin.mjs`
+- `.omcp/hooks/sample-plugin.mjs`
 
 ## Enablement model
 
@@ -118,23 +118,23 @@ SDK surface includes:
 - `sdk.tmux.sendKeys(...)`
 - `sdk.log.info|warn|error(...)`
 - `sdk.state.read|write|delete|all(...)` (plugin namespace scoped)
-- `sdk.omx.session.read()`
-- `sdk.omx.hud.read()`
-- `sdk.omx.notifyFallback.read()`
-- `sdk.omx.updateCheck.read()`
+- `sdk.omcp.session.read()`
+- `sdk.omcp.hud.read()`
+- `sdk.omcp.notifyFallback.read()`
+- `sdk.omcp.updateCheck.read()`
 
-`sdk.omx` is intentionally narrow and read-only in pass one. These helpers read the
-repo-root `.omx/state/*.json` runtime files for the current workspace.
+`sdk.omcp` is intentionally narrow and read-only in pass one. These helpers read the
+repo-root `.omcp/state/*.json` runtime files for the current workspace.
 
 Compatibility notes:
 
-- `omx tmux-hook` remains a CLI/runtime workflow, not `sdk.omx.tmuxHook.*`
-- pass one does not add `sdk.omx.tmuxHook.*`; tmux plugin behavior stays on `sdk.tmux.sendKeys(...)`
-- pass one does not add generic `sdk.omx.readJson(...)`, `sdk.omx.list()`, or `sdk.omx.exists()`
+- `omcp tmux-hook` remains a CLI/runtime workflow, not `sdk.omcp.tmuxHook.*`
+- pass one does not add `sdk.omcp.tmuxHook.*`; tmux plugin behavior stays on `sdk.tmux.sendKeys(...)`
+- pass one does not add generic `sdk.omcp.readJson(...)`, `sdk.omcp.list()`, or `sdk.omcp.exists()`
 - pass one does not add `sdk.pluginState`; keep using `sdk.state`
 
 ## Logs
 
 Plugin dispatch and plugin logs are written to:
 
-- `.omx/logs/hooks-YYYY-MM-DD.jsonl`
+- `.omcp/logs/hooks-YYYY-MM-DD.jsonl`

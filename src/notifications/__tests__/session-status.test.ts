@@ -22,7 +22,7 @@ function createMapping(projectPath: string, sessionId = 'sess-1'): SessionMappin
     messageId: 'orig-discord-msg',
     sessionId,
     tmuxPaneId: '%9',
-    tmuxSessionName: 'omx-session',
+    tmuxSessionName: 'omcp-session',
     event: 'session-idle',
     createdAt: '2026-03-20T00:00:00.000Z',
     projectPath,
@@ -43,10 +43,10 @@ describe('session-status helper', () => {
   });
 
   it('renders a bounded running summary with active subagent details', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-session-status-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-session-status-'));
     try {
       await writeSessionStart(wd, 'sess-1', { nativeSessionId: 'native-1' });
-      await writeJson(join(wd, '.omx', 'state', 'sessions', 'sess-1', 'skill-active-state.json'), {
+      await writeJson(join(wd, '.omcp', 'state', 'sessions', 'sess-1', 'skill-active-state.json'), {
         active: true,
         skill: 'ralph',
         phase: 'executing',
@@ -80,7 +80,7 @@ describe('session-status helper', () => {
       assert.match(status, /Session: sess-1/);
       assert.match(status, /Native: native-1/);
       assert.match(status, /State: running \(ralph\/executing\)/);
-      assert.match(status, /Tmux: omx-session \/ %9/);
+      assert.match(status, /Tmux: omcp-session \/ %9/);
       assert.match(status, /Updated: 2026-03-20T00:04:30.000Z/);
       assert.match(status, /Freshness: Fresh/);
       assert.match(status, /Subagents: 4 active \(a1b2c3, d4e5f6, g7h8i9, \+1 more\)/);
@@ -90,11 +90,11 @@ describe('session-status helper', () => {
   });
 
   it('renders stale partial summaries with explicit unknown fields', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-session-status-stale-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-session-status-stale-'));
     try {
-      await mkdir(join(wd, '.omx', 'logs'), { recursive: true });
+      await mkdir(join(wd, '.omcp', 'logs'), { recursive: true });
       await writeFile(
-        join(wd, '.omx', 'logs', 'session-history.jsonl'),
+        join(wd, '.omcp', 'logs', 'session-history.jsonl'),
         `${JSON.stringify({
           session_id: 'sess-old',
           started_at: '2026-03-20T00:00:00.000Z',
@@ -121,20 +121,20 @@ describe('session-status helper', () => {
   });
 
   it('does not report a stale tracked session as running when only raw session.json remains', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-session-status-orphaned-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-session-status-orphaned-'));
     try {
-      await writeJson(join(wd, '.omx', 'state', 'session.json'), {
+      await writeJson(join(wd, '.omcp', 'state', 'session.json'), {
         session_id: 'sess-orphaned',
         native_session_id: 'native-orphaned',
         started_at: '2026-03-20T00:00:00.000Z',
         cwd: wd,
         pid: 4242,
         pid_start_ticks: 11,
-        pid_cmdline: 'node omx',
+        pid_cmdline: 'node omcp',
       });
-      await mkdir(join(wd, '.omx', 'logs'), { recursive: true });
+      await mkdir(join(wd, '.omcp', 'logs'), { recursive: true });
       await writeFile(
-        join(wd, '.omx', 'logs', 'session-history.jsonl'),
+        join(wd, '.omcp', 'logs', 'session-history.jsonl'),
         `${JSON.stringify({
           session_id: 'sess-orphaned',
           native_session_id: 'native-orphaned',
@@ -155,7 +155,7 @@ describe('session-status helper', () => {
             cwd: wd,
             pid: 4242,
             pid_start_ticks: 11,
-            pid_cmdline: 'node omx',
+            pid_cmdline: 'node omcp',
           };
         },
         readUsableSessionStateImpl: async (projectPath) => {
@@ -174,7 +174,7 @@ describe('session-status helper', () => {
   });
 
   it('returns a bounded failure message when correlated state cannot be resolved', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-session-status-empty-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-session-status-empty-'));
     try {
       const status = await buildDiscordSessionStatusReply(createMapping(wd));
       assert.equal(status, STATUS_DATA_UNAVAILABLE_MESSAGE);

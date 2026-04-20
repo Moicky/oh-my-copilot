@@ -83,7 +83,7 @@
 | code-review | DONE | ~/.codex/skills/code-review/SKILL.md |
 | security-review | DONE | ~/.codex/skills/security-review/SKILL.md |
 | tdd | DONE | ~/.codex/skills/tdd/SKILL.md |
-| deepinit | DONE (lightweight CLI successor) | `omx agents-init [path]` (`omx deepinit [path]` alias) |
+| deepinit | DONE (lightweight CLI successor) | `omcp agents-init [path]` (`omcp deepinit [path]` alias) |
 | deepsearch | DONE | ~/.codex/skills/deepsearch/SKILL.md |
 | analyze | DONE | ~/.codex/skills/analyze/SKILL.md |
 | build-fix | DONE | ~/.codex/skills/build-fix/SKILL.md |
@@ -100,7 +100,7 @@
 | review | DONE | ~/.codex/skills/review/SKILL.md |
 | ralph-init | DONE | ~/.codex/skills/ralph-init/SKILL.md |
 | ~~release~~ | REMOVED (v0.5.0) | — |
-| omx-setup | DONE | ~/.codex/skills/omx-setup/SKILL.md |
+| omcp-setup | DONE | ~/.codex/skills/omcp-setup/SKILL.md |
 | configure-notifications | DONE | ~/.codex/skills/configure-notifications/SKILL.md |
 | ~~configure-telegram~~ | MERGED -> configure-notifications | — |
 | ~~configure-discord~~ | MERGED -> configure-notifications | — |
@@ -110,7 +110,7 @@
 | ~~project-session-manager~~ | REMOVED (v0.5.0) | — |
 | ~~psm~~ | REMOVED (v0.5.0) | — |
 | swarm | DONE | ~/.codex/skills/swarm/SKILL.md |
-| ~~learn-about-omx~~ | REMOVED (v0.5.0) | — |
+| ~~learn-about-omcp~~ | REMOVED (v0.5.0) | — |
 | worker | DONE | ~/.codex/skills/worker/SKILL.md |
 
 ### Hook Pipeline (6 full + 3 partial out of 9 = ~89%)
@@ -125,9 +125,9 @@
 | SubagentStop | Codex CLI multi_agent native | FULL |
 | PreCompact | AGENTS.md overlay compaction protocol | PARTIAL (instructions only) |
 | Stop | notify config + postLaunch cleanup | FULL |
-| SessionEnd | omx postLaunch lifecycle phase | PARTIAL (post-exit cleanup) |
+| SessionEnd | omcp postLaunch lifecycle phase | PARTIAL (post-exit cleanup) |
 
-`*` FULL via terminal automation workaround (default-enabled in `v0.2.3` generated `.omx/tmux-hook.json`), not native hook context injection.
+`*` FULL via terminal automation workaround (default-enabled in `v0.2.3` generated `.omcp/tmux-hook.json`), not native hook context injection.
 
 ### Infrastructure
 
@@ -153,9 +153,9 @@
 ## Known Gaps
 
 1. **Pre-tool interception** - Cannot intercept tool calls before execution. Workaround: AGENTS.md instructs model to self-moderate.
-2. **Native context injection from hooks** - Not available in Codex hooks API. Workaround: tmux prompt injection (`omx tmux-hook`) plus state files + AGENTS.md instructions (default-enabled in `v0.2.3` generated config).
+2. **Native context injection from hooks** - Not available in Codex hooks API. Workaround: tmux prompt injection (`omcp tmux-hook`) plus state files + AGENTS.md instructions (default-enabled in `v0.2.3` generated config).
 3. **PreCompact hook** - No event interception. Workaround: AGENTS.md overlay includes compaction survival instructions that tell the model to checkpoint state before compaction.
-4. **Session end** - No real-time event. Workaround: `omx` wrapper detects Codex exit via blocking execSync and runs postLaunch cleanup (overlay strip, session archive, mode cancellation).
+4. **Session end** - No real-time event. Workaround: `omcp` wrapper detects Codex exit via blocking execSync and runs postLaunch cleanup (overlay strip, session archive, mode cancellation).
 5. **Full LSP protocol** - LSP tools use pragmatic wrappers (tsc, grep, regex) rather than full LSP protocol. Missing: lsp_goto_definition, lsp_prepare_rename, lsp_rename, lsp_code_actions, lsp_code_action_resolve (5 tools need real LSP).
 6. **Python REPL** - Not yet ported. Needed only by scientist agent. Low priority for v0.1.0.
 

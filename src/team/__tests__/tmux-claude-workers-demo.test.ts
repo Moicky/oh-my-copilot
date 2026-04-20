@@ -186,7 +186,7 @@ describe('tmux claude workers demo', () => {
           i,
           launchArgs,
           cwd,
-          { OMX_TEAM_STATE_ROOT: `${cwd}/.omx/state` },
+          { OMX_TEAM_STATE_ROOT: `${cwd}/.omcp/state` },
           workerCli,
         );
 
@@ -195,7 +195,7 @@ describe('tmux claude workers demo', () => {
         assert.equal(spec.env.OMX_TEAM_WORKER, `${teamName}/worker-${i}`);
         assert.ok(spec.env.OMX_LEADER_NODE_PATH, 'OMX_LEADER_NODE_PATH must be set');
         assert.ok(spec.env.OMX_LEADER_CLI_PATH, 'OMX_LEADER_CLI_PATH must be set');
-        assert.equal(spec.env.OMX_TEAM_STATE_ROOT, `${cwd}/.omx/state`);
+        assert.equal(spec.env.OMX_TEAM_STATE_ROOT, `${cwd}/.omcp/state`);
 
         // CLI-specific assertions
         if (workerCli === 'claude') {

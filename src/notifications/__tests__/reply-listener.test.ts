@@ -60,7 +60,7 @@ function createMapping(platform: SessionMapping['platform']): SessionMapping {
     messageId: platform === 'discord-bot' ? 'orig-discord-msg' : '222',
     sessionId: 'session-1',
     tmuxPaneId: '%9',
-    tmuxSessionName: 'omx-session',
+    tmuxSessionName: 'omcp-session',
     event: 'session-idle',
     createdAt: '2026-03-20T00:00:00.000Z',
     projectPath: '/tmp/project',

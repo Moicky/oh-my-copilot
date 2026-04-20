@@ -59,7 +59,7 @@ export interface OpenClawHookMapping {
   enabled: boolean;
 }
 
-/** Top-level config schema for notifications.openclaw key in .omx-config.json */
+/** Top-level config schema for notifications.openclaw key in .omcp-config.json */
 export interface OpenClawConfig {
   /** Global enable/disable */
   enabled: boolean;

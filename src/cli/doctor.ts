@@ -1,5 +1,5 @@
 /**
- * omx doctor - Validate oh-my-copilot installation
+ * omcp doctor - Validate oh-my-copilot installation
  */
 
 import { existsSync } from 'fs';
@@ -60,7 +60,7 @@ const LEGACY_SCOPE_MIGRATION: Record<string, DoctorSetupScope> = {
 };
 
 async function resolveDoctorScope(cwd: string): Promise<DoctorScopeResolution> {
-  const scopePath = join(cwd, '.omx', 'setup-scope.json');
+  const scopePath = join(cwd, '.omcp', 'setup-scope.json');
   if (!existsSync(scopePath)) {
     return { scope: 'user', source: 'default' };
   }
@@ -117,7 +117,7 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
   const scopeResolution = await resolveDoctorScope(cwd);
   const paths = resolveDoctorPaths(cwd, scopeResolution.scope);
   const scopeSourceMessage = scopeResolution.source === 'persisted'
-    ? ' (from .omx/setup-scope.json)'
+    ? ' (from .omcp/setup-scope.json)'
     : '';
 
   console.log('oh-my-copilot doctor');
@@ -186,9 +186,9 @@ export async function doctor(options: DoctorOptions = {}): Promise<void> {
   console.log(`\nResults: ${passCount} passed, ${warnCount} warnings, ${failCount} failed`);
 
   if (failCount > 0) {
-    console.log('\nRun "omx setup" to fix installation issues.');
+    console.log('\nRun "omcp setup" to fix installation issues.');
   } else if (warnCount > 0) {
-    console.log('\nRun "omx setup --force" to refresh all components.');
+    console.log('\nRun "omcp setup --force" to refresh all components.');
   } else {
     console.log('\nAll checks passed! oh-my-copilot is ready.');
   }
@@ -220,7 +220,7 @@ async function doctorTeam(): Promise<void> {
   }
 
   console.log(`\nResults: ${warningCount} warnings, ${failureCount} failed`);
-  // Ensure non-zero exit for `omx doctor --team` failures.
+  // Ensure non-zero exit for `omcp doctor --team` failures.
   if (failureCount > 0) process.exitCode = 1;
 }
 
@@ -274,7 +274,7 @@ async function collectTeamDoctorIssues(cwd: string): Promise<TeamDoctorIssue[]> 
     const manifestPath = join(teamDir, 'manifest.v2.json');
     const configPath = join(teamDir, 'config.json');
 
-    let tmuxSession = `omx-team-${teamName}`;
+    let tmuxSession = `omcp-team-${teamName}`;
     if (existsSync(manifestPath)) {
       try {
         const raw = await readFile(manifestPath, 'utf-8');
@@ -370,8 +370,8 @@ async function collectTeamDoctorIssues(cwd: string): Promise<TeamDoctorIssue[]> 
       if (leaderIsStale && !tmuxUnavailable) {
         // Check if any team tmux session has live worker panes
         for (const teamName of teamDirs) {
-          const session = knownTeamSessions.has(`omx-team-${teamName}`)
-            ? `omx-team-${teamName}`
+          const session = knownTeamSessions.has(`omcp-team-${teamName}`)
+            ? `omcp-team-${teamName}`
             : [...knownTeamSessions].find(s => s.includes(teamName));
           if (!session || !tmuxSessions.has(session)) continue;
           issues.push({
@@ -433,7 +433,7 @@ function listTeamTmuxSessions(): Set<string> | null {
   const sessions = (res.stdout || '')
     .split('\n')
     .map((s) => s.trim())
-    .filter((s) => s.startsWith('omx-team-'));
+    .filter((s) => s.startsWith('omcp-team-'));
   return new Set(sessions);
 }
 
@@ -489,12 +489,12 @@ export function checkExploreHarness(
   env: NodeJS.ProcessEnv = process.env,
 ): Check {
   const packageRoot = getPackageRoot();
-  const manifestPath = join(packageRoot, 'crates', 'omx-explore', 'Cargo.toml');
+  const manifestPath = join(packageRoot, 'crates', 'omcp-explore', 'Cargo.toml');
   if (!existsSync(manifestPath)) {
     return {
       name: 'Explore Harness',
       status: 'warn',
-      message: 'Rust harness sources not found in this install (omx explore unavailable until packaged or OMX_EXPLORE_BIN is set)',
+      message: 'Rust harness sources not found in this install (omcp explore unavailable until packaged or OMX_EXPLORE_BIN is set)',
     };
   }
 
@@ -543,7 +543,7 @@ export function checkExploreHarness(
       return {
         name: 'Explore Harness',
         status: 'warn',
-        message: `Rust harness sources are packaged, but no compatible packaged prebuilt or cargo was found (install Rust or set ${EXPLORE_BIN_ENV} for omx explore)`,
+        message: `Rust harness sources are packaged, but no compatible packaged prebuilt or cargo was found (install Rust or set ${EXPLORE_BIN_ENV} for omcp explore)`,
       };
     }
     return {
@@ -617,7 +617,7 @@ async function checkConfig(configPath: string): Promise<Check> {
         name: 'Config',
         status: 'warn',
         message:
-          'retired [mcp_servers.omx_team_run] table still present; run "omx setup --force" to repair the config',
+          'retired [mcp_servers.omx_team_run] table still present; run "omcp setup --force" to repair the config',
       };
     }
 
@@ -629,7 +629,7 @@ async function checkConfig(configPath: string): Promise<Check> {
     return {
       name: 'Config',
       status: 'warn',
-      message: 'config.toml exists but no OMCP entries yet (expected before first setup; run "omx setup --force" once)',
+      message: 'config.toml exists but no OMCP entries yet (expected before first setup; run "omcp setup --force" once)',
     };
   } catch {
     return { name: 'Config', status: 'fail', message: 'cannot read config.toml' };
@@ -699,7 +699,7 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
           return {
             name: 'Native hooks',
             status: 'warn',
-            message: 'hooks.json not found even though config.toml has OMCP entries; run "omx setup --force" to restore native hook coverage',
+            message: 'hooks.json not found even though config.toml has OMCP entries; run "omcp setup --force" to restore native hook coverage',
           };
         }
       } catch {
@@ -722,7 +722,7 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
       return {
         name: 'Native hooks',
         status: 'fail',
-        message: 'invalid hooks.json; Codex may skip OMCP hook coverage until "omx setup --force" repairs it',
+        message: 'invalid hooks.json; Codex may skip OMCP hook coverage until "omcp setup --force" repairs it',
       };
     }
 
@@ -731,7 +731,7 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
         name: 'Native hooks',
         status: 'warn',
         message:
-          `hooks.json is missing OMCP-managed coverage for ${missingEvents.join(', ')}; run "omx setup --force" to restore native hooks`,
+          `hooks.json is missing OMCP-managed coverage for ${missingEvents.join(', ')}; run "omcp setup --force" to restore native hooks`,
       };
     }
 
@@ -831,7 +831,7 @@ function checkAgentsMd(scope: DoctorSetupScope, codexHomeDir: string): Check {
     return {
       name: 'AGENTS.md',
       status: 'warn',
-      message: `not found in ${userAgentsMd} (run omx setup --scope user)`,
+      message: `not found in ${userAgentsMd} (run omcp setup --scope user)`,
     };
   }
 
@@ -842,7 +842,7 @@ function checkAgentsMd(scope: DoctorSetupScope, codexHomeDir: string): Check {
   return {
     name: 'AGENTS.md',
     status: 'warn',
-    message: 'not found in project root (run omx agents-init . or omx setup --scope project)',
+    message: 'not found in project root (run omcp agents-init . or omcp setup --scope project)',
   };
 }
 
@@ -901,7 +901,7 @@ async function checkMcpServers(configPath: string): Promise<Check> {
         return {
           name: 'MCP Servers',
           status: 'warn',
-          message: `${mcpCount} servers configured, but retired [mcp_servers.omx_team_run] is not supported; run "omx setup --force" to repair the config`,
+          message: `${mcpCount} servers configured, but retired [mcp_servers.omx_team_run] is not supported; run "omcp setup --force" to repair the config`,
         };
       }
       const hasOmx = content.includes('omx_state') || content.includes('omx_memory');
@@ -911,7 +911,7 @@ async function checkMcpServers(configPath: string): Promise<Check> {
       return {
         name: 'MCP Servers',
         status: 'warn',
-        message: `${mcpCount} servers but no OMCP servers yet (expected before first setup; run "omx setup --force" once)`,
+        message: `${mcpCount} servers but no OMCP servers yet (expected before first setup; run "omcp setup --force" once)`,
       };
     }
     return { name: 'MCP Servers', status: 'warn', message: 'no MCP servers configured' };

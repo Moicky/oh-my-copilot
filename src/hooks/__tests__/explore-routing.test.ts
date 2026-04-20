@@ -38,8 +38,8 @@ describe('explore-routing', () => {
     const guidance = buildExploreRoutingGuidance({});
     assert.match(guidance, /USE_OMX_EXPLORE_CMD/);
     assert.match(guidance, /default-on; opt out/i);
-    assert.match(guidance, /agents SHOULD treat `omx explore` as the default first stop/i);
-    assert.match(guidance, /use `omx explore` FIRST before attempting full code analysis/i);
+    assert.match(guidance, /agents SHOULD treat `omcp explore` as the default first stop/i);
+    assert.match(guidance, /use `omcp explore` FIRST before attempting full code analysis/i);
     assert.match(guidance, /Explore examples:/);
     assert.match(guidance, /SparkShell examples:/);
     assert.match(guidance, /--prompt-file/);

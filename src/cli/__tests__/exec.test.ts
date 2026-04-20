@@ -14,7 +14,7 @@ function runOmx(
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omx.js');
+  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
   const result = spawnSync(process.execPath, [omxBin, ...argv], {
     cwd,
     encoding: 'utf-8',
@@ -35,9 +35,9 @@ function runOmx(
   };
 }
 
-describe('omx exec', () => {
+describe('omcp exec', () => {
   it('runs codex exec with session-scoped instructions that preserve AGENTS and overlay content', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-exec-cli-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-exec-cli-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
@@ -81,24 +81,24 @@ describe('omx exec', () => {
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);
       assert.match(result.stdout, /fake-codex:exec --model gpt-5 say hi /);
-      assert.match(result.stdout, /instructions-path:.*\/\.omx\/state\/sessions\/omx-.*\/AGENTS\.md/);
+      assert.match(result.stdout, /instructions-path:.*\/\.omcp\/state\/sessions\/omcp-.*\/AGENTS\.md/);
       assert.match(result.stdout, /# User Instructions/);
       assert.match(result.stdout, /# Project Instructions/);
       assert.match(result.stdout, /<!-- OMCP:RUNTIME:START -->/);
 
-      const sessionRoot = join(wd, '.omx', 'state', 'sessions');
+      const sessionRoot = join(wd, '.omcp', 'state', 'sessions');
       const sessionEntries = await readdir(sessionRoot);
       assert.equal(sessionEntries.length, 1);
       const sessionFiles = await readdir(join(sessionRoot, sessionEntries[0]));
       assert.equal(sessionFiles.includes('AGENTS.md'), false, 'session-scoped AGENTS file should be cleaned up after exec exits');
-      assert.equal(existsSync(join(wd, '.omx', 'state', 'session.json')), false);
+      assert.equal(existsSync(join(wd, '.omcp', 'state', 'session.json')), false);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
   it('passes exec --help through to codex exec', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-exec-help-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-exec-help-'));
     try {
       const home = join(wd, 'home');
       const fakeBin = join(wd, 'bin');
@@ -123,7 +123,7 @@ describe('omx exec', () => {
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);
       assert.match(result.stdout, /fake-codex:exec --help\b/);
-      assert.doesNotMatch(result.stdout, /oh-my-copilot \(omx\) - Multi-agent orchestration for Codex CLI/i);
+      assert.doesNotMatch(result.stdout, /oh-my-copilot \(omcp\) - Multi-agent orchestration for Codex CLI/i);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }

@@ -17,7 +17,7 @@ function runOmx(
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error?: string } {
-  const omxBin = join(repoRoot(), 'dist', 'cli', 'omx.js');
+  const omxBin = join(repoRoot(), 'dist', 'cli', 'omcp.js');
   const result = spawnSync(process.execPath, [omxBin, ...argv], {
     cwd,
     encoding: 'utf-8',
@@ -100,9 +100,9 @@ switch (command.command) {
 
 describe('rust runtime legacy-reader compatibility', () => {
   it('keeps team status on the manifest-authored compatibility view', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-rust-compat-team-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-rust-compat-team-'));
     try {
-      const teamStateRoot = join(wd, '.omx', 'state');
+      const teamStateRoot = join(wd, '.omcp', 'state');
       await withTempTeamStateRoot(teamStateRoot, async () => {
         await initTeamState('rust-compat-team', 'compatibility lane', 'executor', 1, wd);
 
@@ -113,9 +113,9 @@ describe('rust runtime legacy-reader compatibility', () => {
         const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as Record<string, unknown>;
 
         config.workspace_mode = 'single';
-        config.tmux_session = 'omx-team-legacy-rust-compat-team';
+        config.tmux_session = 'omcp-team-legacy-rust-compat-team';
         manifest.workspace_mode = 'worktree';
-        manifest.tmux_session = 'omx-team-rust-compat-team';
+        manifest.tmux_session = 'omcp-team-rust-compat-team';
 
         await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
         await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
@@ -130,7 +130,7 @@ describe('rust runtime legacy-reader compatibility', () => {
           status?: string;
           workspace_mode?: string | null;
         };
-        assert.equal(payload.command, 'omx team status');
+        assert.equal(payload.command, 'omcp team status');
         assert.equal(payload.team_name, 'rust-compat-team');
         assert.equal(payload.status, 'ok');
         assert.equal(payload.workspace_mode, 'worktree');
@@ -141,9 +141,9 @@ describe('rust runtime legacy-reader compatibility', () => {
   });
 
   it('keeps doctor --team on the manifest-authored tmux session', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-rust-compat-doctor-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-rust-compat-doctor-'));
     try {
-      const teamStateRoot = join(wd, '.omx', 'state');
+      const teamStateRoot = join(wd, '.omcp', 'state');
       await withTempTeamStateRoot(teamStateRoot, async () => {
         await initTeamState('rust-compat-doctor', 'compatibility lane', 'executor', 1, wd);
 
@@ -153,8 +153,8 @@ describe('rust runtime legacy-reader compatibility', () => {
         const config = JSON.parse(await readFile(configPath, 'utf-8')) as Record<string, unknown>;
         const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as Record<string, unknown>;
 
-        config.tmux_session = 'omx-team-legacy-rust-compat-doctor';
-        manifest.tmux_session = 'omx-team-rust-compat-doctor';
+        config.tmux_session = 'omcp-team-legacy-rust-compat-doctor';
+        manifest.tmux_session = 'omcp-team-rust-compat-doctor';
 
         await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
         await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
@@ -164,7 +164,7 @@ describe('rust runtime legacy-reader compatibility', () => {
         const tmuxPath = join(fakeBin, 'tmux');
         await writeFile(
           tmuxPath,
-          '#!/bin/sh\nif [ "$1" = "list-sessions" ]; then echo "omx-team-rust-compat-doctor"; exit 0; fi\nexit 0\n',
+          '#!/bin/sh\nif [ "$1" = "list-sessions" ]; then echo "omcp-team-rust-compat-doctor"; exit 0; fi\nexit 0\n',
         );
         await chmod(tmuxPath, 0o755);
 
@@ -186,9 +186,9 @@ describe('rust runtime legacy-reader compatibility', () => {
   });
 
   it('keeps HUD team state on the session-scoped compatibility file', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-rust-compat-hud-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-rust-compat-hud-'));
     try {
-      const stateRoot = join(wd, '.omx', 'state');
+      const stateRoot = join(wd, '.omcp', 'state');
       const sessionId = 'hud-rust-compat';
       const sessionStateDir = join(stateRoot, 'sessions', sessionId);
       await mkdir(sessionStateDir, { recursive: true });
@@ -224,15 +224,15 @@ describe('rust runtime legacy-reader compatibility', () => {
   });
 
   it('prefers bridge-authored dispatch/mailbox compatibility views over stale legacy files', async () => {
-    const wd = await mkdtemp(join(tmpdir(), 'omx-rust-compat-bridge-'));
+    const wd = await mkdtemp(join(tmpdir(), 'omcp-rust-compat-bridge-'));
     const previousRuntimeBinary = process.env.OMX_RUNTIME_BINARY;
     try {
-      const teamStateRoot = join(wd, '.omx', 'state');
+      const teamStateRoot = join(wd, '.omcp', 'state');
       await withTempTeamStateRoot(teamStateRoot, async () => {
         await initTeamState('rust-compat-bridge', 'compatibility lane', 'executor', 2, wd);
         const fakeBin = join(wd, 'bin');
         await mkdir(fakeBin, { recursive: true });
-        const runtimePath = join(fakeBin, 'omx-runtime');
+        const runtimePath = join(fakeBin, 'omcp-runtime');
         await writeCompatRuntimeFixture(runtimePath);
         process.env.OMX_RUNTIME_BINARY = runtimePath;
 

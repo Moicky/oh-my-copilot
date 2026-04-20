@@ -159,7 +159,7 @@ describe('getTeamTmuxSessions - session matching', () => {
   });
 
   function makeFakeTmux(sessions: string[]): void {
-    const fakeBinDir = mkdtempSync(join(tmpdir(), 'omx-tmux-team-test-'));
+    const fakeBinDir = mkdtempSync(join(tmpdir(), 'omcp-tmux-team-test-'));
     tmpDirs.push(fakeBinDir);
     const tmuxPath = join(fakeBinDir, 'tmux');
     const lines = sessions.length > 0
@@ -170,18 +170,18 @@ describe('getTeamTmuxSessions - session matching', () => {
     process.env.PATH = `${fakeBinDir}:${originalPath ?? ''}`;
   }
 
-  it('returns canonical session name (omx-team-alpha) for team "alpha"', () => {
-    makeFakeTmux(['omx-team-alpha', 'other-session']);
-    assert.deepEqual(getTeamTmuxSessions('alpha'), ['omx-team-alpha']);
+  it('returns canonical session name (omcp-team-alpha) for team "alpha"', () => {
+    makeFakeTmux(['omcp-team-alpha', 'other-session']);
+    assert.deepEqual(getTeamTmuxSessions('alpha'), ['omcp-team-alpha']);
   });
 
-  it('returns prefixed worker sessions (omx-team-alpha-worker1)', () => {
-    makeFakeTmux(['omx-team-alpha-worker1', 'omx-team-alpha-worker2']);
-    assert.deepEqual(getTeamTmuxSessions('alpha'), ['omx-team-alpha-worker1', 'omx-team-alpha-worker2']);
+  it('returns prefixed worker sessions (omcp-team-alpha-worker1)', () => {
+    makeFakeTmux(['omcp-team-alpha-worker1', 'omcp-team-alpha-worker2']);
+    assert.deepEqual(getTeamTmuxSessions('alpha'), ['omcp-team-alpha-worker1', 'omcp-team-alpha-worker2']);
   });
 
   it('does NOT return sessions for a different team', () => {
-    makeFakeTmux(['omx-team-beta', 'omx-team-beta-worker1']);
+    makeFakeTmux(['omcp-team-beta', 'omcp-team-beta-worker1']);
     assert.deepEqual(getTeamTmuxSessions('alpha'), []);
   });
 
@@ -229,7 +229,7 @@ describe('captureTmuxPane', () => {
 
   it('captures output for valid pane id and sanitizes/clamps lines', () => {
     const livePid = process.pid;
-    const fakeBinDir = mkdtempSync(join(tmpdir(), 'omx-tmux-test-'));
+    const fakeBinDir = mkdtempSync(join(tmpdir(), 'omcp-tmux-test-'));
     tmpDirs.push(fakeBinDir);
     const tmuxPath = join(fakeBinDir, 'tmux');
     writeFileSync(
@@ -261,7 +261,7 @@ describe('captureTmuxPane', () => {
   });
 
   it('suppresses capture when the target pane is already dead', () => {
-    const fakeBinDir = mkdtempSync(join(tmpdir(), 'omx-tmux-dead-pane-test-'));
+    const fakeBinDir = mkdtempSync(join(tmpdir(), 'omcp-tmux-dead-pane-test-'));
     tmpDirs.push(fakeBinDir);
     const tmuxPath = join(fakeBinDir, 'tmux');
     writeFileSync(
