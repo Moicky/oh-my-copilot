@@ -85,7 +85,7 @@ describe('compat doctor contract', () => {
     const home = join(wd, 'home');
     const codexHome = join(home, '.codex');
     await mkdir(codexHome, { recursive: true });
-    await writeFile(join(codexHome, 'config.toml'), '[mcp_servers.non_omx]\ncommand = "node"\n');
+    await writeFile(join(codexHome, 'config.toml'), '[mcp_servers.non_omcp]\ncommand = "node"\n');
 
     try {
       const result = runCompatTarget(wd, ['doctor'], { HOME: home, CODEX_HOME: codexHome });

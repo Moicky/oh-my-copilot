@@ -1,5 +1,5 @@
 import { resolve } from 'path';
-import { omxStateDir } from '../utils/paths.js';
+import { omcpStateDir } from '../utils/paths.js';
 
 /**
  * Resolve the canonical OMCP team state root for a leader working directory.
@@ -12,5 +12,5 @@ export function resolveCanonicalTeamStateRoot(
   if (typeof explicit === 'string' && explicit.trim() !== '') {
     return resolve(leaderCwd, explicit.trim());
   }
-  return resolve(omxStateDir(leaderCwd));
+  return resolve(omcpStateDir(leaderCwd));
 }

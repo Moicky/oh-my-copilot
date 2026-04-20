@@ -2180,22 +2180,22 @@ exit 0
     const stateDir = join(wd, '.omcp', 'state');
     const tmuxLogPath = join(wd, 'tmux.log');
     const statePath = join(stateDir, 'notify-fallback-state.json');
-    const omxSessionId = 'sess-current';
+    const omcpSessionId = 'sess-current';
     const codexSessionId = 'codex-session-1';
     try {
-      await mkdir(join(stateDir, 'sessions', omxSessionId), { recursive: true });
+      await mkdir(join(stateDir, 'sessions', omcpSessionId), { recursive: true });
       await mkdir(fakeBinDir, { recursive: true });
       await writeFile(join(fakeBinDir, 'tmux'), buildFakeTmux(tmuxLogPath));
       await chmod(join(fakeBinDir, 'tmux'), 0o755);
-      await writeSessionStart(wd, omxSessionId);
-      await writeFile(join(stateDir, 'sessions', omxSessionId, 'ralph-state.json'), JSON.stringify({
+      await writeSessionStart(wd, omcpSessionId);
+      await writeFile(join(stateDir, 'sessions', omcpSessionId, 'ralph-state.json'), JSON.stringify({
         active: true,
         current_phase: 'executing',
         tmux_pane_id: '%42',
-        owner_omx_session_id: omxSessionId,
+        owner_omcp_session_id: omcpSessionId,
         owner_codex_session_id: codexSessionId,
       }, null, 2));
-      await writeFile(join(stateDir, 'sessions', omxSessionId, 'hud-state.json'), JSON.stringify({
+      await writeFile(join(stateDir, 'sessions', omcpSessionId, 'hud-state.json'), JSON.stringify({
         last_progress_at: new Date(Date.now() - 61_000).toISOString(),
       }, null, 2));
       await writeFile(statePath, JSON.stringify({

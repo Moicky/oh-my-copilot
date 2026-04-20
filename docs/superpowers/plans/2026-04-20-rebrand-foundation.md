@@ -281,7 +281,7 @@ cargo build --workspace
 
 Expected: build succeeds. The very first invocation will rewrite `Cargo.lock` with the new package names. (Cold-cache build may take several minutes.)
 
-If build fails because a Rust source file has `use omx_mux::…` or similar, **stop**: that's a Rust crate identifier that the loose token rename in Phase C will catch — but here it surfaces because we're building before Phase C runs. **Resolution:** apply the minimum-needed Rust source rewrite only for the failing identifiers (`omx_mux` → `omcp_mux`, `omx_runtime_core` → `omcp_runtime_core`) right now in this task, then re-run `cargo build`. Document each file you had to touch in the commit message.
+If build fails because a Rust source file has `use omcp_mux::…` or similar, **stop**: that's a Rust crate identifier that the loose token rename in Phase C will catch — but here it surfaces because we're building before Phase C runs. **Resolution:** apply the minimum-needed Rust source rewrite only for the failing identifiers (`omcp_mux` → `omcp_mux`, `omcp_runtime_core` → `omcp_runtime_core`) right now in this task, then re-run `cargo build`. Document each file you had to touch in the commit message.
 
 - [ ] **Step 3: Verify package list**
 
@@ -452,8 +452,8 @@ This is the most invasive rule and uses a word-boundary regex to avoid touching 
 ```bash
 grep -v '\.rs$' /tmp/omcp-rename-files.txt > /tmp/omcp-rename-files-nonrust.txt
 xargs -a /tmp/omcp-rename-files-nonrust.txt -I{} sh -c '
-  if grep -l "\\bomx\\b" "$1" >/dev/null 2>&1; then
-    perl -i -pe "s/\\bomx\\b/omcp/g" "$1"
+  if grep -l "\\bomcp\\b" "$1" >/dev/null 2>&1; then
+    perl -i -pe "s/\\bomcp\\b/omcp/g" "$1"
   fi
 ' _ {}
 ```
@@ -461,7 +461,7 @@ xargs -a /tmp/omcp-rename-files-nonrust.txt -I{} sh -c '
 - [ ] **Step 2: Verify**
 
 ```bash
-rg "\\bomx\\b" $(cat /tmp/omcp-rename-files-nonrust.txt)
+rg "\\bomcp\\b" $(cat /tmp/omcp-rename-files-nonrust.txt)
 ```
 
 Expected: empty output.
@@ -481,7 +481,7 @@ git add -u
 git commit -m "chore(rebrand): replace lowercase 'omcp' with 'omcp' in non-Rust source"
 ```
 
-### Task C6: Rule 5 — Rust crate identifiers (`omx_*` and `omcp-*`) → `omcp_*` / `omcp-*`
+### Task C6: Rule 5 — Rust crate identifiers (`omcp_*` and `omcp-*`) → `omcp_*` / `omcp-*`
 
 Rust uses `_` in `use` statements and `-` in `Cargo.toml`. Apply both.
 
@@ -490,7 +490,7 @@ Rust uses `_` in `use` statements and `-` in `Cargo.toml`. Apply both.
 ```bash
 grep '\.rs$' /tmp/omcp-rename-files.txt > /tmp/omcp-rename-files-rust.txt
 xargs -a /tmp/omcp-rename-files-rust.txt -I{} sh -c '
-  perl -i -pe "s/\\bomx_(mux|runtime|runtime_core|sparkshell|explore_harness)\\b/omcp_\$1/g; s/\\bomx-(mux|runtime|runtime-core|sparkshell|explore-harness)\\b/omcp-\$1/g; s/\\bomx\\b/omcp/g" "$1"
+  perl -i -pe "s/\\bomcp_(mux|runtime|runtime_core|sparkshell|explore_harness)\\b/omcp_\$1/g; s/\\bomcp-(mux|runtime|runtime-core|sparkshell|explore-harness)\\b/omcp-\$1/g; s/\\bomcp\\b/omcp/g" "$1"
 ' _ {}
 ```
 
@@ -505,8 +505,8 @@ Expected: succeeds.
 - [ ] **Step 3: Verify no stray `omcp` Rust identifiers remain**
 
 ```bash
-rg '\bomx[_-]' $(cat /tmp/omcp-rename-files-rust.txt)
-rg '\bomx\b' $(cat /tmp/omcp-rename-files-rust.txt)
+rg '\bomcp[_-]' $(cat /tmp/omcp-rename-files-rust.txt)
+rg '\bomcp\b' $(cat /tmp/omcp-rename-files-rust.txt)
 ```
 
 Expected: both empty.
@@ -1026,7 +1026,7 @@ If the CLI errors immediately because some sub-command tries to talk to Codex du
 - [ ] **Step 2: Confirm output contains no `omcp`/`OMCP`/`oh-my-copilot` strings**
 
 ```bash
-grep -E "\\bomx\\b|\\bOMX\\b|oh-my-copilot" /tmp/omcp-help.txt && echo "FAIL: stale brand strings in help" || echo "ok"
+grep -E "\\bomcp\\b|\\bOMX\\b|oh-my-copilot" /tmp/omcp-help.txt && echo "FAIL: stale brand strings in help" || echo "ok"
 ```
 
 Expected output ends with: `ok`
@@ -1038,7 +1038,7 @@ If it fails, find the source string in the TS sources and fix it (likely a hardc
 - [ ] **Step 1: Run the master audit**
 
 ```bash
-rg -i 'oh-my-copilot|\bomx\b|\bOMX\b|yeachan-heo' \
+rg -i 'oh-my-copilot|\bomcp\b|\bOMX\b|yeachan-heo' \
    -g '!node_modules' -g '!dist' -g '!target' \
    -g '!Cargo.lock' -g '!package-lock.json' \
    -g '!docs/superpowers/specs/2026-04-20-rebrand-foundation-design.md' \

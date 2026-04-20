@@ -4,7 +4,7 @@ import { parsePaneIdFromTmuxOutput, shellEscapeSingle } from '../hud/tmux.js';
 import { sanitizeReplyInput } from '../notifications/reply-listener.js';
 import { getCurrentTmuxPaneId } from '../notifications/tmux.js';
 import { resolveTmuxBinaryForPlatform } from '../utils/platform-command.js';
-import { resolveOmxCliEntryPath } from '../utils/paths.js';
+import { resolveOmcpCliEntryPath } from '../utils/paths.js';
 import type { QuestionAnswer, QuestionRendererState } from './types.js';
 
 export type QuestionRendererStrategy = 'inside-tmux' | 'detached-tmux' | 'test-noop' | 'unsupported';
@@ -38,10 +38,10 @@ export function resolveQuestionRendererStrategy(
 }
 
 function buildQuestionUiCommand(recordPath: string, sessionId?: string): string {
-  const omxBin = resolveOmxCliEntryPath() || process.argv[1];
-  if (!omxBin) throw new Error('Unable to resolve OMCP CLI entry path for question UI launch.');
+  const omcpBin = resolveOmcpCliEntryPath() || process.argv[1];
+  if (!omcpBin) throw new Error('Unable to resolve OMCP CLI entry path for question UI launch.');
   const sessionPrefix = sessionId ? `OMCP_SESSION_ID=${shellEscapeSingle(sessionId)} ` : '';
-  return `${sessionPrefix}${shellEscapeSingle(process.execPath)} ${shellEscapeSingle(omxBin)} question --ui --state-path ${shellEscapeSingle(recordPath)}`;
+  return `${sessionPrefix}${shellEscapeSingle(process.execPath)} ${shellEscapeSingle(omcpBin)} question --ui --state-path ${shellEscapeSingle(recordPath)}`;
 }
 
 function defaultExecTmux(args: string[]): string {

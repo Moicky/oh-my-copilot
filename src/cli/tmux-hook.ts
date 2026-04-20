@@ -89,20 +89,20 @@ export async function tmuxHookCommand(args: string[]): Promise<void> {
   }
 }
 
-function omxDir(cwd = process.cwd()): string {
+function omcpDir(cwd = process.cwd()): string {
   return join(cwd, '.omcp');
 }
 
 function tmuxHookConfigPath(cwd = process.cwd()): string {
-  return join(omxDir(cwd), 'tmux-hook.json');
+  return join(omcpDir(cwd), 'tmux-hook.json');
 }
 
 function tmuxHookStatePath(cwd = process.cwd()): string {
-  return join(omxDir(cwd), 'state', 'tmux-hook-state.json');
+  return join(omcpDir(cwd), 'state', 'tmux-hook-state.json');
 }
 
 function tmuxHookLogPath(cwd = process.cwd()): string {
-  return join(omxDir(cwd), 'logs', `tmux-hook-${new Date().toISOString().split('T')[0]}.jsonl`);
+  return join(omcpDir(cwd), 'logs', `tmux-hook-${new Date().toISOString().split('T')[0]}.jsonl`);
 }
 
 function parseConfig(raw: unknown): TmuxHookConfig {
@@ -314,7 +314,7 @@ async function initTmuxHookConfig(opts?: { silent?: boolean; cwd?: string }): Pr
   const cwd = opts?.cwd ?? process.cwd();
   const silent = opts?.silent ?? false;
   const configPath = tmuxHookConfigPath(cwd);
-  await mkdir(omxDir(cwd), { recursive: true });
+  await mkdir(omcpDir(cwd), { recursive: true });
 
   if (existsSync(configPath)) {
     if (!silent) {

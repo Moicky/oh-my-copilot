@@ -188,7 +188,7 @@ export function isPaneRunningShell(paneCurrentCommand: any): boolean {
 const AGENT_COMMANDS = new Set(['node', 'codex', 'npx']);
 
 function isHudStartCommand(startCommand: string): boolean {
-  return /\bomx\b.*\bhud\b.*--watch/i.test(startCommand);
+  return /\bomcp\b.*\bhud\b.*--watch/i.test(startCommand);
 }
 
 /**

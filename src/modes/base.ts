@@ -139,7 +139,7 @@ export async function startMode(
     task_description: taskDescription,
     started_at: new Date().toISOString(),
     ...(transitionMessage ? { transition_message: transitionMessage } : {}),
-    ...(mode === 'ralph' && scope.sessionId ? { owner_omx_session_id: scope.sessionId } : {}),
+    ...(mode === 'ralph' && scope.sessionId ? { owner_omcp_session_id: scope.sessionId } : {}),
   };
 
   const withContext = withModeRuntimeContext({}, stateBase) as ModeState;
@@ -213,8 +213,8 @@ export async function updateModeState(
   if (!Object.prototype.hasOwnProperty.call(updates, 'run_outcome')) {
     delete updatedBase.run_outcome;
   }
-  if (mode === 'ralph' && scope.sessionId && typeof updatedBase.owner_omx_session_id !== 'string') {
-    updatedBase.owner_omx_session_id = scope.sessionId;
+  if (mode === 'ralph' && scope.sessionId && typeof updatedBase.owner_omcp_session_id !== 'string') {
+    updatedBase.owner_omcp_session_id = scope.sessionId;
   }
   const normalizedBase = normalizeModeStateOrThrow(mode, updatedBase as ModeState);
   const updated = withModeRuntimeContext(current, normalizedBase) as ModeState;

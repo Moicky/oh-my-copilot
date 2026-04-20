@@ -25,20 +25,20 @@ import {
 import { writePage, WIKI_SCHEMA_VERSION } from '../../wiki/index.js';
 import { withPackagedExploreHarnessHidden, withPackagedExploreHarnessLock } from './packaged-explore-harness-lock.js';
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error?: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
   const nodeWrapper = join(cwd, '.omcp-test-node.sh');
   if (!existsSync(nodeWrapper)) {
     writeFileSync(nodeWrapper, '#!/bin/sh\nexec node "$@"\n');
     chmodSync(nodeWrapper, 0o755);
   }
-  const r = spawnSync(nodeWrapper, [omxBin, ...argv], {
+  const r = spawnSync(nodeWrapper, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: { ...process.env, ...envOverrides },
@@ -692,7 +692,7 @@ describe('exploreCommand', () => {
       await chmod(sparkshellStub, 0o755);
       await chmod(harnessStub, 0o755);
 
-      const result = runOmx(wd, ['explore', '--prompt', 'git log --oneline'], {
+      const result = runOmcp(wd, ['explore', '--prompt', 'git log --oneline'], {
         OMCP_SPARKSHELL_BIN: sparkshellStub,
         OMCP_EXPLORE_BIN: harnessStub,
       });
@@ -718,7 +718,7 @@ describe('exploreCommand', () => {
       );
       await chmod(harnessStub, 0o755);
 
-      const result = runOmx(wd, ['explore', '--prompt', 'git log --oneline'], {
+      const result = runOmcp(wd, ['explore', '--prompt', 'git log --oneline'], {
         OMCP_SPARKSHELL_BIN: join(wd, 'missing-sparkshell'),
         OMCP_EXPLORE_BIN: harnessStub,
       });
@@ -749,7 +749,7 @@ describe('exploreCommand', () => {
       await chmod(sparkshellStub, 0o755);
       await chmod(harnessStub, 0o755);
 
-      const result = runOmx(wd, ['explore', '--prompt', 'git log --oneline'], {
+      const result = runOmcp(wd, ['explore', '--prompt', 'git log --oneline'], {
         OMCP_SPARKSHELL_BIN: sparkshellStub,
         OMCP_EXPLORE_BIN: harnessStub,
       });
@@ -825,7 +825,7 @@ describe('exploreCommand', () => {
       );
       await chmod(stub, 0o755);
 
-      const result = runOmx(wd, ['explore', '--prompt', 'find auth'], { OMCP_EXPLORE_BIN: stub });
+      const result = runOmcp(wd, ['explore', '--prompt', 'find auth'], { OMCP_EXPLORE_BIN: stub });
       if (shouldSkipForSpawnPermissions(result.error)) return;
       assert.equal(result.status, 0, result.stderr || result.stdout);
       assert.equal(result.stdout, '# Answer\nReady to proceed\n');
@@ -842,7 +842,7 @@ describe('exploreCommand', () => {
         const codexStub = await writeEnvNodeCodexStub(wd, capturePath);
         const testPath = await createExploreTestPath(wd);
 
-        const result = runOmx(wd, ['explore', '--prompt', 'find buildTmuxPaneCommand'], {
+        const result = runOmcp(wd, ['explore', '--prompt', 'find buildTmuxPaneCommand'], {
           OMCP_EXPLORE_CODEX_BIN: codexStub,
           PATH: testPath,
         });
@@ -872,7 +872,7 @@ describe('exploreCommand', () => {
         const codexShim = await writePosixPackageManagerCodexShim(wd, capturePath);
         const testPath = await createExploreTestPath(wd);
 
-        const result = runOmx(wd, ['explore', '--prompt', 'find buildTmuxPaneCommand'], {
+        const result = runOmcp(wd, ['explore', '--prompt', 'find buildTmuxPaneCommand'], {
           OMCP_EXPLORE_CODEX_BIN: codexShim,
           PATH: testPath,
         });
@@ -901,7 +901,7 @@ describe('exploreCommand', () => {
         const promptPath = join(wd, 'prompt.md');
         await writeFile(promptPath, 'find prompt-file support\n');
 
-        const result = runOmx(wd, ['explore', '--prompt-file', promptPath], {
+        const result = runOmcp(wd, ['explore', '--prompt-file', promptPath], {
           OMCP_EXPLORE_CODEX_BIN: codexStub,
           PATH: testPath,
         });

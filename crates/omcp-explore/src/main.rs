@@ -585,7 +585,7 @@ fn resolve_host_command(command: &str) -> Option<PathBuf> {
     let candidate = Path::new(command);
     if candidate.is_absolute()
         && is_usable_host_command(candidate)
-        && !is_omx_explore_allowlist_path(candidate)
+        && !is_omcp_explore_allowlist_path(candidate)
     {
         return Some(candidate.to_path_buf());
     }
@@ -593,14 +593,14 @@ fn resolve_host_command(command: &str) -> Option<PathBuf> {
     let path = env::var_os("PATH")?;
     for entry in env::split_paths(&path) {
         let resolved = entry.join(command);
-        if is_usable_host_command(&resolved) && !is_omx_explore_allowlist_path(&resolved) {
+        if is_usable_host_command(&resolved) && !is_omcp_explore_allowlist_path(&resolved) {
             return Some(resolved);
         }
     }
     None
 }
 
-fn is_omx_explore_allowlist_path(path: &Path) -> bool {
+fn is_omcp_explore_allowlist_path(path: &Path) -> bool {
     fn is_under_allowlist_bin(path: &Path) -> bool {
         path.ancestors().any(|ancestor| {
             let is_allowlist_root = ancestor
@@ -1320,7 +1320,7 @@ exec node "$basedir/../@openai/codex/bin/codex.js" "$@"
 
     #[cfg(unix)]
     #[test]
-    fn resolve_host_command_skips_omx_explore_allowlist_wrappers() {
+    fn resolve_host_command_skips_omcp_explore_allowlist_wrappers() {
         let _guard = env_lock();
         let allowlist_root = temp_allowlist_dir().expect("allowlist root");
         let real_root = TempDirGuard {
@@ -1385,7 +1385,7 @@ exec node "$basedir/../@openai/codex/bin/codex.js" "$@"
     }
 
     #[test]
-    fn discover_codex_support_dirs_includes_home_omx_and_codex_when_present() {
+    fn discover_codex_support_dirs_includes_home_omcp_and_codex_when_present() {
         let _guard = env_lock();
         let root = temp_allowlist_dir().expect("temp root");
         let home_dir = root.path.join("home");

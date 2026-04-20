@@ -123,7 +123,7 @@ const MCP_TRANSPORT_FAILURE_PATTERNS = [
   /mcp(?: server)? .*closed/i,
 ];
 
-type OmxParityCommand =
+type OmcpParityCommand =
   | "state"
   | "notepad"
   | "project-memory"
@@ -147,7 +147,7 @@ export function detectMcpTransportFailure(
 
   const mcpContextDetected = isMcpLikeToolName(normalized.toolName)
     || /\bmcp\b/i.test(combined)
-    || /\bomx-(?:state|memory|trace|code-intel)-server\b/i.test(combined);
+    || /\bomcp-(?:state|memory|trace|code-intel)-server\b/i.test(combined);
   if (!mcpContextDetected) return null;
   if (!combined) return null;
   if (!MCP_TRANSPORT_FAILURE_PATTERNS.some((pattern) => pattern.test(combined))) {
@@ -160,8 +160,8 @@ export function detectMcpTransportFailure(
   };
 }
 
-function resolveOmxParityTarget(toolName: string): { command: OmxParityCommand; tool: string } | null {
-  const match = toolName.match(/^mcp__omx_(state|memory|trace|code_intel)__([a-z0-9_]+)$/i);
+function resolveOmcpParityTarget(toolName: string): { command: OmcpParityCommand; tool: string } | null {
+  const match = toolName.match(/^mcp__omcp_(state|memory|trace|code_intel)__([a-z0-9_]+)$/i);
   if (!match) return null;
 
   const [, server, tool] = match;
@@ -181,8 +181,8 @@ function shellSingleQuote(value: string): string {
   return `'${value.replace(/'/g, `'\"'\"'`)}'`;
 }
 
-function buildOmxParityFallbackCommand(payload: CodexHookPayload, toolName: string): string | null {
-  const target = resolveOmxParityTarget(toolName);
+function buildOmcpParityFallbackCommand(payload: CodexHookPayload, toolName: string): string | null {
+  const target = resolveOmcpParityTarget(toolName);
   if (!target) return null;
   const input = safeObject(payload.tool_input) ?? {};
   return `omcp ${target.command} ${target.tool} --input ${shellSingleQuote(JSON.stringify(input))} --json`;
@@ -589,7 +589,7 @@ export function buildNativePostToolUseOutput(
 ): Record<string, unknown> | null {
   const mcpTransportFailure = detectMcpTransportFailure(payload);
   if (mcpTransportFailure) {
-    const fallbackCommand = buildOmxParityFallbackCommand(payload, mcpTransportFailure.toolName);
+    const fallbackCommand = buildOmcpParityFallbackCommand(payload, mcpTransportFailure.toolName);
     const fallbackText = fallbackCommand
       ? `Retry via CLI parity with \`${fallbackCommand}\`.`
       : "Retry via the matching OMCP CLI parity surface instead of retrying the MCP transport blindly.";

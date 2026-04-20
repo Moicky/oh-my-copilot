@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
 import {
-  OmxQuestionError,
-  runOmxQuestion,
-  type OmxQuestionProcessRunner,
+  OmcpQuestionError,
+  runOmcpQuestion,
+  type OmcpQuestionProcessRunner,
 } from '../client.js';
 
-function makeRunner(stdout: unknown, code = 0, stderr = ''): OmxQuestionProcessRunner {
+function makeRunner(stdout: unknown, code = 0, stderr = ''): OmcpQuestionProcessRunner {
   return async () => ({
     code,
     stdout: typeof stdout === 'string' ? stdout : JSON.stringify(stdout),
@@ -14,9 +14,9 @@ function makeRunner(stdout: unknown, code = 0, stderr = ''): OmxQuestionProcessR
   });
 }
 
-describe('runOmxQuestion', () => {
+describe('runOmcpQuestion', () => {
   it('parses a successful blocking stdout payload', async () => {
-    const result = await runOmxQuestion(
+    const result = await runOmcpQuestion(
       {
         question: 'What next?',
         options: [{ label: 'Launch', value: 'launch' }],
@@ -57,7 +57,7 @@ describe('runOmxQuestion', () => {
 
   it('throws explicit question errors from stdout payloads', async () => {
     await assert.rejects(
-      runOmxQuestion(
+      runOmcpQuestion(
         {
           question: 'What next?',
           options: [{ label: 'Launch', value: 'launch' }],
@@ -76,7 +76,7 @@ describe('runOmxQuestion', () => {
         },
       ),
       (error) => {
-        assert.ok(error instanceof OmxQuestionError);
+        assert.ok(error instanceof OmcpQuestionError);
         assert.equal(error.code, 'team_blocked');
         assert.match(error.message, /team_blocked/);
         return true;

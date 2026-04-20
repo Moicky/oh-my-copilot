@@ -6,13 +6,13 @@ import {
 export const OMCP_GENERATED_AGENTS_MARKER = '<!-- omcp:generated:agents-md -->'
 const AUTONOMY_DIRECTIVE_END_MARKER = '<!-- END AUTONOMY DIRECTIVE -->'
 
-export function isOmxGeneratedAgentsMd(content: string): boolean {
+export function isOmcpGeneratedAgentsMd(content: string): boolean {
   return content.includes(OMCP_GENERATED_AGENTS_MARKER)
 }
 
-export function hasOmxManagedAgentsSections(content: string): boolean {
+export function hasOmcpManagedAgentsSections(content: string): boolean {
   return (
-    isOmxGeneratedAgentsMd(content) ||
+    isOmcpGeneratedAgentsMd(content) ||
     (content.includes(OMCP_MODELS_START_MARKER) &&
       content.includes(OMCP_MODELS_END_MARKER))
   )

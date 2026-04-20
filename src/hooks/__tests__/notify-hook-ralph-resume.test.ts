@@ -130,19 +130,19 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-resume-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const currentOmxSessionId = 'sess-current';
-      const priorOmxSessionId = 'sess-prior';
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
-      const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
+      const currentOmcpSessionId = 'sess-current';
+      const priorOmcpSessionId = 'sess-prior';
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
+      const priorSessionDir = join(stateDir, 'sessions', priorOmcpSessionId);
       const currentPaneId = '%99';
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
       await writeJson(join(priorSessionDir, 'ralph-state.json'), {
         active: true,
         iteration: 4,
         max_iterations: 10,
         current_phase: 'executing',
         started_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: priorOmxSessionId,
+        owner_omcp_session_id: priorOmcpSessionId,
         owner_codex_session_id: 'codex-session-1',
         tmux_pane_id: '%42',
       });
@@ -160,7 +160,7 @@ describe('notify-hook Ralph session resume', () => {
       const currentState = JSON.parse(await readFile(join(currentSessionDir, 'ralph-state.json'), 'utf-8')) as Record<string, unknown>;
       assert.equal(currentState.active, true);
       assert.equal(currentState.iteration, 5);
-      assert.equal(currentState.owner_omx_session_id, currentOmxSessionId);
+      assert.equal(currentState.owner_omcp_session_id, currentOmcpSessionId);
       assert.equal(currentState.owner_codex_session_id, 'codex-session-1');
       assert.equal(currentState.tmux_pane_id, currentPaneId);
 
@@ -177,12 +177,12 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-current-pane-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const currentOmxSessionId = 'sess-current';
-      const priorOmxSessionId = 'sess-prior';
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
-      const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
+      const currentOmcpSessionId = 'sess-current';
+      const priorOmcpSessionId = 'sess-prior';
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
+      const priorSessionDir = join(stateDir, 'sessions', priorOmcpSessionId);
       const currentPaneId = '%77';
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
       await writeJson(join(currentSessionDir, 'ralph-state.json'), {
         active: true,
         iteration: 4,
@@ -196,7 +196,7 @@ describe('notify-hook Ralph session resume', () => {
         max_iterations: 10,
         current_phase: 'executing',
         started_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: priorOmxSessionId,
+        owner_omcp_session_id: priorOmcpSessionId,
         owner_codex_session_id: 'codex-session-1',
         tmux_pane_id: '%42',
       });
@@ -213,7 +213,7 @@ describe('notify-hook Ralph session resume', () => {
 
       const currentState = JSON.parse(await readFile(join(currentSessionDir, 'ralph-state.json'), 'utf-8')) as Record<string, unknown>;
       assert.equal(currentState.active, true);
-      assert.equal(currentState.owner_omx_session_id, currentOmxSessionId);
+      assert.equal(currentState.owner_omcp_session_id, currentOmcpSessionId);
       assert.equal(currentState.owner_codex_session_id, 'codex-session-1');
       assert.equal(currentState.tmux_pane_id, currentPaneId);
       assert.ok(typeof currentState.tmux_pane_set_at === 'string' && currentState.tmux_pane_set_at.length > 0);
@@ -231,17 +231,17 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-current-legacy-owner-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const currentOmxSessionId = 'sess-current';
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
+      const currentOmcpSessionId = 'sess-current';
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
       const currentPaneId = '%79';
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
       await writeJson(join(currentSessionDir, 'ralph-state.json'), {
         active: true,
         iteration: 4,
         max_iterations: 10,
         current_phase: 'executing',
         started_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: currentOmxSessionId,
+        owner_omcp_session_id: currentOmcpSessionId,
         owner_codex_thread_id: 'thread-current-legacy-1',
         tmux_pane_id: '%42',
       });
@@ -257,7 +257,7 @@ describe('notify-hook Ralph session resume', () => {
 
       const currentState = JSON.parse(await readFile(join(currentSessionDir, 'ralph-state.json'), 'utf-8')) as Record<string, unknown>;
       assert.equal(currentState.active, true);
-      assert.equal(currentState.owner_omx_session_id, currentOmxSessionId);
+      assert.equal(currentState.owner_omcp_session_id, currentOmcpSessionId);
       assert.equal(currentState.owner_codex_session_id, undefined);
       assert.equal(currentState.owner_codex_thread_id, 'thread-current-legacy-1');
       assert.equal(currentState.tmux_pane_id, currentPaneId);
@@ -270,19 +270,19 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-thread-turnover-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const priorOmxSessionId = 'sess-prior';
-      const currentOmxSessionId = 'sess-current';
-      const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
+      const priorOmcpSessionId = 'sess-prior';
+      const currentOmcpSessionId = 'sess-current';
+      const priorSessionDir = join(stateDir, 'sessions', priorOmcpSessionId);
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
 
-      await writeJson(join(stateDir, 'session.json'), { session_id: priorOmxSessionId });
+      await writeJson(join(stateDir, 'session.json'), { session_id: priorOmcpSessionId });
       await writeJson(join(priorSessionDir, 'ralph-state.json'), {
         active: true,
         iteration: 4,
         max_iterations: 10,
         current_phase: 'executing',
         started_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: priorOmxSessionId,
+        owner_omcp_session_id: priorOmcpSessionId,
         tmux_pane_id: '%42',
       });
 
@@ -304,7 +304,7 @@ describe('notify-hook Ralph session resume', () => {
       assert.equal(updatedPriorState.owner_codex_thread_id, 'thread-turnover-1');
       assert.equal(updatedPriorState.tmux_pane_id, '%81');
 
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
 
       const secondResult = runNotifyHook(
         buildPayload(wd, {
@@ -320,7 +320,7 @@ describe('notify-hook Ralph session resume', () => {
       ) as Record<string, unknown>;
       assert.equal(currentState.active, true);
       assert.equal(currentState.iteration, 6);
-      assert.equal(currentState.owner_omx_session_id, currentOmxSessionId);
+      assert.equal(currentState.owner_omcp_session_id, currentOmcpSessionId);
       assert.equal(currentState.owner_codex_session_id, undefined);
       assert.equal(currentState.owner_codex_thread_id, 'thread-turnover-1');
       assert.equal(currentState.tmux_pane_id, '%82');
@@ -355,9 +355,9 @@ describe('notify-hook Ralph session resume', () => {
         const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-no-resume-'));
         try {
           const stateDir = join(wd, '.omcp', 'state');
-          const currentOmxSessionId = 'sess-current';
-          const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
-          await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+          const currentOmcpSessionId = 'sess-current';
+          const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
+          await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
           await mkdir(currentSessionDir, { recursive: true });
 
           for (const priorSessionId of scenario.priorSessions) {
@@ -367,7 +367,7 @@ describe('notify-hook Ralph session resume', () => {
               max_iterations: 10,
               current_phase: 'executing',
               started_at: '2026-02-22T00:00:00.000Z',
-              owner_omx_session_id: priorSessionId,
+              owner_omcp_session_id: priorSessionId,
               owner_codex_session_id: 'codex-session-1',
             });
           }
@@ -398,19 +398,19 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-thread-resume-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const currentOmxSessionId = 'sess-current';
-      const priorOmxSessionId = 'sess-prior';
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
-      const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
+      const currentOmcpSessionId = 'sess-current';
+      const priorOmcpSessionId = 'sess-prior';
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
+      const priorSessionDir = join(stateDir, 'sessions', priorOmcpSessionId);
       const currentPaneId = '%55';
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
       await writeJson(join(priorSessionDir, 'ralph-state.json'), {
         active: true,
         iteration: 4,
         max_iterations: 10,
         current_phase: 'executing',
         started_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: priorOmxSessionId,
+        owner_omcp_session_id: priorOmcpSessionId,
         owner_codex_thread_id: 'thread-legacy-1',
         tmux_pane_id: '%42',
       });
@@ -428,7 +428,7 @@ describe('notify-hook Ralph session resume', () => {
       const currentState = JSON.parse(await readFile(join(currentSessionDir, 'ralph-state.json'), 'utf-8')) as Record<string, unknown>;
       assert.equal(currentState.active, true);
       assert.equal(currentState.iteration, 5);
-      assert.equal(currentState.owner_omx_session_id, currentOmxSessionId);
+      assert.equal(currentState.owner_omcp_session_id, currentOmcpSessionId);
       assert.equal(currentState.owner_codex_session_id, 'codex-session-1');
       assert.equal(currentState.owner_codex_thread_id, undefined);
       assert.equal(currentState.tmux_pane_id, currentPaneId);
@@ -446,11 +446,11 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-session-precedence-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const currentOmxSessionId = 'sess-current';
-      const priorOmxSessionId = 'sess-prior';
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
-      const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      const currentOmcpSessionId = 'sess-current';
+      const priorOmcpSessionId = 'sess-prior';
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
+      const priorSessionDir = join(stateDir, 'sessions', priorOmcpSessionId);
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
       await mkdir(currentSessionDir, { recursive: true });
       await writeJson(join(priorSessionDir, 'ralph-state.json'), {
         active: true,
@@ -458,7 +458,7 @@ describe('notify-hook Ralph session resume', () => {
         max_iterations: 10,
         current_phase: 'executing',
         started_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: priorOmxSessionId,
+        owner_omcp_session_id: priorOmcpSessionId,
         owner_codex_session_id: 'codex-session-other',
         owner_codex_thread_id: 'thread-shared-1',
       });
@@ -484,11 +484,11 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-empty-thread-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const currentOmxSessionId = 'sess-current';
-      const priorOmxSessionId = 'sess-prior';
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
-      const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      const currentOmcpSessionId = 'sess-current';
+      const priorOmcpSessionId = 'sess-prior';
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
+      const priorSessionDir = join(stateDir, 'sessions', priorOmcpSessionId);
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
       await mkdir(currentSessionDir, { recursive: true });
       await writeJson(join(priorSessionDir, 'ralph-state.json'), {
         active: true,
@@ -496,7 +496,7 @@ describe('notify-hook Ralph session resume', () => {
         max_iterations: 10,
         current_phase: 'executing',
         started_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: priorOmxSessionId,
+        owner_omcp_session_id: priorOmcpSessionId,
       });
 
       const result = runNotifyHook(buildPayload(wd, {
@@ -519,11 +519,11 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-blocked-on-user-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const currentOmxSessionId = 'sess-current';
-      const priorOmxSessionId = 'sess-prior';
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
-      const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      const currentOmcpSessionId = 'sess-current';
+      const priorOmcpSessionId = 'sess-prior';
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
+      const priorSessionDir = join(stateDir, 'sessions', priorOmcpSessionId);
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
       await mkdir(currentSessionDir, { recursive: true });
       await writeJson(join(priorSessionDir, 'ralph-state.json'), {
         active: false,
@@ -531,7 +531,7 @@ describe('notify-hook Ralph session resume', () => {
         max_iterations: 10,
         current_phase: 'blocked_on_user',
         completed_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: priorOmxSessionId,
+        owner_omcp_session_id: priorOmcpSessionId,
         owner_codex_session_id: 'codex-session-1',
       });
 
@@ -555,11 +555,11 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-inactive-current-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const currentOmxSessionId = 'sess-current';
-      const priorOmxSessionId = 'sess-prior';
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
-      const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      const currentOmcpSessionId = 'sess-current';
+      const priorOmcpSessionId = 'sess-prior';
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
+      const priorSessionDir = join(stateDir, 'sessions', priorOmcpSessionId);
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
       await writeJson(join(currentSessionDir, 'ralph-state.json'), {
         active: false,
         iteration: 4,
@@ -567,7 +567,7 @@ describe('notify-hook Ralph session resume', () => {
         current_phase: 'cancelled',
         started_at: '2026-02-22T00:00:00.000Z',
         completed_at: '2026-02-22T00:10:00.000Z',
-        owner_omx_session_id: currentOmxSessionId,
+        owner_omcp_session_id: currentOmcpSessionId,
       });
       await writeJson(join(priorSessionDir, 'ralph-state.json'), {
         active: true,
@@ -575,7 +575,7 @@ describe('notify-hook Ralph session resume', () => {
         max_iterations: 10,
         current_phase: 'executing',
         started_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: priorOmxSessionId,
+        owner_omcp_session_id: priorOmcpSessionId,
         owner_codex_session_id: 'codex-session-1',
       });
 
@@ -589,7 +589,7 @@ describe('notify-hook Ralph session resume', () => {
       const currentState = JSON.parse(await readFile(join(currentSessionDir, 'ralph-state.json'), 'utf-8')) as Record<string, unknown>;
       assert.equal(currentState.active, false);
       assert.equal(currentState.current_phase, 'cancelled');
-      assert.equal(currentState.owner_omx_session_id, currentOmxSessionId);
+      assert.equal(currentState.owner_omcp_session_id, currentOmcpSessionId);
 
       const priorState = JSON.parse(await readFile(join(priorSessionDir, 'ralph-state.json'), 'utf-8')) as Record<string, unknown>;
       assert.equal(priorState.active, true);
@@ -604,11 +604,11 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-unreadable-current-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const currentOmxSessionId = 'sess-current';
-      const priorOmxSessionId = 'sess-prior';
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
-      const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      const currentOmcpSessionId = 'sess-current';
+      const priorOmcpSessionId = 'sess-prior';
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
+      const priorSessionDir = join(stateDir, 'sessions', priorOmcpSessionId);
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
       await mkdir(currentSessionDir, { recursive: true });
       await writeFile(join(currentSessionDir, 'ralph-state.json'), '{ "active": true');
       await writeJson(join(priorSessionDir, 'ralph-state.json'), {
@@ -617,7 +617,7 @@ describe('notify-hook Ralph session resume', () => {
         max_iterations: 10,
         current_phase: 'executing',
         started_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: priorOmxSessionId,
+        owner_omcp_session_id: priorOmcpSessionId,
         owner_codex_session_id: 'codex-session-1',
       });
 
@@ -644,18 +644,18 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-concurrent-resume-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const currentOmxSessionId = 'sess-current';
-      const priorOmxSessionId = 'sess-prior';
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
-      const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      const currentOmcpSessionId = 'sess-current';
+      const priorOmcpSessionId = 'sess-prior';
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
+      const priorSessionDir = join(stateDir, 'sessions', priorOmcpSessionId);
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
       await writeJson(join(priorSessionDir, 'ralph-state.json'), {
         active: true,
         iteration: 4,
         max_iterations: 10,
         current_phase: 'executing',
         started_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: priorOmxSessionId,
+        owner_omcp_session_id: priorOmcpSessionId,
         owner_codex_session_id: 'codex-session-1',
         tmux_pane_id: '%42',
       });
@@ -704,7 +704,7 @@ describe('notify-hook Ralph session resume', () => {
 
         const currentState = JSON.parse(await readFile(join(currentSessionDir, 'ralph-state.json'), 'utf-8')) as Record<string, unknown>;
         assert.equal(currentState.active, true);
-        assert.equal(currentState.owner_omx_session_id, currentOmxSessionId);
+        assert.equal(currentState.owner_omcp_session_id, currentOmcpSessionId);
         assert.equal(currentState.owner_codex_session_id, 'codex-session-1');
         assert.equal(currentState.tmux_pane_id, '%56');
 
@@ -722,18 +722,18 @@ describe('notify-hook Ralph session resume', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-notify-ralph-transfer-rollback-'));
     try {
       const stateDir = join(wd, '.omcp', 'state');
-      const currentOmxSessionId = 'sess-current';
-      const priorOmxSessionId = 'sess-prior';
-      const currentSessionDir = join(stateDir, 'sessions', currentOmxSessionId);
-      const priorSessionDir = join(stateDir, 'sessions', priorOmxSessionId);
-      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmxSessionId });
+      const currentOmcpSessionId = 'sess-current';
+      const priorOmcpSessionId = 'sess-prior';
+      const currentSessionDir = join(stateDir, 'sessions', currentOmcpSessionId);
+      const priorSessionDir = join(stateDir, 'sessions', priorOmcpSessionId);
+      await writeJson(join(stateDir, 'session.json'), { session_id: currentOmcpSessionId });
       await writeJson(join(priorSessionDir, 'ralph-state.json'), {
         active: true,
         iteration: 4,
         max_iterations: 10,
         current_phase: 'executing',
         started_at: '2026-02-22T00:00:00.000Z',
-        owner_omx_session_id: priorOmxSessionId,
+        owner_omcp_session_id: priorOmcpSessionId,
         owner_codex_session_id: 'codex-session-1',
         tmux_pane_id: '%42',
       });

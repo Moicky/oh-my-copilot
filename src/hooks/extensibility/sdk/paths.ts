@@ -22,6 +22,6 @@ export function hookPluginLogPath(cwd: string, now = new Date()): string {
   return join(cwd, '.omcp', 'logs', `hooks-${day}.jsonl`);
 }
 
-export function omxRootStateFilePath(cwd: string, fileName: string): string {
+export function omcpRootStateFilePath(cwd: string, fileName: string): string {
   return join(cwd, '.omcp', 'state', fileName);
 }

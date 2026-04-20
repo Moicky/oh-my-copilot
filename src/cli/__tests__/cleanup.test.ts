@@ -2,12 +2,12 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   cleanupCommand,
-  cleanupOmxMcpProcesses,
+  cleanupOmcpMcpProcesses,
   cleanupStaleTmpDirectories,
   findCleanupCandidates,
   findLaunchSafeCleanupCandidates,
-  isOmxMcpProcess,
-  listOmxProcesses,
+  isOmcpMcpProcess,
+  listOmcpProcesses,
   type ProcessEntry,
 } from '../cleanup.js';
 
@@ -58,7 +58,7 @@ const CURRENT_SESSION_PROCESSES: ProcessEntry[] = [
 
 describe('findCleanupCandidates', () => {
   it('does not treat legacy team-server entrypoints as active OMCP MCP processes', () => {
-    assert.equal(isOmxMcpProcess('node /tmp/worktree/dist/mcp/team-server.js'), false);
+    assert.equal(isOmcpMcpProcess('node /tmp/worktree/dist/mcp/team-server.js'), false);
   });
 
   it('selects orphaned OMCP MCP processes while preserving the current session tree', () => {
@@ -149,12 +149,12 @@ describe('findCleanupCandidates', () => {
   });
 });
 
-describe('listOmxProcesses', () => {
+describe('listOmcpProcesses', () => {
   it('parses valid Windows process discovery rows on win32', () => {
     const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
     Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
     try {
-      const processes = listOmxProcesses(() => [
+      const processes = listOmcpProcesses(() => [
         JSON.stringify({ pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-copilot/dist/mcp/state-server.js' }),
         JSON.stringify({ pid: 810, ppid: 42, command: 'node C:/tmp/oh-my-copilot/dist/mcp/trace-server.js' }),
       ].join('\n'));
@@ -171,7 +171,7 @@ describe('listOmxProcesses', () => {
     const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
     Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
     try {
-      const processes = listOmxProcesses(() => [
+      const processes = listOmcpProcesses(() => [
         JSON.stringify({ pid: 800, ppid: 1, command: 'node C:/tmp/oh-my-copilot/dist/mcp/state-server.js' }),
         JSON.stringify({ pid: 'abc', ppid: 1, command: 'node malformed.js' }),
         JSON.stringify({ pid: 901, ppid: -1, command: 'node malformed.js' }),
@@ -190,7 +190,7 @@ describe('listOmxProcesses', () => {
     const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform');
     Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
     try {
-      const parsed = listOmxProcesses(() => [
+      const parsed = listOmcpProcesses(() => [
         JSON.stringify({ pid: 700, ppid: 500, command: 'codex' }),
         JSON.stringify({ pid: 701, ppid: 700, command: 'node C:/repo/bin/omcp.js cleanup --dry-run' }),
         JSON.stringify({ pid: 710, ppid: 700, command: 'node C:/repo/dist/mcp/state-server.js' }),
@@ -219,12 +219,12 @@ describe('listOmxProcesses', () => {
   });
 });
 
-describe('cleanupOmxMcpProcesses', () => {
+describe('cleanupOmcpMcpProcesses', () => {
   it('supports dry-run without sending signals', async () => {
     const lines: string[] = [];
     let signalCount = 0;
 
-    const result = await cleanupOmxMcpProcesses(['--dry-run'], {
+    const result = await cleanupOmcpMcpProcesses(['--dry-run'], {
       currentPid: 701,
       listProcesses: () => CURRENT_SESSION_PROCESSES,
       sendSignal: () => {
@@ -247,7 +247,7 @@ describe('cleanupOmxMcpProcesses', () => {
     const alive = new Set([800, 810]);
     let fakeNow = 0;
 
-    const result = await cleanupOmxMcpProcesses([], {
+    const result = await cleanupOmcpMcpProcesses([], {
       currentPid: 701,
       listProcesses: () => [
         ...CURRENT_SESSION_PROCESSES.filter((processEntry) => processEntry.pid !== 821 && processEntry.pid !== 831),
@@ -281,7 +281,7 @@ describe('cleanupOmxMcpProcesses', () => {
     const lines: string[] = [];
     const signals: Array<{ pid: number; signal: NodeJS.Signals }> = [];
 
-    const result = await cleanupOmxMcpProcesses([], {
+    const result = await cleanupOmcpMcpProcesses([], {
       currentPid: 701,
       listProcesses: () => CURRENT_SESSION_PROCESSES,
       selectCandidates: findLaunchSafeCleanupCandidates,

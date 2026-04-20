@@ -26,16 +26,16 @@ type HooksFile = {
   [key: string]: unknown;
 };
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, "..", "..", "..");
-  const omxBin = join(repoRoot, "dist", "cli", "omcp.js");
+  const omcpBin = join(repoRoot, "dist", "cli", "omcp.js");
   const resolvedHome = envOverrides.HOME ?? process.env.HOME;
-  const result = spawnSync(process.execPath, [omxBin, ...argv], {
+  const result = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: "utf-8",
     env: {
@@ -113,7 +113,7 @@ describe("omcp setup/uninstall shared ownership for native hooks", () => {
         },
       });
 
-      const setupResult = runOmx(wd, ["setup", "--scope", "project"], {
+      const setupResult = runOmcp(wd, ["setup", "--scope", "project"], {
         HOME: home,
       });
       if (shouldSkipForSpawnPermissions(setupResult.error)) return;
@@ -153,7 +153,7 @@ describe("omcp setup/uninstall shared ownership for native hooks", () => {
       const home = join(wd, "home");
       await mkdir(home, { recursive: true });
 
-      const initial = runOmx(wd, ["setup", "--scope", "project"], { HOME: home });
+      const initial = runOmcp(wd, ["setup", "--scope", "project"], { HOME: home });
       if (shouldSkipForSpawnPermissions(initial.error)) return;
       assert.equal(initial.status, 0, initial.stderr || initial.stdout);
 
@@ -184,7 +184,7 @@ describe("omcp setup/uninstall shared ownership for native hooks", () => {
         },
       });
 
-      const refreshedSetup = runOmx(wd, ["setup", "--scope", "project"], { HOME: home });
+      const refreshedSetup = runOmcp(wd, ["setup", "--scope", "project"], { HOME: home });
       if (shouldSkipForSpawnPermissions(refreshedSetup.error)) return;
       assert.equal(refreshedSetup.status, 0, refreshedSetup.stderr || refreshedSetup.stdout);
 
@@ -225,7 +225,7 @@ describe("omcp setup/uninstall shared ownership for native hooks", () => {
       const home = join(wd, "home");
       await mkdir(home, { recursive: true });
 
-      const initial = runOmx(wd, ["setup", "--scope", "project"], { HOME: home });
+      const initial = runOmcp(wd, ["setup", "--scope", "project"], { HOME: home });
       if (shouldSkipForSpawnPermissions(initial.error)) return;
       assert.equal(initial.status, 0, initial.stderr || initial.stdout);
 
@@ -247,7 +247,7 @@ describe("omcp setup/uninstall shared ownership for native hooks", () => {
         },
       });
 
-      const uninstall = runOmx(wd, ["uninstall"], { HOME: home });
+      const uninstall = runOmcp(wd, ["uninstall"], { HOME: home });
       if (shouldSkipForSpawnPermissions(uninstall.error)) return;
       assert.equal(uninstall.status, 0, uninstall.stderr || uninstall.stdout);
 

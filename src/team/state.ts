@@ -3,7 +3,7 @@ import { join, dirname, resolve, sep } from 'path';
 import { existsSync } from 'fs';
 import { randomUUID } from 'crypto';
 import { readUsableSessionState } from '../hooks/session.js';
-import { omxStateDir } from '../utils/paths.js';
+import { omcpStateDir } from '../utils/paths.js';
 import { isTerminalPhase, type TeamPhase, type TerminalPhase } from './orchestrator.js';
 import {
   computeTaskReadiness as computeTaskReadinessImpl,
@@ -549,7 +549,7 @@ function resolveTeamStateRoot(cwd: string, env: NodeJS.ProcessEnv = process.env)
   if (typeof explicit === 'string' && explicit.trim() !== '') {
     return resolve(cwd, explicit.trim());
   }
-  return omxStateDir(cwd);
+  return omcpStateDir(cwd);
 }
 
 function teamDir(teamName: string, cwd: string): string {
@@ -2067,7 +2067,7 @@ export async function markOwnedTeamsLeaderStopObserved(
   source: TeamLeaderAttentionState['source'] = 'native_stop',
 ): Promise<string[]> {
   if (!leaderSessionId.trim()) return [];
-  const teamsRoot = join(omxStateDir(cwd), 'team');
+  const teamsRoot = join(omcpStateDir(cwd), 'team');
   if (!existsSync(teamsRoot)) return [];
   const entries = await readdir(teamsRoot, { withFileTypes: true }).catch(() => []);
   const updatedTeams: string[] = [];

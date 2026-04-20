@@ -23,15 +23,15 @@ import {
   codexPromptsDir,
   codexAgentsDir,
   userSkillsDir,
-  omxStateDir,
+  omcpStateDir,
   detectLegacySkillRootOverlap,
-  omxPlansDir,
-  omxLogsDir,
+  omcpPlansDir,
+  omcpLogsDir,
 } from "../utils/paths.js";
 import {
   buildMergedConfig,
   getRootModelName,
-  hasLegacyOmxTeamRunTable,
+  hasLegacyOmcpTeamRunTable,
 } from "../config/generator.js";
 import { mergeManagedCodexHooksConfig } from "../config/codex-hooks.js";
 import {
@@ -50,8 +50,8 @@ import { tryReadCatalogManifest } from "../catalog/reader.js";
 import { DEFAULT_FRONTIER_MODEL } from "../config/models.js";
 import {
   addGeneratedAgentsMarker,
-  hasOmxManagedAgentsSections,
-  isOmxGeneratedAgentsMd,
+  hasOmcpManagedAgentsSections,
+  isOmcpGeneratedAgentsMd,
 } from "../utils/agents-md.js";
 import {
   resolveAgentsModelTableContext,
@@ -117,7 +117,7 @@ interface SetupBackupContext {
 
 interface ManagedConfigResult {
   finalConfig: string;
-  omxManagesTui: boolean;
+  omcpManagesTui: boolean;
   repairedLegacyTeamRunTable: boolean;
 }
 
@@ -540,7 +540,7 @@ function probeInstalledCodexVersion(): string | null {
   return stdout === "" ? null : stdout;
 }
 
-function shouldOmxManageTuiFromCodexVersion(versionOutput: string | null): boolean {
+function shouldOmcpManageTuiFromCodexVersion(versionOutput: string | null): boolean {
   if (!versionOutput) return true;
   const parsed = parseSemverTriplet(versionOutput);
   if (!parsed) return true;
@@ -708,9 +708,9 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     scopeDirs.promptsDir,
     scopeDirs.skillsDir,
     scopeDirs.nativeAgentsDir,
-    omxStateDir(projectRoot),
-    omxPlansDir(projectRoot),
-    omxLogsDir(projectRoot),
+    omcpStateDir(projectRoot),
+    omcpPlansDir(projectRoot),
+    omcpLogsDir(projectRoot),
   ];
   for (const dir of dirs) {
     if (!dryRun) {
@@ -934,7 +934,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     if (agentsMdExists) {
       const existing = await readFile(agentsMdDst, "utf-8");
       changed = existing !== rewritten;
-      if (hasOmxManagedAgentsSections(existing)) {
+      if (hasOmcpManagedAgentsSections(existing)) {
         managedRefreshContent = upsertAgentsModelTable(
           existing,
           modelTableContext,
@@ -1032,7 +1032,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   } else {
     console.log("  HUD config already exists (use --force to overwrite).");
   }
-  if (managedConfig.omxManagesTui) {
+  if (managedConfig.omcpManagesTui) {
     console.log("  StatusLine configured in config.toml via [tui] section.");
   } else {
     console.log("  Codex CLI >= 0.107.0 manages [tui]; OMCP left that section untouched.");
@@ -1240,7 +1240,7 @@ async function syncManagedAgentsContent(
     if (!shouldOverwrite) {
       summary.skipped += 1;
       if (options.verbose) {
-        const managedLabel = isOmxGeneratedAgentsMd(existing)
+        const managedLabel = isOmcpGeneratedAgentsMd(existing)
           ? "managed"
           : "unmanaged";
         console.log(`  skipped ${managedLabel} AGENTS.md at ${dstPath}`);
@@ -1617,12 +1617,12 @@ async function updateManagedConfig(
   const existing = existsSync(configPath)
     ? await readFile(configPath, "utf-8")
     : "";
-  const hadLegacyTeamRunTable = hasLegacyOmxTeamRunTable(existing);
+  const hadLegacyTeamRunTable = hasLegacyOmcpTeamRunTable(existing);
   const currentModel = getRootModelName(existing);
   let modelOverride: string | undefined;
   const codexVersion =
     options.codexVersionProbe?.() ?? probeInstalledCodexVersion();
-  const omxManagesTui = shouldOmxManageTuiFromCodexVersion(codexVersion);
+  const omcpManagesTui = shouldOmcpManageTuiFromCodexVersion(codexVersion);
 
   if (currentModel === LEGACY_SETUP_MODEL) {
     const shouldPrompt =
@@ -1639,7 +1639,7 @@ async function updateManagedConfig(
   }
 
   const finalConfig = buildMergedConfig(existing, pkgRoot, {
-    includeTui: omxManagesTui,
+    includeTui: omcpManagesTui,
     modelOverride,
     sharedMcpServers: sharedMcpRegistry.servers,
     sharedMcpRegistrySource: sharedMcpRegistry.sourcePath,
@@ -1651,7 +1651,7 @@ async function updateManagedConfig(
     summary.unchanged += 1;
     return {
       finalConfig,
-      omxManagesTui,
+      omcpManagesTui,
       repairedLegacyTeamRunTable: false,
     };
   }
@@ -1690,9 +1690,9 @@ async function updateManagedConfig(
   }
   return {
     finalConfig,
-    omxManagesTui,
+    omcpManagesTui,
     repairedLegacyTeamRunTable:
-      hadLegacyTeamRunTable && !hasLegacyOmxTeamRunTable(finalConfig),
+      hadLegacyTeamRunTable && !hasLegacyOmcpTeamRunTable(finalConfig),
   };
 }
 

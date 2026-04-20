@@ -57,7 +57,7 @@ const OMCP_TUI_STATUS_LINE =
 const LEGACY_OMX_TEAM_RUN_TABLE_PATTERN =
   /^\s*\[mcp_servers\.(?:"omcp_team_run"|omcp_team_run)\]\s*$/m;
 
-export function hasLegacyOmxTeamRunTable(config: string): boolean {
+export function hasLegacyOmcpTeamRunTable(config: string): boolean {
   return LEGACY_OMX_TEAM_RUN_TABLE_PATTERN.test(config);
 }
 
@@ -81,7 +81,7 @@ function parseRootKeyValues(config: string): Map<string, string> {
   return values;
 }
 
-function getOmxTopLevelLines(
+function getOmcpTopLevelLines(
   pkgRoot: string,
   existingConfig = "",
   modelOverride?: string,
@@ -169,7 +169,7 @@ function stripOrphanedManagedNotify(config: string): string {
  * Remove any existing OMCP-owned top-level keys so we can re-insert them
  * cleanly. Also removes the comment line that precedes them.
  */
-export function stripOmxTopLevelKeys(config: string): string {
+export function stripOmcpTopLevelKeys(config: string): string {
   return stripRootLevelKeys(config, OMCP_TOP_LEVEL_KEYS);
 }
 
@@ -343,7 +343,7 @@ function upsertAgentsSettings(config: string): string {
  * Remove OMCP-owned feature flags from the [features] section.
  * If the section becomes empty after removal, remove the section header too.
  */
-export function stripOmxFeatureFlags(config: string): string {
+export function stripOmcpFeatureFlags(config: string): string {
   const lines = config.split(/\r?\n/);
   const featuresStart = lines.findIndex((line) =>
     /^\s*\[features\]\s*$/.test(line),
@@ -359,14 +359,14 @@ export function stripOmxFeatureFlags(config: string): string {
     }
   }
 
-  const omxFlags = ["multi_agent", "child_agents_md", "codex_hooks", "collab"];
+  const omcpFlags = ["multi_agent", "child_agents_md", "codex_hooks", "collab"];
   const filtered: string[] = [];
   for (let i = 0; i < lines.length; i++) {
     if (i > featuresStart && i < sectionEnd) {
-      const isOmxFlag = omxFlags.some((f) =>
+      const isOmcpFlag = omcpFlags.some((f) =>
         new RegExp(`^\\s*${f}\\s*=`).test(lines[i]),
       );
-      if (isOmxFlag) continue;
+      if (isOmcpFlag) continue;
     }
     filtered.push(lines[i]);
   }
@@ -392,7 +392,7 @@ export function stripOmxFeatureFlags(config: string): string {
   return filtered.join("\n");
 }
 
-export function stripOmxEnvSettings(config: string): string {
+export function stripOmcpEnvSettings(config: string): string {
   const lines = config.split(/\r?\n/);
   const envStart = lines.findIndex((line) => /^\s*\[env\]\s*$/.test(line));
 
@@ -409,10 +409,10 @@ export function stripOmxEnvSettings(config: string): string {
   const filtered: string[] = [];
   for (let i = 0; i < lines.length; i++) {
     if (i > envStart && i < sectionEnd) {
-      const isOmxEnvKey = new RegExp(
+      const isOmcpEnvKey = new RegExp(
         `^\\s*${OMCP_EXPLORE_CMD_ENV}\\s*=`,
       ).test(lines[i]);
-      if (isOmxEnvKey) continue;
+      if (isOmcpEnvKey) continue;
     }
     filtered.push(lines[i]);
   }
@@ -443,7 +443,7 @@ export function stripOmxEnvSettings(config: string): string {
  * Check whether a TOML table name belongs to a legacy OMCP-managed agent entry.
  * Handles both `agents.name` and `agents."name"` forms.
  */
-function isLegacyOmxAgentSection(tableName: string): boolean {
+function isLegacyOmcpAgentSection(tableName: string): boolean {
   const m = tableName.match(/^agents\.(?:"([^"]+)"|(\w[\w-]*))$/);
   if (!m) return false;
   const name = m[1] || m[2] || "";
@@ -457,7 +457,7 @@ function isLegacyOmxAgentSection(tableName: string): boolean {
  *
  * Targets: [mcp_servers.omcp_*], legacy [agents.<name>] entries, [tui]
  */
-function stripOrphanedOmxSections(config: string): string {
+function stripOrphanedOmcpSections(config: string): string {
   const lines = config.split(/\r?\n/);
   const result: string[] = [];
 
@@ -469,13 +469,13 @@ function stripOrphanedOmxSections(config: string): string {
     if (tableMatch) {
       const tableName = tableMatch[1];
       // Note: [tui] is NOT stripped here because it could be user-owned.
-      // The marker-based stripExistingOmxBlocks already handles [tui]
+      // The marker-based stripExistingOmcpBlocks already handles [tui]
       // when it lives inside the OMCP marker block.
-      const isOmxSection =
+      const isOmcpSection =
         /^mcp_servers\.omcp_/.test(tableName) ||
-        isLegacyOmxAgentSection(tableName);
+        isLegacyOmcpAgentSection(tableName);
 
-      if (isOmxSection) {
+      if (isOmcpSection) {
         // Remove preceding OMCP comment lines and blank lines
         while (result.length > 0) {
           const last = result[result.length - 1];
@@ -577,7 +577,7 @@ function upsertTuiStatusLine(config: string): {
 // OMCP [table] sections block (appended at end of file)
 // ---------------------------------------------------------------------------
 
-export function stripExistingOmxBlocks(config: string): {
+export function stripExistingOmcpBlocks(config: string): {
   cleaned: string;
   removed: number;
 } {
@@ -831,7 +831,7 @@ function getSharedMcpRegistryBlock(
  * OMCP table-section block (MCP servers, TUI).
  * Contains ONLY [table] sections — no bare keys.
  */
-function getOmxTablesBlock(pkgRoot: string, includeTui = true): string {
+function getOmcpTablesBlock(pkgRoot: string, includeTui = true): string {
   const stateServerPath = escapeTomlString(
     join(pkgRoot, "dist", "mcp", "state-server.js"),
   );
@@ -928,7 +928,7 @@ export function buildMergedConfig(
   const includeTui = options.includeTui !== false;
 
   if (existing.includes("oh-my-copilot (OMCP) Configuration")) {
-    const stripped = stripExistingOmxBlocks(existing);
+    const stripped = stripExistingOmcpBlocks(existing);
     existing = stripped.cleaned;
   }
   if (existing.includes(SHARED_MCP_REGISTRY_MARKER)) {
@@ -936,12 +936,12 @@ export function buildMergedConfig(
     existing = stripped.cleaned;
   }
 
-  existing = stripOmxTopLevelKeys(existing);
+  existing = stripOmcpTopLevelKeys(existing);
   existing = stripOrphanedManagedNotify(existing);
   if (options.modelOverride) {
     existing = stripRootLevelKeys(existing, ["model"]);
   }
-  existing = stripOrphanedOmxSections(existing);
+  existing = stripOrphanedOmcpSections(existing);
   existing = upsertFeatureFlags(existing);
   existing = upsertEnvSettings(existing);
   existing = upsertAgentsSettings(existing);
@@ -950,12 +950,12 @@ export function buildMergedConfig(
     : { cleaned: existing, hadExistingTui: false };
   existing = tuiUpsert.cleaned;
 
-  const topLines = getOmxTopLevelLines(
+  const topLines = getOmcpTopLevelLines(
     pkgRoot,
     existing,
     options.modelOverride,
   );
-  const tablesBlock = getOmxTablesBlock(
+  const tablesBlock = getOmcpTablesBlock(
     pkgRoot,
     includeTui && !tuiUpsert.hadExistingTui,
   );
@@ -995,7 +995,7 @@ export async function repairConfigIfNeeded(
 
   const content = await readFile(configPath, "utf-8");
   const tuiCount = (content.match(/^\s*\[tui\]\s*$/gm) || []).length;
-  const hasLegacyTeamRunTable = hasLegacyOmxTeamRunTable(content);
+  const hasLegacyTeamRunTable = hasLegacyOmcpTeamRunTable(content);
   const hasLauncherTimeoutGap = findLauncherTimeoutRepairTargets(content).length > 0;
   if (tuiCount <= 1 && !hasLegacyTeamRunTable && !hasLauncherTimeoutGap) return false;
 
@@ -1018,7 +1018,7 @@ export async function mergeConfig(
   }
 
   if (existing.includes("oh-my-copilot (OMCP) Configuration")) {
-    const stripped = stripExistingOmxBlocks(existing);
+    const stripped = stripExistingOmcpBlocks(existing);
     if (options.verbose && stripped.removed > 0) {
       console.log("  Updating existing OMCP config block.");
     }

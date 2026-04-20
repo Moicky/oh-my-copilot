@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, join } from 'node:path';
-import { omxPlansDir } from '../utils/paths.js';
+import { omcpPlansDir } from '../utils/paths.js';
 
 const PRD_PATTERN = /^prd-.*\.md$/i;
 const TEST_SPEC_PATTERN = /^test-?spec-.*\.md$/i;
@@ -51,7 +51,7 @@ function readMatchingPaths(dir: string, pattern: RegExp): string[] {
 }
 
 export function readPlanningArtifacts(cwd: string): PlanningArtifacts {
-  const plansDir = omxPlansDir(cwd);
+  const plansDir = omcpPlansDir(cwd);
   const specsDir = join(cwd, '.omcp', 'specs');
 
   return {

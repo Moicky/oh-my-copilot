@@ -77,10 +77,10 @@ async function writePanesFile(
   paneIds: string[],
   leaderPaneId: string,
 ): Promise<void> {
-  const omxJobsDir = process.env.OMCP_JOBS_DIR;
-  if (!jobId || !omxJobsDir) return;
+  const omcpJobsDir = process.env.OMCP_JOBS_DIR;
+  if (!jobId || !omcpJobsDir) return;
 
-  const panesPath = join(omxJobsDir, `${jobId}-panes.json`);
+  const panesPath = join(omcpJobsDir, `${jobId}-panes.json`);
   await writeFile(
     panesPath + '.tmp',
     JSON.stringify({ paneIds: [...paneIds], leaderPaneId }),

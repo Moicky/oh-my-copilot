@@ -132,9 +132,9 @@ async function main(): Promise<void> {
 
     run('npm', ['install', '-g', tarballPath, '--prefix', prefixDir], { cwd: repoRoot });
 
-    const omxPath = join(prefixDir, process.platform === 'win32' ? '' : 'bin', npmBinName('omcp'));
+    const omcpPath = join(prefixDir, process.platform === 'win32' ? '' : 'bin', npmBinName('omcp'));
     for (const argv of PACKED_INSTALL_SMOKE_CORE_COMMANDS) {
-      run(omxPath, argv, { cwd: repoRoot });
+      run(omcpPath, argv, { cwd: repoRoot });
     }
 
     console.log('packed install smoke: PASS');

@@ -6,11 +6,11 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-function runOmx(cwd: string, argv: string[]) {
+function runOmcp(cwd: string, argv: string[]) {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  return spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  return spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: {
@@ -37,7 +37,7 @@ describe('nested help routing', () => {
     it(`routes ${argv.join(' ')} to command-local help`, async () => {
       const cwd = await mkdtemp(join(tmpdir(), 'omcp-nested-help-'));
       try {
-        const result = runOmx(cwd, argv);
+        const result = runOmcp(cwd, argv);
         assert.equal(result.status, 0, result.stderr || result.stdout);
         assert.match(result.stdout, expectedUsage);
         assert.doesNotMatch(result.stdout, /oh-my-copilot \(omcp\) - Multi-agent orchestration for Codex CLI/i);
@@ -50,7 +50,7 @@ describe('nested help routing', () => {
   it('routes `omcp state read` through the top-level CLI', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-state-route-'));
     try {
-      const result = runOmx(cwd, ['state', 'read', '--input', '{"mode":"ralph"}', '--json']);
+      const result = runOmcp(cwd, ['state', 'read', '--input', '{"mode":"ralph"}', '--json']);
       assert.equal(result.status, 0, result.stderr || result.stdout);
       assert.match(result.stdout.trim(), /^\{"exists":false,"mode":"ralph"\}$/);
       assert.doesNotMatch(result.stdout, /Unknown command: state/i);

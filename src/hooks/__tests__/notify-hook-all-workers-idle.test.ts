@@ -78,9 +78,9 @@ function runNotifyHookAsWorker(
 describe('notify-hook all-workers-idle notification', () => {
   it('sends notification to leader when all workers are idle', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'myteam';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -159,9 +159,9 @@ describe('notify-hook all-workers-idle notification', () => {
 
   it('writes deferred visibility once per cooldown window when leader pane is missing', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'missing-pane-repeat';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -209,9 +209,9 @@ describe('notify-hook all-workers-idle notification', () => {
 
   it('does not inject all-workers-idle into a shell leader pane', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'shell-pane-all-idle';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -297,9 +297,9 @@ exit 0
 
   it('injects all-workers-idle notification even while the leader pane has an active task', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'busy-leader-all-idle';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -389,9 +389,9 @@ exit 0
 
   it('targets leader pane id when leader_pane_id is present', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'pane-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -438,9 +438,9 @@ exit 0
 
   it('does not notify when some workers are still working', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'busy-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -489,9 +489,9 @@ exit 0
 
   it('does not notify when a worker heartbeat is stale', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'stale-heartbeat';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -551,9 +551,9 @@ exit 0
 
   it('does not notify when current worker is not idle', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'active-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -595,9 +595,9 @@ exit 0
 
   it('respects cooldown: does not send repeated notifications', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'cooldown-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -648,9 +648,9 @@ exit 0
 
   it('writes all_workers_idle event to events.ndjson', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'event-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -711,9 +711,9 @@ exit 0
 
   it('does not fire for leader (non-team-worker) context', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'leader-test';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -775,9 +775,9 @@ exit 0
 
   it('handles single worker team correctly with singular message', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'solo-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -821,9 +821,9 @@ exit 0
 
   it('uses manifest.v2.json over config.json when both present', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'manifest-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');

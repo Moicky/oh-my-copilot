@@ -6,15 +6,15 @@ import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {}
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  const r = spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const r = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: { ...process.env, ...envOverrides },
@@ -47,7 +47,7 @@ describe('omcp setup (gh star hint)', () => {
       const home = join(wd, 'home');
       await mkdir(home, { recursive: true });
 
-      const res = runOmx(wd, ['setup', '--dry-run'], {
+      const res = runOmcp(wd, ['setup', '--dry-run'], {
         PATH: `${fakeBin}:${process.env.PATH || ''}`,
         HOME: home,
       });
@@ -65,7 +65,7 @@ describe('omcp setup (gh star hint)', () => {
       const home = join(wd, 'home');
       await mkdir(home, { recursive: true });
 
-      const res = runOmx(wd, ['setup', '--dry-run'], { PATH: '', HOME: home });
+      const res = runOmcp(wd, ['setup', '--dry-run'], { PATH: '', HOME: home });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.doesNotMatch(res.stdout, /gh repo star Moicky\/oh-my-copilot/);

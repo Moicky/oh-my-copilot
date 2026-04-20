@@ -13,13 +13,13 @@ describe("unified MCP registry loader", () => {
   it("prefers ~/.omcp/mcp-registry.json over ~/.omc/mcp-registry.json", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omcp-mcp-registry-"));
     try {
-      const omxPath = join(wd, ".omcp", "mcp-registry.json");
+      const omcpPath = join(wd, ".omcp", "mcp-registry.json");
       const omcPath = join(wd, ".omc", "mcp-registry.json");
       await mkdir(join(wd, ".omcp"), { recursive: true });
       await mkdir(join(wd, ".omc"), { recursive: true });
 
       await writeFile(
-        omxPath,
+        omcpPath,
         JSON.stringify({
           eslint: { command: "npx", args: ["@eslint/mcp@latest"], timeout: 11 },
         }),
@@ -32,7 +32,7 @@ describe("unified MCP registry loader", () => {
       );
 
       const result = await loadUnifiedMcpRegistry({ homeDir: wd });
-      assert.equal(result.sourcePath, omxPath);
+      assert.equal(result.sourcePath, omcpPath);
       assert.deepEqual(result.servers.map((server) => server.name), ["eslint"]);
       assert.equal(result.servers[0].startupTimeoutSec, 11);
     } finally {

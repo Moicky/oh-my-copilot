@@ -8,14 +8,14 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { agentsInit } from '../agents-init.js';
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
 ): { status: number | null; stdout: string; stderr: string; error?: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  const result = spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const result = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: { ...process.env },
@@ -187,12 +187,12 @@ describe('omcp agents-init', () => {
   it('exposes help for agents-init and the deepinit alias', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-agents-init-'));
     try {
-      const helpRes = runOmx(wd, ['agents-init', '--help']);
+      const helpRes = runOmcp(wd, ['agents-init', '--help']);
       if (shouldSkipForSpawnPermissions(helpRes.error)) return;
       assert.equal(helpRes.status, 0, helpRes.stderr || helpRes.stdout);
       assert.match(helpRes.stdout, /Usage: omcp agents-init/);
 
-      const aliasRes = runOmx(wd, ['deepinit', '--help']);
+      const aliasRes = runOmcp(wd, ['deepinit', '--help']);
       if (shouldSkipForSpawnPermissions(aliasRes.error)) return;
       assert.equal(aliasRes.status, 0, aliasRes.stderr || aliasRes.stdout);
       assert.match(aliasRes.stdout, /Usage: omcp agents-init/);

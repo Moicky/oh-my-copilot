@@ -435,7 +435,7 @@ const KEYWORD_INTENT_PATTERNS: Record<IntentKeyword, RegExp[]> = {
   ],
   stop: [
     /^(?:please\s+)?stop(?:\s+now)?\s*[.!]?\s*$/i,
-    /\bcancelomx\b/i,
+    /\bcancelomcp\b/i,
     /(?:^|[^\w])\$(?:stop|cancel|abort)\b/i,
     /\/(?:cancel|stop|abort)\b/i,
     /\bstop\s+(?:the\s+)?(?:agent|ralph|autopilot|team|ultrawork|execution|current\s+(?:mode|task|run))\b/i,
@@ -443,7 +443,7 @@ const KEYWORD_INTENT_PATTERNS: Record<IntentKeyword, RegExp[]> = {
   ],
   abort: [
     /^(?:please\s+)?abort(?:\s+now)?\s*[.!]?\s*$/i,
-    /\bcancelomx\b/i,
+    /\bcancelomcp\b/i,
     /(?:^|[^\w])\$(?:stop|cancel|abort)\b/i,
     /\/(?:cancel|stop|abort)\b/i,
     /\babort\s+(?:the\s+)?(?:agent|ralph|autopilot|team|ultrawork|execution|current\s+(?:mode|task|run))\b/i,

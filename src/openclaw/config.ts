@@ -202,7 +202,7 @@ function isValidOpenClawConfig(
 	return Boolean(raw?.enabled && raw.gateways && raw.hooks);
 }
 
-function defaultOmxConfigPath(): string {
+function defaultOmcpConfigPath(): string {
 	return join(codexHome(), ".omcp-config.json");
 }
 
@@ -212,7 +212,7 @@ export function inspectOpenClawConfig(
 	const activationGateEnabled = env.OMCP_OPENCLAW === "1";
 	const commandGateEnabled = env.OMCP_OPENCLAW_COMMAND === "1";
 	const envOverride = env.OMCP_OPENCLAW_CONFIG?.trim();
-	const configPath = envOverride || defaultOmxConfigPath();
+	const configPath = envOverride || defaultOmcpConfigPath();
 	const configExists = existsSync(configPath);
 
 	if (!activationGateEnabled) {
@@ -450,14 +450,14 @@ export function getOpenClawConfig(): OpenClawConfig | null {
 		}
 
 		// Primary: read from notifications block in .omcp-config.json
-		const omxConfigPath = defaultOmxConfigPath();
-		if (!existsSync(omxConfigPath)) {
+		const omcpConfigPath = defaultOmcpConfigPath();
+		if (!existsSync(omcpConfigPath)) {
 			_cachedConfig = undefined;
 			return null;
 		}
 
 		const fullConfig = JSON.parse(
-			readFileSync(omxConfigPath, "utf-8"),
+			readFileSync(omcpConfigPath, "utf-8"),
 		) as Record<string, unknown>;
 		const notifications = asRecord(fullConfig.notifications);
 		if (!notifications) {

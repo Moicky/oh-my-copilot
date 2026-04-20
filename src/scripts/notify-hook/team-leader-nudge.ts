@@ -592,7 +592,7 @@ export async function maybeNudgeTeamLeader({
   const workerTurnStallThresholdMs = resolveWorkerTurnStallThresholdMs();
   const nowMs = Date.now();
   const nowIso = new Date().toISOString();
-  const omxDir = join(cwd, '.omcp');
+  const omcpDir = join(cwd, '.omcp');
   const nudgeStatePath = join(stateDir, 'team-leader-nudge.json');
 
   let nudgeState = await readJsonIfExists(nudgeStatePath, null);
@@ -651,8 +651,8 @@ export async function maybeNudgeTeamLeader({
     let ownerSessionId = '';
     let workers = [];
     try {
-      const manifestPath = join(omxDir, 'state', 'team', teamName, 'manifest.v2.json');
-      const configPath = join(omxDir, 'state', 'team', teamName, 'config.json');
+      const manifestPath = join(omcpDir, 'state', 'team', teamName, 'manifest.v2.json');
+      const configPath = join(omcpDir, 'state', 'team', teamName, 'config.json');
       const srcPath = existsSync(manifestPath) ? manifestPath : configPath;
       if (existsSync(srcPath)) {
         const raw = JSON.parse(await readFile(srcPath, 'utf-8'));
@@ -667,7 +667,7 @@ export async function maybeNudgeTeamLeader({
     if (currentSessionId && ownerSessionId && ownerSessionId !== currentSessionId) continue;
     let mailbox = null;
     try {
-      const mailboxPath = join(omxDir, 'state', 'team', teamName, 'mailbox', 'leader-fixed.json');
+      const mailboxPath = join(omcpDir, 'state', 'team', teamName, 'mailbox', 'leader-fixed.json');
       mailbox = await readJsonIfExists(mailboxPath, null);
     } catch {
       mailbox = null;

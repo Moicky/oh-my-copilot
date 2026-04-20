@@ -99,7 +99,7 @@ function formatPlural(count: number, singular: string, plural = `${singular}s`):
   return `${count} ${count === 1 ? singular : plural}`;
 }
 
-export function isOmxMcpProcess(command: string): boolean {
+export function isOmcpMcpProcess(command: string): boolean {
   const normalized = normalizeCommand(command);
   return OMCP_MCP_SERVER_PATTERN.test(normalized);
 }
@@ -159,7 +159,7 @@ function parseWindowsProcessOutput(output: string): ProcessEntry[] {
     .filter((entry): entry is ProcessEntry => entry !== null);
 }
 
-function listWindowsOmxProcesses(
+function listWindowsOmcpProcesses(
   runCommand: ProcessListCommandRunner,
 ): ProcessEntry[] {
   const output = runCommand(
@@ -170,10 +170,10 @@ function listWindowsOmxProcesses(
   return parseWindowsProcessOutput(output);
 }
 
-export function listOmxProcesses(
+export function listOmcpProcesses(
   runCommand: ProcessListCommandRunner = defaultProcessListCommandRunner,
 ): ProcessEntry[] {
-  if (process.platform === 'win32') return listWindowsOmxProcesses(runCommand);
+  if (process.platform === 'win32') return listWindowsOmcpProcesses(runCommand);
   const output = runCommand('ps', ['axww', '-o', 'pid=,ppid=,command='], PROCESS_LIST_COMMAND_OPTIONS);
   return parsePsOutput(output);
 }
@@ -182,7 +182,7 @@ function isCodexSessionProcess(command: string): boolean {
   return CODEX_PROCESS_PATTERN.test(normalizeCommand(command));
 }
 
-function isOmxLaunchProcess(command: string): boolean {
+function isOmcpLaunchProcess(command: string): boolean {
   return OMCP_LAUNCH_PROCESS_PATTERN.test(normalizeCommand(command));
 }
 
@@ -265,7 +265,7 @@ export function findCleanupCandidates(
 
   return processes
     .filter((processEntry) => processEntry.pid !== currentPid)
-    .filter((processEntry) => isOmxMcpProcess(processEntry.command))
+    .filter((processEntry) => isOmcpMcpProcess(processEntry.command))
     .filter((processEntry) => !protectedPids.has(processEntry.pid))
     .sort((left, right) => left.pid - right.pid)
     .map((processEntry) => ({
@@ -286,7 +286,7 @@ export function findLaunchSafeCleanupCandidates(
     if (candidate.ppid <= 1) return true;
     return (
       !hasAncestorMatching(processByPid, candidate.pid, isCodexSessionProcess) &&
-      !hasAncestorMatching(processByPid, candidate.pid, isOmxLaunchProcess)
+      !hasAncestorMatching(processByPid, candidate.pid, isOmcpLaunchProcess)
     );
   });
 }
@@ -333,7 +333,7 @@ function formatCandidate(candidate: CleanupCandidate): string {
   return `PID ${candidate.pid} (PPID ${candidate.ppid}, ${candidate.reason}) ${candidate.command}`;
 }
 
-export async function cleanupOmxMcpProcesses(
+export async function cleanupOmcpMcpProcesses(
   args: readonly string[],
   dependencies: CleanupDependencies = {},
 ): Promise<CleanupResult> {
@@ -351,7 +351,7 @@ export async function cleanupOmxMcpProcesses(
   const dryRun = args.includes('--dry-run');
   const writeLine = dependencies.writeLine ?? ((line: string) => console.log(line));
   const currentPid = dependencies.currentPid ?? process.pid;
-  const listProcessesImpl = dependencies.listProcesses ?? listOmxProcesses;
+  const listProcessesImpl = dependencies.listProcesses ?? listOmcpProcesses;
   const selectCandidates = dependencies.selectCandidates ?? findCleanupCandidates;
   const isPidAlive = dependencies.isPidAlive ?? defaultIsPidAlive;
   const sendSignal = dependencies.sendSignal ?? ((pid: number, signal: NodeJS.Signals) => process.kill(pid, signal));
@@ -523,7 +523,7 @@ export async function cleanupCommand(
   args: string[],
   dependencies: CleanupCommandDependencies = {},
 ): Promise<void> {
-  const cleanupProcesses = dependencies.cleanupProcesses ?? cleanupOmxMcpProcesses;
+  const cleanupProcesses = dependencies.cleanupProcesses ?? cleanupOmcpMcpProcesses;
   const cleanupTmpDirectories = dependencies.cleanupTmpDirectories ?? cleanupStaleTmpDirectories;
 
   await cleanupProcesses(args);

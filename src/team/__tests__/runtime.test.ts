@@ -1766,7 +1766,7 @@ process.on('SIGTERM', () => process.exit(0));
             repo,
             { worktreeMode: { enabled: true, detached: true, name: null } },
           )),
-        /leader_workspace_dirty_for_worktrees:.*M README\.md.*\?\? notes\.txt.*commit_or_stash_before_omx_team/s,
+        /leader_workspace_dirty_for_worktrees:.*M README\.md.*\?\? notes\.txt.*commit_or_stash_before_omcp_team/s,
       );
 
       const listedWorktrees = execFileSync('git', ['worktree', 'list', '--porcelain'], {

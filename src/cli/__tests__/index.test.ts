@@ -1468,7 +1468,7 @@ describe("detached tmux new-session sequencing", () => {
     const source = await readFile(join(repoRoot, 'src', 'cli', 'index.ts'), 'utf-8');
     assert.match(
       source,
-      /buildTmuxPaneCommand\("env", \[`OMCP_SESSION_ID=\$\{sessionId\}`, "node", omxBin, "hud", "--watch"\]\)/,
+      /buildTmuxPaneCommand\("env", \[`OMCP_SESSION_ID=\$\{sessionId\}`, "node", omcpBin, "hud", "--watch"\]\)/,
     );
   });
 

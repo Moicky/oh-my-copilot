@@ -28,7 +28,7 @@ import {
   resolveCommandPathForPlatform,
   spawnPlatformCommandSync,
 } from '../utils/platform-command.js';
-import { resolveOmxCliEntryPath } from '../utils/paths.js';
+import { resolveOmcpCliEntryPath } from '../utils/paths.js';
 
 const execFileAsync = promisify(execFile);
 import { HUD_RESIZE_RECONCILE_DELAY_SECONDS, HUD_TMUX_TEAM_HEIGHT_LINES } from '../hud/constants.js';
@@ -235,7 +235,7 @@ export function listPaneIds(target: string): string[] {
 
 function isHudWatchPane(pane: TmuxPaneInfo): boolean {
   const start = pane.startCommand || '';
-  return /\bomx\b.*\bhud\b.*--watch/i.test(start);
+  return /\bomcp\b.*\bhud\b.*--watch/i.test(start);
 }
 
 export function chooseTeamLeaderPaneId(panes: TmuxPaneInfo[], preferredPaneId: string): string {
@@ -1068,9 +1068,9 @@ export function createTeamSession(
     let hudPaneId: string | null = null;
     let resizeHookName: string | null = null;
     let resizeHookTarget: string | null = null;
-    const omxEntry = resolveOmxCliEntryPath();
-    if (omxEntry && omxEntry.trim() !== '') {
-      const hudCmd = `node ${shellQuoteSingle(translatePathForMsys(omxEntry))} hud --watch`;
+    const omcpEntry = resolveOmcpCliEntryPath();
+    if (omcpEntry && omcpEntry.trim() !== '') {
+      const hudCmd = `node ${shellQuoteSingle(translatePathForMsys(omcpEntry))} hud --watch`;
       const hudCwd = translatePathForMsys(cwd);
       const hudResult = runTmux([
         'split-window', '-v', '-f', '-l', String(HUD_TMUX_TEAM_HEIGHT_LINES), '-t', teamTarget, '-d', '-P', '-F', '#{pane_id}', '-c', hudCwd, hudCmd,
@@ -1173,10 +1173,10 @@ export function restoreStandaloneHudPane(
   const normalizedLeaderPaneId = normalizePaneTarget(leaderPaneId);
   if (!normalizedLeaderPaneId) return null;
 
-  const omxEntry = resolveOmxCliEntryPath();
-  if (!omxEntry || omxEntry.trim() === '') return null;
+  const omcpEntry = resolveOmcpCliEntryPath();
+  if (!omcpEntry || omcpEntry.trim() === '') return null;
 
-  const hudCmd = `${shellQuoteSingle(translatePathForMsys(resolveLeaderNodePath()))} ${shellQuoteSingle(translatePathForMsys(omxEntry))} hud --watch`;
+  const hudCmd = `${shellQuoteSingle(translatePathForMsys(resolveLeaderNodePath()))} ${shellQuoteSingle(translatePathForMsys(omcpEntry))} hud --watch`;
   const hudCwd = translatePathForMsys(cwd);
   const hudResult = runTmux([
     'split-window',

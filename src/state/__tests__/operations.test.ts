@@ -366,7 +366,7 @@ describe('state operations directory initialization', () => {
         JSON.stringify({
           active: true,
           current_phase: 'executing',
-          owner_omx_session_id: 'stale-root-owner',
+          owner_omcp_session_id: 'stale-root-owner',
         }, null, 2),
       );
       await writeFile(
@@ -374,7 +374,7 @@ describe('state operations directory initialization', () => {
         JSON.stringify({
           active: true,
           current_phase: 'executing',
-          owner_omx_session_id: sessionId,
+          owner_omcp_session_id: sessionId,
         }, null, 2),
       );
 
@@ -392,13 +392,13 @@ describe('state operations directory initialization', () => {
       ) as Record<string, unknown>;
       assert.equal(sessionState.active, true);
       assert.equal(sessionState.current_phase, 'verifying');
-      assert.equal(sessionState.owner_omx_session_id, sessionId);
+      assert.equal(sessionState.owner_omcp_session_id, sessionId);
 
       const rootState = JSON.parse(
         await readFile(join(stateDir, 'ralph-state.json'), 'utf-8'),
       ) as Record<string, unknown>;
       assert.equal(rootState.current_phase, 'executing');
-      assert.equal(rootState.owner_omx_session_id, 'stale-root-owner');
+      assert.equal(rootState.owner_omcp_session_id, 'stale-root-owner');
     } finally {
       await rm(wd, { recursive: true, force: true });
     }

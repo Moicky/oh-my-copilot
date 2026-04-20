@@ -5,8 +5,8 @@ import {
 	slugifyMissionName,
 } from "../autoresearch/contracts.js";
 import {
-	OmxQuestionError,
-	type OmxQuestionSuccessPayload,
+	OmcpQuestionError,
+	type OmcpQuestionSuccessPayload,
 } from "../question/client.js";
 import { evaluateQuestionPolicy } from "../question/policy.js";
 import type { QuestionType } from "../question/types.js";
@@ -52,7 +52,7 @@ export interface AutoresearchStructuredQuestionInput {
 
 export type AutoresearchStructuredQuestionAsker = (
 	input: AutoresearchStructuredQuestionInput,
-) => Promise<OmxQuestionSuccessPayload>;
+) => Promise<OmcpQuestionSuccessPayload>;
 
 function createQuestionIO(): AutoresearchQuestionIO {
 	const rl = createInterface({ input: process.stdin, output: process.stdout });
@@ -172,14 +172,14 @@ async function ensureStructuredQuestionFallbackAllowed(
 ): Promise<void> {
 	const policy = await evaluateQuestionPolicy({ cwd: repoRoot });
 	if (policy.allowed || policy.fallbackAllowed !== false) return;
-	throw new OmxQuestionError(
+	throw new OmcpQuestionError(
 		policy.code ?? "question_policy_denied",
 		policy.message ?? "Structured questions are unavailable in the current OMCP workflow context.",
 	);
 }
 
 function shouldFallbackFromStructuredQuestion(error: unknown): boolean {
-	if (error instanceof OmxQuestionError) {
+	if (error instanceof OmcpQuestionError) {
 		if (
 			error.code === "worker_blocked"
 			|| error.code === "team_blocked"

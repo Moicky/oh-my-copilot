@@ -6,10 +6,10 @@ import { readFile, writeFile, readdir, rm } from "fs/promises";
 import { existsSync } from "fs";
 import { join, basename } from "path";
 import {
-  stripExistingOmxBlocks,
-  stripOmxEnvSettings,
-  stripOmxTopLevelKeys,
-  stripOmxFeatureFlags,
+  stripExistingOmcpBlocks,
+  stripOmcpEnvSettings,
+  stripOmcpTopLevelKeys,
+  stripOmcpFeatureFlags,
 } from "../config/generator.js";
 import {
   parseCodexHooksConfig,
@@ -20,7 +20,7 @@ import { AGENT_DEFINITIONS } from "../agents/definitions.js";
 import { detectLegacySkillRootOverlap } from "../utils/paths.js";
 import { resolveScopeDirectories, type SetupScope } from "./setup.js";
 import { readPersistedSetupScope } from "./index.js";
-import { isOmxGeneratedAgentsMd } from "../utils/agents-md.js";
+import { isOmcpGeneratedAgentsMd } from "../utils/agents-md.js";
 
 export interface UninstallOptions {
   dryRun?: boolean;
@@ -54,7 +54,7 @@ const OMCP_MCP_SERVERS = [
   "omcp_wiki",
 ];
 
-function detectOmxConfigArtifacts(config: string): {
+function detectOmcpConfigArtifacts(config: string): {
   hasMcpServers: string[];
   hasAgentEntries: number;
   hasTuiSection: boolean;
@@ -129,7 +129,7 @@ async function cleanConfig(
   }
 
   const original = await readFile(configPath, "utf-8");
-  const detected = detectOmxConfigArtifacts(original);
+  const detected = detectOmcpConfigArtifacts(original);
 
   result.mcpServersRemoved = detected.hasMcpServers;
   result.agentEntriesRemoved = detected.hasAgentEntries;
@@ -139,17 +139,17 @@ async function cleanConfig(
 
   // Strip OMCP tables block (MCP servers, agents, tui)
   let config = original;
-  const { cleaned } = stripExistingOmxBlocks(config);
+  const { cleaned } = stripExistingOmcpBlocks(config);
   config = cleaned;
 
   // Strip top-level keys
-  config = stripOmxTopLevelKeys(config);
+  config = stripOmcpTopLevelKeys(config);
 
   // Strip feature flags
-  config = stripOmxFeatureFlags(config);
+  config = stripOmcpFeatureFlags(config);
 
   // Strip OMCP-managed env defaults
-  config = stripOmxEnvSettings(config);
+  config = stripOmcpEnvSettings(config);
 
   // Normalize trailing whitespace
   config = config.trimEnd() + "\n";
@@ -276,7 +276,7 @@ async function removeAgentsMd(
 
   try {
     const content = await readFile(agentsMdPath, "utf-8");
-    if (!isOmxGeneratedAgentsMd(content)) {
+    if (!isOmcpGeneratedAgentsMd(content)) {
       if (options.verbose)
         console.log("  AGENTS.md is not OMCP-generated, skipping.");
       return false;
@@ -328,14 +328,14 @@ async function removeCacheDirectory(
   projectRoot: string,
   options: Pick<UninstallOptions, "dryRun" | "verbose">,
 ): Promise<boolean> {
-  const omxDir = join(projectRoot, ".omcp");
-  if (!existsSync(omxDir)) return false;
+  const omcpDir = join(projectRoot, ".omcp");
+  if (!existsSync(omcpDir)) return false;
 
   if (!options.dryRun) {
-    await rm(omxDir, { recursive: true, force: true });
+    await rm(omcpDir, { recursive: true, force: true });
   }
   if (options.verbose)
-    console.log(`  ${options.dryRun ? "Would remove" : "Removed"} ${omxDir}`);
+    console.log(`  ${options.dryRun ? "Would remove" : "Removed"} ${omcpDir}`);
   return true;
 }
 

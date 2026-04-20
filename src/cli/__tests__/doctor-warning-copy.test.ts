@@ -9,19 +9,19 @@ import { fileURLToPath } from 'node:url';
 import { withPackagedExploreHarnessHidden, withPackagedExploreHarnessLock } from './packaged-explore-harness-lock.js';
 import { checkExploreHarness } from '../doctor.js';
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error?: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
   const mergedEnv = { ...process.env, ...envOverrides };
   if (typeof envOverrides.HOME === 'string' && typeof envOverrides.USERPROFILE !== 'string') {
     mergedEnv.USERPROFILE = envOverrides.HOME;
   }
-  const r = spawnSync(process.execPath, [omxBin, ...argv], {
+  const r = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: mergedEnv,
@@ -52,12 +52,12 @@ describe('omcp doctor onboarding warning copy', () => {
       await writeFile(
         join(codexDir, 'config.toml'),
         `
-[mcp_servers.non_omx]
+[mcp_servers.non_omcp]
 command = "node"
 `.trimStart(),
       );
 
-      const res = runOmx(wd, ['doctor'], {
+      const res = runOmcp(wd, ['doctor'], {
         HOME: home,
         CODEX_HOME: join(home, '.codex'),
       });
@@ -92,7 +92,7 @@ enabled = true
 `.trimStart(),
       );
 
-      const res = runOmx(wd, ['doctor'], {
+      const res = runOmcp(wd, ['doctor'], {
         HOME: home,
         CODEX_HOME: join(home, '.codex'),
       });
@@ -128,7 +128,7 @@ enabled = true
         await writeFile(join(fakeBin, 'codex'), '#!/bin/sh\necho "codex test"\n');
         spawnSync('chmod', ['+x', join(fakeBin, 'codex')], { encoding: 'utf-8' });
 
-        const res = runOmx(wd, ['doctor'], {
+        const res = runOmcp(wd, ['doctor'], {
           HOME: home,
           CODEX_HOME: join(home, '.codex'),
           PATH: fakeBin,
@@ -171,7 +171,7 @@ enabled = true
         spawnSync('chmod', ['+x', packagedBinary], { encoding: 'utf-8' });
 
         try {
-          const res = runOmx(wd, ['doctor'], {
+          const res = runOmcp(wd, ['doctor'], {
             HOME: home,
             CODEX_HOME: join(home, '.codex'),
             PATH: fakeBin,
@@ -215,7 +215,7 @@ USE_OMX_EXPLORE_CMD = "off"
 `.trimStart(),
       );
 
-      const res = runOmx(wd, ['doctor'], {
+      const res = runOmcp(wd, ['doctor'], {
         HOME: home,
         CODEX_HOME: join(home, '.codex'),
       });
@@ -245,7 +245,7 @@ USE_OMX_EXPLORE_CMD = "off"
       await writeFile(join(canonicalPlan, 'SKILL.md'), '# canonical plan\n');
       await writeFile(join(legacyHelp, 'SKILL.md'), '# legacy help\n');
 
-      const res = runOmx(wd, ['doctor'], {
+      const res = runOmcp(wd, ['doctor'], {
         HOME: home,
         CODEX_HOME: codexDir,
       });
@@ -288,7 +288,7 @@ USE_OMX_EXPLORE_CMD = "off"
         ) + '\n',
       );
 
-      const res = runOmx(wd, ['doctor'], {
+      const res = runOmcp(wd, ['doctor'], {
         HOME: home,
         CODEX_HOME: codexDir,
       });
@@ -318,7 +318,7 @@ command = "node"
 `.trimStart(),
       );
 
-      const res = runOmx(wd, ['doctor'], {
+      const res = runOmcp(wd, ['doctor'], {
         HOME: home,
         CODEX_HOME: codexDir,
       });
@@ -341,7 +341,7 @@ command = "node"
       await mkdir(codexDir, { recursive: true });
       await writeFile(join(codexDir, 'hooks.json'), '{invalid json\n');
 
-      const res = runOmx(wd, ['doctor'], {
+      const res = runOmcp(wd, ['doctor'], {
         HOME: home,
         CODEX_HOME: codexDir,
       });
@@ -373,7 +373,7 @@ command = "node"
         process.platform === 'win32' ? 'junction' : 'dir',
       );
 
-      const res = runOmx(wd, ['doctor'], {
+      const res = runOmcp(wd, ['doctor'], {
         HOME: home,
         CODEX_HOME: codexDir,
       });

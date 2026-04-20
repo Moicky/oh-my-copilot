@@ -9,7 +9,7 @@ import { readdir } from 'node:fs/promises';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(__dirname, '..', '..', '..');
-const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
 const tempDirs: string[] = [];
 
 async function makeRepo(): Promise<string> {
@@ -28,7 +28,7 @@ describe('omcp question CLI', () => {
   it('hard-fails worker contexts before UI launch', async () => {
     const cwd = await makeRepo();
     const result = await new Promise<{ code: number | null; stdout: string; stderr: string }>((resolve) => {
-      const child = spawn(process.execPath, [omxBin, 'question', '--input', JSON.stringify({
+      const child = spawn(process.execPath, [omcpBin, 'question', '--input', JSON.stringify({
         question: 'Pick one',
         options: ['A'],
         allow_other: true,
@@ -61,7 +61,7 @@ describe('omcp question CLI', () => {
       session_id: 'sess-q',
     });
 
-    const child = spawn(process.execPath, [omxBin, 'question', '--input', input, '--json'], {
+    const child = spawn(process.execPath, [omcpBin, 'question', '--input', input, '--json'], {
       cwd,
       env: { ...process.env, OMCP_AUTO_UPDATE: '0', OMCP_NOTIFY_FALLBACK: '0', OMCP_HOOK_DERIVED_SIGNALS: '0', OMCP_QUESTION_TEST_RENDERER: 'noop' },
       stdio: ['ignore', 'pipe', 'pipe'],

@@ -47,7 +47,7 @@ import {
   isDeepInterviewInputLockActive,
   syncSkillStateFromTurn,
 } from './notify-hook/auto-nudge.js';
-import { isManagedOmxSession } from './notify-hook/managed-tmux.js';
+import { isManagedOmcpSession } from './notify-hook/managed-tmux.js';
 import { logNotifyHookEvent } from './notify-hook/log.js';
 import { reconcileRalphSessionResume } from './notify-hook/ralph-session-resume.js';
 import { sendPaneInput } from './notify-hook/team-tmux-guard.js';
@@ -187,14 +187,14 @@ async function main() {
     ? await resolveTeamStateDirForWorker(cwd, parsedTeamWorker)
     : join(cwd, '.omcp', 'state');
   const logsDir = join(cwd, '.omcp', 'logs');
-  const omxDir = join(cwd, '.omcp');
-  let currentOmxSessionId = '';
-  const getEffectiveSessionId = () => currentOmxSessionId || payloadSessionId;
+  const omcpDir = join(cwd, '.omcp');
+  let currentOmcpSessionId = '';
+  const getEffectiveSessionId = () => currentOmcpSessionId || payloadSessionId;
 
   // Ensure directories exist
   await mkdir(logsDir, { recursive: true }).catch(() => {});
   await mkdir(stateDir, { recursive: true }).catch(() => {});
-  currentOmxSessionId = await readCurrentSessionId(stateDir).catch(() => '') || '';
+  currentOmcpSessionId = await readCurrentSessionId(stateDir).catch(() => '') || '';
 
   // Turn-level dedupe prevents double-processing when native notify and fallback
   // watcher both emit the same completed turn.
@@ -277,13 +277,13 @@ async function main() {
         payloadSessionId,
         payloadThreadId,
       });
-      currentOmxSessionId = resumeResult.currentOmxSessionId;
+      currentOmcpSessionId = resumeResult.currentOmcpSessionId;
       if (resumeResult.resumed || resumeResult.updatedCurrentOwner) {
         await logNotifyHookEvent(logsDir, {
           timestamp: new Date().toISOString(),
           type: 'ralph_session_resume',
           reason: resumeResult.reason,
-          current_omx_session_id: resumeResult.currentOmxSessionId || null,
+          current_omcp_session_id: resumeResult.currentOmcpSessionId || null,
           payload_codex_session_id: payloadSessionId || null,
           source_path: resumeResult.sourcePath || null,
           target_path: resumeResult.targetPath || null,
@@ -363,7 +363,7 @@ async function main() {
 
   // 3. Track subagent metrics (lead session only)
   if (!isTeamWorker) {
-    const metricsPath = join(omxDir, 'metrics.json');
+    const metricsPath = join(omcpDir, 'metrics.json');
     try {
       let metrics = {
         total_turns: 0,
@@ -702,7 +702,7 @@ async function main() {
       const { processCodeSimplifier } = await import('../hooks/code-simplifier/index.js');
       const csResult = processCodeSimplifier(cwd, stateDir);
       if (csResult.triggered) {
-        const managedSession = await isManagedOmxSession(cwd, payload, { allowTeamWorker: false });
+        const managedSession = await isManagedOmcpSession(cwd, payload, { allowTeamWorker: false });
         if (!managedSession) {
           const { logTmuxHookEvent } = await import('./notify-hook/log.js');
           await logTmuxHookEvent(logsDir, {

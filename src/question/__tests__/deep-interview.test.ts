@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, it } from 'node:test';
-import { OmxQuestionError, type OmxQuestionProcessRunner } from '../client.js';
+import { OmcpQuestionError, type OmcpQuestionProcessRunner } from '../client.js';
 import { runDeepInterviewQuestion } from '../deep-interview.js';
 
 const tempDirs: string[] = [];
@@ -40,7 +40,7 @@ describe('runDeepInterviewQuestion', () => {
     const statePath = join(cwd, '.omcp', 'state', 'sessions', 'sess-di', 'deep-interview-state.json');
     let inFlightQuestionStatus = '';
 
-    const runner: OmxQuestionProcessRunner = async () => {
+    const runner: OmcpQuestionProcessRunner = async () => {
       const inFlightState = JSON.parse(await readFile(statePath, 'utf-8')) as {
         question_enforcement?: { status?: string };
       };
@@ -128,7 +128,7 @@ describe('runDeepInterviewQuestion', () => {
         },
       ),
       (error) => {
-        assert.ok(error instanceof OmxQuestionError);
+        assert.ok(error instanceof OmcpQuestionError);
         assert.equal(error.code, 'team_blocked');
         return true;
       },

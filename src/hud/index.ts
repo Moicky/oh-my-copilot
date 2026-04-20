@@ -16,7 +16,7 @@ import type { HudFlags, HudPreset, HudRenderContext, ResolvedHudConfig } from '.
 import { HUD_TMUX_HEIGHT_LINES, HUD_TMUX_MAX_HEIGHT_LINES } from './constants.js';
 import { sleep } from '../utils/sleep.js';
 import { runHudAuthorityTick } from './authority.js';
-import { resolveOmxCliEntryPath } from '../utils/paths.js';
+import { resolveOmcpCliEntryPath } from '../utils/paths.js';
 
 export const HUD_USAGE = [
   'Usage:',
@@ -248,12 +248,12 @@ export function shellEscape(s: string): string {
  * Build the argument array for `execFileSync('tmux', args)`.
  *
  * By returning an argv array instead of a shell command string, `cwd` is
- * passed as a literal argument to tmux (no shell expansion).  `omxBin` is
+ * passed as a literal argument to tmux (no shell expansion).  `omcpBin` is
  * shell-escaped inside the command string that tmux will execute in a shell.
  */
 export function buildTmuxSplitArgs(
   cwd: string,
-  omxBin: string,
+  omcpBin: string,
   preset?: string,
   sessionId?: string,
 ): string[] {
@@ -262,7 +262,7 @@ export function buildTmuxSplitArgs(
   const presetArg = safePreset ? ` --preset=${safePreset}` : '';
   const safeSessionId = typeof sessionId === 'string' ? sessionId.trim() : '';
   const sessionPrefix = safeSessionId ? `OMCP_SESSION_ID=${shellEscape(safeSessionId)} ` : '';
-  const cmd = `${sessionPrefix}node ${shellEscape(omxBin)} hud --watch${presetArg}`;
+  const cmd = `${sessionPrefix}node ${shellEscape(omcpBin)} hud --watch${presetArg}`;
   return ['split-window', '-v', '-l', String(HUD_TMUX_HEIGHT_LINES), '-c', cwd, cmd];
 }
 
@@ -273,16 +273,16 @@ async function launchTmuxPane(cwd: string, flags: HudFlags): Promise<void> {
     process.exit(1);
   }
 
-  const omxBin = resolveOmxCliEntryPath();
-  if (!omxBin) {
+  const omcpBin = resolveOmcpCliEntryPath();
+  if (!omcpBin) {
     console.error('Failed to resolve OMCP launcher path for tmux HUD startup.');
     process.exit(1);
   }
-  const args = buildTmuxSplitArgs(cwd, omxBin, flags.preset, process.env.OMCP_SESSION_ID);
+  const args = buildTmuxSplitArgs(cwd, omcpBin, flags.preset, process.env.OMCP_SESSION_ID);
 
   try {
     // Split bottom pane, 4 lines tall, running omcp hud --watch.
-    // execFileSync bypasses the shell – cwd and omxBin cannot inject commands.
+    // execFileSync bypasses the shell – cwd and omcpBin cannot inject commands.
     execFileSync('tmux', args, { stdio: 'inherit' });
     console.log('HUD launched in tmux pane below. Close with: Ctrl+C in that pane, or `tmux kill-pane -t bottom`');
   } catch {

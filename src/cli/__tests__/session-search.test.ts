@@ -19,11 +19,11 @@ async function writeRollout(
   await writeFile(join(dir, fileName), `${lines.map((line) => JSON.stringify(line)).join('\n')}\n`, 'utf-8');
 }
 
-function runOmx(cwd: string, argv: string[], envOverrides: Record<string, string> = {}) {
+function runOmcp(cwd: string, argv: string[], envOverrides: Record<string, string> = {}) {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  const result = spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const result = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: { ...process.env, ...envOverrides },
@@ -68,7 +68,7 @@ describe('omcp session search', () => {
         },
       ]);
 
-      const result = runOmx(cwd, ['session', 'search', 'team api', '--project', 'current', '--json'], {
+      const result = runOmcp(cwd, ['session', 'search', 'team api', '--project', 'current', '--json'], {
         CODEX_HOME: codexHomeDir,
       });
 

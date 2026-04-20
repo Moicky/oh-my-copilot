@@ -7,15 +7,15 @@ import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error?: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  const result = spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const result = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: { ...process.env, ...envOverrides },
@@ -51,7 +51,7 @@ describe('omcp agents', () => {
         'name = "reviewer"\ndescription = "User reviewer"\ndeveloper_instructions = """review"""\n',
       );
 
-      const result = runOmx(wd, ['agents', 'list'], {
+      const result = runOmcp(wd, ['agents', 'list'], {
         HOME: home,
         CODEX_HOME: join(home, '.codex'),
       });
@@ -72,7 +72,7 @@ describe('omcp agents', () => {
     try {
       await mkdir(home, { recursive: true });
 
-      const result = runOmx(wd, ['agents', 'add', 'my-helper', '--scope', 'project'], {
+      const result = runOmcp(wd, ['agents', 'add', 'my-helper', '--scope', 'project'], {
         HOME: home,
         CODEX_HOME: join(home, '.codex'),
       });
@@ -113,7 +113,7 @@ describe('omcp agents', () => {
       );
       await chmod(editorScript, 0o755);
 
-      const editResult = runOmx(wd, ['agents', 'edit', 'editor-test', '--scope', 'project'], {
+      const editResult = runOmcp(wd, ['agents', 'edit', 'editor-test', '--scope', 'project'], {
         HOME: home,
         CODEX_HOME: join(home, '.codex'),
         EDITOR: editorScript,
@@ -123,7 +123,7 @@ describe('omcp agents', () => {
       assert.equal(editResult.status, 0, editResult.stderr || editResult.stdout);
       assert.match(await readFile(agentPath, 'utf-8'), /^model = "gpt-5\.4"$/m);
 
-      const removeResult = runOmx(wd, ['agents', 'remove', 'editor-test', '--scope', 'project', '--force'], {
+      const removeResult = runOmcp(wd, ['agents', 'remove', 'editor-test', '--scope', 'project', '--force'], {
         HOME: home,
         CODEX_HOME: join(home, '.codex'),
       });
@@ -149,7 +149,7 @@ describe('omcp agents', () => {
         'name = "non-interactive"\ndescription = "Remove me"\ndeveloper_instructions = """noop"""\n',
       );
 
-      const result = runOmx(wd, ['agents', 'remove', 'non-interactive', '--scope', 'project'], {
+      const result = runOmcp(wd, ['agents', 'remove', 'non-interactive', '--scope', 'project'], {
         HOME: home,
         CODEX_HOME: join(home, '.codex'),
       });

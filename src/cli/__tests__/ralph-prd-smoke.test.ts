@@ -9,15 +9,15 @@ import { fileURLToPath } from 'node:url';
 
 const CLI_SPAWN_TIMEOUT_MS = 15_000;
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  const result = spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const result = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     timeout: CLI_SPAWN_TIMEOUT_MS,
@@ -91,7 +91,7 @@ describe('omcp ralph --prd smoke gate', () => {
       await mkdir(home, { recursive: true });
       await installFakeCodex(fakeBin, launchLog);
 
-      const result = runOmx(cwd, ['ralph', '--prd', 'ship release checklist'], buildEnv(home, fakeBin));
+      const result = runOmcp(cwd, ['ralph', '--prd', 'ship release checklist'], buildEnv(home, fakeBin));
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
       assert.notEqual(result.status, 0, result.error || result.stderr || result.stdout);
@@ -113,7 +113,7 @@ describe('omcp ralph --prd smoke gate', () => {
       await mkdir(join(cwd, '.omcp', 'plans'), { recursive: true });
       await writeFile(join(cwd, '.omcp', 'plans', 'prd-existing.md'), '# Existing canonical PRD\n', 'utf-8');
 
-      const result = runOmx(cwd, ['ralph', '--prd', 'ship release checklist'], buildEnv(home, fakeBin));
+      const result = runOmcp(cwd, ['ralph', '--prd', 'ship release checklist'], buildEnv(home, fakeBin));
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
       assert.notEqual(result.status, 0, result.error || result.stderr || result.stdout);
@@ -141,7 +141,7 @@ describe('omcp ralph --prd smoke gate', () => {
         }],
       });
 
-      const result = runOmx(cwd, ['ralph', '--prd', 'ship release checklist'], buildEnv(home, fakeBin));
+      const result = runOmcp(cwd, ['ralph', '--prd', 'ship release checklist'], buildEnv(home, fakeBin));
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
       assert.notEqual(result.status, 0, result.error || result.stderr || result.stdout);
@@ -170,7 +170,7 @@ describe('omcp ralph --prd smoke gate', () => {
         }],
       });
 
-      const result = runOmx(cwd, ['ralph', '--prd', 'ship release checklist'], buildEnv(home, fakeBin));
+      const result = runOmcp(cwd, ['ralph', '--prd', 'ship release checklist'], buildEnv(home, fakeBin));
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);

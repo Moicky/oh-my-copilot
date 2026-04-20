@@ -12,13 +12,13 @@ function repoRoot(): string {
   return join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
 }
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error?: string } {
-  const omxBin = join(repoRoot(), 'dist', 'cli', 'omcp.js');
-  const result = spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot(), 'dist', 'cli', 'omcp.js');
+  const result = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: { ...process.env, ...envOverrides },
@@ -120,7 +120,7 @@ describe('rust runtime legacy-reader compatibility', () => {
         await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`);
         await writeFile(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
 
-        const result = runOmx(wd, ['team', 'status', 'rust-compat-team', '--json'], { OMCP_TEAM_STATE_ROOT: teamStateRoot });
+        const result = runOmcp(wd, ['team', 'status', 'rust-compat-team', '--json'], { OMCP_TEAM_STATE_ROOT: teamStateRoot });
         if (shouldSkipForSpawnPermissions(result.error)) return;
 
         assert.equal(result.status, 0, result.stderr || result.stdout);
@@ -168,7 +168,7 @@ describe('rust runtime legacy-reader compatibility', () => {
         );
         await chmod(tmuxPath, 0o755);
 
-        const result = runOmx(
+        const result = runOmcp(
           wd,
           ['doctor', '--team'],
           { PATH: `${fakeBin}:${process.env.PATH || ''}`, OMCP_TEAM_STATE_ROOT: teamStateRoot },

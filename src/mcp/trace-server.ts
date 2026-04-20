@@ -188,8 +188,8 @@ interface Metrics {
   session_total_tokens?: number;
 }
 
-async function readMetrics(omxDir: string): Promise<Metrics | null> {
-  const metricsPath = join(omxDir, 'metrics.json');
+async function readMetrics(omcpDir: string): Promise<Metrics | null> {
+  const metricsPath = join(omcpDir, 'metrics.json');
   if (!existsSync(metricsPath)) return null;
   try {
     return JSON.parse(await readFile(metricsPath, 'utf-8'));
@@ -255,8 +255,8 @@ export async function handleTraceToolCall(request: {
       isError: true,
     };
   }
-  const omxDir = join(wd, '.omcp');
-  const logsDir = join(omxDir, 'logs');
+  const omcpDir = join(wd, '.omcp');
+  const logsDir = join(omcpDir, 'logs');
 
   switch (name) {
     case 'trace_timeline': {
@@ -301,7 +301,7 @@ export async function handleTraceToolCall(request: {
       const [logSummary, modeEvents, metrics] = await Promise.all([
         summarizeLogFiles(logsDir),
         readModeEvents(wd),
-        readMetrics(omxDir),
+        readMetrics(omcpDir),
       ]);
 
       const modesByName: Record<string, { starts: number; ends: number }> = {};

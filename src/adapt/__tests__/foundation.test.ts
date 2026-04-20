@@ -39,7 +39,7 @@ afterEach(async () => {
 	}
 });
 
-async function writeOpenClawOmxConfig(config: unknown): Promise<void> {
+async function writeOpenClawOmcpConfig(config: unknown): Promise<void> {
 	const configDir = join(tempDir, ".codex");
 	await mkdir(configDir, { recursive: true });
 	await writeFile(
@@ -128,7 +128,7 @@ describe("adapt foundation", () => {
 
 	it("writes OpenClaw adapter artifacts only under adapter-owned paths", async () => {
 		process.env.OMCP_OPENCLAW = "1";
-		await writeOpenClawOmxConfig({
+		await writeOpenClawOmcpConfig({
 			notifications: {
 				openclaw: {
 					enabled: true,
@@ -202,7 +202,7 @@ describe("adapt foundation", () => {
 
 	it("OpenClaw status reports local command-gateway blocking without over-claiming health", async () => {
 		process.env.OMCP_OPENCLAW = "1";
-		await writeOpenClawOmxConfig({
+		await writeOpenClawOmcpConfig({
 			notifications: {
 				openclaw: {
 					enabled: true,

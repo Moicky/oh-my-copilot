@@ -30,7 +30,7 @@ import {
 } from '../tmux-hook-engine.js';
 
 function isHudPaneStartCommand(startCommand: any): boolean {
-  return /\bomx\b.*\bhud\b.*--watch/i.test(safeString(startCommand));
+  return /\bomcp\b.*\bhud\b.*--watch/i.test(safeString(startCommand));
 }
 
 async function resolvePaneCwdMismatch(paneId: string, expectedCwd: any): Promise<any | null> {
@@ -301,8 +301,8 @@ export async function handleTmuxInjection({
   stateDir,
   logsDir,
 }: any): Promise<void> {
-  const omxDir = join(cwd, '.omcp');
-  const configPath = join(omxDir, 'tmux-hook.json');
+  const omcpDir = join(cwd, '.omcp');
+  const configPath = join(omcpDir, 'tmux-hook.json');
   const hookStatePath = join(stateDir, 'tmux-hook-state.json');
   const nowIso = new Date().toISOString();
   const now = Date.now();

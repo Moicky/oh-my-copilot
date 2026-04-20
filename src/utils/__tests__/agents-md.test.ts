@@ -2,8 +2,8 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   addGeneratedAgentsMarker,
-  hasOmxManagedAgentsSections,
-  isOmxGeneratedAgentsMd,
+  hasOmcpManagedAgentsSections,
+  isOmcpGeneratedAgentsMd,
   OMCP_GENERATED_AGENTS_MARKER,
 } from '../agents-md.js';
 
@@ -40,7 +40,7 @@ describe('agents-md helpers', () => {
       '# oh-my-copilot - Intelligent Multi-Agent Orchestration',
     ].join('\n');
 
-    assert.equal(isOmxGeneratedAgentsMd(content), true);
+    assert.equal(isOmcpGeneratedAgentsMd(content), true);
   });
 
   it('does not treat title-only user AGENTS.md content as OMCP-generated', () => {
@@ -50,8 +50,8 @@ describe('agents-md helpers', () => {
       'User-authored guidance without any OMCP ownership markers.',
     ].join('\n');
 
-    assert.equal(isOmxGeneratedAgentsMd(content), false);
-    assert.equal(hasOmxManagedAgentsSections(content), false);
+    assert.equal(isOmcpGeneratedAgentsMd(content), false);
+    assert.equal(hasOmcpManagedAgentsSections(content), false);
   });
 
   it('recognizes explicit OMCP-owned model table blocks as managed sections', () => {
@@ -63,7 +63,7 @@ describe('agents-md helpers', () => {
       '<!-- OMCP:MODELS:END -->',
     ].join('\n');
 
-    assert.equal(isOmxGeneratedAgentsMd(content), false);
-    assert.equal(hasOmxManagedAgentsSections(content), true);
+    assert.equal(isOmcpGeneratedAgentsMd(content), false);
+    assert.equal(hasOmcpManagedAgentsSections(content), true);
   });
 });

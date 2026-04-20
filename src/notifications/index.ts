@@ -139,7 +139,7 @@ import { formatNotification } from "./formatter.js";
 import { dispatchNotifications } from "./dispatcher.js";
 import { getCurrentTmuxSession, sanitizeTmuxAlertText } from "./tmux.js";
 import { basename } from "path";
-import { omxStateDir } from "../utils/paths.js";
+import { omcpStateDir } from "../utils/paths.js";
 import {
   shouldSendLifecycleNotification,
   recordLifecycleNotificationSent,
@@ -255,7 +255,7 @@ export async function notifyLifecycle(
       payload.tmuxTailLive = data.tmuxTailLive;
     }
 
-    const lifecycleStateDir = payload.projectPath ? omxStateDir(payload.projectPath) : "";
+    const lifecycleStateDir = payload.projectPath ? omcpStateDir(payload.projectPath) : "";
     const normalizedIdleTmuxTail = event === "session-idle" ? parseTmuxTail(payload.tmuxTail || "") : "";
     const sessionIdleTmuxTailAllowed = event !== "session-idle"
       || shouldIncludeSessionIdleTmuxTail(lifecycleStateDir, payload.sessionId, normalizedIdleTmuxTail);

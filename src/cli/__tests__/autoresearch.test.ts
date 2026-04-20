@@ -13,15 +13,15 @@ import {
   parseAutoresearchArgs,
 } from '../autoresearch.js';
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error?: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  const result = spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const result = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: {
@@ -97,7 +97,7 @@ describe('omcp autoresearch hard deprecation', () => {
   it('documents autoresearch as deprecated in top-level help', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-autoresearch-help-'));
     try {
-      const result = runOmx(cwd, ['--help']);
+      const result = runOmcp(cwd, ['--help']);
       assert.equal(result.status, 0, result.stderr || result.stdout);
       assert.match(result.stdout, /omcp autoresearch\s+\[DEPRECATED\] Use \$autoresearch; direct CLI launch removed/i);
     } finally {
@@ -108,7 +108,7 @@ describe('omcp autoresearch hard deprecation', () => {
   it('routes autoresearch --help to local deprecation help', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-autoresearch-local-help-'));
     try {
-      const result = runOmx(cwd, ['autoresearch', '--help']);
+      const result = runOmcp(cwd, ['autoresearch', '--help']);
       assert.equal(result.status, 0, result.stderr || result.stdout);
       assert.match(result.stdout, /hard-deprecated legacy command surface/i);
       assert.match(result.stdout, /\$deep-interview --autoresearch/i);
@@ -131,7 +131,7 @@ describe('omcp autoresearch hard deprecation', () => {
     it(`fails legacy invocation: omcp ${argv.join(' ')}`, async () => {
       const cwd = await mkdtemp(join(tmpdir(), 'omcp-autoresearch-fail-'));
       try {
-        const result = runOmx(cwd, argv);
+        const result = runOmcp(cwd, argv);
         assert.notEqual(result.status, 0);
         const output = `${result.stdout}\n${result.stderr}`;
         assert.match(output, /hard-deprecated/i);
@@ -154,7 +154,7 @@ describe('omcp autoresearch hard deprecation', () => {
       execFileSync('chmod', ['+x', join(fakeBin, 'codex')], { stdio: 'ignore' });
       execFileSync('chmod', ['+x', join(fakeBin, 'tmux')], { stdio: 'ignore' });
 
-      const result = runOmx(cwd, ['autoresearch', 'run', 'missions/demo'], {
+      const result = runOmcp(cwd, ['autoresearch', 'run', 'missions/demo'], {
         PATH: `${fakeBin}:${process.env.PATH || ''}`,
       });
       assert.notEqual(result.status, 0);

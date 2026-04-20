@@ -3,7 +3,7 @@ import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, it } from "node:test";
-import { OmxQuestionError } from "../../question/client.js";
+import { OmcpQuestionError } from "../../question/client.js";
 import {
 	type AutoresearchStructuredQuestionAsker,
 	type AutoresearchQuestionIO,
@@ -337,7 +337,7 @@ describe("runAutoresearchNoviceBridge", () => {
 								"should not be used",
 							]),
 							async () => {
-								throw new OmxQuestionError(
+								throw new OmcpQuestionError(
 									"active_execution_mode_blocked",
 									"omcp question is unavailable while auto-executing workflows are active: autoresearch.",
 								);
@@ -345,7 +345,7 @@ describe("runAutoresearchNoviceBridge", () => {
 						),
 					),
 				(error) => {
-					assert.ok(error instanceof OmxQuestionError);
+					assert.ok(error instanceof OmcpQuestionError);
 					assert.equal(error.code, "active_execution_mode_blocked");
 					return true;
 				},

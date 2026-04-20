@@ -24,7 +24,7 @@ import { buildCapturePaneArgv, DEFAULT_MARKER, tmuxHookExplicitlyDisablesInjecti
 import { readAutoresearchCompletionStatus } from '../../autoresearch/skill-validation.js';
 import { persistDeepInterviewModeState } from '../../hooks/keyword-detector.js';
 import {
-  isManagedOmxSession,
+  isManagedOmcpSession,
   resolveManagedCurrentPane,
   resolveManagedPaneFromAnchor,
   resolveManagedSessionPane,
@@ -585,7 +585,7 @@ export async function maybeAutoNudge({ cwd, stateDir, logsDir, payload }) {
   }
 
   const sourceName = safeString(payload?.source || '');
-  const managedSession = await isManagedOmxSession(cwd, payload, { allowTeamWorker: true });
+  const managedSession = await isManagedOmcpSession(cwd, payload, { allowTeamWorker: true });
   if (!managedSession) {
     if (sourceName === 'notify-fallback-watcher-stall') return;
     await logTmuxHookEvent(logsDir, {

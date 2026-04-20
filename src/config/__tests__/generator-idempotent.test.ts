@@ -15,7 +15,7 @@ function count(text: string, pattern: RegExp): number {
 }
 
 /** Assert the current OMCP block appears exactly once */
-function assertSingleOmxBlock(toml: string): void {
+function assertSingleOmcpBlock(toml: string): void {
   assert.equal(
     count(toml, /# oh-my-copilot \(OMCP\) Configuration/g),
     1,
@@ -103,7 +103,7 @@ describe("config generator idempotency (#384)", () => {
       await mergeConfig(configPath, wd);
       const toml = await readFile(configPath, "utf-8");
 
-      assertSingleOmxBlock(toml);
+      assertSingleOmcpBlock(toml);
       assert.match(toml, /^multi_agent = true$/m);
       assert.match(toml, /^child_agents_md = true$/m);
       assert.match(toml, /^codex_hooks = true$/m);
@@ -120,12 +120,12 @@ describe("config generator idempotency (#384)", () => {
       // First run
       await mergeConfig(configPath, wd);
       const first = await readFile(configPath, "utf-8");
-      assertSingleOmxBlock(first);
+      assertSingleOmcpBlock(first);
 
       // Second run
       await mergeConfig(configPath, wd);
       const second = await readFile(configPath, "utf-8");
-      assertSingleOmxBlock(second);
+      assertSingleOmcpBlock(second);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -141,7 +141,7 @@ describe("config generator idempotency (#384)", () => {
       await mergeConfig(configPath, wd);
 
       const toml = await readFile(configPath, "utf-8");
-      assertSingleOmxBlock(toml);
+      assertSingleOmcpBlock(toml);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -183,7 +183,7 @@ describe("config generator idempotency (#384)", () => {
       await mergeConfig(configPath, wd);
       const toml = await readFile(configPath, "utf-8");
 
-      assertSingleOmxBlock(toml);
+      assertSingleOmcpBlock(toml);
 
       // User settings preserved
       assert.match(toml, /^model = "o3"$/m, "user model preserved");
@@ -230,7 +230,7 @@ describe("config generator idempotency (#384)", () => {
       await mergeConfig(configPath, wd);
       const toml = await readFile(configPath, "utf-8");
 
-      assertSingleOmxBlock(toml);
+      assertSingleOmcpBlock(toml);
       assert.match(toml, /^model = "o3"$/m, "user model preserved");
       assert.match(toml, /^\[user\.settings\]$/m, "user section preserved");
       assert.match(toml, /^name = "kept"$/m, "user key preserved");
@@ -256,7 +256,7 @@ describe("config generator idempotency (#384)", () => {
       await mergeConfig(configPath, wd);
       const result = await readFile(configPath, "utf-8");
 
-      assertSingleOmxBlock(result);
+      assertSingleOmcpBlock(result);
       assert.match(
         result,
         /^\[user\.prefs\]$/m,
@@ -299,7 +299,7 @@ describe("config generator idempotency (#384)", () => {
       await mergeConfig(configPath, wd);
       const toml = await readFile(configPath, "utf-8");
 
-      assertSingleOmxBlock(toml);
+      assertSingleOmcpBlock(toml);
       assert.match(toml, /^\[user\.custom\]$/m, "user section preserved");
       assert.match(toml, /^name = "kept"$/m, "user key preserved");
       assert.match(toml, /^\[agents\]$/m, "global agents settings added");
@@ -636,7 +636,7 @@ describe("config generator idempotency (#384)", () => {
       await mergeConfig(configPath, wd);
       const toml = await readFile(configPath, "utf-8");
 
-      assertSingleOmxBlock(toml);
+      assertSingleOmcpBlock(toml);
       assert.doesNotMatch(toml, /^\[mcp_servers\.omcp_team_run\]$/m);
       assert.doesNotMatch(toml, /team-server\.js/);
       assert.match(toml, /^\[user\.before\]$/m);
@@ -671,7 +671,7 @@ describe("config generator idempotency (#384)", () => {
       assert.equal(didRepair, true, "legacy team-run config should be repaired");
 
       const toml = await readFile(configPath, "utf-8");
-      assertSingleOmxBlock(toml);
+      assertSingleOmcpBlock(toml);
       assert.doesNotMatch(toml, /^\[mcp_servers\.omcp_team_run\]$/m);
       assert.doesNotMatch(toml, /team-server\.js/);
       assert.match(toml, /^\[user\.before\]$/m);
@@ -708,7 +708,7 @@ describe("config generator idempotency (#384)", () => {
 
       const repaired = await readFile(configPath, "utf-8");
       assert.equal(count(repaired, /^\[tui\]$/gm), 1, "[tui] should appear once after repair");
-      assertSingleOmxBlock(repaired);
+      assertSingleOmcpBlock(repaired);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }

@@ -128,9 +128,9 @@ const maxLifetimeMs = runOnce
     )
   );
 
-const omxDir = join(cwd, '.omcp');
-const logsDir = join(omxDir, 'logs');
-const stateDir = join(omxDir, 'state');
+const omcpDir = join(cwd, '.omcp');
+const logsDir = join(omcpDir, 'logs');
+const stateDir = join(omcpDir, 'state');
 const statePath = join(stateDir, 'notify-fallback-state.json');
 const pidFilePath = resolve(argValue('--pid-file', join(stateDir, 'notify-fallback.pid')));
 const logPath = join(logsDir, `notify-fallback-${new Date().toISOString().split('T')[0]}.jsonl`);

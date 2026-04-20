@@ -6,15 +6,15 @@ import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  const result = spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const result = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: {
@@ -46,7 +46,7 @@ describe('omcp resume', () => {
       await writeFile(fakePsPath, '#!/bin/sh\nexit 0\n');
       await chmod(fakePsPath, 0o755);
 
-      const result = runOmx(wd, ['resume', '--last'], {
+      const result = runOmcp(wd, ['resume', '--last'], {
         HOME: home,
         PATH: `${fakeBin}:/usr/bin:/bin`,
         OMCP_AUTO_UPDATE: '0',
@@ -76,7 +76,7 @@ describe('omcp resume', () => {
       await writeFile(fakePsPath, '#!/bin/sh\nexit 0\n');
       await chmod(fakePsPath, 0o755);
 
-      const result = runOmx(wd, ['resume', '--help'], {
+      const result = runOmcp(wd, ['resume', '--help'], {
         HOME: home,
         PATH: `${fakeBin}:/usr/bin:/bin`,
         OMCP_AUTO_UPDATE: '0',

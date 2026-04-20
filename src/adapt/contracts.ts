@@ -92,7 +92,7 @@ export interface AdaptOpenClawMetadata {
 	gateways: AdaptOpenClawGatewayObservation[];
 	hooks: AdaptOpenClawHookObservation[];
 	lifecycleBridge: Array<{
-		omxEvent: string;
+		omcpEvent: string;
 		openclawEvent: string;
 	}>;
 	bootstrap?: {

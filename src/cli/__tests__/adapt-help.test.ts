@@ -6,11 +6,11 @@ import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
-function runOmx(cwd: string, argv: string[]) {
+function runOmcp(cwd: string, argv: string[]) {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  return spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  return spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: {
@@ -26,11 +26,11 @@ describe('omcp adapt help', () => {
   it('documents adapt in top-level help and routes adapt-local help output', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-adapt-help-'));
     try {
-      const mainHelp = runOmx(cwd, ['--help']);
+      const mainHelp = runOmcp(cwd, ['--help']);
       assert.equal(mainHelp.status, 0, mainHelp.stderr || mainHelp.stdout);
       assert.match(mainHelp.stdout, /omcp adapt\s+Scaffold OMCP-owned adapter foundations for persistent external targets/i);
 
-      const adaptHelp = runOmx(cwd, ['adapt', '--help']);
+      const adaptHelp = runOmcp(cwd, ['adapt', '--help']);
       assert.equal(adaptHelp.status, 0, adaptHelp.stderr || adaptHelp.stdout);
       assert.match(adaptHelp.stdout, /Usage: omcp adapt <target> <probe\|status\|init\|envelope\|doctor>/i);
     } finally {

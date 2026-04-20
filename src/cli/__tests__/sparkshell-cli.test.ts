@@ -20,15 +20,15 @@ import {
 } from '../sparkshell.js';
 import { buildCapturePaneArgv as buildNotificationCapturePaneArgv } from '../../notifications/tmux-detector.js';
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error?: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  const result = spawnSync('node', [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const result = spawnSync('node', [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: { ...process.env, ...envOverrides },
@@ -391,7 +391,7 @@ describe('omcp sparkshell', () => {
   it('includes sparkshell in top-level help output', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-sparkshell-help-'));
     try {
-      const result = runOmx(cwd, ['--help']);
+      const result = runOmcp(cwd, ['--help']);
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
       assert.equal(result.status, 0, result.stderr || result.stdout);
@@ -407,7 +407,7 @@ describe('omcp sparkshell', () => {
   it('prints sparkshell usage when invoked with --help', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-sparkshell-subhelp-'));
     try {
-      const result = runOmx(cwd, ['sparkshell', '--help']);
+      const result = runOmcp(cwd, ['sparkshell', '--help']);
       if (shouldSkipForSpawnPermissions(result.error)) return;
 
       assert.equal(result.status, 0, result.stderr || result.stdout);
@@ -437,7 +437,7 @@ describe('omcp sparkshell', () => {
         await chmod(stubPath, 0o755);
       }
 
-      const result = runOmx(cwd, ['sparkshell', 'git', 'status'], {
+      const result = runOmcp(cwd, ['sparkshell', 'git', 'status'], {
         OMCP_SPARKSHELL_BIN: stubPath,
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;
@@ -468,7 +468,7 @@ describe('omcp sparkshell', () => {
       );
       if (process.platform !== 'win32') await chmod(stubPath, 0o755);
 
-      const result = runOmx(cwd, ['sparkshell', 'node', '-e', 'process.stdout.write("raw-fallback\\n")'], {
+      const result = runOmcp(cwd, ['sparkshell', 'node', '-e', 'process.stdout.write("raw-fallback\\n")'], {
         OMCP_NATIVE_CACHE_DIR: cacheDir,
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;
@@ -486,7 +486,7 @@ describe('omcp sparkshell', () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omcp-sparkshell-missing-'));
     try {
       const missingBinary = join(cwd, 'bin', 'does-not-exist');
-      const result = runOmx(cwd, ['sparkshell', 'ls'], {
+      const result = runOmcp(cwd, ['sparkshell', 'ls'], {
         OMCP_SPARKSHELL_BIN: missingBinary,
       });
       if (shouldSkipForSpawnPermissions(result.error)) return;

@@ -20,7 +20,7 @@ import { questionCommand } from "./question.js";
 import { stateCommand } from "./state.js";
 import {
   cleanupCommand,
-  cleanupOmxMcpProcesses,
+  cleanupOmcpMcpProcesses,
   findLaunchSafeCleanupCandidates,
   type CleanupDependencies,
   type CleanupResult,
@@ -82,7 +82,7 @@ import {
   mitigateCopyModeUnderlineArtifacts,
 } from "../team/tmux-session.js";
 import { getPackageRoot } from "../utils/package.js";
-import { codexConfigPath, rememberOmxLaunchContext, resolveOmxEntryPath } from "../utils/paths.js";
+import { codexConfigPath, rememberOmcpLaunchContext, resolveOmcpEntryPath } from "../utils/paths.js";
 import { repairConfigIfNeeded } from "../config/generator.js";
 import { HUD_TMUX_HEIGHT_LINES } from "../hud/constants.js";
 import {
@@ -94,7 +94,7 @@ import {
 
 export { parseTmuxPaneSnapshot, isHudWatchPane, findHudWatchPaneIds } from "../hud/tmux.js";
 
-rememberOmxLaunchContext();
+rememberOmcpLaunchContext();
 import {
   classifySpawnError,
   resolveTmuxBinaryForPlatform,
@@ -2026,7 +2026,7 @@ export function shouldEnableNotifyFallbackWatcher(
 export async function cleanupLaunchOrphanedMcpProcesses(
   dependencies: CleanupDependencies = {},
 ): Promise<CleanupResult> {
-  return cleanupOmxMcpProcesses([], {
+  return cleanupOmcpMcpProcesses([], {
     ...dependencies,
     selectCandidates: dependencies.selectCandidates ?? findLaunchSafeCleanupCandidates,
     writeLine: dependencies.writeLine ?? (() => {}),
@@ -2418,13 +2418,13 @@ function runCodex(
     sessionModelInstructionsPath(cwd, sessionId),
   );
   const nativeWindows = isNativeWindows();
-  const omxBin = resolveOmxEntryPath();
-  if (!omxBin) {
+  const omcpBin = resolveOmcpEntryPath();
+  if (!omcpBin) {
     throw new Error("Unable to resolve OMCP launcher path for tmux HUD bootstrap");
   }
   const hudCmd = nativeWindows
-    ? buildWindowsPromptCommand("node", [omxBin, "hud", "--watch"])
-    : buildTmuxPaneCommand("env", [`OMCP_SESSION_ID=${sessionId}`, "node", omxBin, "hud", "--watch"]);
+    ? buildWindowsPromptCommand("node", [omcpBin, "hud", "--watch"])
+    : buildTmuxPaneCommand("env", [`OMCP_SESSION_ID=${sessionId}`, "node", omcpBin, "hud", "--watch"]);
   const inheritLeaderFlags = process.env[TEAM_INHERIT_LEADER_FLAGS_ENV] !== "0";
   const workerLaunchArgs = resolveTeamWorkerLaunchArgsEnv(
     process.env[TEAM_WORKER_LAUNCH_ARGS_ENV],
@@ -3103,7 +3103,7 @@ function parseWatcherPidRecord(content: string): WatcherPidRecord | null {
   return pid ? { pid, startedAt: null } : null;
 }
 
-function isLikelyOmxWatcherProcess(
+function isLikelyOmcpWatcherProcess(
   pid: number,
   execFileSyncFn: typeof execFileSync = execFileSync,
   platform: NodeJS.Platform = process.platform,
@@ -3144,7 +3144,7 @@ export async function reapStaleNotifyFallbackWatcher(
   const tryKillPidImpl = deps.tryKillPid ?? tryKillPid;
   const hasErrnoCodeImpl = deps.hasErrnoCode ?? hasErrnoCode;
   const warn = deps.warn ?? console.warn;
-  const isWatcherProcessImpl = deps.isWatcherProcess ?? isLikelyOmxWatcherProcess;
+  const isWatcherProcessImpl = deps.isWatcherProcess ?? isLikelyOmcpWatcherProcess;
 
   try {
     const record = parseWatcherPidRecord(await readFileImpl(pidPath, "utf-8"));

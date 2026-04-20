@@ -5,7 +5,7 @@ use std::process::Command;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 fn sparkshell_bin() -> &'static str {
-    env!("CARGO_BIN_EXE_omx-sparkshell")
+    env!("CARGO_BIN_EXE_omcp-sparkshell")
 }
 
 fn unique_temp_dir(name: &str) -> PathBuf {

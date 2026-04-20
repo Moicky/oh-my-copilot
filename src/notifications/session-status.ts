@@ -6,7 +6,7 @@ import {
   readSubagentSessionSummary,
   type SubagentSessionSummary,
 } from '../subagents/tracker.js';
-import { omxLogsDir } from '../utils/paths.js';
+import { omcpLogsDir } from '../utils/paths.js';
 import type { SessionMapping } from './session-registry.js';
 
 export const DISCORD_STATUS_COMMAND = 'status';
@@ -56,7 +56,7 @@ function readLatestHistoryEntry(
 ): SessionHistoryEntry | null {
   const existsSyncImpl = deps.existsSyncImpl ?? existsSync;
   const readFileSyncImpl = deps.readFileSyncImpl ?? readFileSync;
-  const historyPath = join(omxLogsDir(projectPath), 'session-history.jsonl');
+  const historyPath = join(omcpLogsDir(projectPath), 'session-history.jsonl');
   if (!existsSyncImpl(historyPath)) return null;
 
   try {

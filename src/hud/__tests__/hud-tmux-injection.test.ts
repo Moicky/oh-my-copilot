@@ -17,12 +17,12 @@ import { HUD_TMUX_HEIGHT_LINES } from '../constants.js';
 describe('VULNERABILITY – old string-interpolation approach', () => {
   /**
    * Reproduces the exact string construction from the original code:
-   *   const cmd  = `node ${omxBin} hud --watch${presetArg}`;
+   *   const cmd  = `node ${omcpBin} hud --watch${presetArg}`;
    *   execSync(`tmux split-window -v -l 4 -c "${cwd}" '${cmd}'`);
    */
-  function buildOldCommand(cwd: string, omxBin: string, preset?: string): string {
+  function buildOldCommand(cwd: string, omcpBin: string, preset?: string): string {
     const presetArg = preset ? ` --preset=${preset}` : '';
-    const cmd = `node ${omxBin} hud --watch${presetArg}`;
+    const cmd = `node ${omcpBin} hud --watch${presetArg}`;
     return `tmux split-window -v -l ${HUD_TMUX_HEIGHT_LINES} -c "${cwd}" '${cmd}'`;
   }
 
@@ -47,9 +47,9 @@ describe('VULNERABILITY – old string-interpolation approach', () => {
     );
   });
 
-  it("omxBin containing single quote breaks out of the '-quoted command", () => {
-    const maliciousOmx = "/tmp/it';touch /tmp/pwned;echo '/omcp.js";
-    const shellCmd = buildOldCommand('/home/user', maliciousOmx);
+  it("omcpBin containing single quote breaks out of the '-quoted command", () => {
+    const maliciousOmcp = "/tmp/it';touch /tmp/pwned;echo '/omcp.js";
+    const shellCmd = buildOldCommand('/home/user', maliciousOmcp);
 
     // The injected single quote terminates the tmux shell-command argument
     // early, allowing arbitrary commands to follow.
@@ -120,9 +120,9 @@ describe('buildTmuxSplitArgs – shell injection hardening', () => {
     assert.ok(!args[6].includes('`id'));
   });
 
-  it("omxBin with single quote is properly escaped in command string", () => {
-    const maliciousOmx = "/tmp/it's/omcp.js";
-    const args = buildTmuxSplitArgs('/home/user', maliciousOmx);
+  it("omcpBin with single quote is properly escaped in command string", () => {
+    const maliciousOmcp = "/tmp/it's/omcp.js";
+    const args = buildTmuxSplitArgs('/home/user', maliciousOmcp);
     const cmd = args[6];
 
     // The single quote must be escaped, not a raw breakout.
@@ -133,26 +133,26 @@ describe('buildTmuxSplitArgs – shell injection hardening', () => {
     assert.equal(cmd, "node '/tmp/it'\\''s/omcp.js' hud --watch");
   });
 
-  it('omxBin with $() is neutralised by single-quote wrapping', () => {
-    const maliciousOmx = '/tmp/$(id)/omcp.js';
-    const args = buildTmuxSplitArgs('/home/user', maliciousOmx);
+  it('omcpBin with $() is neutralised by single-quote wrapping', () => {
+    const maliciousOmcp = '/tmp/$(id)/omcp.js';
+    const args = buildTmuxSplitArgs('/home/user', maliciousOmcp);
     const cmd = args[6];
 
     // Inside single quotes, $() is literal.
     assert.equal(cmd, "node '/tmp/$(id)/omcp.js' hud --watch");
   });
 
-  it('omxBin with backticks is neutralised by single-quote wrapping', () => {
-    const maliciousOmx = '/tmp/`whoami`/omcp.js';
-    const args = buildTmuxSplitArgs('/home/user', maliciousOmx);
+  it('omcpBin with backticks is neutralised by single-quote wrapping', () => {
+    const maliciousOmcp = '/tmp/`whoami`/omcp.js';
+    const args = buildTmuxSplitArgs('/home/user', maliciousOmcp);
     const cmd = args[6];
 
     assert.equal(cmd, "node '/tmp/`whoami`/omcp.js' hud --watch");
   });
 
-  it("omxBin with ';command' breakout attempt is neutralised", () => {
-    const maliciousOmx = "/tmp/x';touch /tmp/pwned;echo '/omcp.js";
-    const args = buildTmuxSplitArgs('/home/user', maliciousOmx);
+  it("omcpBin with ';command' breakout attempt is neutralised", () => {
+    const maliciousOmcp = "/tmp/x';touch /tmp/pwned;echo '/omcp.js";
+    const args = buildTmuxSplitArgs('/home/user', maliciousOmcp);
     const cmd = args[6];
 
     // The shell-escape wraps the entire path in single quotes with internal

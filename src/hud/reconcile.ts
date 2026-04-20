@@ -10,7 +10,7 @@ import {
   resizeTmuxPane,
   type TmuxPaneSnapshot,
 } from './tmux.js';
-import { resolveOmxCliEntryPath } from '../utils/paths.js';
+import { resolveOmcpCliEntryPath } from '../utils/paths.js';
 
 export interface ReconcileHudForPromptSubmitResult {
   status:
@@ -37,7 +37,7 @@ export interface ReconcileHudForPromptSubmitDeps {
   killTmuxPane?: (paneId: string) => boolean;
   resizeTmuxPane?: (paneId: string, heightLines: number) => boolean;
   readHudConfig?: typeof readHudConfig;
-  resolveOmxCliEntryPath?: typeof resolveOmxCliEntryPath;
+  resolveOmcpCliEntryPath?: typeof resolveOmcpCliEntryPath;
 }
 
 export async function reconcileHudForPromptSubmit(
@@ -54,9 +54,9 @@ export async function reconcileHudForPromptSubmit(
     };
   }
 
-  const resolveOmxCliEntryPathFn = deps.resolveOmxCliEntryPath ?? resolveOmxCliEntryPath;
-  const omxBin = resolveOmxCliEntryPathFn();
-  if (!omxBin) {
+  const resolveOmcpCliEntryPathFn = deps.resolveOmcpCliEntryPath ?? resolveOmcpCliEntryPath;
+  const omcpBin = resolveOmcpCliEntryPathFn();
+  if (!omcpBin) {
     return {
       status: 'skipped_no_entry',
       paneId: null,
@@ -81,7 +81,7 @@ export async function reconcileHudForPromptSubmit(
   const hudConfig = await readHudConfigFn(cwd).catch(() => null);
   const preset = hudConfig?.preset;
   const resolvedSessionId = deps.sessionId?.trim() || env.OMCP_SESSION_ID?.trim() || undefined;
-  const hudCmd = buildHudWatchCommand(omxBin, preset, resolvedSessionId);
+  const hudCmd = buildHudWatchCommand(omcpBin, preset, resolvedSessionId);
 
   if (hudPaneIds.length === 1) {
     const resized = resizePane(hudPaneIds[0], desiredHeight);

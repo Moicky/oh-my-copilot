@@ -13,18 +13,18 @@ import {
   legacyUserSkillsDir,
   listInstalledSkillDirectories,
   detectLegacySkillRootOverlap,
-  omxStateDir,
-  omxProjectMemoryPath,
-  omxNotepadPath,
-  omxPlansDir,
-  omxAdaptersDir,
-  omxLogsDir,
+  omcpStateDir,
+  omcpProjectMemoryPath,
+  omcpNotepadPath,
+  omcpPlansDir,
+  omcpAdaptersDir,
+  omcpLogsDir,
   packageRoot,
   OMCP_ENTRY_PATH_ENV,
   OMCP_STARTUP_CWD_ENV,
-  rememberOmxLaunchContext,
-  resolveOmxCliEntryPath,
-  resolveOmxEntryPath,
+  rememberOmcpLaunchContext,
+  resolveOmcpCliEntryPath,
+  resolveOmcpEntryPath,
 } from "../paths.js";
 
 describe("codexHome", () => {
@@ -188,9 +188,9 @@ describe("legacyUserSkillsDir", () => {
   });
 });
 
-describe("omxAdaptersDir", () => {
+describe("omcpAdaptersDir", () => {
   it("returns .omcp/adapters under the project root", () => {
-    assert.equal(omxAdaptersDir("/my/project"), join("/my/project", ".omcp", "adapters"));
+    assert.equal(omcpAdaptersDir("/my/project"), join("/my/project", ".omcp", "adapters"));
   });
 });
 
@@ -344,59 +344,59 @@ describe("listInstalledSkillDirectories", () => {
   });
 });
 
-describe("omxStateDir", () => {
+describe("omcpStateDir", () => {
   it("uses provided projectRoot", () => {
-    assert.equal(omxStateDir("/my/project"), join("/my/project", ".omcp", "state"));
+    assert.equal(omcpStateDir("/my/project"), join("/my/project", ".omcp", "state"));
   });
 
   it("defaults to cwd when no projectRoot given", () => {
-    assert.equal(omxStateDir(), join(process.cwd(), ".omcp", "state"));
+    assert.equal(omcpStateDir(), join(process.cwd(), ".omcp", "state"));
   });
 });
 
-describe("omxProjectMemoryPath", () => {
+describe("omcpProjectMemoryPath", () => {
   it("uses provided projectRoot", () => {
     assert.equal(
-      omxProjectMemoryPath("/my/project"),
+      omcpProjectMemoryPath("/my/project"),
       join("/my/project", ".omcp", "project-memory.json"),
     );
   });
 
   it("defaults to cwd when no projectRoot given", () => {
     assert.equal(
-      omxProjectMemoryPath(),
+      omcpProjectMemoryPath(),
       join(process.cwd(), ".omcp", "project-memory.json"),
     );
   });
 });
 
-describe("omxNotepadPath", () => {
+describe("omcpNotepadPath", () => {
   it("uses provided projectRoot", () => {
-    assert.equal(omxNotepadPath("/my/project"), join("/my/project", ".omcp", "notepad.md"));
+    assert.equal(omcpNotepadPath("/my/project"), join("/my/project", ".omcp", "notepad.md"));
   });
 
   it("defaults to cwd when no projectRoot given", () => {
-    assert.equal(omxNotepadPath(), join(process.cwd(), ".omcp", "notepad.md"));
+    assert.equal(omcpNotepadPath(), join(process.cwd(), ".omcp", "notepad.md"));
   });
 });
 
-describe("omxPlansDir", () => {
+describe("omcpPlansDir", () => {
   it("uses provided projectRoot", () => {
-    assert.equal(omxPlansDir("/my/project"), join("/my/project", ".omcp", "plans"));
+    assert.equal(omcpPlansDir("/my/project"), join("/my/project", ".omcp", "plans"));
   });
 
   it("defaults to cwd when no projectRoot given", () => {
-    assert.equal(omxPlansDir(), join(process.cwd(), ".omcp", "plans"));
+    assert.equal(omcpPlansDir(), join(process.cwd(), ".omcp", "plans"));
   });
 });
 
-describe("omxLogsDir", () => {
+describe("omcpLogsDir", () => {
   it("uses provided projectRoot", () => {
-    assert.equal(omxLogsDir("/my/project"), join("/my/project", ".omcp", "logs"));
+    assert.equal(omcpLogsDir("/my/project"), join("/my/project", ".omcp", "logs"));
   });
 
   it("defaults to cwd when no projectRoot given", () => {
-    assert.equal(omxLogsDir(), join(process.cwd(), ".omcp", "logs"));
+    assert.equal(omcpLogsDir(), join(process.cwd(), ".omcp", "logs"));
   });
 });
 
@@ -433,7 +433,7 @@ describe("OMCP launcher path resolution", () => {
       await mkdir(launcherDir, { recursive: true });
       await writeFile(launcherPath, "#!/usr/bin/env node\n", "utf-8");
 
-      const resolved = resolveOmxEntryPath({
+      const resolved = resolveOmcpEntryPath({
         argv1: "dist/cli/omcp.js",
         cwd: laterCwd,
         env: {
@@ -459,7 +459,7 @@ describe("OMCP launcher path resolution", () => {
 
       delete process.env[OMCP_ENTRY_PATH_ENV];
       delete process.env[OMCP_STARTUP_CWD_ENV];
-      rememberOmxLaunchContext({
+      rememberOmcpLaunchContext({
         argv1: "dist/cli/omcp.js",
         cwd: startupCwd,
         env: process.env,
@@ -485,7 +485,7 @@ describe("OMCP launcher path resolution", () => {
       await writeFile(hookPath, "#!/usr/bin/env node\n", "utf-8");
       await writeFile(cliPath, "#!/usr/bin/env node\n", "utf-8");
 
-      const resolved = resolveOmxCliEntryPath({
+      const resolved = resolveOmcpCliEntryPath({
         argv1: "dist/scripts/codex-native-hook.js",
         cwd: startupCwd,
         env: {
@@ -510,7 +510,7 @@ describe("OMCP launcher path resolution", () => {
       await mkdir(cliDir, { recursive: true });
       await writeFile(cliPath, "#!/usr/bin/env node\n", "utf-8");
 
-      const resolved = resolveOmxCliEntryPath({
+      const resolved = resolveOmcpCliEntryPath({
         argv1: "dist/cli/omcp.js",
         cwd: startupCwd,
         env: {
@@ -536,7 +536,7 @@ describe("OMCP launcher path resolution", () => {
       await mkdir(cliDir, { recursive: true });
       await writeFile(cliPath, "#!/usr/bin/env node\n", "utf-8");
 
-      const resolved = resolveOmxCliEntryPath({
+      const resolved = resolveOmcpCliEntryPath({
         argv1: hostPath,
         cwd: startupCwd,
         env: {

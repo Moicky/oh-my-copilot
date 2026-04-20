@@ -14,7 +14,7 @@ import {
 } from "../../team/state.js";
 import {
   dispatchCodexNativeHook,
-  mapCodexHookEventToOmxEvent,
+  mapCodexHookEventToOmcpEvent,
   resolveSessionOwnerPidFromAncestry,
 } from "../codex-native-hook.js";
 import { writeSessionStart } from "../../hooks/session.js";
@@ -174,11 +174,11 @@ describe("codex native hook dispatch", () => {
   });
 
   it("maps Codex events onto OMCP logical surfaces", () => {
-    assert.equal(mapCodexHookEventToOmxEvent("SessionStart"), "session-start");
-    assert.equal(mapCodexHookEventToOmxEvent("UserPromptSubmit"), "keyword-detector");
-    assert.equal(mapCodexHookEventToOmxEvent("PreToolUse"), "pre-tool-use");
-    assert.equal(mapCodexHookEventToOmxEvent("PostToolUse"), "post-tool-use");
-    assert.equal(mapCodexHookEventToOmxEvent("Stop"), "stop");
+    assert.equal(mapCodexHookEventToOmcpEvent("SessionStart"), "session-start");
+    assert.equal(mapCodexHookEventToOmcpEvent("UserPromptSubmit"), "keyword-detector");
+    assert.equal(mapCodexHookEventToOmcpEvent("PreToolUse"), "pre-tool-use");
+    assert.equal(mapCodexHookEventToOmcpEvent("PostToolUse"), "post-tool-use");
+    assert.equal(mapCodexHookEventToOmcpEvent("Stop"), "stop");
   });
 
   it("writes SessionStart state against the long-lived session owner pid and stays quiet for clean sessions", async () => {
@@ -196,7 +196,7 @@ describe("codex native hook dispatch", () => {
         },
       );
 
-      assert.equal(result.omxEventName, "session-start");
+      assert.equal(result.omcpEventName, "session-start");
       assert.equal(result.outputJson, null);
       const sessionState = JSON.parse(
         await readFile(join(cwd, ".omcp", "state", "session.json"), "utf-8"),
@@ -253,7 +253,7 @@ describe("codex native hook dispatch", () => {
         { cwd },
       );
 
-      assert.equal(promptResult.omxEventName, "keyword-detector");
+      assert.equal(promptResult.omcpEventName, "keyword-detector");
       assert.equal(existsSync(join(stateDir, "sessions", canonicalSessionId, "skill-active-state.json")), true);
       assert.equal(existsSync(join(stateDir, "sessions", canonicalSessionId, "ralplan-state.json")), true);
       assert.equal(existsSync(join(stateDir, "sessions", nativeSessionId, "skill-active-state.json")), false);
@@ -291,7 +291,7 @@ describe("codex native hook dispatch", () => {
         },
       );
 
-      assert.equal(promptResult.omxEventName, "keyword-detector");
+      assert.equal(promptResult.omcpEventName, "keyword-detector");
       assert.deepEqual(reconcileCall, { cwd, sessionId: canonicalSessionId });
       assert.equal(existsSync(join(stateDir, "sessions", canonicalSessionId, "skill-active-state.json")), true);
       assert.equal(existsSync(join(stateDir, "sessions", canonicalSessionId, "ralplan-state.json")), true);
@@ -317,7 +317,7 @@ describe("codex native hook dispatch", () => {
         { cwd, sessionOwnerPid: 43210 },
       );
 
-      assert.equal(result.omxEventName, "session-start");
+      assert.equal(result.omcpEventName, "session-start");
       const gitignore = await readFile(join(cwd, ".gitignore"), "utf-8");
       assert.match(gitignore, /^node_modules\/\n\.omcp\/\n$/);
       assert.match(
@@ -483,7 +483,7 @@ describe("codex native hook dispatch", () => {
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "keyword-detector");
+      assert.equal(result.omcpEventName, "keyword-detector");
       assert.equal(result.skillState?.skill, "ralplan");
       assert.ok(result.outputJson, "UserPromptSubmit should emit developer context");
       assert.match(JSON.stringify(result.outputJson), /skill: ralplan activated and initial state initialized at \.omcp\/state\/sessions\/sess-1\/ralplan-state\.json; write subsequent updates via omcp_state MCP\./);
@@ -520,7 +520,7 @@ describe("codex native hook dispatch", () => {
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "keyword-detector");
+      assert.equal(result.omcpEventName, "keyword-detector");
       assert.equal(result.skillState, null);
       // Triage may inject advisory LIGHT/explore context for the question-shaped
       // prompt, but the invariant this test guards is that no Ralph workflow state
@@ -615,7 +615,7 @@ describe("codex native hook dispatch", () => {
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "keyword-detector");
+      assert.equal(result.omcpEventName, "keyword-detector");
       assert.equal(result.skillState?.skill, "ralph");
       const message = String(
         (result.outputJson as { hookSpecificOutput?: { additionalContext?: string } })?.hookSpecificOutput?.additionalContext || "",
@@ -667,7 +667,7 @@ describe("codex native hook dispatch", () => {
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "keyword-detector");
+      assert.equal(result.omcpEventName, "keyword-detector");
       assert.equal(result.skillState?.skill, "autopilot");
       const message = String(
         (result.outputJson as { hookSpecificOutput?: { additionalContext?: string } })?.hookSpecificOutput?.additionalContext || "",
@@ -698,7 +698,7 @@ describe("codex native hook dispatch", () => {
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "keyword-detector");
+      assert.equal(result.omcpEventName, "keyword-detector");
       assert.equal(result.skillState?.skill, "deep-interview");
       const message = String(
         (result.outputJson as { hookSpecificOutput?: { additionalContext?: string } })?.hookSpecificOutput?.additionalContext || "",
@@ -753,7 +753,7 @@ describe("codex native hook dispatch", () => {
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "keyword-detector");
+      assert.equal(result.omcpEventName, "keyword-detector");
       assert.equal(result.skillState?.skill, "ralph");
       const message = String(
         (result.outputJson as { hookSpecificOutput?: { additionalContext?: string } })?.hookSpecificOutput?.additionalContext || "",
@@ -787,7 +787,7 @@ describe("codex native hook dispatch", () => {
         { cwd },
       );
 
-      assert.equal(promptResult.omxEventName, "keyword-detector");
+      assert.equal(promptResult.omcpEventName, "keyword-detector");
       assert.equal(promptResult.skillState, null);
       assert.equal(promptResult.outputJson, null);
       assert.equal(existsSync(join(cwd, ".omcp", "state", "skill-active-state.json")), false);
@@ -803,7 +803,7 @@ describe("codex native hook dispatch", () => {
         { cwd },
       );
 
-      assert.equal(stopResult.omxEventName, "stop");
+      assert.equal(stopResult.omcpEventName, "stop");
       assert.equal(stopResult.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -872,7 +872,7 @@ export async function onHookEvent(event) {
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "keyword-detector");
+      assert.equal(result.omcpEventName, "keyword-detector");
       assert.equal(result.skillState, null);
       assert.equal(result.outputJson, null);
       assert.equal(existsSync(join(cwd, ".omcp", "state", "skill-active-state.json")), false);
@@ -897,7 +897,7 @@ export async function onHookEvent(event) {
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "keyword-detector");
+      assert.equal(result.omcpEventName, "keyword-detector");
       assert.equal(result.skillState?.skill, "team");
       assert.match(
         JSON.stringify(result.outputJson),
@@ -1083,7 +1083,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "keyword-detector");
+      assert.equal(result.omcpEventName, "keyword-detector");
       const tmuxCalls = await readFile(tmuxLog, "utf-8");
       assert.match(tmuxCalls, /list-panes/);
       assert.match(tmuxCalls, /split-window/);
@@ -1121,7 +1121,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         hookSpecificOutput: {
           hookEventName: "PreToolUse",
@@ -1148,7 +1148,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -1169,7 +1169,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1211,7 +1211,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -1232,7 +1232,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -1253,7 +1253,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -1274,7 +1274,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1316,7 +1316,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1358,7 +1358,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1400,7 +1400,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1442,7 +1442,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1484,7 +1484,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1526,7 +1526,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1568,7 +1568,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1610,7 +1610,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1652,7 +1652,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1696,7 +1696,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -1741,7 +1741,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "pre-tool-use");
+      assert.equal(result.omcpEventName, "pre-tool-use");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -1763,7 +1763,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "post-tool-use");
+      assert.equal(result.omcpEventName, "post-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: "The Bash output indicates a command/setup failure that should be fixed before retrying.",
@@ -1785,7 +1785,7 @@ esac
         {
           hook_event_name: "PostToolUse",
           cwd,
-          tool_name: "mcp__omx_state__state_write",
+          tool_name: "mcp__omcp_state__state_write",
           tool_use_id: "tool-mcp-transport",
           tool_input: { mode: "team", active: true },
           tool_response: "{\"error\":\"MCP transport closed\",\"details\":\"stdio pipe closed before response\"}",
@@ -1793,7 +1793,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "post-tool-use");
+      assert.equal(result.omcpEventName, "post-tool-use");
       const output = result.outputJson as {
         decision?: string;
         reason?: string;
@@ -1835,7 +1835,7 @@ esac
         {
           hook_event_name: "PostToolUse",
           cwd,
-          tool_name: "mcp__omx_state__state_write",
+          tool_name: "mcp__omcp_state__state_write",
           tool_use_id: "tool-mcp-nontransport",
           tool_input: { active: true },
           tool_response: "{\"error\":\"validation failed\",\"details\":\"mode is required\"}",
@@ -1843,7 +1843,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "post-tool-use");
+      assert.equal(result.omcpEventName, "post-tool-use");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -1875,7 +1875,7 @@ esac
           hook_event_name: "PostToolUse",
           cwd,
           session_id: "sess-transport",
-          tool_name: "mcp__omx_state__state_write",
+          tool_name: "mcp__omcp_state__state_write",
           tool_use_id: "tool-mcp-transport-team",
           tool_input: { mode: "team", active: true },
           tool_response: "{\"error\":\"MCP transport closed\",\"details\":\"stdio pipe closed before response\"}",
@@ -1939,7 +1939,7 @@ esac
           hook_event_name: "PostToolUse",
           cwd,
           session_id: nativeSessionId,
-          tool_name: "mcp__omx_state__state_write",
+          tool_name: "mcp__omcp_state__state_write",
           tool_use_id: "tool-mcp-transport-team-native",
           tool_input: { mode: "team", active: true },
           tool_response: "{\"error\":\"MCP transport closed\",\"details\":\"stdio pipe closed before response\"}",
@@ -1974,7 +1974,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "post-tool-use");
+      assert.equal(result.omcpEventName, "post-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: "The Bash command returned a non-zero exit code but produced useful output that should be reviewed before retrying.",
@@ -2004,7 +2004,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "post-tool-use");
+      assert.equal(result.omcpEventName, "post-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: "The Bash command returned a non-zero exit code but produced useful output that should be reviewed before retrying.",
@@ -2037,7 +2037,7 @@ esac
           hook_event_name: "PostToolUse",
           cwd,
           session_id: "sess-mcp-dead",
-          tool_name: "mcp__omx_state__state_write",
+          tool_name: "mcp__omcp_state__state_write",
           tool_use_id: "tool-mcp-dead",
           tool_response: JSON.stringify({
             error: "transport closed",
@@ -2047,7 +2047,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "post-tool-use");
+      assert.equal(result.omcpEventName, "post-tool-use");
       assert.equal(result.outputJson?.decision, "block");
       assert.match(String(result.outputJson?.reason || ""), /lost its transport\/server connection/);
       const hookSpecificOutput = result.outputJson?.hookSpecificOutput as {
@@ -2095,7 +2095,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "post-tool-use");
+      assert.equal(result.omcpEventName, "post-tool-use");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2125,7 +2125,7 @@ esac
           hook_event_name: "PostToolUse",
           cwd,
           session_id: "sess-stop-mcp-transport",
-          tool_name: "mcp__omx_state__state_write",
+          tool_name: "mcp__omcp_state__state_write",
           tool_use_id: "tool-mcp-fail",
           tool_input: { mode: "team", active: true },
           tool_response: JSON.stringify({
@@ -2136,7 +2136,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "post-tool-use");
+      assert.equal(result.omcpEventName, "post-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: "The MCP tool appears to have lost its transport/server connection. Preserve state, debug the transport failure, and use OMCP CLI/file-backed fallbacks instead of retrying blindly.",
@@ -2175,7 +2175,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -2208,7 +2208,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2296,7 +2296,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -2449,7 +2449,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -2499,7 +2499,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -2544,7 +2544,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -2593,7 +2593,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -2635,7 +2635,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2673,7 +2673,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -2712,7 +2712,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -2756,7 +2756,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -2800,7 +2800,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -2838,7 +2838,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -2879,7 +2879,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2937,7 +2937,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2965,7 +2965,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2997,7 +2997,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: "OMCP autoresearch is still active (phase: executing); continue until validator evidence is complete before stopping.",
@@ -3037,7 +3037,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3070,7 +3070,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, 'stop');
+      assert.equal(result.omcpEventName, 'stop');
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3146,7 +3146,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -3202,9 +3202,9 @@ esac
       const first = await dispatchCodexNativeHook(payload, { cwd });
       const replay = await dispatchCodexNativeHook({ ...payload, stop_hook_active: true }, { cwd });
 
-      assert.equal(first.omxEventName, "stop");
+      assert.equal(first.omcpEventName, "stop");
       assert.deepEqual(first.outputJson, expected);
-      assert.equal(replay.omxEventName, "stop");
+      assert.equal(replay.omcpEventName, "stop");
       assert.deepEqual(replay.outputJson, expected);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3249,7 +3249,7 @@ esac
           { cwd },
         );
 
-        assert.equal(result.omxEventName, "stop");
+        assert.equal(result.omcpEventName, "stop");
         assert.equal(result.outputJson, null);
       } finally {
         await rm(cwd, { recursive: true, force: true });
@@ -3292,7 +3292,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3335,7 +3335,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -3399,7 +3399,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -3434,7 +3434,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -3470,7 +3470,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3497,7 +3497,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3524,7 +3524,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3557,7 +3557,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3587,7 +3587,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3596,7 +3596,7 @@ esac
 
   it("keeps blocking Ralph Stop replays until the active task advances", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omcp-native-hook-stop-ralph-replay-"));
-    const previousOmxSessionId = process.env.OMCP_SESSION_ID;
+    const previousOmcpSessionId = process.env.OMCP_SESSION_ID;
     try {
       const stateDir = join(cwd, ".omcp", "state");
       await mkdir(stateDir, { recursive: true });
@@ -3632,12 +3632,12 @@ esac
         { cwd },
       );
 
-      assert.equal(first.omxEventName, "stop");
+      assert.equal(first.omcpEventName, "stop");
       assert.deepEqual(first.outputJson, expected);
-      assert.equal(replay.omxEventName, "stop");
+      assert.equal(replay.omcpEventName, "stop");
       assert.deepEqual(replay.outputJson, expected);
     } finally {
-      if (typeof previousOmxSessionId === "string") process.env.OMCP_SESSION_ID = previousOmxSessionId;
+      if (typeof previousOmcpSessionId === "string") process.env.OMCP_SESSION_ID = previousOmcpSessionId;
       else delete process.env.OMCP_SESSION_ID;
       await rm(cwd, { recursive: true, force: true });
     }
@@ -3661,7 +3661,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
@@ -3706,7 +3706,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
@@ -3755,7 +3755,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
@@ -3805,7 +3805,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
@@ -3834,7 +3834,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
@@ -3863,7 +3863,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
@@ -3920,7 +3920,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3953,7 +3953,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3982,7 +3982,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4013,7 +4013,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
@@ -4050,7 +4050,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
@@ -4093,7 +4093,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
@@ -4136,7 +4136,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
@@ -4176,7 +4176,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
@@ -4230,7 +4230,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -4290,7 +4290,7 @@ esac
         { cwd },
       );
 
-      assert.equal(duplicate.omxEventName, "stop");
+      assert.equal(duplicate.omcpEventName, "stop");
       assert.deepEqual(duplicate.outputJson, {
         decision: "block",
         reason:
@@ -4311,7 +4311,7 @@ esac
         { cwd },
       );
 
-      assert.equal(fresh.omxEventName, "stop");
+      assert.equal(fresh.omcpEventName, "stop");
       assert.deepEqual(fresh.outputJson, {
         decision: "block",
         reason:
@@ -4384,7 +4384,7 @@ esac
           { cwd },
         );
 
-        assert.equal(repeated.omxEventName, "stop");
+        assert.equal(repeated.omcpEventName, "stop");
         assert.deepEqual(repeated.outputJson, {
           decision: "block",
           reason: testCase.reason,
@@ -4436,7 +4436,7 @@ esac
         { cwd },
       );
 
-      assert.equal(repeated.omxEventName, "stop");
+      assert.equal(repeated.omcpEventName, "stop");
       assert.deepEqual(repeated.outputJson, {
         decision: "block",
         reason:
@@ -4478,7 +4478,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4507,7 +4507,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4556,7 +4556,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
@@ -4604,7 +4604,7 @@ esac
         { cwd },
       );
 
-      assert.equal(result.omxEventName, "stop");
+      assert.equal(result.omcpEventName, "stop");
       assert.equal(result.outputJson, null);
     } finally {
       await rm(cwd, { recursive: true, force: true });

@@ -18,7 +18,7 @@ import {
   writeTeamLeaderAttention,
   writeTeamPhase,
 } from "../team/state.js";
-import { omxNotepadPath, omxProjectMemoryPath } from "../utils/paths.js";
+import { omcpNotepadPath, omcpProjectMemoryPath } from "../utils/paths.js";
 import { getStateFilePath, getStatePath } from "../mcp/state-paths.js";
 import {
   detectKeywords,
@@ -74,7 +74,7 @@ interface NativeHookDispatchOptions {
 
 export interface NativeHookDispatchResult {
   hookEventName: CodexHookEventName | null;
-  omxEventName: string | null;
+  omcpEventName: string | null;
   skillState: SkillActiveState | null;
   outputJson: Record<string, unknown> | null;
 }
@@ -168,7 +168,7 @@ function readHookEventName(payload: CodexHookPayload): CodexHookEventName | null
   return null;
 }
 
-export function mapCodexHookEventToOmxEvent(
+export function mapCodexHookEventToOmcpEvent(
   hookEventName: CodexHookEventName | null,
 ): string | null {
   switch (hookEventName) {
@@ -265,10 +265,10 @@ async function readActiveRalphState(
   preferredSessionId?: string,
 ): Promise<Record<string, unknown> | null> {
   const sessionInfo = await readUsableSessionState(resolve(stateDir, "..", ".."));
-  const currentOmxSessionId = safeString(sessionInfo?.session_id).trim();
+  const currentOmcpSessionId = safeString(sessionInfo?.session_id).trim();
   const sessionCandidates = [...new Set([
     safeString(preferredSessionId).trim(),
-    currentOmxSessionId,
+    currentOmcpSessionId,
   ].filter(Boolean))];
 
   for (const sessionId of sessionCandidates) {
@@ -399,7 +399,7 @@ function resolveSessionOwnerPid(payload: CodexHookPayload): number {
   return process.pid;
 }
 
-async function ensureOmxGitignoreEntry(cwd: string): Promise<{ changed: boolean; gitignorePath?: string }> {
+async function ensureOmcpGitignoreEntry(cwd: string): Promise<{ changed: boolean; gitignorePath?: string }> {
   let repoRoot = "";
   try {
     repoRoot = execFileSync("git", ["rev-parse", "--show-toplevel"], {
@@ -433,7 +433,7 @@ async function buildSessionStartContext(
 ): Promise<string | null> {
   const sections: string[] = [];
 
-  const gitignoreResult = await ensureOmxGitignoreEntry(cwd);
+  const gitignoreResult = await ensureOmcpGitignoreEntry(cwd);
   if (gitignoreResult.changed) {
     sections.push(`Added .omcp/ to ${gitignoreResult.gitignorePath} to keep local OMCP state out of source control.`);
   }
@@ -459,7 +459,7 @@ async function buildSessionStartContext(
     sections.push(["[Active OMCP modes]", ...modeSummaries].join("\n"));
   }
 
-  const projectMemory = await readJsonIfExists(omxProjectMemoryPath(cwd));
+  const projectMemory = await readJsonIfExists(omcpProjectMemoryPath(cwd));
   if (projectMemory) {
     const directives = Array.isArray(projectMemory.directives) ? projectMemory.directives : [];
     const notes = Array.isArray(projectMemory.notes) ? projectMemory.notes : [];
@@ -485,9 +485,9 @@ async function buildSessionStartContext(
     }
   }
 
-  if (existsSync(omxNotepadPath(cwd))) {
+  if (existsSync(omcpNotepadPath(cwd))) {
     try {
-      const notepad = await readFile(omxNotepadPath(cwd), "utf-8");
+      const notepad = await readFile(omcpNotepadPath(cwd), "utf-8");
       const header = "## PRIORITY";
       const idx = notepad.indexOf(header);
       if (idx >= 0) {
@@ -1580,7 +1580,7 @@ export async function dispatchCodexNativeHook(
   const stateDir = join(cwd, ".omcp", "state");
   await mkdir(stateDir, { recursive: true });
 
-  const omxEventName = mapCodexHookEventToOmxEvent(hookEventName);
+  const omcpEventName = mapCodexHookEventToOmcpEvent(hookEventName);
   let skillState: SkillActiveState | null = null;
   let triageAdditionalContext: string | null = null;
 
@@ -1683,7 +1683,7 @@ export async function dispatchCodexNativeHook(
     await reconcileHudForPromptSubmitFn(cwd, { sessionId: canonicalSessionId || sessionIdForState || undefined }).catch(() => {});
   }
 
-  if (omxEventName) {
+  if (omcpEventName) {
     const baseContext = buildBaseContext(cwd, payload, hookEventName!);
     if (nativeSessionId) {
       baseContext.native_session_id = nativeSessionId;
@@ -1693,7 +1693,7 @@ export async function dispatchCodexNativeHook(
       baseContext.omcp_session_id = canonicalSessionId;
     }
     const event: HookEventEnvelope = buildNativeHookEvent(
-      omxEventName,
+      omcpEventName,
       baseContext,
       {
         session_id: eventSessionId,
@@ -1731,7 +1731,7 @@ export async function dispatchCodexNativeHook(
 
   return {
     hookEventName,
-    omxEventName,
+    omcpEventName,
     skillState,
     outputJson,
   };

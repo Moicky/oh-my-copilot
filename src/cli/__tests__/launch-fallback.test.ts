@@ -9,15 +9,15 @@ import { HUD_TMUX_HEIGHT_LINES } from '../../hud/constants.js';
 
 const CLI_SPAWN_TIMEOUT_MS = 15_000;
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  const result = spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const result = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     timeout: CLI_SPAWN_TIMEOUT_MS,
@@ -58,7 +58,7 @@ describe('omcp launch fallback when tmux is unavailable', () => {
       await writeFile(fakePsPath, '#!/bin/sh\nexit 0\n');
       await chmod(fakePsPath, 0o755);
 
-      const result = runOmx(
+      const result = runOmcp(
         wd,
         ['--xhigh', '--madmax'],
         {
@@ -140,7 +140,7 @@ exit 0
       );
       await chmod(fakeTmuxPath, 0o755);
 
-      const result = runOmx(
+      const result = runOmcp(
         wd,
         ['--madmax', '--tmux'],
         {
@@ -236,7 +236,7 @@ exit 0
       );
       await chmod(fakeTmuxPath, 0o755);
 
-      const result = runOmx(
+      const result = runOmcp(
         wd,
         ['--madmax', '--tmux'],
         {
@@ -331,7 +331,7 @@ exit 0
       );
       await chmod(fakeTmuxPath, 0o755);
 
-      const result = runOmx(
+      const result = runOmcp(
         wd,
         ['--madmax', '--tmux'],
         {

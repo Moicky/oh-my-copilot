@@ -24,11 +24,11 @@ const OPENCLAW_HOOK_EVENTS = [
 ] as const;
 
 const OPENCLAW_LIFECYCLE_BRIDGE = [
-	{ omxEvent: "session-start", openclawEvent: "session-start" },
-	{ omxEvent: "session-end", openclawEvent: "session-end" },
-	{ omxEvent: "session-idle", openclawEvent: "session-idle" },
-	{ omxEvent: "ask-user-question", openclawEvent: "ask-user-question" },
-	{ omxEvent: "session-stop", openclawEvent: "stop" },
+	{ omcpEvent: "session-start", openclawEvent: "session-start" },
+	{ omcpEvent: "session-end", openclawEvent: "session-end" },
+	{ omcpEvent: "session-idle", openclawEvent: "session-idle" },
+	{ omcpEvent: "ask-user-question", openclawEvent: "ask-user-question" },
+	{ omcpEvent: "session-stop", openclawEvent: "stop" },
 ] as const;
 
 function summarizeObservedState(

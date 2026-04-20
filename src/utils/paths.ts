@@ -46,7 +46,7 @@ export function sameFilePath(leftPath: string, rightPath: string): boolean {
   return canonicalizeComparablePath(leftPath) === canonicalizeComparablePath(rightPath);
 }
 
-export function resolveOmxEntryPath(
+export function resolveOmcpEntryPath(
   options: {
     argv1?: string | null;
     cwd?: string;
@@ -64,13 +64,13 @@ export function resolveOmxEntryPath(
   return resolveLauncherPath(rawPath, startupCwd);
 }
 
-function isOmxCliEntryPath(value: string | null | undefined): boolean {
+function isOmcpCliEntryPath(value: string | null | undefined): boolean {
   if (typeof value !== "string") return false;
   const normalized = value.trim().replace(/\\/g, "/");
   return normalized.endsWith('/dist/cli/omcp.js') || normalized.endsWith('/omcp.js')
 }
 
-export function resolveOmxCliEntryPath(
+export function resolveOmcpCliEntryPath(
   options: {
     argv1?: string | null;
     cwd?: string;
@@ -78,15 +78,15 @@ export function resolveOmxCliEntryPath(
     packageRootDir?: string;
   } = {},
 ): string | null {
-  const entry = resolveOmxEntryPath(options);
-  if (isOmxCliEntryPath(entry)) return entry;
+  const entry = resolveOmcpEntryPath(options);
+  if (isOmcpCliEntryPath(entry)) return entry;
 
   const packageRootDir = options.packageRootDir || packageRoot();
   const fallback = resolveLauncherPath(join(packageRootDir, 'dist', 'cli', 'omcp.js'), options.cwd || process.cwd());
   return existsSync(fallback) ? fallback : entry;
 }
 
-export function rememberOmxLaunchContext(
+export function rememberOmcpLaunchContext(
   options: {
     argv1?: string | null;
     cwd?: string;
@@ -99,7 +99,7 @@ export function rememberOmxLaunchContext(
   }
   if (String(env[OMCP_ENTRY_PATH_ENV] ?? "").trim() !== "") return;
 
-  const resolved = resolveOmxEntryPath({
+  const resolved = resolveOmcpEntryPath({
     argv1: options.argv1,
     cwd,
     env,
@@ -272,37 +272,37 @@ async function hashSkillDirectory(
 }
 
 /** oh-my-copilot state directory (.omcp/state/) */
-export function omxStateDir(projectRoot?: string): string {
+export function omcpStateDir(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omcp", "state");
 }
 
 /** oh-my-copilot project memory file (.omcp/project-memory.json) */
-export function omxProjectMemoryPath(projectRoot?: string): string {
+export function omcpProjectMemoryPath(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omcp", "project-memory.json");
 }
 
 /** oh-my-copilot notepad file (.omcp/notepad.md) */
-export function omxNotepadPath(projectRoot?: string): string {
+export function omcpNotepadPath(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omcp", "notepad.md");
 }
 
 /** oh-my-copilot wiki directory (.omcp/wiki/) */
-export function omxWikiDir(projectRoot?: string): string {
+export function omcpWikiDir(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omcp", "wiki");
 }
 
 /** oh-my-copilot plans directory (.omcp/plans/) */
-export function omxPlansDir(projectRoot?: string): string {
+export function omcpPlansDir(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omcp", "plans");
 }
 
 /** oh-my-copilot adapters directory (.omcp/adapters/) */
-export function omxAdaptersDir(projectRoot?: string): string {
+export function omcpAdaptersDir(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omcp", "adapters");
 }
 
 /** oh-my-copilot logs directory (.omcp/logs/) */
-export function omxLogsDir(projectRoot?: string): string {
+export function omcpLogsDir(projectRoot?: string): string {
   return join(projectRoot || process.cwd(), ".omcp", "logs");
 }
 

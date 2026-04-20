@@ -28,7 +28,7 @@ describe('reconcileHudForPromptSubmit', () => {
         resized.push({ paneId, heightLines });
         return true;
       },
-      resolveOmxCliEntryPath: () => '/repo/dist/cli/omcp.js',
+      resolveOmcpCliEntryPath: () => '/repo/dist/cli/omcp.js',
     });
 
     assert.equal(result.status, 'recreated');
@@ -54,7 +54,7 @@ describe('reconcileHudForPromptSubmit', () => {
         return '%9';
       },
       resizeTmuxPane: () => true,
-      resolveOmxCliEntryPath: () => '/repo/dist/cli/omcp.js',
+      resolveOmcpCliEntryPath: () => '/repo/dist/cli/omcp.js',
     });
 
     assert.equal(result.status, 'recreated');
@@ -84,7 +84,7 @@ describe('reconcileHudForPromptSubmit', () => {
         return '%9';
       },
       resizeTmuxPane: () => true,
-      resolveOmxCliEntryPath: () => '/repo/dist/cli/omcp.js',
+      resolveOmcpCliEntryPath: () => '/repo/dist/cli/omcp.js',
     });
 
     assert.equal(result.status, 'replaced_duplicates');
@@ -103,7 +103,7 @@ describe('reconcileHudForPromptSubmit', () => {
         resized.push({ paneId, heightLines });
         return true;
       },
-      resolveOmxCliEntryPath: () => '/repo/dist/cli/omcp.js',
+      resolveOmcpCliEntryPath: () => '/repo/dist/cli/omcp.js',
     });
 
     assert.equal(result.status, 'resized');

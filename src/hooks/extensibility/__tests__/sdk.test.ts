@@ -17,7 +17,7 @@ function makeEvent(event = 'session-start'): HookEventEnvelope {
   };
 }
 
-async function writeOmxStateFile(cwd: string, fileName: string, value: unknown): Promise<void> {
+async function writeOmcpStateFile(cwd: string, fileName: string, value: unknown): Promise<void> {
   const stateDir = join(cwd, '.omcp', 'state');
   const targetPath = join(stateDir, fileName);
   await mkdir(dirname(targetPath), { recursive: true });
@@ -326,7 +326,7 @@ exit 1
     it('reads session state from .omcp/state/session.json', async () => {
       const cwd = await mkdtemp(join(tmpdir(), 'omcp-sdk-'));
       try {
-        await writeOmxStateFile(cwd, 'session.json', {
+        await writeOmcpStateFile(cwd, 'session.json', {
           session_id: 'session-123',
           cwd,
           started_at: '2026-01-01T00:00:00.000Z',
@@ -347,7 +347,7 @@ exit 1
     it('returns null for invalid session state without session_id', async () => {
       const cwd = await mkdtemp(join(tmpdir(), 'omcp-sdk-'));
       try {
-        await writeOmxStateFile(cwd, 'session.json', {
+        await writeOmcpStateFile(cwd, 'session.json', {
           started_at: '2026-01-01T00:00:00.000Z',
         });
 
@@ -361,16 +361,16 @@ exit 1
     it('reads hud, notifyFallback, and updateCheck state from root-scoped omcp files', async () => {
       const cwd = await mkdtemp(join(tmpdir(), 'omcp-sdk-'));
       try {
-        await writeOmxStateFile(cwd, 'hud-state.json', {
+        await writeOmcpStateFile(cwd, 'hud-state.json', {
           last_turn_at: '2026-01-01T00:00:00.000Z',
           turn_count: 3,
         });
-        await writeOmxStateFile(cwd, 'notify-fallback-state.json', {
+        await writeOmcpStateFile(cwd, 'notify-fallback-state.json', {
           pid: 1234,
           stopping: false,
           tracked_files: 2,
         });
-        await writeOmxStateFile(cwd, 'update-check.json', {
+        await writeOmcpStateFile(cwd, 'update-check.json', {
           last_checked_at: '2026-01-01T00:00:00.000Z',
           last_seen_latest: '0.11.0',
         });
@@ -397,17 +397,17 @@ exit 1
     it('reads hud state from the current session scope instead of stale root fallback', async () => {
       const cwd = await mkdtemp(join(tmpdir(), 'omcp-sdk-hud-session-'));
       try {
-        await writeOmxStateFile(cwd, 'session.json', {
+        await writeOmcpStateFile(cwd, 'session.json', {
           session_id: 'sess-current',
           cwd,
           started_at: '2026-01-01T00:00:00.000Z',
         });
-        await writeOmxStateFile(cwd, 'hud-state.json', {
+        await writeOmcpStateFile(cwd, 'hud-state.json', {
           last_turn_at: 'root-stale',
           turn_count: 99,
           last_agent_output: 'Would you like me to continue?',
         });
-        await writeOmxStateFile(cwd, join('sessions', 'sess-current', 'hud-state.json'), {
+        await writeOmcpStateFile(cwd, join('sessions', 'sess-current', 'hud-state.json'), {
           last_turn_at: '2026-01-01T00:00:00.000Z',
           turn_count: 3,
           last_agent_output: 'Current session output',

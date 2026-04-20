@@ -20,8 +20,8 @@ import { existsSync } from "fs";
 import {
   codexHome,
   listInstalledSkillDirectories,
-  omxNotepadPath,
-  omxProjectMemoryPath,
+  omcpNotepadPath,
+  omcpProjectMemoryPath,
   packageRoot,
 } from "../utils/paths.js";
 import {
@@ -264,7 +264,7 @@ async function readActiveModes(
 }
 
 async function readNotepadPriority(cwd: string): Promise<string> {
-  const notePath = omxNotepadPath(cwd);
+  const notePath = omcpNotepadPath(cwd);
   if (!existsSync(notePath)) return "";
 
   try {
@@ -284,7 +284,7 @@ async function readNotepadPriority(cwd: string): Promise<string> {
 }
 
 async function readProjectMemorySummary(cwd: string): Promise<string> {
-  const memPath = omxProjectMemoryPath(cwd);
+  const memPath = omcpProjectMemoryPath(cwd);
   if (!existsSync(memPath)) return "";
 
   try {

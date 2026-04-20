@@ -6,15 +6,15 @@ import { tmpdir } from 'os';
 import { spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
 
-function runOmx(
+function runOmcp(
   cwd: string,
   argv: string[],
   envOverrides: Record<string, string> = {},
 ): { status: number | null; stdout: string; stderr: string; error?: string } {
   const testDir = dirname(fileURLToPath(import.meta.url));
   const repoRoot = join(testDir, '..', '..', '..');
-  const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
-  const r = spawnSync(process.execPath, [omxBin, ...argv], {
+  const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+  const r = spawnSync(process.execPath, [omcpBin, ...argv], {
     cwd,
     encoding: 'utf-8',
     env: { ...process.env, ...envOverrides },
@@ -52,7 +52,7 @@ describe('omcp doctor --team', () => {
       await writeFile(tmuxPath, '#!/bin/sh\n# list-sessions success with no sessions\nexit 0\n');
       spawnSync('chmod', ['+x', tmuxPath], { encoding: 'utf-8' });
 
-      const res = runOmx(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
+      const res = runOmcp(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 1, res.stderr || res.stdout);
       assert.match(res.stdout, /resume_blocker/);
@@ -71,7 +71,7 @@ describe('omcp doctor --team', () => {
         tmux_session: 'omcp-team-alpha',
       }));
 
-      const res = runOmx(wd, ['doctor', '--team'], { PATH: '' });
+      const res = runOmcp(wd, ['doctor', '--team'], { PATH: '' });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.doesNotMatch(res.stdout, /resume_blocker/);
@@ -94,7 +94,7 @@ describe('omcp doctor --team', () => {
       await writeFile(join(workerDir, 'shutdown-request.json'), JSON.stringify({ requested_at: requestedAt }));
 
       const fakeBin = await createFakeTmuxBin(wd, '#!/bin/sh\n# list-sessions success with no sessions\nexit 0\n');
-      const res = runOmx(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
+      const res = runOmcp(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 1, res.stderr || res.stdout);
       assert.match(res.stdout, /slow_shutdown/);
@@ -123,7 +123,7 @@ describe('omcp doctor --team', () => {
       }));
 
       const fakeBin = await createFakeTmuxBin(wd, '#!/bin/sh\n# list-sessions success with no sessions\nexit 0\n');
-      const res = runOmx(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
+      const res = runOmcp(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 1, res.stderr || res.stdout);
       assert.match(res.stdout, /delayed_status_lag/);
@@ -141,7 +141,7 @@ describe('omcp doctor --team', () => {
       await writeFile(tmuxPath, '#!/bin/sh\nif [ "$1" = "list-sessions" ]; then echo "omcp-team-orphan"; exit 0; fi\nexit 0\n');
       spawnSync('chmod', ['+x', tmuxPath], { encoding: 'utf-8' });
 
-      const res = runOmx(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
+      const res = runOmcp(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(res.stdout, /orphan_tmux_session/);
@@ -174,7 +174,7 @@ describe('omcp doctor --team', () => {
       await writeFile(tmuxPath, '#!/bin/sh\nif [ "$1" = "list-sessions" ]; then echo "omcp-team-epsilon"; exit 0; fi\nexit 0\n');
       spawnSync('chmod', ['+x', tmuxPath], { encoding: 'utf-8' });
 
-      const res = runOmx(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
+      const res = runOmcp(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 1, res.stderr || res.stdout);
       assert.match(res.stdout, /stale_leader/);
@@ -205,7 +205,7 @@ describe('omcp doctor --team', () => {
       await writeFile(tmuxPath, '#!/bin/sh\nif [ "$1" = "list-sessions" ]; then echo "omcp-team-zeta"; exit 0; fi\nexit 0\n');
       spawnSync('chmod', ['+x', tmuxPath], { encoding: 'utf-8' });
 
-      const res = runOmx(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
+      const res = runOmcp(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.doesNotMatch(res.stdout, /stale_leader/);
     } finally {
@@ -240,7 +240,7 @@ describe('omcp doctor --team', () => {
       await writeFile(tmuxPath, '#!/bin/sh\nif [ "$1" = "list-sessions" ]; then echo "omcp-team-eta"; exit 0; fi\nexit 0\n');
       spawnSync('chmod', ['+x', tmuxPath], { encoding: 'utf-8' });
 
-      const res = runOmx(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
+      const res = runOmcp(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.doesNotMatch(res.stdout, /stale_leader/);
@@ -261,7 +261,7 @@ describe('omcp doctor --team', () => {
       );
       spawnSync('chmod', ['+x', tmuxPath], { encoding: 'utf-8' });
 
-      const res = runOmx(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
+      const res = runOmcp(wd, ['doctor', '--team'], { PATH: `${fakeBin}:${process.env.PATH || ''}` });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.doesNotMatch(res.stdout, /orphan_tmux_session/);

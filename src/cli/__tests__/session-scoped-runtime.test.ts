@@ -8,10 +8,10 @@ import { fileURLToPath } from 'url';
 
 const testDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(testDir, '..', '..', '..');
-const omxBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
+const omcpBin = join(repoRoot, 'dist', 'cli', 'omcp.js');
 
-function runOmx(cwd: string, ...args: string[]) {
-  return spawnSync(process.execPath, [omxBin, ...args], {
+function runOmcp(cwd: string, ...args: string[]) {
+  return spawnSync(process.execPath, [omcpBin, ...args], {
     cwd,
     encoding: 'utf-8',
   });
@@ -30,12 +30,12 @@ describe('CLI session-scoped state parity', () => {
         current_phase: 'team-exec',
       }));
 
-      const statusResult = runOmx(wd, 'status');
+      const statusResult = runOmcp(wd, 'status');
       if (statusResult.error && /(EPERM|EACCES)/i.test(statusResult.error.message)) return;
       assert.equal(statusResult.status, 0, statusResult.stderr || statusResult.stdout);
       assert.match(statusResult.stdout, /team: ACTIVE/);
 
-      const cancelResult = runOmx(wd, 'cancel');
+      const cancelResult = runOmcp(wd, 'cancel');
       assert.equal(cancelResult.status, 0, cancelResult.stderr || cancelResult.stdout);
       assert.match(cancelResult.stdout, /Cancelled: team/);
 
@@ -70,7 +70,7 @@ describe('CLI session-scoped state parity', () => {
         current_phase: 'executing',
       }));
 
-      const cancelResult = runOmx(wd, 'cancel');
+      const cancelResult = runOmcp(wd, 'cancel');
       assert.equal(cancelResult.status, 0, cancelResult.stderr || cancelResult.stdout);
       assert.match(cancelResult.stdout, /Cancelled: ralph/);
       assert.match(cancelResult.stdout, /Cancelled: ultrawork/);
@@ -109,7 +109,7 @@ describe('CLI session-scoped state parity', () => {
         started_at: '2026-02-22T00:00:00.000Z',
       }));
 
-      const cancelResult = runOmx(wd, 'cancel');
+      const cancelResult = runOmcp(wd, 'cancel');
       assert.equal(cancelResult.status, 0, cancelResult.stderr || cancelResult.stdout);
       assert.match(cancelResult.stdout, /Cancelled: ralph/);
 

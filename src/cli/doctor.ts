@@ -7,7 +7,7 @@ import { readdir, readFile } from 'fs/promises';
 import { join } from 'path';
 import {
   codexHome, codexConfigPath, codexPromptsDir,
-  userSkillsDir, projectSkillsDir, omxStateDir, detectLegacySkillRootOverlap,
+  userSkillsDir, projectSkillsDir, omcpStateDir, detectLegacySkillRootOverlap,
 } from '../utils/paths.js';
 import { classifySpawnError, spawnPlatformCommandSync } from '../utils/platform-command.js';
 import { getCatalogExpectations } from './catalog-contract.js';
@@ -18,7 +18,7 @@ import {
   EXPLORE_BIN_ENV,
 } from './explore.js';
 import { getPackageRoot } from '../utils/package.js';
-import { hasLegacyOmxTeamRunTable } from '../config/generator.js';
+import { hasLegacyOmcpTeamRunTable } from '../config/generator.js';
 import { getMissingManagedCodexHookEvents } from '../config/codex-hooks.js';
 import { getDefaultBridge, isBridgeEnabled } from '../runtime/bridge.js';
 import { OMCP_EXPLORE_CMD_ENV, isExploreCommandRoutingEnabled } from '../hooks/explore-routing.js';
@@ -93,7 +93,7 @@ function resolveDoctorPaths(cwd: string, scope: DoctorSetupScope): DoctorPaths {
       hooksPath: join(codexHomeDir, 'hooks.json'),
       promptsDir: join(codexHomeDir, 'prompts'),
       skillsDir: projectSkillsDir(cwd),
-      stateDir: omxStateDir(cwd),
+      stateDir: omcpStateDir(cwd),
     };
   }
 
@@ -103,7 +103,7 @@ function resolveDoctorPaths(cwd: string, scope: DoctorSetupScope): DoctorPaths {
     hooksPath: join(codexHome(), 'hooks.json'),
     promptsDir: codexPromptsDir(),
     skillsDir: userSkillsDir(),
-    stateDir: omxStateDir(cwd),
+    stateDir: omcpStateDir(cwd),
   };
 }
 
@@ -226,7 +226,7 @@ async function doctorTeam(): Promise<void> {
 
 async function collectTeamDoctorIssues(cwd: string): Promise<TeamDoctorIssue[]> {
   const issues: TeamDoctorIssue[] = [];
-  const stateDir = omxStateDir(cwd);
+  const stateDir = omcpStateDir(cwd);
   const teamsRoot = join(stateDir, 'team');
   const nowMs = Date.now();
   const lagThresholdMs = 60_000;
@@ -612,7 +612,7 @@ async function checkConfig(configPath: string): Promise<Check> {
       };
     }
 
-    if (hasLegacyOmxTeamRunTable(content)) {
+    if (hasLegacyOmcpTeamRunTable(content)) {
       return {
         name: 'Config',
         status: 'warn',
@@ -621,8 +621,8 @@ async function checkConfig(configPath: string): Promise<Check> {
       };
     }
 
-    const hasOmx = content.includes('omcp_') || content.includes('oh-my-copilot');
-    if (hasOmx) {
+    const hasOmcp = content.includes('omcp_') || content.includes('oh-my-copilot');
+    if (hasOmcp) {
       return { name: 'Config', status: 'pass', message: 'config.toml has OMCP entries' };
     }
 
@@ -694,8 +694,8 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
     if (existsSync(configPath)) {
       try {
         const configContent = await readFile(configPath, 'utf-8');
-        const hasOmx = configContent.includes('omcp_') || configContent.includes('oh-my-copilot');
-        if (hasOmx) {
+        const hasOmcp = configContent.includes('omcp_') || configContent.includes('oh-my-copilot');
+        if (hasOmcp) {
           return {
             name: 'Native hooks',
             status: 'warn',
@@ -897,15 +897,15 @@ async function checkMcpServers(configPath: string): Promise<Check> {
     const content = await readFile(configPath, 'utf-8');
     const mcpCount = (content.match(/\[mcp_servers\./g) || []).length;
     if (mcpCount > 0) {
-      if (hasLegacyOmxTeamRunTable(content)) {
+      if (hasLegacyOmcpTeamRunTable(content)) {
         return {
           name: 'MCP Servers',
           status: 'warn',
           message: `${mcpCount} servers configured, but retired [mcp_servers.omcp_team_run] is not supported; run "omcp setup --force" to repair the config`,
         };
       }
-      const hasOmx = content.includes('omcp_state') || content.includes('omcp_memory');
-      if (hasOmx) {
+      const hasOmcp = content.includes('omcp_state') || content.includes('omcp_memory');
+      if (hasOmcp) {
         return { name: 'MCP Servers', status: 'pass', message: `${mcpCount} servers configured (OMCP present)` };
       }
       return {

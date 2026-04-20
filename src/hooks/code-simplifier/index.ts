@@ -23,7 +23,7 @@ export interface CodeSimplifierConfig {
 }
 
 /** Global OMCP config shape (subset relevant to code-simplifier) */
-interface OmxGlobalConfig {
+interface OmcpGlobalConfig {
   codeSimplifier?: CodeSimplifierConfig;
 }
 
@@ -47,7 +47,7 @@ export const TRIGGER_MARKER_FILENAME = 'code-simplifier-triggered.marker';
  *   the config is read from `<configDir>/.omcp/config.json` instead of
  *   `~/.omcp/config.json`. Useful for testing without relying on `os.homedir()`.
  */
-export function readOmxConfig(configDir?: string): OmxGlobalConfig | null {
+export function readOmcpConfig(configDir?: string): OmcpGlobalConfig | null {
   const configPath = join(configDir ?? homedir(), '.omcp', 'config.json');
 
   if (!existsSync(configPath)) {
@@ -55,7 +55,7 @@ export function readOmxConfig(configDir?: string): OmxGlobalConfig | null {
   }
 
   try {
-    return JSON.parse(readFileSync(configPath, 'utf-8')) as OmxGlobalConfig;
+    return JSON.parse(readFileSync(configPath, 'utf-8')) as OmcpGlobalConfig;
   } catch {
     return null;
   }
@@ -66,7 +66,7 @@ export function readOmxConfig(configDir?: string): OmxGlobalConfig | null {
  * Disabled by default — requires explicit opt-in.
  */
 export function isCodeSimplifierEnabled(configDir?: string): boolean {
-  const config = readOmxConfig(configDir);
+  const config = readOmcpConfig(configDir);
   return config?.codeSimplifier?.enabled === true;
 }
 
@@ -202,7 +202,7 @@ export function processCodeSimplifier(
     return { triggered: false, message: '' };
   }
 
-  const config = readOmxConfig(configDir);
+  const config = readOmcpConfig(configDir);
   const extensions = config?.codeSimplifier?.extensions ?? DEFAULT_EXTENSIONS;
   const maxFiles = config?.codeSimplifier?.maxFiles ?? DEFAULT_MAX_FILES;
   const files = getModifiedFiles(cwd, extensions, maxFiles);

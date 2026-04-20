@@ -28,12 +28,12 @@ export interface ModelsConfig {
   [mode: string]: string | undefined;
 }
 
-export interface OmxConfigEnv {
+export interface OmcpConfigEnv {
   [key: string]: string | undefined;
 }
 
-interface OmxConfigFile {
-  env?: OmxConfigEnv;
+interface OmcpConfigFile {
+  env?: OmcpConfigEnv;
   models?: ModelsConfig;
 }
 
@@ -47,13 +47,13 @@ export const OMCP_DEFAULT_STANDARD_MODEL_ENV = 'OMCP_DEFAULT_STANDARD_MODEL';
 export const OMCP_DEFAULT_SPARK_MODEL_ENV = 'OMCP_DEFAULT_SPARK_MODEL';
 export const OMCP_SPARK_MODEL_ENV = 'OMCP_SPARK_MODEL';
 
-function readOmxConfigFile(codexHomeOverride?: string): OmxConfigFile | null {
+function readOmcpConfigFile(codexHomeOverride?: string): OmcpConfigFile | null {
   const configPath = join(codexHomeOverride || codexHome(), '.omcp-config.json');
   if (!existsSync(configPath)) return null;
   try {
     const raw = JSON.parse(readFileSync(configPath, 'utf-8'));
     if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null;
-    return raw as OmxConfigFile;
+    return raw as OmcpConfigFile;
   } catch {
     return null;
   }
@@ -74,7 +74,7 @@ function readCodexConfigFile(codexHomeOverride?: string): CodexConfigFile | null
 }
 
 function readModelsBlock(codexHomeOverride?: string): ModelsConfig | null {
-  const config = readOmxConfigFile(codexHomeOverride);
+  const config = readOmcpConfigFile(codexHomeOverride);
   if (!config) return null;
   if (config.models && typeof config.models === 'object' && !Array.isArray(config.models)) {
     return config.models;
@@ -93,7 +93,7 @@ function normalizeConfiguredValue(value: unknown): string | undefined {
 }
 
 function readConfigEnvValue(key: string, codexHomeOverride?: string): string | undefined {
-  const config = readOmxConfigFile(codexHomeOverride);
+  const config = readOmcpConfigFile(codexHomeOverride);
   if (!config || !config.env || typeof config.env !== 'object' || Array.isArray(config.env)) {
     return undefined;
   }
@@ -111,7 +111,7 @@ function readTeamLowComplexityOverride(codexHomeOverride?: string): string | und
 }
 
 export function readConfiguredEnvOverrides(codexHomeOverride?: string): NodeJS.ProcessEnv {
-  const config = readOmxConfigFile(codexHomeOverride);
+  const config = readOmcpConfigFile(codexHomeOverride);
   if (!config || !config.env || typeof config.env !== 'object' || Array.isArray(config.env)) {
     return {};
   }

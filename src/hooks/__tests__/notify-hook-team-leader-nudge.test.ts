@@ -200,9 +200,9 @@ function runNotifyHook(
 describe('notify-hook leader-side authority handoff', () => {
   it('does not inject leader nudge from notify-hook when team is active and stale', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'handoff-alpha';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -284,9 +284,9 @@ describe('notify-hook leader-side authority handoff', () => {
 
   it('does not nudge stale leader when recent team status activity proves the leader is active', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'beta-active-status';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -348,9 +348,9 @@ describe('notify-hook team leader nudge', () => {
 
   it('disables leader nudges when deep-interview state is active', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'deep-interview-suppressed';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -399,9 +399,9 @@ describe('notify-hook team leader nudge', () => {
 
   it('sends immediate all-workers-idle nudge for active team (leader context)', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'idle-alpha';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -473,9 +473,9 @@ describe('notify-hook team leader nudge', () => {
 
   it('suggests shutdown when all workers are idle and the current task set is complete', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'idle-shutdown';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -542,9 +542,9 @@ describe('notify-hook team leader nudge', () => {
 
   it('suggests reusing the team when follow-up tasks are pending and worker panes are still reusable', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'idle-followup-reuse';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -610,9 +610,9 @@ describe('notify-hook team leader nudge', () => {
 
   it('suggests launching a new team when follow-up tasks are pending but worker panes are no longer reusable', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'idle-followup-relaunch';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -676,9 +676,9 @@ describe('notify-hook team leader nudge', () => {
 
   it('falls back to global team-state when session-scoped state is active but team-state.json remains global', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const sessionId = 'sess-idle-fallback';
       const sessionDir = join(stateDir, 'sessions', sessionId);
       const teamName = 'idle-global-fallback';
@@ -859,9 +859,9 @@ describe('notify-hook team leader nudge', () => {
 
   it('nudges leader via tmux send-keys when team is active and mailbox has messages', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'alpha';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -922,9 +922,9 @@ describe('notify-hook team leader nudge', () => {
 
   it('injects leader nudge into a busy live Codex pane so the message can queue', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'busy-live-pane';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -1025,9 +1025,9 @@ exit 0
 
   it('surfaces ack-like mailbox replies without work-start evidence as missing-start nudges', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'ack-missing-start';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -1091,9 +1091,9 @@ exit 0
 
   it('does not classify ack-like replies as missing-start after a worker has claimed work', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'ack-with-start';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -1174,9 +1174,9 @@ exit 0
 
   it('does not re-nudge for the same fresh mailbox message on repeated notify-hook runs', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'fresh-mailbox-bounded';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -1234,9 +1234,9 @@ exit 0
 
   it('does not inject leader nudge into a shell pane', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'shell-guard';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -1321,9 +1321,9 @@ exit 0
 
   it('injects leader nudge even while the leader pane has an active task', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'busy-leader-queue';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -1418,9 +1418,9 @@ exit 0
 
   it('injects leader nudge when capture-pane fails but the leader pane is a live codex pane', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'capture-failure-live-leader';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -1514,9 +1514,9 @@ exit 0
 
   it('suppresses duplicate visible leader injection when the pane already shows the same classified state', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'same-classified-state';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -1621,9 +1621,9 @@ exit 0
 
   it('does not inject leader nudge while leader pane is in copy-mode', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'scroll-guard';
       const teamDir = join(stateDir, 'team', teamName);
       const mailboxDir = join(teamDir, 'mailbox');
@@ -1712,9 +1712,9 @@ exit 0
 
   it('syncs stale root team-state to inactive when team-local phase is already terminal', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'terminal-sync';
       const teamDir = join(stateDir, 'team', teamName);
       const fakeBinDir = join(cwd, 'fake-bin');
@@ -1758,9 +1758,9 @@ exit 0
 
   it('does not nudge completed teams on reopen even when config and idle worker state still exist', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'completed-reopen';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -1816,9 +1816,9 @@ exit 0
 
   it('does not nudge a team owned by another session', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'other-session-team';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -1909,9 +1909,9 @@ exit 0
 
   it('nudges when worker panes are alive and leader is stale (no recent HUD turn)', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'beta';
       const teamDir = join(stateDir, 'team', teamName);
       const fakeBinDir = join(cwd, 'fake-bin');
@@ -1958,9 +1958,9 @@ exit 0
 
   it('nudges when team progress is stalled even if timing signals are fresh or missing (fallback threshold)', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'stalled-progress';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -2085,9 +2085,9 @@ exit 0
 
   it('nudges when team progress is stalled before the leader becomes stale (fallback threshold)', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'stalled-before-stale';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -2213,9 +2213,9 @@ exit 0
 
   it('nudges stalled team after configurable worker turn stall window elapses (primary threshold)', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'worker-turn-stall-threshold';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -2315,9 +2315,9 @@ exit 0
 
   it('does not nudge stalled team when an in-progress worker is still advancing heartbeat turns', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'active-turns-no-stall';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -2434,9 +2434,9 @@ exit 0
 
   it('bounds repeated stalled-team nudges before leader stale by cooldown', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'stalled-before-stale-bounded';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -2554,9 +2554,9 @@ exit 0
 
   it('does not treat leader and HUD panes as active worker panes when worker pane ids are known', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'stale-no-workers';
       const teamDir = join(stateDir, 'team', teamName);
       const fakeBinDir = join(cwd, 'fake-bin');
@@ -2601,9 +2601,9 @@ exit 0
 
   it('does not send a generic periodic leader nudge when the leader is not stale', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'fresh-leader';
       const teamDir = join(stateDir, 'team', teamName);
       const fakeBinDir = join(cwd, 'fake-bin');
@@ -2644,9 +2644,9 @@ exit 0
 
   it('uses a 30s cadence for stale leader follow-up nudges', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'stale-cadence';
       const teamDir = join(stateDir, 'team', teamName);
       const fakeBinDir = join(cwd, 'fake-bin');
@@ -2716,9 +2716,9 @@ exit 0
 
   it('suppresses stale leader follow-up when detached worktree progress is still fresh', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'fresh-detached-progress';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -2818,9 +2818,9 @@ exit 0
 
   it('emits team_leader_nudge event to events.ndjson when nudge fires', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'gamma';
       const teamDir = join(stateDir, 'team', teamName);
       const eventsDir = join(teamDir, 'events');
@@ -2880,9 +2880,9 @@ exit 0
 
   it('defers leader nudge when leader_pane_id is missing', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'gamma-missing-pane';
       const teamDir = join(stateDir, 'team', teamName);
       const eventsDir = join(teamDir, 'events');
@@ -2967,9 +2967,9 @@ exit 0
 
   it('bounds repeated all-workers-idle nudges by cooldown', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'idle-bounded';
       const teamDir = join(stateDir, 'team', teamName);
       const workersDir = join(teamDir, 'workers');
@@ -3024,9 +3024,9 @@ exit 0
 
   it('does not nudge when no active team state exists', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const tmuxLogPath = join(cwd, 'tmux.log');
@@ -3053,9 +3053,9 @@ exit 0
 
   it('includes stale_leader_with_messages reason when both conditions met', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const teamName = 'delta';
       const teamDir = join(stateDir, 'team', teamName);
       const eventsDir = join(teamDir, 'events');
@@ -3125,9 +3125,9 @@ exit 0
 
   it('rejects invalid team_name before leader follow-up team path joins', async () => {
     await withTempWorkingDir(async (cwd) => {
-      const omxDir = join(cwd, '.omcp');
-      const stateDir = join(omxDir, 'state');
-      const logsDir = join(omxDir, 'logs');
+      const omcpDir = join(cwd, '.omcp');
+      const stateDir = join(omcpDir, 'state');
+      const logsDir = join(omcpDir, 'logs');
       const fakeBinDir = join(cwd, 'fake-bin');
       const fakeTmuxPath = join(fakeBinDir, 'tmux');
       const tmuxLogPath = join(cwd, 'tmux.log');

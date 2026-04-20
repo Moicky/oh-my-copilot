@@ -1,7 +1,7 @@
 {
   "name": "@moicky/oh-my-copilot",
   "version": "0.1.0",
-  "description": "Workflow layer for GitHub Copilot CLI (forked from oh-my-copilot)",
+  "description": "Workflow layer for GitHub Copilot CLI (forked from oh-my-codex)",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
