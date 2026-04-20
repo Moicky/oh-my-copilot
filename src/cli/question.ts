@@ -9,7 +9,7 @@ import { launchQuestionRenderer } from '../question/renderer.js';
 import { normalizeQuestionInput } from '../question/types.js';
 import { runQuestionUi } from '../question/ui.js';
 
-export const QUESTION_HELP = `omx question - OMX-owned blocking user question entrypoint
+export const QUESTION_HELP = `omx question - OMCP-owned blocking user question entrypoint
 
 Usage:
   omx question --input '<json>' [--json]
@@ -20,13 +20,13 @@ Options:
   --input <json>       JSON object with question/options schema; blocks until answered
   --input=<json>       Same as --input
   --json               Emit compact JSON on stdout for machine callers
-  --ui                 Internal renderer mode; renders the OMX question UI for an existing state record
+  --ui                 Internal renderer mode; renders the OMCP question UI for an existing state record
   --state-path <path>  Question record path used by --ui mode
 
 Input schema:
   {
     "header": "Optional short heading",
-    "question": "What should OMX do next?",
+    "question": "What should OMCP do next?",
     "options": [
       {"label": "Proceed", "value": "proceed", "description": "Continue"},
       {"label": "Revise", "value": "revise"}

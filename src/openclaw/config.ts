@@ -144,7 +144,7 @@ function normalizeFromCustomAliases(notifications: Record<string, unknown>): {
 			gatewayName,
 			parseInstruction(
 				cliAlias.instruction,
-				"OMX event {{event}} for {{projectPath}}",
+				"OMCP event {{event}} for {{projectPath}}",
 			),
 			"custom_cli_command",
 		);
@@ -176,7 +176,7 @@ function normalizeFromCustomAliases(notifications: Record<string, unknown>): {
 			gatewayName,
 			parseInstruction(
 				webhookAlias.instruction,
-				"OMX event {{event}} for {{projectPath}}",
+				"OMCP event {{event}} for {{projectPath}}",
 			),
 			"custom_webhook_command",
 		);
@@ -313,7 +313,7 @@ export function inspectOpenClawConfig(
 				explicitOverridesAliases: false,
 				warnings: [],
 				detail:
-					"The OMX config file exists, but notifications are not configured.",
+					"The OMCP config file exists, but notifications are not configured.",
 				config: null,
 			};
 		}

@@ -9,7 +9,7 @@ to spike, often alongside visible CPU churn in `sysmond`.
 
 ### Root Cause
 
-The dominant trigger was not `syspolicyd` itself. OMX startup entered the
+The dominant trigger was not `syspolicyd` itself. OMCP startup entered the
 fallback watcher path in a repository with stale runtime state, which caused
 `leader_nudge` polling to run roughly every 250 to 350 ms.
 

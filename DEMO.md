@@ -68,12 +68,12 @@ oh-my-copilot doctor
   [OK] Codex CLI: installed
   [OK] Node.js: v20+
   [OK] Codex home: ~/.codex
-  [OK] Config: config.toml has OMX entries
+  [OK] Config: config.toml has OMCP entries
   [OK] Prompts: 30 agent prompts installed
   [OK] Skills: 40 skills installed
   [OK] AGENTS.md: found in project root
   [OK] State dir: .omx/state
-  [OK] MCP Servers: 4 servers configured (OMX present)
+  [OK] MCP Servers: 4 servers configured (OMCP present)
 
 Results: 9 passed, 0 warnings, 0 failed
 ```
@@ -399,7 +399,7 @@ Expected:
 
 ## Demo 9: Autoresearch Showcase Hub
 
-OMX now includes a lightweight research-showcase hub for reproducible autoresearch demos under `playground/README.md`.
+OMCP now includes a lightweight research-showcase hub for reproducible autoresearch demos under `playground/README.md`.
 
 Quick start:
 

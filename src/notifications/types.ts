@@ -175,7 +175,7 @@ export interface FullNotificationPayload {
   projectPath?: string;
   /** Basename of the project directory */
   projectName?: string;
-  /** Active OMX modes during this session */
+  /** Active OMCP modes during this session */
   modesUsed?: string[];
   /** Context summary of what was done */
   contextSummary?: string;

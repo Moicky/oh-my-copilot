@@ -28,7 +28,7 @@ describe('omx adapt help', () => {
     try {
       const mainHelp = runOmx(cwd, ['--help']);
       assert.equal(mainHelp.status, 0, mainHelp.stderr || mainHelp.stdout);
-      assert.match(mainHelp.stdout, /omx adapt\s+Scaffold OMX-owned adapter foundations for persistent external targets/i);
+      assert.match(mainHelp.stdout, /omx adapt\s+Scaffold OMCP-owned adapter foundations for persistent external targets/i);
 
       const adaptHelp = runOmx(cwd, ['adapt', '--help']);
       assert.equal(adaptHelp.status, 0, adaptHelp.stderr || adaptHelp.stdout);

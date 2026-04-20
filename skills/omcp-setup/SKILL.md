@@ -3,9 +3,9 @@ name: omx-setup
 description: Setup and configure oh-my-copilot using current CLI behavior
 ---
 
-# OMX Setup
+# OMCP Setup
 
-Use this skill when users want to install or refresh oh-my-copilot for the **current project plus user-level OMX directories**.
+Use this skill when users want to install or refresh oh-my-copilot for the **current project plus user-level OMCP directories**.
 
 ## Command
 
@@ -44,9 +44,9 @@ Supported setup flags (current implementation):
 - Scope targets:
   - `user`: user directories (`~/.codex`, `~/.codex/skills`, `~/.omx/agents`)
   - `project`: local directories (`./.codex`, `./.codex/skills`, `./.omx/agents`)
-- Migration hint: in `user` scope, if historical `~/.agents/skills` still exists alongside `${CODEX_HOME:-~/.codex}/skills`, current setup prints a cleanup hint. **Why the paths differ**: `${CODEX_HOME:-~/.codex}/skills/` is the path current Codex CLI natively loads as its skill root; `~/.agents/skills/` was the skill root in an older Codex CLI release before `~/.codex` became the standard home directory. OMX writes only to the canonical `${CODEX_HOME:-~/.codex}/skills/` path. When both directories exist simultaneously, Codex discovers skills from both trees and may show duplicate entries in Enable/Disable Skills. Archive or remove `~/.agents/skills/` to resolve this.
+- Migration hint: in `user` scope, if historical `~/.agents/skills` still exists alongside `${CODEX_HOME:-~/.codex}/skills`, current setup prints a cleanup hint. **Why the paths differ**: `${CODEX_HOME:-~/.codex}/skills/` is the path current Codex CLI natively loads as its skill root; `~/.agents/skills/` was the skill root in an older Codex CLI release before `~/.codex` became the standard home directory. OMCP writes only to the canonical `${CODEX_HOME:-~/.codex}/skills/` path. When both directories exist simultaneously, Codex discovers skills from both trees and may show duplicate entries in Enable/Disable Skills. Archive or remove `~/.agents/skills/` to resolve this.
 - If persisted scope is `project`, `omx` launch automatically uses `CODEX_HOME=./.codex` unless user explicitly overrides `CODEX_HOME`.
-- With `--force`, AGENTS overwrite may still be skipped if an active OMX session is detected (safety guard).
+- With `--force`, AGENTS overwrite may still be skipped if an active OMCP session is detected (safety guard).
 - Legacy persisted scope values (`project-local`) are automatically migrated to `project` with a one-time warning.
 
 ## Recommended workflow
@@ -63,7 +63,7 @@ omx setup --force --verbose
 omx doctor
 ```
 
-3. Start Codex with OMX in the target project directory.
+3. Start Codex with OMCP in the target project directory.
 
 ## Expected verification indicators
 
@@ -72,7 +72,7 @@ From `omx doctor`, expect:
 - Skills installed (scope-dependent: user or project)
 - AGENTS.md found in project root
 - `.omx/state` exists
-- OMX MCP servers configured in scope target `config.toml` (`~/.codex/config.toml` or `./.codex/config.toml`)
+- OMCP MCP servers configured in scope target `config.toml` (`~/.codex/config.toml` or `./.codex/config.toml`)
 
 ## Troubleshooting
 
@@ -89,4 +89,4 @@ node bin/omx.js setup --force --verbose
 node bin/omx.js doctor
 ```
 
-- If AGENTS.md was not overwritten during `--force`, stop active OMX session and rerun setup.
+- If AGENTS.md was not overwritten during `--force`, stop active OMCP session and rerun setup.

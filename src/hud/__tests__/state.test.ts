@@ -380,7 +380,7 @@ describe('additional HUD mode state readers', () => {
     });
   });
 
-  it('keeps hud notify pinned to the canonical OMX session when session metadata also carries a native session id', async () => {
+  it('keeps hud notify pinned to the canonical OMCP session when session metadata also carries a native session id', async () => {
     await withTempRepo('omx-hud-notify-native-meta-', async (cwd) => {
       const rootStateDir = join(cwd, '.omx', 'state');
       const canonicalSessionId = 'omx-canonical-session';

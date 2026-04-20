@@ -170,7 +170,7 @@ describe('dispatchHookEventRuntime', () => {
     }
   });
 
-  it('routes native stop leader attention by canonical OMX session id while preserving native metadata in context', async () => {
+  it('routes native stop leader attention by canonical OMCP session id while preserving native metadata in context', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omx-runtime-stop-team-native-meta-'));
     try {
       await initTeamState('stop-owned-team-meta', 'stop test', 'executor', 1, cwd);

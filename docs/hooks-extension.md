@@ -1,17 +1,17 @@
 # Hooks Extension (Custom Plugins)
 
-OMX supports an additive hooks extension point for user plugins under `.omx/hooks/*.mjs`.
+OMCP supports an additive hooks extension point for user plugins under `.omx/hooks/*.mjs`.
 
 Native Codex hook ownership is documented separately in
 [Codex native hook mapping](./codex-native-hooks.md). In short:
 
 - `.codex/hooks.json` = native Codex hook registrations installed by `omx setup`
-- `.omx/hooks/*.mjs` = OMX plugin hooks dispatched by runtime/native events
+- `.omx/hooks/*.mjs` = OMCP plugin hooks dispatched by runtime/native events
 - `omx tmux-hook` / notify-hook / derived watcher = tmux/runtime fallback surfaces
 
-`omx setup` treats `.codex/hooks.json` as a shared-ownership file: it refreshes only the OMX-managed
+`omx setup` treats `.codex/hooks.json` as a shared-ownership file: it refreshes only the OMCP-managed
 wrapper entries that invoke `dist/scripts/codex-native-hook.js` and preserves user hook entries in the
-same file. `omx uninstall` removes only those OMX-managed wrappers and leaves `.codex/hooks.json` in
+same file. `omx uninstall` removes only those OMCP-managed wrappers and leaves `.codex/hooks.json` in
 place when user hooks remain.
 
 > Compatibility guarantee: `omx tmux-hook` remains fully supported and unchanged.
@@ -53,7 +53,7 @@ Native/derived plugin events come from two places:
 1. Existing lifecycle/notify paths
 2. Native Codex hook entrypoint dispatch (`dist/scripts/codex-native-hook.js`)
 
-Current event vocabulary exposed to OMX plugins:
+Current event vocabulary exposed to OMCP plugins:
 
 - `session-start`
 - `keyword-detector`
@@ -64,7 +64,7 @@ Current event vocabulary exposed to OMX plugins:
 - `turn-complete`
 - `session-idle`
 
-OMX keeps this existing event vocabulary rather than exposing raw Codex hook names directly.
+OMCP keeps this existing event vocabulary rather than exposing raw Codex hook names directly.
 That lets native Codex hooks and fallback/derived paths feed one shared plugin/runtime surface.
 
 For clawhip-oriented operational routing, see [Clawhip Event Contract](./clawhip-event-contract.md).

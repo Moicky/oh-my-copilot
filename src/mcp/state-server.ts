@@ -1,5 +1,5 @@
 /**
- * OMX State Management MCP Server
+ * OMCP State Management MCP Server
  * Provides state read/write/clear/list tools for workflow modes
  * Storage: .omx/state/{mode}-state.json
  */

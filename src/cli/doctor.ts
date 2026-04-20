@@ -623,13 +623,13 @@ async function checkConfig(configPath: string): Promise<Check> {
 
     const hasOmx = content.includes('omx_') || content.includes('oh-my-copilot');
     if (hasOmx) {
-      return { name: 'Config', status: 'pass', message: 'config.toml has OMX entries' };
+      return { name: 'Config', status: 'pass', message: 'config.toml has OMCP entries' };
     }
 
     return {
       name: 'Config',
       status: 'warn',
-      message: 'config.toml exists but no OMX entries yet (expected before first setup; run "omx setup --force" once)',
+      message: 'config.toml exists but no OMCP entries yet (expected before first setup; run "omx setup --force" once)',
     };
   } catch {
     return { name: 'Config', status: 'fail', message: 'cannot read config.toml' };
@@ -699,7 +699,7 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
           return {
             name: 'Native hooks',
             status: 'warn',
-            message: 'hooks.json not found even though config.toml has OMX entries; run "omx setup --force" to restore native hook coverage',
+            message: 'hooks.json not found even though config.toml has OMCP entries; run "omx setup --force" to restore native hook coverage',
           };
         }
       } catch {
@@ -722,7 +722,7 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
       return {
         name: 'Native hooks',
         status: 'fail',
-        message: 'invalid hooks.json; Codex may skip OMX hook coverage until "omx setup --force" repairs it',
+        message: 'invalid hooks.json; Codex may skip OMCP hook coverage until "omx setup --force" repairs it',
       };
     }
 
@@ -731,14 +731,14 @@ async function checkNativeHooks(hooksPath: string, configPath: string): Promise<
         name: 'Native hooks',
         status: 'warn',
         message:
-          `hooks.json is missing OMX-managed coverage for ${missingEvents.join(', ')}; run "omx setup --force" to restore native hooks`,
+          `hooks.json is missing OMCP-managed coverage for ${missingEvents.join(', ')}; run "omx setup --force" to restore native hooks`,
       };
     }
 
     return {
       name: 'Native hooks',
       status: 'pass',
-      message: 'hooks.json includes OMX-managed coverage for all native hook events',
+      message: 'hooks.json includes OMCP-managed coverage for all native hook events',
     };
   } catch {
     return {
@@ -906,12 +906,12 @@ async function checkMcpServers(configPath: string): Promise<Check> {
       }
       const hasOmx = content.includes('omx_state') || content.includes('omx_memory');
       if (hasOmx) {
-        return { name: 'MCP Servers', status: 'pass', message: `${mcpCount} servers configured (OMX present)` };
+        return { name: 'MCP Servers', status: 'pass', message: `${mcpCount} servers configured (OMCP present)` };
       }
       return {
         name: 'MCP Servers',
         status: 'warn',
-        message: `${mcpCount} servers but no OMX servers yet (expected before first setup; run "omx setup --force" once)`,
+        message: `${mcpCount} servers but no OMCP servers yet (expected before first setup; run "omx setup --force" once)`,
       };
     }
     return { name: 'MCP Servers', status: 'warn', message: 'no MCP servers configured' };

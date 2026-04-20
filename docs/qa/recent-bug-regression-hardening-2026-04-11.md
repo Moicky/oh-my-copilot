@@ -4,7 +4,7 @@ Focused regression additions for the compiled recent-bug suite on this branch:
 
 1. **Planning-precedence follow-ups** — keeps approved short `ralph` follow-ups from being re-gated back into `ralplan` after planning artifacts already exist.
 2. **Stop-hook stale-root vs current-session** — treats an explicitly inactive session-scoped deep-interview mode state as authoritative over an active root fallback, so auto-nudge is not suppressed by stale root state.
-3. **Detached tmux launch shell drift fallback** — confirms detached tmux launch preserves the requested cwd when an unsupported `SHELL` value forces OMX to fall back away from rc-driven cwd drift.
+3. **Detached tmux launch shell drift fallback** — confirms detached tmux launch preserves the requested cwd when an unsupported `SHELL` value forces OMCP to fall back away from rc-driven cwd drift.
 4. **Team startup worker-state evidence** — accepts malformed external worker status inputs without breaking the hardening-e2e coverage, and accepts `blocked` worker status as real startup progress before a worker has persisted `current_task_id`.
 
 Covered files:

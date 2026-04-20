@@ -276,7 +276,7 @@ describe('notify-hook/auto-nudge – detectStallPattern', () => {
     assert.equal(detectNativeStopStallPattern(text, DEFAULT_STALL_PATTERNS), true);
   });
 
-  it('ignores prior OMX injection lines so injected text cannot self-trigger detection', async () => {
+  it('ignores prior OMCP injection lines so injected text cannot self-trigger detection', async () => {
     const { detectStallPattern, DEFAULT_STALL_PATTERNS } = await loadModule('notify-hook/auto-nudge.js');
     const text = 'Completed the change.\nyes, proceed [OMX_TMUX_INJECT]\nkeep going [OMX_TMUX_INJECT]';
     assert.equal(detectStallPattern(text, DEFAULT_STALL_PATTERNS), false);

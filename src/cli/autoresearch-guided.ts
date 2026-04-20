@@ -174,7 +174,7 @@ async function ensureStructuredQuestionFallbackAllowed(
 	if (policy.allowed || policy.fallbackAllowed !== false) return;
 	throw new OmxQuestionError(
 		policy.code ?? "question_policy_denied",
-		policy.message ?? "Structured questions are unavailable in the current OMX workflow context.",
+		policy.message ?? "Structured questions are unavailable in the current OMCP workflow context.",
 	);
 }
 
@@ -343,7 +343,7 @@ export async function runAutoresearchNoviceBridge(
 			const evaluatorIntent = await withStructuredQuestionFallback((question) =>
 				promptWithDefault(
 					io,
-					"\nHow should OMX judge success? Describe it in plain language",
+					"\nHow should OMCP judge success? Describe it in plain language",
 					topic,
 					question,
 				),

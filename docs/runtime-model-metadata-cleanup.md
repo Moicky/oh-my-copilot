@@ -2,7 +2,7 @@
 
 ## Why
 
-Benchmark runs showed spawned child agents being labeled with legacy model aliases such as `sonnet`, even when OMX was launched under Codex with GPT-5.x reasoning settings.
+Benchmark runs showed spawned child agents being labeled with legacy model aliases such as `sonnet`, even when OMCP was launched under Codex with GPT-5.x reasoning settings.
 
 The prompt/skill layer was already sanitized, but runtime metadata still used historical aliases in `src/agents/definitions.ts`. Those aliases were also used when generating native agent configs, which made legacy labels leak into spawned-agent UX and benchmark output.
 
@@ -25,7 +25,7 @@ The prompt/skill layer was already sanitized, but runtime metadata still used hi
 
 ## Expected effect
 
-After rebuilding and rerunning `omx setup --force`, spawned-agent metadata should stop surfacing `haiku` / `sonnet` / `opus` as if they were active runtime models for Codex-based OMX runs.
+After rebuilding and rerunning `omx setup --force`, spawned-agent metadata should stop surfacing `haiku` / `sonnet` / `opus` as if they were active runtime models for Codex-based OMCP runs.
 
 ## Re-test steps
 

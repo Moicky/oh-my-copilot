@@ -147,7 +147,7 @@ describe("omx setup/uninstall shared ownership for native hooks", () => {
     }
   });
 
-  it("setup preserves user hooks while deduping stale OMX wrappers", async () => {
+  it("setup preserves user hooks while deduping stale OMCP wrappers", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omx-setup-hooks-ownership-"));
     try {
       const home = join(wd, "home");
@@ -219,7 +219,7 @@ describe("omx setup/uninstall shared ownership for native hooks", () => {
     }
   });
 
-  it("uninstall removes only OMX-managed wrappers and preserves user hook content", async () => {
+  it("uninstall removes only OMCP-managed wrappers and preserves user hook content", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omx-uninstall-hooks-ownership-"));
     try {
       const home = join(wd, "home");
@@ -260,7 +260,7 @@ describe("omx setup/uninstall shared ownership for native hooks", () => {
       assert.equal(
         allCommands.some((command) => command.includes("codex-native-hook.js")),
         false,
-        "uninstall should strip only OMX-managed wrappers",
+        "uninstall should strip only OMCP-managed wrappers",
       );
     } finally {
       await rm(wd, { recursive: true, force: true });

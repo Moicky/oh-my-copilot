@@ -41,10 +41,10 @@ import {
   readVisibleSkillActiveState,
 } from "../state/skill-active.js";
 
-const START_MARKER = "<!-- OMX:RUNTIME:START -->";
-const END_MARKER = "<!-- OMX:RUNTIME:END -->";
-const WORKER_START_MARKER = "<!-- OMX:TEAM:WORKER:START -->";
-const WORKER_END_MARKER = "<!-- OMX:TEAM:WORKER:END -->";
+const START_MARKER = "<!-- OMCP:RUNTIME:START -->";
+const END_MARKER = "<!-- OMCP:RUNTIME:END -->";
+const WORKER_START_MARKER = "<!-- OMCP:TEAM:WORKER:START -->";
+const WORKER_END_MARKER = "<!-- OMCP:TEAM:WORKER:END -->";
 const MAX_OVERLAY_SIZE = 3500;
 const SKILL_REFERENCE_PATTERN = /\/skills\/([^/\s`]+)\/SKILL\.md\b/g;
 

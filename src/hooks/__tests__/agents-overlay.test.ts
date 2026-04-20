@@ -22,10 +22,10 @@ import {
   sessionModelInstructionsPath,
 } from "../agents-overlay.js";
 
-const RUNTIME_START = "<!-- OMX:RUNTIME:START -->";
-const RUNTIME_END = "<!-- OMX:RUNTIME:END -->";
-const WORKER_START = "<!-- OMX:TEAM:WORKER:START -->";
-const WORKER_END = "<!-- OMX:TEAM:WORKER:END -->";
+const RUNTIME_START = "<!-- OMCP:RUNTIME:START -->";
+const RUNTIME_END = "<!-- OMCP:RUNTIME:END -->";
+const WORKER_START = "<!-- OMCP:TEAM:WORKER:START -->";
+const WORKER_END = "<!-- OMCP:TEAM:WORKER:END -->";
 
 async function makeTempDir(): Promise<string> {
   const dir = await mkdtemp(join(tmpdir(), "omx-overlay-test-"));
@@ -53,8 +53,8 @@ describe("generateOverlay", () => {
 
   it("generates overlay with no state files (empty but valid)", async () => {
     const overlay = await generateOverlay(tempDir, "test-session-1");
-    assert.ok(overlay.includes("<!-- OMX:RUNTIME:START -->"));
-    assert.ok(overlay.includes("<!-- OMX:RUNTIME:END -->"));
+    assert.ok(overlay.includes("<!-- OMCP:RUNTIME:START -->"));
+    assert.ok(overlay.includes("<!-- OMCP:RUNTIME:END -->"));
     assert.ok(overlay.includes("test-session-1"));
     assert.ok(overlay.includes("Compaction Protocol"));
   });
@@ -234,8 +234,8 @@ describe("generateOverlay", () => {
       overlay.length <= 3500,
       `Overlay too large: ${overlay.length} chars`,
     );
-    assert.ok(overlay.includes("<!-- OMX:RUNTIME:START -->"));
-    assert.ok(overlay.includes("<!-- OMX:RUNTIME:END -->"));
+    assert.ok(overlay.includes("<!-- OMCP:RUNTIME:START -->"));
+    assert.ok(overlay.includes("<!-- OMCP:RUNTIME:END -->"));
   });
 
   it("uses deterministic overflow policy under size cap", async () => {
@@ -558,7 +558,7 @@ IF BLOCKED, TRY AN ALTERNATIVE APPROACH. ONLY ASK WHEN TRULY AMBIGUOUS OR DESTRU
     const secondApply = await readFile(agentsMd, "utf-8");
 
     assert.equal(secondApply, firstApply);
-    const startCount = (secondApply.match(/<!-- OMX:RUNTIME:START -->/g) || [])
+    const startCount = (secondApply.match(/<!-- OMCP:RUNTIME:START -->/g) || [])
       .length;
     assert.equal(startCount, 1);
   });
@@ -567,7 +567,7 @@ IF BLOCKED, TRY AN ALTERNATIVE APPROACH. ONLY ASK WHEN TRULY AMBIGUOUS OR DESTRU
     const agentsMd = join(tempDir, "AGENTS-stale.md");
     const staleContent =
       originalContent +
-      "\n<!-- OMX:RUNTIME:START -->\n<session_context>\nOld stale content\n</session_context>\n<!-- OMX:RUNTIME:END -->\n";
+      "\n<!-- OMCP:RUNTIME:START -->\n<session_context>\nOld stale content\n</session_context>\n<!-- OMCP:RUNTIME:END -->\n";
     await writeFile(agentsMd, staleContent);
 
     const overlay = await generateOverlay(tempDir, "fresh-session");
@@ -576,7 +576,7 @@ IF BLOCKED, TRY AN ALTERNATIVE APPROACH. ONLY ASK WHEN TRULY AMBIGUOUS OR DESTRU
     const result = await readFile(agentsMd, "utf-8");
     assert.ok(result.includes("fresh-session"));
     assert.ok(!result.includes("Old stale content"));
-    const startCount = (result.match(/<!-- OMX:RUNTIME:START -->/g) || [])
+    const startCount = (result.match(/<!-- OMCP:RUNTIME:START -->/g) || [])
       .length;
     assert.equal(startCount, 1);
   });
@@ -731,7 +731,7 @@ describe("session-scoped model instructions file", () => {
       sessionContent.indexOf("# User instructions") <
         sessionContent.indexOf("# Project instructions"),
     );
-    assert.match(sessionContent, /<!-- OMX:RUNTIME:START -->/);
+    assert.match(sessionContent, /<!-- OMCP:RUNTIME:START -->/);
     assert.equal(projectAfter, projectContent);
   });
 
@@ -789,8 +789,8 @@ describe("session-scoped model instructions file", () => {
     );
     const sessionContent = await readFile(writtenPath, "utf-8");
 
-    assert.ok(sessionContent.includes("<!-- OMX:RUNTIME:START -->"));
-    assert.ok(sessionContent.includes("<!-- OMX:RUNTIME:END -->"));
+    assert.ok(sessionContent.includes("<!-- OMCP:RUNTIME:START -->"));
+    assert.ok(sessionContent.includes("<!-- OMCP:RUNTIME:END -->"));
   });
 
   it("removes session-scoped file without touching project AGENTS.md", async () => {
@@ -814,7 +814,7 @@ describe("session-scoped model instructions file", () => {
 describe("hasOverlay", () => {
   it("returns true when both markers present", () => {
     const content =
-      "start\n<!-- OMX:RUNTIME:START -->\nmiddle\n<!-- OMX:RUNTIME:END -->\nend";
+      "start\n<!-- OMCP:RUNTIME:START -->\nmiddle\n<!-- OMCP:RUNTIME:END -->\nend";
     assert.ok(hasOverlay(content));
   });
 
@@ -823,6 +823,6 @@ describe("hasOverlay", () => {
   });
 
   it("returns false when only start marker", () => {
-    assert.ok(!hasOverlay("<!-- OMX:RUNTIME:START -->\nbroken"));
+    assert.ok(!hasOverlay("<!-- OMCP:RUNTIME:START -->\nbroken"));
   });
 });

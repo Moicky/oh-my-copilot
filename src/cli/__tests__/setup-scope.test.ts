@@ -235,7 +235,7 @@ describe("omx setup scope behavior", () => {
     }
   });
 
-  it("setup preserves user hooks while replacing stale OMX wrappers", async () => {
+  it("setup preserves user hooks while replacing stale OMCP wrappers", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omx-setup-scope-"));
     try {
       const home = join(wd, "home");

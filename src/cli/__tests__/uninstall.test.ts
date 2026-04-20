@@ -38,7 +38,7 @@ function shouldSkipForSpawnPermissions(err: string): boolean {
   return typeof err === 'string' && /(EPERM|EACCES)/i.test(err);
 }
 
-/** Build a realistic OMX config.toml for testing */
+/** Build a realistic OMCP config.toml for testing */
 function buildOmxConfig(): string {
   return [
     '# oh-my-copilot top-level settings (must be before any [table])',
@@ -52,39 +52,39 @@ function buildOmxConfig(): string {
     'codex_hooks = true',
     '',
     '# ============================================================',
-    '# oh-my-copilot (OMX) Configuration',
+    '# oh-my-copilot (OMCP) Configuration',
     '# Managed by omx setup - manual edits preserved on next setup',
     '# ============================================================',
     '',
-    '# OMX State Management MCP Server',
+    '# OMCP State Management MCP Server',
     '[mcp_servers.omx_state]',
     'command = "node"',
     'args = ["/path/to/state-server.js"]',
     'enabled = true',
     'startup_timeout_sec = 5',
     '',
-    '# OMX Project Memory MCP Server',
+    '# OMCP Project Memory MCP Server',
     '[mcp_servers.omx_memory]',
     'command = "node"',
     'args = ["/path/to/memory-server.js"]',
     'enabled = true',
     'startup_timeout_sec = 5',
     '',
-    '# OMX Code Intelligence MCP Server',
+    '# OMCP Code Intelligence MCP Server',
     '[mcp_servers.omx_code_intel]',
     'command = "node"',
     'args = ["/path/to/code-intel-server.js"]',
     'enabled = true',
     'startup_timeout_sec = 10',
     '',
-    '# OMX Trace MCP Server',
+    '# OMCP Trace MCP Server',
     '[mcp_servers.omx_trace]',
     'command = "node"',
     'args = ["/path/to/trace-server.js"]',
     'enabled = true',
     'startup_timeout_sec = 5',
     '',
-    '# OMX Wiki MCP Server',
+    '# OMCP Wiki MCP Server',
     '[mcp_servers.omx_wiki]',
     'command = "node"',
     'args = ["/path/to/wiki-server.js"]',
@@ -95,7 +95,7 @@ function buildOmxConfig(): string {
     'description = "Code implementation"',
     'config_file = "/path/to/executor.toml"',
     '',
-    '# OMX TUI StatusLine (Codex CLI v0.101.0+)',
+    '# OMCP TUI StatusLine (Codex CLI v0.101.0+)',
     '[tui]',
     'status_line = ["model-with-reasoning", "git-branch"]',
     '',
@@ -105,7 +105,7 @@ function buildOmxConfig(): string {
   ].join('\n');
 }
 
-/** Build a config with OMX entries mixed with user entries */
+/** Build a config with OMCP entries mixed with user entries */
 
 function buildConfigWithSeededModelContext(): string {
   return [
@@ -123,7 +123,7 @@ function buildConfigWithSeededModelContext(): string {
     'codex_hooks = true',
     '',
     '# ============================================================',
-    '# oh-my-copilot (OMX) Configuration',
+    '# oh-my-copilot (OMCP) Configuration',
     '# Managed by omx setup - manual edits preserved on next setup',
     '# ============================================================',
     '',
@@ -159,7 +159,7 @@ function buildMixedConfig(): string {
     'args = ["--flag"]',
     '',
     '# ============================================================',
-    '# oh-my-copilot (OMX) Configuration',
+    '# oh-my-copilot (OMCP) Configuration',
     '# Managed by omx setup - manual edits preserved on next setup',
     '# ============================================================',
     '',
@@ -202,7 +202,7 @@ function buildMixedConfig(): string {
 }
 
 describe('omx uninstall', () => {
-  it('removes OMX block from config.toml with --dry-run', async () => {
+  it('removes OMCP block from config.toml with --dry-run', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
     try {
       const home = join(wd, 'home');
@@ -218,20 +218,20 @@ describe('omx uninstall', () => {
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(res.stdout, /dry-run mode/);
-      assert.match(res.stdout, /OMX configuration block/);
+      assert.match(res.stdout, /OMCP configuration block/);
       assert.match(res.stdout, /hooks\.json/);
       assert.match(res.stdout, /omx_state/);
 
       // Config should NOT have been modified
       const config = await readFile(join(codexDir, 'config.toml'), 'utf-8');
-      assert.match(config, /oh-my-copilot \(OMX\) Configuration/);
+      assert.match(config, /oh-my-copilot \(OMCP\) Configuration/);
       assert.equal(existsSync(join(codexDir, 'hooks.json')), true);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
-  it('removes OMX block from config.toml', async () => {
+  it('removes OMCP block from config.toml', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
     try {
       const home = join(wd, 'home');
@@ -246,10 +246,10 @@ describe('omx uninstall', () => {
       const res = runOmx(wd, ['uninstall'], { HOME: home });
       if (shouldSkipForSpawnPermissions(res.error)) return;
       assert.equal(res.status, 0, res.stderr || res.stdout);
-      assert.match(res.stdout, /Removed OMX configuration block/);
+      assert.match(res.stdout, /Removed OMCP configuration block/);
 
       const config = await readFile(join(codexDir, 'config.toml'), 'utf-8');
-      assert.doesNotMatch(config, /oh-my-copilot \(OMX\) Configuration/);
+      assert.doesNotMatch(config, /oh-my-copilot \(OMCP\) Configuration/);
       assert.doesNotMatch(config, /omx_state/);
       assert.doesNotMatch(config, /omx_memory/);
       assert.doesNotMatch(config, /omx_code_intel/);
@@ -270,7 +270,7 @@ describe('omx uninstall', () => {
   });
 
 
-  it('preserves user config entries when removing OMX', async () => {
+  it('preserves user config entries when removing OMCP', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
     try {
       const home = join(wd, 'home');
@@ -287,7 +287,7 @@ describe('omx uninstall', () => {
       assert.match(config, /model = "o4-mini"/);
       assert.match(config, /\[mcp_servers\.user_custom\]/);
       assert.match(config, /web_search = true/);
-      // OMX entries removed
+      // OMCP entries removed
       assert.doesNotMatch(config, /omx_state/);
       assert.doesNotMatch(config, /omx_memory/);
       assert.doesNotMatch(config, /notify\s*=.*node/);
@@ -299,7 +299,7 @@ describe('omx uninstall', () => {
     }
   });
 
-  it('preserves user hooks while removing OMX-managed wrappers', async () => {
+  it('preserves user hooks while removing OMCP-managed wrappers', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-uninstall-'));
     try {
       const home = join(wd, 'home');
@@ -361,7 +361,7 @@ describe('omx uninstall', () => {
       assert.doesNotMatch(config, /notify\s*=/);
       assert.doesNotMatch(config, /model_reasoning_effort\s*=/);
       assert.doesNotMatch(config, /developer_instructions\s*=/);
-      assert.doesNotMatch(config, /oh-my-copilot \(OMX\) Configuration/);
+      assert.doesNotMatch(config, /oh-my-copilot \(OMCP\) Configuration/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -382,7 +382,7 @@ describe('omx uninstall', () => {
 
       // Config should NOT have been modified
       const config = await readFile(join(codexDir, 'config.toml'), 'utf-8');
-      assert.match(config, /oh-my-copilot \(OMX\) Configuration/);
+      assert.match(config, /oh-my-copilot \(OMCP\) Configuration/);
       assert.match(config, /omx_state/);
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -435,7 +435,7 @@ describe('omx uninstall', () => {
 
       // Project-local config.toml should be cleaned
       const config = await readFile(join(codexDir, 'config.toml'), 'utf-8');
-      assert.doesNotMatch(config, /oh-my-copilot \(OMX\) Configuration/);
+      assert.doesNotMatch(config, /oh-my-copilot \(OMCP\) Configuration/);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
@@ -497,7 +497,7 @@ describe('omx uninstall', () => {
         res.stdout,
         /Warning: 1 overlapping skill names remain between .*\.codex[\\/]+skills and .*\.agents[\\/]+skills; 1 differ in SKILL\.md content\. omx uninstall only removes the active canonical skill root; archive or remove ~\/\.agents\/skills if Codex still shows duplicates/,
       );
-      assert.equal(existsSync(canonicalHelp), false, 'canonical OMX skill should be removed');
+      assert.equal(existsSync(canonicalHelp), false, 'canonical OMCP skill should be removed');
       assert.equal(existsSync(join(home, '.agents', 'skills')), true, 'legacy skill root should remain for manual cleanup');
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -523,7 +523,7 @@ describe('omx uninstall', () => {
         res.stdout,
         /Warning: legacy ~\/\.agents\/skills still exists \(1 skills\)\. omx uninstall does not remove that historical root automatically; archive or remove ~\/\.agents\/skills if Codex still shows stale or duplicate skills/,
       );
-      assert.equal(existsSync(canonicalHelp), false, 'canonical OMX skill should be removed');
+      assert.equal(existsSync(canonicalHelp), false, 'canonical OMCP skill should be removed');
       assert.equal(existsSync(join(home, '.agents', 'skills')), true, 'legacy skill root should remain for manual cleanup');
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -634,7 +634,7 @@ describe('omx uninstall', () => {
       const first = runOmx(wd, ['uninstall'], { HOME: home });
       if (shouldSkipForSpawnPermissions(first.error)) return;
       assert.equal(first.status, 0, first.stderr || first.stdout);
-      assert.match(first.stdout, /Removed OMX configuration block/);
+      assert.match(first.stdout, /Removed OMCP configuration block/);
 
       const second = runOmx(wd, ['uninstall'], { HOME: home });
       if (shouldSkipForSpawnPermissions(second.error)) return;
@@ -720,7 +720,7 @@ describe('omx uninstall', () => {
 });
 
 describe('stripOmxFeatureFlags', () => {
-  it('removes OMX feature flags and preserves user flags', async () => {
+  it('removes OMCP feature flags and preserves user flags', async () => {
     const { stripOmxFeatureFlags } = await import('../../config/generator.js');
 
     const config = [

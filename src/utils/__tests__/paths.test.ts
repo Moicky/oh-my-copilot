@@ -407,7 +407,7 @@ describe("packageRoot", () => {
   });
 });
 
-describe("OMX launcher path resolution", () => {
+describe("OMCP launcher path resolution", () => {
   const originalEntryPath = process.env[OMX_ENTRY_PATH_ENV];
   const originalStartupCwd = process.env[OMX_STARTUP_CWD_ENV];
 
@@ -525,7 +525,7 @@ describe("OMX launcher path resolution", () => {
     }
   });
 
-  it("falls back from a non-OMX host binary to the packaged CLI entry", async () => {
+  it("falls back from a non-OMCP host binary to the packaged CLI entry", async () => {
     const startupCwd = await mkdtemp(join(tmpdir(), "omx-launcher-cli-host-start-"));
     const packageRootDir = await mkdtemp(join(tmpdir(), "omx-launcher-cli-host-root-"));
     try {

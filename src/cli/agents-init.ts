@@ -24,9 +24,9 @@ export const AGENTS_INIT_USAGE = [
   "  --help      Show this message",
 ].join("\n");
 
-const MANAGED_MARKER = "<!-- OMX:AGENTS-INIT:MANAGED -->";
-const MANUAL_START = "<!-- OMX:AGENTS-INIT:MANUAL:START -->";
-const MANUAL_END = "<!-- OMX:AGENTS-INIT:MANUAL:END -->";
+const MANAGED_MARKER = "<!-- OMCP:AGENTS-INIT:MANAGED -->";
+const MANUAL_START = "<!-- OMCP:AGENTS-INIT:MANUAL:START -->";
+const MANUAL_END = "<!-- OMCP:AGENTS-INIT:MANUAL:END -->";
 const DEFAULT_LIST_LIMIT = 12;
 const IGNORE_DIRECTORY_NAMES = new Set([
   ".git",

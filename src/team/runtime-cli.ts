@@ -3,7 +3,7 @@
  * Reads JSON config from stdin, runs startTeam/monitorTeam/shutdownTeam,
  * writes structured JSON result to stdout.
  *
- * Spawned by OMX team orchestration entrypoints when a background team run starts.
+ * Spawned by OMCP team orchestration entrypoints when a background team run starts.
  */
 
 import { createInterface } from 'readline';
@@ -300,7 +300,7 @@ async function main(): Promise<void> {
   process.on('SIGINT', () => handleShutdown('SIGINT'));
   process.on('SIGTERM', () => handleShutdown('SIGTERM'));
 
-  // Start the team — OMX's startTeam takes individual parameters
+  // Start the team — OMCP's startTeam takes individual parameters
   const agentType = 'executor';
   try {
     const providers = normalizeAgentTypes(agentTypes, workerCount);
@@ -325,7 +325,7 @@ async function main(): Promise<void> {
     process.exit(1);
   }
 
-  // Persist pane IDs when a background launcher provides an OMX job ID.
+  // Persist pane IDs when a background launcher provides an OMCP job ID.
   const jobId = process.env.OMX_JOB_ID;
   try {
     const livePanes = await loadLivePaneState(teamName, cwd);

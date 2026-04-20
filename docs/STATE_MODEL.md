@@ -1,6 +1,6 @@
-# OMX State Model
+# OMCP State Model
 
-This document explains how OMX tracks workflow/skill state, how transition rules are evaluated, and which transitions are commonly allowed or blocked.
+This document explains how OMCP tracks workflow/skill state, how transition rules are evaluated, and which transitions are commonly allowed or blocked.
 
 ## Goals
 

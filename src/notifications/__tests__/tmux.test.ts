@@ -294,7 +294,7 @@ describe('sanitizeTmuxAlertText', () => {
     const raw = [
       'fix/issue-1525-post-stop-keyword-replay',
       'fix/issue-1525-post-stop-keyword-replay | ralph:2/50 | turns:4 | session:1m | last:5s ago',
-      '[OMX#3] ultrawork active',
+      '[OMCP#3] ultrawork active',
     ].join('\n');
 
     assert.equal(sanitizeTmuxAlertText(raw), undefined);

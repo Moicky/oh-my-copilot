@@ -2,31 +2,31 @@
 
 This page is the canonical answer to:
 
-> Which OMC/OMX hooks run on native Codex hooks already, which stay on runtime fallbacks, and which are not supported yet?
+> Which OMC/OMCP hooks run on native Codex hooks already, which stay on runtime fallbacks, and which are not supported yet?
 
 ## Install surface
 
 `omx setup` now owns both of these native Codex artifacts:
 
 - `.codex/config.toml` → enables `[features].codex_hooks = true`
-- `.codex/hooks.json` → registers the OMX-managed native hook command while preserving non-OMX hook entries already in the file
+- `.codex/hooks.json` → registers the OMCP-managed native hook command while preserving non-OMCP hook entries already in the file
 
 For project scope, `.gitignore` keeps generated `.codex/hooks.json` out of source control.
-`omx uninstall` removes only the OMX-managed wrapper entries from `.codex/hooks.json`; if user hooks remain, the file stays in place.
+`omx uninstall` removes only the OMCP-managed wrapper entries from `.codex/hooks.json`; if user hooks remain, the file stays in place.
 
-`omx doctor` can confirm that these files exist and are shaped correctly. It does not prove that the same shell/profile can complete an authenticated Codex request; use `codex login status` plus a real `omx exec --skip-git-repo-check -C . "Reply with exactly OMX-EXEC-OK"` smoke test for that boundary.
+`omx doctor` can confirm that these files exist and are shaped correctly. It does not prove that the same shell/profile can complete an authenticated Codex request; use `codex login status` plus a real `omx exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"` smoke test for that boundary.
 
 ## Ownership split
 
 - **Native Codex hooks**: `.codex/hooks.json`
-- **OMX plugin hooks**: `.omx/hooks/*.mjs`
+- **OMCP plugin hooks**: `.omx/hooks/*.mjs`
 - **tmux/runtime fallbacks**: `omx tmux-hook`, notify-hook, derived watcher, idle/session-end reporters
 
-OMX only owns the wrapper entries that invoke `dist/scripts/codex-native-hook.js`. User-managed hook entries in the same `.codex/hooks.json` file are preserved across `omx setup` refreshes and `omx uninstall`.
+OMCP only owns the wrapper entries that invoke `dist/scripts/codex-native-hook.js`. User-managed hook entries in the same `.codex/hooks.json` file are preserved across `omx setup` refreshes and `omx uninstall`.
 
 ## Mapping matrix
 
-| OMC / OMX surface | Native Codex source | OMX runtime target | Status | Notes |
+| OMC / OMCP surface | Native Codex source | OMCP runtime target | Status | Notes |
 | --- | --- | --- | --- | --- |
 | `session-start` | `SessionStart` | `session-start` | native | Native adapter refreshes session bookkeeping, restores startup developer context, and ensures `.omx/` is gitignored at the repo root |
 | wiki startup context | `SessionStart` | `session-start` | native | Wiki session-start context can append a compact `.omx/wiki/` summary when wiki pages exist; startup writes stay config-gated |
@@ -52,12 +52,12 @@ OMX only owns the wrapper entries that invoke `dist/scripts/codex-native-hook.js
 
 ## Project wiki addendum (approved v1 backport)
 
-The approved OMX-native wiki backport keeps lifecycle ownership intentionally narrow:
+The approved OMCP-native wiki backport keeps lifecycle ownership intentionally narrow:
 
 - **Storage** lives under `.omx/wiki/`, not `.omc/wiki/`.
 - **SessionStart** may surface bounded wiki context from `.omx/wiki/` when the wiki already exists, but it should stay read-mostly and must not block the native hook path on expensive writes or index rebuilds.
 - **SessionEnd** remains a runtime/notify-path responsibility for best-effort, non-blocking session capture into `.omx/wiki/`.
-- **PreCompact parity is intentionally deferred** in v1 unless a clearly OMX-native compaction seam exists.
+- **PreCompact parity is intentionally deferred** in v1 unless a clearly OMCP-native compaction seam exists.
 - **Routing should stay explicit**: prefer `$wiki` or task verbs like `wiki query` / `wiki add`, and avoid implicit bare `wiki` noun activation.
 
 ## Combined workflow note
@@ -85,7 +85,7 @@ When validating hooks, keep the proof boundary explicit:
 1. **Native Codex hook proof**
    - `omx setup` wrote `.codex/hooks.json`
    - native Codex event invoked `dist/scripts/codex-native-hook.js`
-2. **OMX plugin proof**
+2. **OMCP plugin proof**
    - plugin dispatch/log evidence exists under `.omx/logs/hooks-*.jsonl`
 3. **Fallback proof**
    - behavior came from notify-hook / derived watcher / tmux runtime, not native Codex hooks

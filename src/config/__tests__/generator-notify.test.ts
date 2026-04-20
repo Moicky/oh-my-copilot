@@ -125,7 +125,7 @@ describe('config generator', () => {
     }
   });
 
-  it('re-runs setup replacing OMX config cleanly', async () => {
+  it('re-runs setup replacing OMCP config cleanly', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-config-gen-'));
     try {
       const configPath = join(wd, 'config.toml');
@@ -140,9 +140,9 @@ describe('config generator', () => {
       await mergeConfig(configPath, wd);
       const rerun = await readFile(configPath, 'utf-8');
 
-      // OMX block appears exactly once
+      // OMCP block appears exactly once
       assert.equal(
-        (rerun.match(/# oh-my-copilot \(OMX\) Configuration/g) ?? []).length,
+        (rerun.match(/# oh-my-copilot \(OMCP\) Configuration/g) ?? []).length,
         1
       );
       assert.equal((rerun.match(/# End oh-my-copilot/g) ?? []).length, 1);
@@ -206,21 +206,21 @@ describe('config generator', () => {
       assert.match(toml, /^model = "o3"$/m);
       assert.match(toml, /^approval_policy = "on-failure"$/m);
 
-      // OMX keys added
+      // OMCP keys added
       assert.match(toml, /^notify = \[/m);
       assert.match(toml, /^model_reasoning_effort = "high"$/m);
 
       // User's feature flag preserved
       assert.match(toml, /^web_search = true$/m);
 
-      // OMX feature flags added
+      // OMCP feature flags added
       assert.match(toml, /^multi_agent = true$/m);
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
-  it('writes a global [agents] section with OMX defaults', async () => {
+  it('writes a global [agents] section with OMCP defaults', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-config-gen-'));
     try {
       const configPath = join(wd, 'config.toml');
@@ -267,7 +267,7 @@ describe('config generator', () => {
     }
   });
 
-  it('migrates a legacy OMX block and preserves user settings', async () => {
+  it('migrates a legacy OMCP block and preserves user settings', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-config-gen-'));
     try {
       const configPath = join(wd, 'config.toml');
@@ -275,7 +275,7 @@ describe('config generator', () => {
         '[user.before]',
         'name = "kept-before"',
         '',
-        '# oh-my-copilot (OMX) Configuration',
+        '# oh-my-copilot (OMCP) Configuration',
         '# legacy block without top divider',
         'notify = ["node", "/tmp/legacy notify-hook.js"]',
         '[mcp_servers.omx_state]',
@@ -293,7 +293,7 @@ describe('config generator', () => {
       const toml = await readFile(configPath, 'utf-8');
 
       assert.equal(
-        (toml.match(/oh-my-copilot \(OMX\) Configuration/g) ?? []).length,
+        (toml.match(/oh-my-copilot \(OMCP\) Configuration/g) ?? []).length,
         1
       );
       assert.match(toml, /^\[user.before\]$/m);

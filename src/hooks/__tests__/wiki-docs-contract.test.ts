@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { loadSurface } from "./prompt-guidance-test-helpers.js";
 
 describe("project wiki documentation contract", () => {
-  it("documents the OMX-native storage, routing, and tool surface", () => {
+  it("documents the OMCP-native storage, routing, and tool surface", () => {
     const doc = loadSurface("docs/reference/project-wiki.md");
     assert.match(doc, /`omx_wiki`/);
     assert.match(doc, /`\.omx\/wiki\/`/);

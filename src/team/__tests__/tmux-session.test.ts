@@ -2674,7 +2674,7 @@ esac
     }
   });
 
-  it('restores standalone HUD panes with an absolute OMX entry path after cwd drift', async () => {
+  it('restores standalone HUD panes with an absolute OMCP entry path after cwd drift', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omx-standalone-relative-hud-'));
     const startupCwd = await mkdtemp(join(tmpdir(), 'omx-standalone-relative-start-'));
     const previousEntryPath = process.env[OMX_ENTRY_PATH_ENV];
@@ -2729,7 +2729,7 @@ esac
     }
   });
 
-  it('restores standalone HUD panes with the packaged CLI entry when argv1 is not the OMX CLI', async () => {
+  it('restores standalone HUD panes with the packaged CLI entry when argv1 is not the OMCP CLI', async () => {
     const cwd = await mkdtemp(join(tmpdir(), 'omx-standalone-noncli-hud-'));
     const previousArgv = process.argv;
 

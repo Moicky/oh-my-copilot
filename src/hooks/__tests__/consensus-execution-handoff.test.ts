@@ -12,7 +12,7 @@
  * and that architect/critic prompts contain required RALPLAN-DR sections.
  *
  * Note: This file loads SKILL.md and prompt content directly via fs.readFileSync()
- * instead of getBuiltinSkill() (which does not exist in OMX).
+ * instead of getBuiltinSkill() (which does not exist in OMCP).
  */
 
 import { describe, it } from 'node:test';

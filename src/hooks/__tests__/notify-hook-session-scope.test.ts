@@ -191,7 +191,7 @@ describe('notify-hook session-scoped iteration updates', () => {
     }
   });
 
-  it('prefers the canonical OMX session scope over a different native payload session id for notify sidefiles', async () => {
+  it('prefers the canonical OMCP session scope over a different native payload session id for notify sidefiles', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-notify-canonical-session-'));
     try {
       const stateDir = join(wd, '.omx', 'state');
@@ -227,7 +227,7 @@ describe('notify-hook session-scoped iteration updates', () => {
   });
 
 
-  it('prefers the invocation OMX session id over the persisted canonical session for notify sidefiles when a fork scope exists', async () => {
+  it('prefers the invocation OMCP session id over the persisted canonical session for notify sidefiles when a fork scope exists', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-notify-fork-session-'));
     try {
       const stateDir = join(wd, '.omx', 'state');

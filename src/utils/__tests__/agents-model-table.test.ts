@@ -105,7 +105,7 @@ describe('agents model table', () => {
     const inserted = upsertAgentsModelTable(withoutMarkers, context);
     assert.match(
       inserted,
-      /<\/team_model_resolution>\n\n<!-- OMX:MODELS:START -->[\s\S]*<!-- OMX:MODELS:END -->\n\n---/,
+      /<\/team_model_resolution>\n\n<!-- OMCP:MODELS:START -->[\s\S]*<!-- OMCP:MODELS:END -->\n\n---/,
     );
   });
 });

@@ -1,5 +1,5 @@
 /**
- * OMX HUD - CLI entry point
+ * OMCP HUD - CLI entry point
  *
  * Usage:
  *   omx hud              Show current HUD state
@@ -275,7 +275,7 @@ async function launchTmuxPane(cwd: string, flags: HudFlags): Promise<void> {
 
   const omxBin = resolveOmxCliEntryPath();
   if (!omxBin) {
-    console.error('Failed to resolve OMX launcher path for tmux HUD startup.');
+    console.error('Failed to resolve OMCP launcher path for tmux HUD startup.');
     process.exit(1);
   }
   const args = buildTmuxSplitArgs(cwd, omxBin, flags.preset, process.env.OMX_SESSION_ID);

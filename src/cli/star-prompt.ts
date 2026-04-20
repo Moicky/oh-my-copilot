@@ -1,5 +1,5 @@
 /**
- * One-time GitHub star prompt shown at OMX startup.
+ * One-time GitHub star prompt shown at OMCP startup.
  * Skipped when no TTY or when gh CLI is not installed.
  * State stored globally (~/.omx/state/star-prompt.json) so it shows once per user.
  */

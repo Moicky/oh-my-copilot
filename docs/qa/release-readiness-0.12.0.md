@@ -28,7 +28,7 @@ Verdict: **GO** ✅
 ## Required release-note items
 
 1. **Native Codex hook ownership moved into the repo/runtime contract.**
-   - Call out that non-team OMX sessions now own native Codex hook setup locally, preserve session-start + stop-state continuity, and expose documented setup/uninstall behavior.
+   - Call out that non-team OMCP sessions now own native Codex hook setup locally, preserve session-start + stop-state continuity, and expose documented setup/uninstall behavior.
 2. **First-party native Bash pre/post tool hooks landed.**
    - Mention `PreToolUse` / `PostToolUse` guidance and the new native hook execution lane instead of burying it under general hook cleanup.
 3. **Team runtime delivery/state handling was substantially hardened.**

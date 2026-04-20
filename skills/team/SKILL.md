@@ -5,7 +5,7 @@ description: N coordinated agents on shared task list using tmux-based orchestra
 
 # Team Skill
 
-`$team` is the tmux-based parallel execution mode for OMX. It starts real worker Codex and/or Claude CLI sessions in split panes and coordinates them through `.omx/state/team/...` files plus CLI team interop (`omx team api ...`) and state files.
+`$team` is the tmux-based parallel execution mode for OMCP. It starts real worker Codex and/or Claude CLI sessions in split panes and coordinates them through `.omx/state/team/...` files plus CLI team interop (`omx team api ...`) and state files.
 
 This skill is operationally sensitive. Treat it as an operator workflow, not a generic prompt pattern.
 
@@ -26,7 +26,7 @@ This skill is operationally sensitive. Treat it as an operator workflow, not a g
 
 When user triggers `$team`, the agent must:
 
-1. Invoke OMX runtime directly with `omx team ...`
+1. Invoke OMCP runtime directly with `omx team ...`
 2. Avoid replacing the flow with in-process `spawn_agent` fanout
 3. Verify startup and surface concrete state/pane evidence
 4. If active team mode state is missing, initialize/sync it from canonical team runtime state before proceeding
@@ -186,7 +186,7 @@ Default-model rule:
 Thinking-level rule (critical):
 - **No model-name heuristic mapping.**
 - Team runtime must **not** infer `model_reasoning_effort` from model-name substrings (e.g., `spark`, `high-capability`, `mini`).
-- When the leader assigns teammate roles/tasks, OMX allocates **per-worker reasoning effort dynamically** from the resolved worker role (`low`, `medium`, `high`).
+- When the leader assigns teammate roles/tasks, OMCP allocates **per-worker reasoning effort dynamically** from the resolved worker role (`low`, `medium`, `high`).
 - Explicit launch args still win: if `OMX_TEAM_WORKER_LAUNCH_ARGS` already includes `-c model_reasoning_effort=...`, that explicit value overrides dynamic allocation for every worker.
 
 Normalization requirements:

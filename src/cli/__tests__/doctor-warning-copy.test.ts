@@ -65,11 +65,11 @@ command = "node"
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Config: config\.toml exists but no OMX entries yet \(expected before first setup; run "omx setup --force" once\)/,
+        /Config: config\.toml exists but no OMCP entries yet \(expected before first setup; run "omx setup --force" once\)/,
       );
       assert.match(
         res.stdout,
-        /MCP Servers: 1 servers but no OMX servers yet \(expected before first setup; run "omx setup --force" once\)/,
+        /MCP Servers: 1 servers but no OMCP servers yet \(expected before first setup; run "omx setup --force" once\)/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -106,10 +106,10 @@ enabled = true
         res.stdout,
         /MCP Servers: 1 servers configured, but retired \[mcp_servers\.omx_team_run\] is not supported; run "omx setup --force" to repair the config/,
       );
-      assert.doesNotMatch(res.stdout, /Config: config\.toml has OMX entries/);
+      assert.doesNotMatch(res.stdout, /Config: config\.toml has OMCP entries/);
       assert.doesNotMatch(
         res.stdout,
-        /MCP Servers: 1 servers but no OMX servers yet \(expected before first setup; run "omx setup --force" once\)/,
+        /MCP Servers: 1 servers but no OMCP servers yet \(expected before first setup; run "omx setup --force" once\)/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -260,7 +260,7 @@ USE_OMX_EXPLORE_CMD = "off"
     }
   });
 
-  it('warns when hooks.json is missing OMX-managed native hook coverage', async () => {
+  it('warns when hooks.json is missing OMCP-managed native hook coverage', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-doctor-hooks-coverage-'));
     try {
       const home = join(wd, 'home');
@@ -296,14 +296,14 @@ USE_OMX_EXPLORE_CMD = "off"
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Native hooks: hooks\.json is missing OMX-managed coverage for PreToolUse, PostToolUse, UserPromptSubmit, Stop; run "omx setup --force" to restore native hooks/,
+        /Native hooks: hooks\.json is missing OMCP-managed coverage for PreToolUse, PostToolUse, UserPromptSubmit, Stop; run "omx setup --force" to restore native hooks/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
-  it('warns when hooks.json is missing after OMX config was already installed', async () => {
+  it('warns when hooks.json is missing after OMCP config was already installed', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-doctor-hooks-missing-'));
     try {
       const home = join(wd, 'home');
@@ -326,7 +326,7 @@ command = "node"
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /Native hooks: hooks\.json not found even though config\.toml has OMX entries; run "omx setup --force" to restore native hook coverage/,
+        /Native hooks: hooks\.json not found even though config\.toml has OMCP entries; run "omx setup --force" to restore native hook coverage/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });
@@ -349,7 +349,7 @@ command = "node"
       assert.equal(res.status, 0, res.stderr || res.stdout);
       assert.match(
         res.stdout,
-        /\[XX\] Native hooks: invalid hooks\.json; Codex may skip OMX hook coverage until "omx setup --force" repairs it/,
+        /\[XX\] Native hooks: invalid hooks\.json; Codex may skip OMCP hook coverage until "omx setup --force" repairs it/,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });

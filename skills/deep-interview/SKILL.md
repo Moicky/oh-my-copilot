@@ -5,7 +5,7 @@ argument-hint: "[--quick|--standard|--deep] [--autoresearch] <idea or vague desc
 ---
 
 <Purpose>
-Deep Interview is an intent-first Socratic clarification loop before planning or implementation. It turns vague ideas into execution-ready specifications by asking targeted questions about why the user wants a change, how far it should go, what should stay out of scope, and what OMX may decide without confirmation.
+Deep Interview is an intent-first Socratic clarification loop before planning or implementation. It turns vague ideas into execution-ready specifications by asking targeted questions about why the user wants a change, how far it should go, what should stay out of scope, and what OMCP may decide without confirmation.
 </Purpose>
 
 <Use_When>
@@ -51,7 +51,7 @@ If no flag is provided, use **Standard**.
 - Always run a preflight context intake before the first interview question
 - Reduce user effort: ask only the highest-leverage unresolved question, and never ask the user for codebase facts that can be discovered directly
 - For brownfield work, prefer evidence-backed confirmation questions such as "I found X in Y. Should this change follow that pattern?"
-- In Codex CLI, deep-interview uses `omx question` as the required OMX-owned structured questioning path for every interview round
+- In Codex CLI, deep-interview uses `omx question` as the required OMCP-owned structured questioning path for every interview round
 - If `omx question` is unavailable in the current runtime, treat that as a blocker/error for deep-interview rather than falling back to `request_user_input` or plain-text questioning
 - Re-score ambiguity after each answer and show progress transparently
 - Do not hand off to execution while ambiguity remains above threshold unless user explicitly opts to proceed with warning
@@ -146,7 +146,7 @@ Detailed dimensions:
 `Non-goals` and `Decision Boundaries` are mandatory readiness gates. Ask about them early and keep revisiting them until they are explicit.
 
 ### 2b) Ask the question
-Use OMX-owned structured questioning via `omx question` for every interview round (this is the required `AskUserQuestion` equivalent for deep-interview) and present:
+Use OMCP-owned structured questioning via `omx question` for every interview round (this is the required `AskUserQuestion` equivalent for deep-interview) and present:
 
 ```
 Round {n} | Target: {weakest_dimension} | Ambiguity: {score}%
@@ -207,7 +207,7 @@ Spec should include:
 - Desired Outcome
 - In-Scope
 - Out-of-Scope / Non-goals
-- Decision Boundaries (what OMX may decide without confirmation)
+- Decision Boundaries (what OMCP may decide without confirmation)
 - Constraints
 - Testable acceptance criteria
 - Assumptions exposed + resolutions
@@ -297,8 +297,8 @@ Present execution options after artifact generation using explicit handoff contr
 
 <Tool_Usage>
 - Use `explore` for codebase fact gathering
-- Use `omx question` as the OMX-native structured user-input tool for each interview round
-- If `omx question` is unavailable in the current runtime, stop and surface that deep-interview requires the OMX question tool rather than falling back to another questioning path
+- Use `omx question` as the OMCP-native structured user-input tool for each interview round
+- If `omx question` is unavailable in the current runtime, stop and surface that deep-interview requires the OMCP question tool rather than falling back to another questioning path
 - Use `state_write` / `state_read` for resumable mode state
 - Read/write context snapshots under `.omx/context/`
 - Save transcript/spec artifacts under `.omx/interviews/` and `.omx/specs/`

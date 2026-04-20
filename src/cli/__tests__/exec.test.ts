@@ -84,7 +84,7 @@ describe('omx exec', () => {
       assert.match(result.stdout, /instructions-path:.*\/\.omx\/state\/sessions\/omx-.*\/AGENTS\.md/);
       assert.match(result.stdout, /# User Instructions/);
       assert.match(result.stdout, /# Project Instructions/);
-      assert.match(result.stdout, /<!-- OMX:RUNTIME:START -->/);
+      assert.match(result.stdout, /<!-- OMCP:RUNTIME:START -->/);
 
       const sessionRoot = join(wd, '.omx', 'state', 'sessions');
       const sessionEntries = await readdir(sessionRoot);

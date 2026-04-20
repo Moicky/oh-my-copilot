@@ -5,7 +5,7 @@
 
 ## Coverage Summary
 
-| Category | OMC Features | OMX Implemented | Coverage |
+| Category | OMC Features | OMCP Implemented | Coverage |
 |----------|-------------|-----------------|----------|
 | Agent Definitions | 29 | 29 | 100% |
 | Skills/Commands | 30 | 30 | 100% |
@@ -31,7 +31,7 @@
 
 ### Agent Definitions / Role Catalog (29/29 = 100%)
 
-| OMC Agent | OMX Status | Mechanism |
+| OMC Agent | OMCP Status | Mechanism |
 |-----------|-----------|-----------|
 | analyst | DONE | prompts/analyst.md |
 | api-reviewer | DONE | prompts/api-reviewer.md |
@@ -67,7 +67,7 @@
 
 ### Skills (30/30 = 100%)
 
-| OMC Skill | OMX Status | Mechanism |
+| OMC Skill | OMCP Status | Mechanism |
 |-----------|-----------|-----------|
 | autopilot | DONE | ~/.codex/skills/autopilot/SKILL.md |
 | ralph | DONE | ~/.codex/skills/ralph/SKILL.md |
@@ -115,7 +115,7 @@
 
 ### Hook Pipeline (6 full + 3 partial out of 9 = ~89%)
 
-| OMC Hook Event | OMX Equivalent | Capability |
+| OMC Hook Event | OMCP Equivalent | Capability |
 |---------------|---------------|------------|
 | SessionStart | AGENTS.md native + runtime overlay (preLaunch) | FULL+ |
 | PreToolUse | AGENTS.md inline guidance | PARTIAL (no interception) |
@@ -131,7 +131,7 @@
 
 ### Infrastructure
 
-| Component | OMC | OMX Status |
+| Component | OMC | OMCP Status |
 |-----------|-----|-----------|
 | CLI (setup) | DONE | DONE |
 | CLI (doctor) | DONE | DONE |

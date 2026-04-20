@@ -76,7 +76,7 @@ describe('session-status helper', () => {
         now: '2026-03-20T00:05:00.000Z',
       });
 
-      assert.match(status, /^Tracked OMX session status/m);
+      assert.match(status, /^Tracked OMCP session status/m);
       assert.match(status, /Session: sess-1/);
       assert.match(status, /Native: native-1/);
       assert.match(status, /State: running \(ralph\/executing\)/);

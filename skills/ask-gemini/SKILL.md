@@ -16,7 +16,7 @@ Use the locally installed Gemini CLI as a direct external advisor for brainstorm
 ## Routing
 
 ### Preferred: Local CLI execution
-Run Gemini through the canonical OMX CLI command path (no MCP routing):
+Run Gemini through the canonical OMCP CLI command path (no MCP routing):
 
 ```bash
 omx ask gemini "{{ARGUMENTS}}"

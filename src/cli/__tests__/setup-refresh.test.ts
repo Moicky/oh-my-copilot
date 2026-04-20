@@ -108,7 +108,7 @@ describe("omx setup refresh summary and dry-run behavior", () => {
     }
   });
 
-  it("creates .gitignore with OMX project ignore rules during project-scoped setup", async () => {
+  it("creates .gitignore with OMCP project ignore rules during project-scoped setup", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omx-setup-refresh-"));
     try {
       await runSetupInTempDir(wd, { scope: "project" });
@@ -123,7 +123,7 @@ describe("omx setup refresh summary and dry-run behavior", () => {
     }
   });
 
-  it("appends missing OMX project ignore rules to an existing project .gitignore without duplicating them", async () => {
+  it("appends missing OMCP project ignore rules to an existing project .gitignore without duplicating them", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omx-setup-refresh-"));
     try {
       await writeFile(join(wd, ".gitignore"), "node_modules/\n");
@@ -304,7 +304,7 @@ describe("omx setup refresh summary and dry-run behavior", () => {
     }
   });
 
-  it("skips OMX-managed [tui] writes for Codex CLI >= 0.107.0 and preserves an existing [tui] table", async () => {
+  it("skips OMCP-managed [tui] writes for Codex CLI >= 0.107.0 and preserves an existing [tui] table", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omx-setup-refresh-"));
     try {
       await mkdir(join(wd, ".omx", "state"), { recursive: true });
@@ -325,14 +325,14 @@ describe("omx setup refresh summary and dry-run behavior", () => {
       assert.match(config, /^status_line = \["git-branch"\]$/m);
       assert.match(
         output,
-        /Codex CLI >= 0\.107\.0 manages \[tui\]; OMX left that section untouched\./,
+        /Codex CLI >= 0\.107\.0 manages \[tui\]; OMCP left that section untouched\./,
       );
     } finally {
       await rm(wd, { recursive: true, force: true });
     }
   });
 
-  it("keeps OMX-managed [tui] writes for older Codex CLI versions", async () => {
+  it("keeps OMCP-managed [tui] writes for older Codex CLI versions", async () => {
     const wd = await mkdtemp(join(tmpdir(), "omx-setup-refresh-"));
     try {
       await mkdir(join(wd, ".omx", "state"), { recursive: true });
@@ -368,7 +368,7 @@ describe("omx setup refresh summary and dry-run behavior", () => {
       });
 
       const config = await readFile(join(wd, ".codex", "config.toml"), "utf-8");
-      assert.match(config, /oh-my-copilot \(OMX\) Shared MCP Registry Sync/);
+      assert.match(config, /oh-my-copilot \(OMCP\) Shared MCP Registry Sync/);
       assert.match(config, /^\[mcp_servers\.eslint\]$/m);
       assert.match(config, /^command = "npx"$/m);
       assert.match(config, /^startup_timeout_sec = 9$/m);

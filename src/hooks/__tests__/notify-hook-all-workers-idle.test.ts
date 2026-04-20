@@ -482,7 +482,7 @@ exit 0
       // Should not send the all-workers-idle notification
       if (existsSync(tmuxLogPath)) {
         const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-        assert.doesNotMatch(tmuxLog, /\[OMX\] All .* idle/, 'should NOT send all-idle message when some workers are busy');
+        assert.doesNotMatch(tmuxLog, /\[OMCP\] All .* idle/, 'should NOT send all-idle message when some workers are busy');
       }
     });
   });
@@ -544,7 +544,7 @@ exit 0
 
       if (existsSync(tmuxLogPath)) {
         const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-        assert.doesNotMatch(tmuxLog, /\[OMX\] All .* idle/, 'stale heartbeat should suppress all-workers-idle notification');
+        assert.doesNotMatch(tmuxLog, /\[OMCP\] All .* idle/, 'stale heartbeat should suppress all-workers-idle notification');
       }
     });
   });
@@ -588,7 +588,7 @@ exit 0
 
       if (existsSync(tmuxLogPath)) {
         const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-        assert.doesNotMatch(tmuxLog, /\[OMX\] All .* idle/);
+        assert.doesNotMatch(tmuxLog, /\[OMCP\] All .* idle/);
       }
     });
   });
@@ -641,7 +641,7 @@ exit 0
 
       if (existsSync(tmuxLogPath)) {
         const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-        assert.doesNotMatch(tmuxLog, /\[OMX\] All .* idle/, 'cooldown should block repeated notification');
+        assert.doesNotMatch(tmuxLog, /\[OMCP\] All .* idle/, 'cooldown should block repeated notification');
       }
     });
   });
@@ -768,7 +768,7 @@ exit 0
 
       if (existsSync(tmuxLogPath)) {
         const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-        assert.doesNotMatch(tmuxLog, /\[OMX\] All .* idle/, 'leader context should not send all-idle notification');
+        assert.doesNotMatch(tmuxLog, /\[OMCP\] All .* idle/, 'leader context should not send all-idle notification');
       }
     });
   });
@@ -812,7 +812,7 @@ exit 0
 
       assert.ok(existsSync(tmuxLogPath), 'tmux should have been called');
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-      assert.match(tmuxLog, /\[OMX\] All 1 worker idle/, 'single worker uses singular form');
+      assert.match(tmuxLog, /\[OMCP\] All 1 worker idle/, 'single worker uses singular form');
       assert.match(tmuxLog, /Run `omx team status solo-team` now, read unread worker messages, then assign the next concrete task, reconcile results, or shut the team down/, 'all-workers-idle notification should tell the agent to execute the runtime status check directly');
       assert.doesNotMatch(tmuxLog, /Next: run omx team status solo-team, read unread worker messages, then decide whether to assign the next concrete task, reconcile results, or shut the team down/, 'all-workers-idle notification should not fall back to human-advisory wording');
       assert.doesNotMatch(tmuxLog, /All 1 workers idle/, 'should not use plural for single worker');

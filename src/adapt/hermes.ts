@@ -356,17 +356,17 @@ export function buildHermesBootstrapMetadata(evidence: HermesEvidence): AdaptBoo
   ];
 
   const nextSteps = [
-    `Set ${HERMES_HOME_ENV} to the Hermes profile home you want OMX to observe.`,
+    `Set ${HERMES_HOME_ENV} to the Hermes profile home you want OMCP to observe.`,
     `Run ${ACP_COMMANDS[0]} from ${evidence.hermesRoot} when validating ACP availability.`,
-    `Use ${STATUS_COMMANDS[0]} to confirm gateway status outside OMX if the runtime evidence looks stale.`,
+    `Use ${STATUS_COMMANDS[0]} to confirm gateway status outside OMCP if the runtime evidence looks stale.`,
   ];
 
   if (process.env[HERMES_BOOTSTRAP_ENV]?.trim()) {
-    nextSteps.unshift(`Bootstrap override detected via ${HERMES_BOOTSTRAP_ENV}; keep Hermes-side reads pointed at OMX-owned adapter artifacts only.`);
+    nextSteps.unshift(`Bootstrap override detected via ${HERMES_BOOTSTRAP_ENV}; keep Hermes-side reads pointed at OMCP-owned adapter artifacts only.`);
   }
 
   return {
-    summary: "Hermes bootstrap metadata maps OMX lifecycle intent into ACP and gateway guidance without claiming direct control over Hermes internals.",
+    summary: "Hermes bootstrap metadata maps OMCP lifecycle intent into ACP and gateway guidance without claiming direct control over Hermes internals.",
     eventBridge: [
       "session-start -> session:start",
       "session-end -> session:end",
@@ -483,7 +483,7 @@ export function applyHermesProbe(
   if (!evidence.installed) {
     nextSteps.push(`If Hermes lives elsewhere, set ${HERMES_ROOT_ENV} and rerun the probe.`);
   } else if (!evidence.runtimeFiles.stateDbReadable) {
-    nextSteps.push(`Ensure ${HERMES_HOME_ENV} points at the Hermes profile whose state.db OMX should inspect.`);
+    nextSteps.push(`Ensure ${HERMES_HOME_ENV} points at the Hermes profile whose state.db OMCP should inspect.`);
   }
 
   return {

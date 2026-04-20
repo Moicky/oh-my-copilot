@@ -48,7 +48,7 @@ export async function evaluateQuestionPolicy(
       allowed: false,
       sessionId,
       code: 'worker_blocked',
-      message: 'omx question is unavailable for OMX team workers; only non-team leader sessions may ask user questions.',
+      message: 'omx question is unavailable for OMCP team workers; only non-team leader sessions may ask user questions.',
       fallbackAllowed: false,
       activeModes: [],
       activeSkills: [],

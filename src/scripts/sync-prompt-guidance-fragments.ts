@@ -26,26 +26,26 @@ async function main(): Promise<void> {
   for (const file of ['AGENTS.md', 'templates/AGENTS.md']) {
     if (!existsSync(file)) continue;
     let text = await read(file);
-    text = replaceBetween(text, '<!-- OMX:GUIDANCE:OPERATING:START -->', '<!-- OMX:GUIDANCE:OPERATING:END -->', op);
-    text = replaceBetween(text, '<!-- OMX:GUIDANCE:SPECIALIST-ROUTING:START -->', '<!-- OMX:GUIDANCE:SPECIALIST-ROUTING:END -->', sr);
-    text = replaceBetween(text, '<!-- OMX:GUIDANCE:VERIFYSEQ:START -->', '<!-- OMX:GUIDANCE:VERIFYSEQ:END -->', vs);
+    text = replaceBetween(text, '<!-- OMCP:GUIDANCE:OPERATING:START -->', '<!-- OMCP:GUIDANCE:OPERATING:END -->', op);
+    text = replaceBetween(text, '<!-- OMCP:GUIDANCE:SPECIALIST-ROUTING:START -->', '<!-- OMCP:GUIDANCE:SPECIALIST-ROUTING:END -->', sr);
+    text = replaceBetween(text, '<!-- OMCP:GUIDANCE:VERIFYSEQ:START -->', '<!-- OMCP:GUIDANCE:VERIFYSEQ:END -->', vs);
     await writeFile(file, text);
   }
 
   let text = await read('prompts/executor.md');
-  text = replaceBetween(text, '<!-- OMX:GUIDANCE:EXECUTOR:CONSTRAINTS:START -->', '<!-- OMX:GUIDANCE:EXECUTOR:CONSTRAINTS:END -->', exC);
-  text = replaceBetween(text, '<!-- OMX:GUIDANCE:EXECUTOR:OUTPUT:START -->', '<!-- OMX:GUIDANCE:EXECUTOR:OUTPUT:END -->', exO);
+  text = replaceBetween(text, '<!-- OMCP:GUIDANCE:EXECUTOR:CONSTRAINTS:START -->', '<!-- OMCP:GUIDANCE:EXECUTOR:CONSTRAINTS:END -->', exC);
+  text = replaceBetween(text, '<!-- OMCP:GUIDANCE:EXECUTOR:OUTPUT:START -->', '<!-- OMCP:GUIDANCE:EXECUTOR:OUTPUT:END -->', exO);
   await writeFile('prompts/executor.md', text);
 
   text = await read('prompts/planner.md');
-  text = replaceBetween(text, '<!-- OMX:GUIDANCE:PLANNER:CONSTRAINTS:START -->', '<!-- OMX:GUIDANCE:PLANNER:CONSTRAINTS:END -->', plC);
-  text = replaceBetween(text, '<!-- OMX:GUIDANCE:PLANNER:INVESTIGATION:START -->', '<!-- OMX:GUIDANCE:PLANNER:INVESTIGATION:END -->', plI);
-  text = replaceBetween(text, '<!-- OMX:GUIDANCE:PLANNER:OUTPUT:START -->', '<!-- OMX:GUIDANCE:PLANNER:OUTPUT:END -->', plO);
+  text = replaceBetween(text, '<!-- OMCP:GUIDANCE:PLANNER:CONSTRAINTS:START -->', '<!-- OMCP:GUIDANCE:PLANNER:CONSTRAINTS:END -->', plC);
+  text = replaceBetween(text, '<!-- OMCP:GUIDANCE:PLANNER:INVESTIGATION:START -->', '<!-- OMCP:GUIDANCE:PLANNER:INVESTIGATION:END -->', plI);
+  text = replaceBetween(text, '<!-- OMCP:GUIDANCE:PLANNER:OUTPUT:START -->', '<!-- OMCP:GUIDANCE:PLANNER:OUTPUT:END -->', plO);
   await writeFile('prompts/planner.md', text);
 
   text = await read('prompts/verifier.md');
-  text = replaceBetween(text, '<!-- OMX:GUIDANCE:VERIFIER:CONSTRAINTS:START -->', '<!-- OMX:GUIDANCE:VERIFIER:CONSTRAINTS:END -->', vfC);
-  text = replaceBetween(text, '<!-- OMX:GUIDANCE:VERIFIER:INVESTIGATION:START -->', '<!-- OMX:GUIDANCE:VERIFIER:INVESTIGATION:END -->', vfI);
+  text = replaceBetween(text, '<!-- OMCP:GUIDANCE:VERIFIER:CONSTRAINTS:START -->', '<!-- OMCP:GUIDANCE:VERIFIER:CONSTRAINTS:END -->', vfC);
+  text = replaceBetween(text, '<!-- OMCP:GUIDANCE:VERIFIER:INVESTIGATION:START -->', '<!-- OMCP:GUIDANCE:VERIFIER:INVESTIGATION:END -->', vfI);
   await writeFile('prompts/verifier.md', text);
 }
 

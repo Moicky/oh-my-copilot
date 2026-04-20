@@ -2,7 +2,7 @@ import { resolve } from 'path';
 import { omxStateDir } from '../utils/paths.js';
 
 /**
- * Resolve the canonical OMX team state root for a leader working directory.
+ * Resolve the canonical OMCP team state root for a leader working directory.
  */
 export function resolveCanonicalTeamStateRoot(
   leaderCwd: string,

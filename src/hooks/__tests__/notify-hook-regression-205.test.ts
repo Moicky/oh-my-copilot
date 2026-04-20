@@ -166,7 +166,7 @@ describe('regression-205: detectStallPattern excludes "if you want" after #1416'
     );
   });
 
-  it('ignores OMX injection-marker lines when matching patterns', async () => {
+  it('ignores OMCP injection-marker lines when matching patterns', async () => {
     const { detectStallPattern, DEFAULT_STALL_PATTERNS } = await loadModule('notify-hook/auto-nudge.js');
     assert.equal(
       detectStallPattern('keep going [OMX_TMUX_INJECT]', DEFAULT_STALL_PATTERNS),

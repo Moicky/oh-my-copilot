@@ -49,7 +49,7 @@ async function writeOpenClawOmxConfig(config: unknown): Promise<void> {
 }
 
 describe("adapt foundation", () => {
-	it("resolves OMX-owned adapter paths under .omx/adapters/<target>", () => {
+	it("resolves OMCP-owned adapter paths under .omx/adapters/<target>", () => {
 		const paths = resolveAdaptPaths(tempDir, "openclaw");
 		assert.equal(
 			paths.adapterRoot,

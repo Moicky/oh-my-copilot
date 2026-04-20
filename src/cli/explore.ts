@@ -90,7 +90,7 @@ function formatWikiContextBlock(prompt: string, cwd: string): string | null {
   const wikiDir = getWikiDir(cwd);
   if (!existsSync(wikiDir)) {
     return [
-      '[OMX Wiki Status]',
+      '[OMCP Wiki Status]',
       WEAK_WIKI_NOTE,
       '',
       '[Original Explore Prompt]',
@@ -100,7 +100,7 @@ function formatWikiContextBlock(prompt: string, cwd: string): string | null {
   const matches = queryWiki(cwd, prompt, { limit: MAX_WIKI_CONTEXT_RESULTS, logQuery: false });
   if (matches.length === 0) {
     return [
-      '[OMX Wiki Status]',
+      '[OMCP Wiki Status]',
       `${WEAK_WIKI_NOTE} Existing wiki pages did not match this prompt strongly enough.`,
       '',
       '[Original Explore Prompt]',
@@ -109,7 +109,7 @@ function formatWikiContextBlock(prompt: string, cwd: string): string | null {
   }
 
   const lines = [
-    '[OMX Wiki Context]',
+    '[OMCP Wiki Context]',
     'Use these wiki matches first before falling back to broader repository search.',
     'If repository inspection contradicts wiki claims, prefer repository-backed facts in the final answer and add a short wiki mismatch warning.',
     'If any factual disagreement is detected, include a `## Wiki mismatch` section explaining the disagreement and the safer repo-backed conclusion.',
@@ -387,7 +387,7 @@ export async function resolveExploreHarnessCommandWithHydration(
   if (!isRepositoryCheckout(packageRoot)) {
     const hydrated = await hydrateNativeBinary('omx-explore-harness', { packageRoot, env });
     if (hydrated) return { command: hydrated, args: [] };
-    throw new Error('[explore] no compatible native harness is available for this install. Reconnect to the network so OMX can fetch the release asset, or set OMX_EXPLORE_BIN to a prebuilt harness binary.');
+    throw new Error('[explore] no compatible native harness is available for this install. Reconnect to the network so OMCP can fetch the release asset, or set OMX_EXPLORE_BIN to a prebuilt harness binary.');
   }
 
   return resolveExploreHarnessCommand(packageRoot, env);

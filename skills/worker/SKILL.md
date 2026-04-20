@@ -1,11 +1,11 @@
 ---
 name: worker
-description: Team worker protocol (ACK, mailbox, task lifecycle) for tmux-based OMX teams
+description: Team worker protocol (ACK, mailbox, task lifecycle) for tmux-based OMCP teams
 ---
 
 # Worker Skill
 
-This skill is for a Codex session that was started as an OMX Team worker (a tmux pane spawned by `$team`).
+This skill is for a Codex session that was started as an OMCP Team worker (a tmux pane spawned by `$team`).
 
 ## Identity
 

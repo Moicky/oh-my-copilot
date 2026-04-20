@@ -166,8 +166,8 @@ describe('generateCodebaseMap integration with generateOverlay', () => {
       await mkdir(join(emptyDir, '.omx', 'state'), { recursive: true });
       const { generateOverlay } = await import('../agents-overlay.js');
       const overlay = await generateOverlay(emptyDir, 'empty-session');
-      assert.ok(overlay.includes('<!-- OMX:RUNTIME:START -->'));
-      assert.ok(overlay.includes('<!-- OMX:RUNTIME:END -->'));
+      assert.ok(overlay.includes('<!-- OMCP:RUNTIME:START -->'));
+      assert.ok(overlay.includes('<!-- OMCP:RUNTIME:END -->'));
       // No codebase map section when no files
       assert.ok(!overlay.includes('Codebase Map'), 'should not inject empty map');
     } finally {

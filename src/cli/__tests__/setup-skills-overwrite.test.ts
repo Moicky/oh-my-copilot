@@ -18,14 +18,14 @@ describe('omx setup skills overwrite behavior', () => {
 
       const wikiSkill = join(wd, '.codex', 'skills', 'wiki', 'SKILL.md');
       assert.equal(existsSync(wikiSkill), true);
-      assert.ok((await readFile(wikiSkill, 'utf-8')).includes('description: "[OMX] '));
+      assert.ok((await readFile(wikiSkill, 'utf-8')).includes('description: "[OMCP] '));
     } finally {
       process.chdir(previousCwd);
       await rm(wd, { recursive: true, force: true });
     }
   });
 
-  it('adds an [OMX] description badge to installed shipped skills without changing the shipped source files', async () => {
+  it('adds an [OMCP] description badge to installed shipped skills without changing the shipped source files', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-setup-skills-'));
     const previousCwd = process.cwd();
     try {
@@ -39,7 +39,7 @@ describe('omx setup skills overwrite behavior', () => {
 
       assert.ok(
         (await readFile(installedHelpSkill, 'utf-8')).includes(
-          'description: "[OMX] Guide on using oh-my-copilot plugin"',
+          'description: "[OMCP] Guide on using oh-my-copilot plugin"',
         ),
       );
       assert.ok(
@@ -231,7 +231,7 @@ describe('omx setup skills overwrite behavior', () => {
     }
   });
 
-  it('does not keep stacking the [OMX] description badge on repeated setup runs', async () => {
+  it('does not keep stacking the [OMCP] description badge on repeated setup runs', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-setup-skills-'));
     const previousCwd = process.cwd();
     try {
@@ -243,9 +243,9 @@ describe('omx setup skills overwrite behavior', () => {
 
       const installedHelpSkill = join(wd, '.codex', 'skills', 'help', 'SKILL.md');
       const content = await readFile(installedHelpSkill, 'utf-8');
-      const matches = content.match(/\[OMX\] Guide on using oh-my-copilot plugin/g) ?? [];
+      const matches = content.match(/\[OMCP\] Guide on using oh-my-copilot plugin/g) ?? [];
       assert.equal(matches.length, 1);
-      assert.doesNotMatch(content, /\[OMX\] \[OMX\]/);
+      assert.doesNotMatch(content, /\[OMCP\] \[OMCP\]/);
     } finally {
       process.chdir(previousCwd);
       await rm(wd, { recursive: true, force: true });

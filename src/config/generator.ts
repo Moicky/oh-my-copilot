@@ -1,6 +1,6 @@
 /**
  * Config.toml generator/merger for oh-my-copilot
- * Merges OMX MCP server entries and feature flags into existing config.toml
+ * Merges OMCP MCP server entries and feature flags into existing config.toml
  *
  * TOML structure reminder: bare key=value pairs after a [table] header belong
  * to that table.  Top-level (root-table) keys MUST appear before the first
@@ -31,7 +31,7 @@ function escapeTomlString(value: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Top-level OMX keys (must live before any [table] header)
+// Top-level OMCP keys (must live before any [table] header)
 // ---------------------------------------------------------------------------
 
 /** Keys we own at the TOML root level. Used for upsert + strip. */
@@ -44,7 +44,7 @@ const OMX_TOP_LEVEL_KEYS = [
 const DEFAULT_SETUP_MODEL = DEFAULT_FRONTIER_MODEL;
 const DEFAULT_SETUP_MODEL_CONTEXT_WINDOW = 1000000;
 const DEFAULT_SETUP_MODEL_AUTO_COMPACT_TOKEN_LIMIT = 900000;
-const SHARED_MCP_REGISTRY_MARKER = "oh-my-copilot (OMX) Shared MCP Registry Sync";
+const SHARED_MCP_REGISTRY_MARKER = "oh-my-copilot (OMCP) Shared MCP Registry Sync";
 const SHARED_MCP_REGISTRY_END_MARKER =
   "# End oh-my-copilot shared MCP registry sync";
 const OMX_AGENTS_MAX_THREADS = 6;
@@ -166,7 +166,7 @@ function stripOrphanedManagedNotify(config: string): string {
 }
 
 /**
- * Remove any existing OMX-owned top-level keys so we can re-insert them
+ * Remove any existing OMCP-owned top-level keys so we can re-insert them
  * cleanly. Also removes the comment line that precedes them.
  */
 export function stripOmxTopLevelKeys(config: string): string {
@@ -340,7 +340,7 @@ function upsertAgentsSettings(config: string): string {
 }
 
 /**
- * Remove OMX-owned feature flags from the [features] section.
+ * Remove OMCP-owned feature flags from the [features] section.
  * If the section becomes empty after removal, remove the section header too.
  */
 export function stripOmxFeatureFlags(config: string): string {
@@ -436,11 +436,11 @@ export function stripOmxEnvSettings(config: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Orphaned OMX table sections (no marker block)
+// Orphaned OMCP table sections (no marker block)
 // ---------------------------------------------------------------------------
 
 /**
- * Check whether a TOML table name belongs to a legacy OMX-managed agent entry.
+ * Check whether a TOML table name belongs to a legacy OMCP-managed agent entry.
  * Handles both `agents.name` and `agents."name"` forms.
  */
 function isLegacyOmxAgentSection(tableName: string): boolean {
@@ -451,7 +451,7 @@ function isLegacyOmxAgentSection(tableName: string): boolean {
 }
 
 /**
- * Strip OMX-owned table sections that exist outside the marker block.
+ * Strip OMCP-owned table sections that exist outside the marker block.
  * This covers legacy configs that were written before markers were added,
  * or configs where the marker was accidentally removed.
  *
@@ -470,16 +470,16 @@ function stripOrphanedOmxSections(config: string): string {
       const tableName = tableMatch[1];
       // Note: [tui] is NOT stripped here because it could be user-owned.
       // The marker-based stripExistingOmxBlocks already handles [tui]
-      // when it lives inside the OMX marker block.
+      // when it lives inside the OMCP marker block.
       const isOmxSection =
         /^mcp_servers\.omx_/.test(tableName) ||
         isLegacyOmxAgentSection(tableName);
 
       if (isOmxSection) {
-        // Remove preceding OMX comment lines and blank lines
+        // Remove preceding OMCP comment lines and blank lines
         while (result.length > 0) {
           const last = result[result.length - 1];
-          if (last.trim() === "" || /^#\s*(OMX|oh-my-copilot)/i.test(last)) {
+          if (last.trim() === "" || /^#\s*(OMCP|oh-my-copilot)/i.test(last)) {
             result.pop();
           } else {
             break;
@@ -574,14 +574,14 @@ function upsertTuiStatusLine(config: string): {
 }
 
 // ---------------------------------------------------------------------------
-// OMX [table] sections block (appended at end of file)
+// OMCP [table] sections block (appended at end of file)
 // ---------------------------------------------------------------------------
 
 export function stripExistingOmxBlocks(config: string): {
   cleaned: string;
   removed: number;
 } {
-  const marker = "oh-my-copilot (OMX) Configuration";
+  const marker = "oh-my-copilot (OMCP) Configuration";
   const endMarker = "# End oh-my-copilot";
   let cleaned = config;
   let removed = 0;
@@ -828,7 +828,7 @@ function getSharedMcpRegistryBlock(
 }
 
 /**
- * OMX table-section block (MCP servers, TUI).
+ * OMCP table-section block (MCP servers, TUI).
  * Contains ONLY [table] sections — no bare keys.
  */
 function getOmxTablesBlock(pkgRoot: string, includeTui = true): string {
@@ -851,39 +851,39 @@ function getOmxTablesBlock(pkgRoot: string, includeTui = true): string {
   return [
     "",
     "# ============================================================",
-    "# oh-my-copilot (OMX) Configuration",
+    "# oh-my-copilot (OMCP) Configuration",
     "# Managed by omx setup - manual edits preserved on next setup",
     "# ============================================================",
     "",
-    "# OMX State Management MCP Server",
+    "# OMCP State Management MCP Server",
     "[mcp_servers.omx_state]",
     'command = "node"',
     `args = ["${stateServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 5",
     "",
-    "# OMX Project Memory MCP Server",
+    "# OMCP Project Memory MCP Server",
     "[mcp_servers.omx_memory]",
     'command = "node"',
     `args = ["${memoryServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 5",
     "",
-    "# OMX Code Intelligence MCP Server (LSP diagnostics, AST search)",
+    "# OMCP Code Intelligence MCP Server (LSP diagnostics, AST search)",
     "[mcp_servers.omx_code_intel]",
     'command = "node"',
     `args = ["${codeIntelServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 10",
     "",
-    "# OMX Trace MCP Server (agent flow timeline & statistics)",
+    "# OMCP Trace MCP Server (agent flow timeline & statistics)",
     "[mcp_servers.omx_trace]",
     'command = "node"',
     `args = ["${traceServerPath}"]`,
     "enabled = true",
     "startup_timeout_sec = 5",
     "",
-    "# OMX Wiki MCP Server (persistent project knowledge base)",
+    "# OMCP Wiki MCP Server (persistent project knowledge base)",
     "[mcp_servers.omx_wiki]",
     'command = "node"',
     `args = ["${wikiServerPath}"]`,
@@ -892,7 +892,7 @@ function getOmxTablesBlock(pkgRoot: string, includeTui = true): string {
     ...(includeTui
       ? [
           "",
-          "# OMX TUI StatusLine (Codex CLI v0.101.0+)",
+          "# OMCP TUI StatusLine (Codex CLI v0.101.0+)",
           "[tui]",
           OMX_TUI_STATUS_LINE,
           "",
@@ -909,15 +909,15 @@ function getOmxTablesBlock(pkgRoot: string, includeTui = true): string {
 // ---------------------------------------------------------------------------
 
 /**
- * Merge OMX config into existing config.toml
- * Preserves existing user settings, appends OMX block if not present.
+ * Merge OMCP config into existing config.toml
+ * Preserves existing user settings, appends OMCP block if not present.
  *
  * Layout:
- *   1. OMX top-level keys (notify, model_reasoning_effort, developer_instructions)
+ *   1. OMCP top-level keys (notify, model_reasoning_effort, developer_instructions)
  *   2. [features] with multi_agent + child_agents_md
  *   3. [env] with defaulted explore-routing opt-in
  *   4. … user sections …
- *   5. OMX [table] sections (mcp_servers, tui)
+ *   5. OMCP [table] sections (mcp_servers, tui)
  */
 export function buildMergedConfig(
   existingConfig: string,
@@ -927,7 +927,7 @@ export function buildMergedConfig(
   let existing = existingConfig;
   const includeTui = options.includeTui !== false;
 
-  if (existing.includes("oh-my-copilot (OMX) Configuration")) {
+  if (existing.includes("oh-my-copilot (OMCP) Configuration")) {
     const stripped = stripExistingOmxBlocks(existing);
     existing = stripped.cleaned;
   }
@@ -981,7 +981,7 @@ export function buildMergedConfig(
  * After an omx version upgrade the OLD setup code (still loaded in memory)
  * may leave a config with duplicate [tui] sections or the retired
  * [mcp_servers.omx_team_run] table. Codex rejects duplicate tables and newer
- * OMX builds no longer ship the team MCP entrypoint, so we repair both before
+ * OMCP builds no longer ship the team MCP entrypoint, so we repair both before
  * the CLI is spawned.
  *
  * Returns `true` if a repair was performed.
@@ -1017,10 +1017,10 @@ export async function mergeConfig(
     existing = await readFile(configPath, "utf-8");
   }
 
-  if (existing.includes("oh-my-copilot (OMX) Configuration")) {
+  if (existing.includes("oh-my-copilot (OMCP) Configuration")) {
     const stripped = stripExistingOmxBlocks(existing);
     if (options.verbose && stripped.removed > 0) {
-      console.log("  Updating existing OMX config block.");
+      console.log("  Updating existing OMCP config block.");
     }
   }
 

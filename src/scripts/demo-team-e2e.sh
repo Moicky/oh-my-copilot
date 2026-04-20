@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# OMX Team E2E Demo Script
+# OMCP Team E2E Demo Script
 #
 # This script demonstrates the tmux-based multi-agent orchestration system
 # with mixed Codex/Claude workers. It performs a complete end-to-end test
@@ -97,7 +97,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-echo "== OMX Team E2E demo =="
+echo "== OMCP Team E2E demo =="
 echo "TEAM_TASK=$TEAM_TASK"
 echo "TEAM_NAME=$TEAM_NAME"
 echo "WORKER_COUNT=$WORKER_COUNT"

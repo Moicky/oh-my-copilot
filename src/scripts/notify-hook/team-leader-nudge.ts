@@ -793,7 +793,7 @@ export async function maybeNudgeTeamLeader({
         taskCounts: progressSnapshot.taskCounts,
         leaderActionState,
       });
-      text = `[OMX] All ${N} worker${N === 1 ? '' : 's'} idle.${waitingText} ${leaderActionGuidance}`;
+      text = `[OMCP] All ${N} worker${N === 1 ? '' : 's'} idle.${waitingText} ${leaderActionGuidance}`;
     } else if (ackWithoutStartEvidence) {
       nudgeReason = ACK_WITHOUT_START_EVIDENCE_REASON;
       text =

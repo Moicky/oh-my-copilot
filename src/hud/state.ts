@@ -1,5 +1,5 @@
 /**
- * OMX HUD - State file readers
+ * OMCP HUD - State file readers
  *
  * Reads .omx/state/ files to build HUD render context.
  */

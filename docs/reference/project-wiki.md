@@ -1,6 +1,6 @@
-# Project wiki (OMX-native backport)
+# Project wiki (OMCP-native backport)
 
-This note captures the approved OMX-native shape for the project wiki backport.
+This note captures the approved OMCP-native shape for the project wiki backport.
 It is intentionally **not** a literal OMC port.
 
 ## Core shape
@@ -22,7 +22,7 @@ args = ["<repo>/dist/mcp/wiki-server.js"]
 enabled = true
 ```
 
-The bootstrap/config path should treat `omx_wiki` as a first-party OMX server
+The bootstrap/config path should treat `omx_wiki` as a first-party OMCP server
 alongside the existing built-ins, while keeping the diff small and idempotent.
 
 ## Storage contract
@@ -52,7 +52,7 @@ The docs and code should never regress back to `.omc/wiki/`.
 - `SessionEnd` stays **runtime-fallback** and **non-blocking**.
   - Best-effort capture is okay.
   - Missing wiki state should degrade to a no-op.
-- Literal `PreCompact` parity is **deferred in v1** unless an OMX-native seam is proven clean.
+- Literal `PreCompact` parity is **deferred in v1** unless an OMCP-native seam is proven clean.
 
 ## Routing contract
 

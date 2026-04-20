@@ -181,7 +181,7 @@ describe("hermes adapter integration", () => {
     assert.match(status.targetRuntime.detail, /connected platforms: telegram/i);
   });
 
-  it("keeps Hermes init writes inside OMX-owned adapter paths", async () => {
+  it("keeps Hermes init writes inside OMCP-owned adapter paths", async () => {
     writeHermesFixture({ withRoot: true, withGatewayRuntime: true, withStateDb: true });
     const result = await initAdaptFoundationForTarget(tempDir, "hermes", true, new Date("2026-04-14T00:00:00.000Z"));
 

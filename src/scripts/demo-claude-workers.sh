@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# OMX Tmux Claude Workers Demo Script
+# OMCP Tmux Claude Workers Demo Script
 #
 # This script demonstrates the tmux-based multi-agent orchestration system
 # with Claude Code CLI workers. It showcases:
@@ -86,7 +86,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-echo "== OMX Tmux Claude Workers Demo v${SCRIPT_VERSION} =="
+echo "== OMCP Tmux Claude Workers Demo v${SCRIPT_VERSION} =="
 echo "TEAM_TASK=$TEAM_TASK"
 echo "TEAM_NAME=$TEAM_NAME"
 echo "WORKER_COUNT=$WORKER_COUNT"
@@ -94,7 +94,7 @@ echo "OMX_TEAM_WORKER_CLI=$OMX_TEAM_WORKER_CLI"
 echo "OMX_TEAM_WORKER_CLI_MAP=$OMX_TEAM_WORKER_CLI_MAP"
 echo ""
 echo "This demo showcases Claude Code CLI workers in tmux panes"
-echo "coordinated through the OMX team orchestration system."
+echo "coordinated through the OMCP team orchestration system."
 echo ""
 
 echo "[1/10] Starting team with ${WORKER_COUNT} Claude workers..."
@@ -235,7 +235,7 @@ echo "  - Verified mailbox-based communication"
 echo "  - Tested broadcast messaging"
 echo "  - Clean shutdown and state cleanup"
 echo ""
-echo "The Claude workers were coordinated through the OMX"
+echo "The Claude workers were coordinated through the OMCP"
 echo "team orchestration system using tmux for process isolation"
 echo "and the CLI interop API for state management."
 echo "=========================================="

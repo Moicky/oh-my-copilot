@@ -133,7 +133,7 @@ describe("codex native hook config", () => {
       String(postToolUse.hooks?.[0]?.command || ""),
       /codex-native-hook\.js"?$/,
     );
-    assert.equal(postToolUse.hooks?.[0]?.statusMessage, "Running OMX tool review");
+    assert.equal(postToolUse.hooks?.[0]?.statusMessage, "Running OMCP tool review");
 
     const stop = config.hooks.Stop[0] as {
       hooks?: Array<Record<string, unknown>>;
@@ -164,7 +164,7 @@ describe("codex native hook dispatch", () => {
     assert.equal(output.decision, "block");
     assert.equal(
       output.reason,
-      "OMX native hook received malformed JSON input. Preserve runtime state, inspect the emitting hook payload yourself, and retry with valid JSON.",
+      "OMCP native hook received malformed JSON input. Preserve runtime state, inspect the emitting hook payload yourself, and retry with valid JSON.",
     );
     assert.equal(output.hookSpecificOutput?.hookEventName, "Unknown");
     assert.match(
@@ -173,7 +173,7 @@ describe("codex native hook dispatch", () => {
     );
   });
 
-  it("maps Codex events onto OMX logical surfaces", () => {
+  it("maps Codex events onto OMCP logical surfaces", () => {
     assert.equal(mapCodexHookEventToOmxEvent("SessionStart"), "session-start");
     assert.equal(mapCodexHookEventToOmxEvent("UserPromptSubmit"), "keyword-detector");
     assert.equal(mapCodexHookEventToOmxEvent("PreToolUse"), "pre-tool-use");
@@ -209,7 +209,7 @@ describe("codex native hook dispatch", () => {
     }
   });
 
-  it("preserves canonical OMX session scope when native SessionStart arrives with a different id", async () => {
+  it("preserves canonical OMCP session scope when native SessionStart arrives with a different id", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omx-native-hook-session-reconcile-"));
     try {
       const stateDir = join(cwd, ".omx", "state");
@@ -263,7 +263,7 @@ describe("codex native hook dispatch", () => {
     }
   });
 
-  it("passes the canonical OMX session id when UserPromptSubmit revives HUD", async () => {
+  it("passes the canonical OMCP session id when UserPromptSubmit revives HUD", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omx-native-hook-hud-session-revive-"));
     try {
       const stateDir = join(cwd, ".omx", "state");
@@ -406,7 +406,7 @@ describe("codex native hook dispatch", () => {
       await writeFile(
         join(cwd, ".omx", "notepad.md"),
         [
-          "# OMX Notepad",
+          "# OMCP Notepad",
           "",
           "## PRIORITY",
           "Preserve durable project guidance.",
@@ -903,7 +903,7 @@ export async function onHookEvent(event) {
         JSON.stringify(result.outputJson),
         /skill: team activated and initial state initialized at \.omx\/state\/team-state\.json; write subsequent updates via omx_state MCP\./,
       );
-      assert.match(JSON.stringify(result.outputJson), /Use the durable OMX team runtime via `omx team \.\.\.`/);
+      assert.match(JSON.stringify(result.outputJson), /Use the durable OMCP team runtime via `omx team \.\.\.`/);
       assert.match(JSON.stringify(result.outputJson), /If you need runtime syntax, run `omx team --help` yourself\./);
 
       const state = JSON.parse(
@@ -1026,7 +1026,7 @@ export async function onHookEvent(event) {
       assert.doesNotMatch(message, /mode transiting:/);
       assert.match(message, /planning preserved over simultaneous execution follow-up; deferred skills: team, ralph\./);
       assert.match(message, /skill: ralplan activated and initial state initialized at \.omx\/state\/sessions\/sess-multi-1\/ralplan-state\.json; write subsequent updates via omx_state MCP\./);
-      assert.doesNotMatch(message, /Use the durable OMX team runtime via `omx team \.\.\.`/);
+      assert.doesNotMatch(message, /Use the durable OMCP team runtime via `omx team \.\.\.`/);
     } finally {
       await rm(cwd, { recursive: true, force: true });
     }
@@ -1802,7 +1802,7 @@ esac
       assert.equal(output?.decision, "block");
       assert.equal(
         output?.reason,
-        "The MCP tool appears to have lost its transport/server connection. Preserve state, debug the transport failure, and use OMX CLI/file-backed fallbacks instead of retrying blindly.",
+        "The MCP tool appears to have lost its transport/server connection. Preserve state, debug the transport failure, and use OMCP CLI/file-backed fallbacks instead of retrying blindly.",
       );
       const additionalContext = String(
         output?.hookSpecificOutput?.additionalContext ?? "",
@@ -2139,11 +2139,11 @@ esac
       assert.equal(result.omxEventName, "post-tool-use");
       assert.deepEqual(result.outputJson, {
         decision: "block",
-        reason: "The MCP tool appears to have lost its transport/server connection. Preserve state, debug the transport failure, and use OMX CLI/file-backed fallbacks instead of retrying blindly.",
+        reason: "The MCP tool appears to have lost its transport/server connection. Preserve state, debug the transport failure, and use OMCP CLI/file-backed fallbacks instead of retrying blindly.",
         hookSpecificOutput: {
           hookEventName: "PostToolUse",
           additionalContext:
-            "Clear MCP transport-death signal detected. Preserve current team/runtime state. Retry via CLI parity with `omx state state_write --input '{\"mode\":\"team\",\"active\":true}' --json`. OMX MCP servers are plain Node stdio processes, so they still shut down when stdin/transport closes. If this happened during team runtime, inspect first with `omx team status <team>` or `omx team api read-stall-state --input '{\"team_name\":\"<team>\"}' --json`, and only force cleanup after capturing needed state. For root-cause debugging, rerun with `OMX_MCP_TRANSPORT_DEBUG=1` to log why the stdio transport closed.",
+            "Clear MCP transport-death signal detected. Preserve current team/runtime state. Retry via CLI parity with `omx state state_write --input '{\"mode\":\"team\",\"active\":true}' --json`. OMCP MCP servers are plain Node stdio processes, so they still shut down when stdin/transport closes. If this happened during team runtime, inspect first with `omx team status <team>` or `omx team api read-stall-state --input '{\"team_name\":\"<team>\"}' --json`, and only force cleanup after capturing needed state. For root-cause debugging, rerun with `OMX_MCP_TRANSPORT_DEBUG=1` to log why the stdio transport closed.",
         },
       });
 
@@ -2179,9 +2179,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "OMX autopilot is still active (phase: execution); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP autopilot is still active (phase: execution); continue the task and gather fresh verification evidence before stopping.",
         stopReason: "autopilot_execution",
-        systemMessage: "OMX autopilot is still active (phase: execution).",
+        systemMessage: "OMCP autopilot is still active (phase: execution).",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2233,9 +2233,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "OMX ultrawork is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP ultrawork is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
         stopReason: "ultrawork_executing",
-        systemMessage: "OMX ultrawork is still active (phase: executing).",
+        systemMessage: "OMCP ultrawork is still active (phase: executing).",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2260,9 +2260,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "OMX ultraqa is still active (phase: diagnose); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP ultraqa is still active (phase: diagnose); continue the task and gather fresh verification evidence before stopping.",
         stopReason: "ultraqa_diagnose",
-        systemMessage: "OMX ultraqa is still active (phase: diagnose).",
+        systemMessage: "OMCP ultraqa is still active (phase: diagnose).",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2300,9 +2300,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (review-team) at phase team-verify; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (review-team) at phase team-verify; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-verify",
-        systemMessage: "OMX team pipeline is still active at phase team-verify.",
+        systemMessage: "OMCP team pipeline is still active at phase team-verify.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2355,9 +2355,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "OMX team worker worker-1 is still assigned non-terminal task 1 (in_progress); continue the current assigned task or report a concrete blocker before stopping.",
+          "OMCP team worker worker-1 is still assigned non-terminal task 1 (in_progress); continue the current assigned task or report a concrete blocker before stopping.",
         stopReason: "team_worker_worker-1_1_in_progress",
-        systemMessage: "OMX team worker worker-1 is still assigned task 1 (in_progress).",
+        systemMessage: "OMCP team worker worker-1 is still assigned task 1 (in_progress).",
       });
     } finally {
       if (typeof prevTeamWorker === "string") process.env.OMX_TEAM_WORKER = prevTeamWorker;
@@ -2414,9 +2414,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (worker-stop-team-terminal) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (worker-stop-team-terminal) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-exec",
-        systemMessage: "OMX team pipeline is still active at phase team-exec.",
+        systemMessage: "OMCP team pipeline is still active at phase team-exec.",
       });
     } finally {
       if (typeof prevTeamWorker === "string") process.env.OMX_TEAM_WORKER = prevTeamWorker;
@@ -2453,9 +2453,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (canonical-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (canonical-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-exec",
-        systemMessage: "OMX team pipeline is still active at phase team-exec.",
+        systemMessage: "OMCP team pipeline is still active at phase team-exec.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2506,7 +2506,7 @@ esac
           'Stable final recommendation already reached with no active worker tasks. Emit exactly one concise final decision summary aligned to "Launch-ready: yes." with no filler or residual acknowledgements (for example "yes"), then stop.',
         stopReason: "release_readiness_auto_finalize",
         systemMessage:
-          "OMX release-readiness detected a stable final recommendation with no active worker tasks; emit one concise final decision summary and finalize.",
+          "OMCP release-readiness detected a stable final recommendation with no active worker tasks; emit one concise final decision summary and finalize.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2548,9 +2548,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (general-review-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (general-review-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-exec",
-        systemMessage: "OMX team pipeline is still active at phase team-exec.",
+        systemMessage: "OMCP team pipeline is still active at phase team-exec.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2597,9 +2597,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (canonical-team-refire) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (canonical-team-refire) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-exec",
-        systemMessage: "OMX team pipeline is still active at phase team-exec.",
+        systemMessage: "OMCP team pipeline is still active at phase team-exec.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2677,9 +2677,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (legacy-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (legacy-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-exec",
-        systemMessage: "OMX team pipeline is still active at phase team-exec.",
+        systemMessage: "OMCP team pipeline is still active at phase team-exec.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2716,9 +2716,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (canonical-root-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (canonical-root-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-exec",
-        systemMessage: "OMX team pipeline is still active at phase team-exec.",
+        systemMessage: "OMCP team pipeline is still active at phase team-exec.",
       });
       assert.equal(existsSync(join(sharedRoot, "team", "canonical-root-team", "phase.json")), true);
     } finally {
@@ -2760,9 +2760,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (env-root-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (env-root-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-exec",
-        systemMessage: "OMX team pipeline is still active at phase team-exec.",
+        systemMessage: "OMCP team pipeline is still active at phase team-exec.",
       });
     } finally {
       if (typeof previousTeamStateRoot === "string") process.env.OMX_TEAM_STATE_ROOT = previousTeamStateRoot;
@@ -2804,9 +2804,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (session-live-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (session-live-team) at phase team-exec; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-exec",
-        systemMessage: "OMX team pipeline is still active at phase team-exec.",
+        systemMessage: "OMCP team pipeline is still active at phase team-exec.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -2842,9 +2842,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "OMX skill ralplan is still active (phase: planning); continue until the current ralplan workflow reaches a terminal state.",
+          "OMCP skill ralplan is still active (phase: planning); continue until the current ralplan workflow reaches a terminal state.",
         stopReason: "skill_ralplan_planning",
-        systemMessage: "OMX skill ralplan is still active (phase: planning).",
+        systemMessage: "OMCP skill ralplan is still active (phase: planning).",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3000,9 +3000,9 @@ esac
       assert.equal(result.omxEventName, "stop");
       assert.deepEqual(result.outputJson, {
         decision: "block",
-        reason: "OMX autoresearch is still active (phase: executing); continue until validator evidence is complete before stopping.",
+        reason: "OMCP autoresearch is still active (phase: executing); continue until validator evidence is complete before stopping.",
         stopReason: "autoresearch_executing",
-        systemMessage: "OMX autoresearch is still active (phase: executing); continue until validator evidence is complete before stopping.",
+        systemMessage: "OMCP autoresearch is still active (phase: executing); continue until validator evidence is complete before stopping.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3153,7 +3153,7 @@ esac
           "Deep interview is still active (phase: intent-first) and has a pending structured question obligation; use `omx question` before stopping.",
         stopReason: "deep_interview_question_required",
         systemMessage:
-          "OMX deep-interview is still active (phase: intent-first) and requires a structured question via omx question before stopping.",
+          "OMCP deep-interview is still active (phase: intent-first) and requires a structured question via omx question before stopping.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3196,7 +3196,7 @@ esac
           "Deep interview is still active (phase: intent-first) and has a pending structured question obligation; use `omx question` before stopping.",
         stopReason: "deep_interview_question_required",
         systemMessage:
-          "OMX deep-interview is still active (phase: intent-first) and requires a structured question via omx question before stopping.",
+          "OMCP deep-interview is still active (phase: intent-first) and requires a structured question via omx question before stopping.",
       };
 
       const first = await dispatchCodexNativeHook(payload, { cwd });
@@ -3342,7 +3342,7 @@ esac
           "Deep interview is still active (phase: intent-first) and has a pending structured question obligation; use `omx question` before stopping.",
         stopReason: "deep_interview_question_required",
         systemMessage:
-          "OMX deep-interview is still active (phase: intent-first) and requires a structured question via omx question before stopping.",
+          "OMCP deep-interview is still active (phase: intent-first) and requires a structured question via omx question before stopping.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3403,10 +3403,10 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "OMX Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
         stopReason: "ralph_executing",
         systemMessage:
-          "OMX Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3438,10 +3438,10 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          "OMX Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
         stopReason: "ralph_executing",
         systemMessage:
-          "OMX Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3617,10 +3617,10 @@ esac
       const expected = {
         decision: "block",
         reason:
-          "OMX Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
         stopReason: "ralph_executing",
         systemMessage:
-          "OMX Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP Ralph is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
       };
 
       const first = await dispatchCodexNativeHook(payload, { cwd });
@@ -3667,7 +3667,7 @@ esac
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
         stopReason: "auto_nudge",
         systemMessage:
-          "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+          "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3712,7 +3712,7 @@ esac
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
         stopReason: "auto_nudge",
         systemMessage:
-          "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+          "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3761,7 +3761,7 @@ esac
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
         stopReason: "auto_nudge",
         systemMessage:
-          "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+          "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
       });
 
       const persisted = JSON.parse(
@@ -3811,7 +3811,7 @@ esac
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
         stopReason: "auto_nudge",
         systemMessage:
-          "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+          "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3840,7 +3840,7 @@ esac
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
         stopReason: "auto_nudge",
         systemMessage:
-          "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+          "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -3869,7 +3869,7 @@ esac
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
         stopReason: "auto_nudge",
         systemMessage:
-          "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+          "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4019,7 +4019,7 @@ esac
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
         stopReason: "auto_nudge",
         systemMessage:
-          "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+          "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4056,7 +4056,7 @@ esac
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
         stopReason: "auto_nudge",
         systemMessage:
-          "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+          "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4099,7 +4099,7 @@ esac
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
         stopReason: "auto_nudge",
         systemMessage:
-          "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+          "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4142,14 +4142,14 @@ esac
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
         stopReason: "auto_nudge",
         systemMessage:
-          "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+          "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
     }
   });
 
-  it("auto-continues native Stop for permission-seeking prompts even outside OMX runtime", async () => {
+  it("auto-continues native Stop for permission-seeking prompts even outside OMCP runtime", async () => {
     const cwd = await mkdtemp(join(tmpdir(), "omx-native-hook-auto-nudge-plain-session-"));
     try {
       await dispatchCodexNativeHook(
@@ -4182,7 +4182,7 @@ esac
         reason: DEFAULT_AUTO_NUDGE_RESPONSE,
         stopReason: "auto_nudge",
         systemMessage:
-          "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+          "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4234,9 +4234,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (review-team) at phase team-verify; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (review-team) at phase team-verify; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-verify",
-        systemMessage: "OMX team pipeline is still active at phase team-verify.",
+        systemMessage: "OMCP team pipeline is still active at phase team-verify.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4294,9 +4294,9 @@ esac
       assert.deepEqual(duplicate.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (current-team) at phase team-verify; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (current-team) at phase team-verify; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-verify",
-        systemMessage: "OMX team pipeline is still active at phase team-verify.",
+        systemMessage: "OMCP team pipeline is still active at phase team-verify.",
       });
 
       const fresh = await dispatchCodexNativeHook(
@@ -4315,9 +4315,9 @@ esac
       assert.deepEqual(fresh.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (current-team) at phase team-verify; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (current-team) at phase team-verify; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-verify",
-        systemMessage: "OMX team pipeline is still active at phase team-verify.",
+        systemMessage: "OMCP team pipeline is still active at phase team-verify.",
       });
 
       const persisted = JSON.parse(
@@ -4335,19 +4335,19 @@ esac
         mode: "autopilot",
         phase: "execution",
         reason:
-          "OMX autopilot is still active (phase: execution); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP autopilot is still active (phase: execution); continue the task and gather fresh verification evidence before stopping.",
       },
       {
         mode: "ultrawork",
         phase: "executing",
         reason:
-          "OMX ultrawork is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP ultrawork is still active (phase: executing); continue the task and gather fresh verification evidence before stopping.",
       },
       {
         mode: "ultraqa",
         phase: "diagnose",
         reason:
-          "OMX ultraqa is still active (phase: diagnose); continue the task and gather fresh verification evidence before stopping.",
+          "OMCP ultraqa is still active (phase: diagnose); continue the task and gather fresh verification evidence before stopping.",
       },
     ] as const;
 
@@ -4389,7 +4389,7 @@ esac
           decision: "block",
           reason: testCase.reason,
           stopReason: `${testCase.mode}_${testCase.phase}`,
-          systemMessage: `OMX ${testCase.mode} is still active (phase: ${testCase.phase}).`,
+          systemMessage: `OMCP ${testCase.mode} is still active (phase: ${testCase.phase}).`,
         });
       } finally {
         await rm(cwd, { recursive: true, force: true });
@@ -4440,9 +4440,9 @@ esac
       assert.deepEqual(repeated.outputJson, {
         decision: "block",
         reason:
-          "OMX skill ralplan is still active (phase: planning); continue until the current ralplan workflow reaches a terminal state.",
+          "OMCP skill ralplan is still active (phase: planning); continue until the current ralplan workflow reaches a terminal state.",
         stopReason: "skill_ralplan_planning",
-        systemMessage: "OMX skill ralplan is still active (phase: planning).",
+        systemMessage: "OMCP skill ralplan is still active (phase: planning).",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -4560,9 +4560,9 @@ esac
       assert.deepEqual(result.outputJson, {
         decision: "block",
         reason:
-          `OMX team pipeline is still active (current-team) at phase team-verify; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
+          `OMCP team pipeline is still active (current-team) at phase team-verify; continue coordinating until the team reaches a terminal phase.${TEAM_STOP_COMMIT_GUIDANCE}`,
         stopReason: "team_team-verify",
-        systemMessage: "OMX team pipeline is still active at phase team-verify.",
+        systemMessage: "OMCP team pipeline is still active at phase team-verify.",
       });
     } finally {
       await rm(cwd, { recursive: true, force: true });

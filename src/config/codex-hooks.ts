@@ -71,17 +71,17 @@ export function buildManagedCodexHooksConfig(
       PreToolUse: [
         buildCommandHook(command, {
           matcher: "Bash",
-          statusMessage: "Running OMX Bash preflight",
+          statusMessage: "Running OMCP Bash preflight",
         }),
       ],
       PostToolUse: [
         buildCommandHook(command, {
-          statusMessage: "Running OMX tool review",
+          statusMessage: "Running OMCP tool review",
         }),
       ],
       UserPromptSubmit: [
         buildCommandHook(command, {
-          statusMessage: "Applying OMX prompt routing",
+          statusMessage: "Applying OMCP prompt routing",
         }),
       ],
       Stop: [

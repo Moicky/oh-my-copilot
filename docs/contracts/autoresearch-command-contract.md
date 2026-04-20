@@ -1,6 +1,6 @@
 # `omx autoresearch` parity contract
 
-`omx autoresearch` is a thin supervisor that drives one Codex experiment session per iteration while OMX owns the durable keep/discard/reset loop.
+`omx autoresearch` is a thin supervisor that drives one Codex experiment session per iteration while OMCP owns the durable keep/discard/reset loop.
 
 ## CLI
 

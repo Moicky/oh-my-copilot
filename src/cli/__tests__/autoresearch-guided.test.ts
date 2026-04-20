@@ -292,7 +292,7 @@ describe("runAutoresearchNoviceBridge", () => {
 						"launch",
 					]),
 					async () => {
-						throw new Error("omx question requires tmux for OMX-owned question UI rendering in this session.");
+						throw new Error("omx question requires tmux for OMCP-owned question UI rendering in this session.");
 					},
 				),
 			);

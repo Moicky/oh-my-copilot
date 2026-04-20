@@ -31,7 +31,7 @@ describe('agents-md helpers', () => {
     assert.equal(addGeneratedAgentsMarker(content), content);
   });
 
-  it('treats autonomy-directive generated files as OMX-managed once marked', () => {
+  it('treats autonomy-directive generated files as OMCP-managed once marked', () => {
     const content = [
       '<!-- AUTONOMY DIRECTIVE — DO NOT REMOVE -->',
       'directive body',
@@ -43,24 +43,24 @@ describe('agents-md helpers', () => {
     assert.equal(isOmxGeneratedAgentsMd(content), true);
   });
 
-  it('does not treat title-only user AGENTS.md content as OMX-generated', () => {
+  it('does not treat title-only user AGENTS.md content as OMCP-generated', () => {
     const content = [
       '# oh-my-copilot - Intelligent Multi-Agent Orchestration',
       '',
-      'User-authored guidance without any OMX ownership markers.',
+      'User-authored guidance without any OMCP ownership markers.',
     ].join('\n');
 
     assert.equal(isOmxGeneratedAgentsMd(content), false);
     assert.equal(hasOmxManagedAgentsSections(content), false);
   });
 
-  it('recognizes explicit OMX-owned model table blocks as managed sections', () => {
+  it('recognizes explicit OMCP-owned model table blocks as managed sections', () => {
     const content = [
       '# Shared ownership AGENTS',
       '',
-      '<!-- OMX:MODELS:START -->',
+      '<!-- OMCP:MODELS:START -->',
       'managed table',
-      '<!-- OMX:MODELS:END -->',
+      '<!-- OMCP:MODELS:END -->',
     ].join('\n');
 
     assert.equal(isOmxGeneratedAgentsMd(content), false);

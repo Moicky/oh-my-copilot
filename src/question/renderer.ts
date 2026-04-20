@@ -39,14 +39,14 @@ export function resolveQuestionRendererStrategy(
 
 function buildQuestionUiCommand(recordPath: string, sessionId?: string): string {
   const omxBin = resolveOmxCliEntryPath() || process.argv[1];
-  if (!omxBin) throw new Error('Unable to resolve OMX CLI entry path for question UI launch.');
+  if (!omxBin) throw new Error('Unable to resolve OMCP CLI entry path for question UI launch.');
   const sessionPrefix = sessionId ? `OMX_SESSION_ID=${shellEscapeSingle(sessionId)} ` : '';
   return `${sessionPrefix}${shellEscapeSingle(process.execPath)} ${shellEscapeSingle(omxBin)} question --ui --state-path ${shellEscapeSingle(recordPath)}`;
 }
 
 function defaultExecTmux(args: string[]): string {
   const tmux = resolveTmuxBinaryForPlatform();
-  if (!tmux) throw new Error('tmux is unavailable; omx question requires tmux for OMX-owned question UI rendering.');
+  if (!tmux) throw new Error('tmux is unavailable; omx question requires tmux for OMCP-owned question UI rendering.');
   return execFileSync(tmux, args, {
     encoding: 'utf-8',
     ...(process.platform === 'win32' ? { windowsHide: true } : {}),
@@ -154,5 +154,5 @@ export function launchQuestionRenderer(
     };
   }
 
-  throw new Error('omx question requires tmux for OMX-owned question UI rendering in this session.');
+  throw new Error('omx question requires tmux for OMCP-owned question UI rendering in this session.');
 }

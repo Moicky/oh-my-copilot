@@ -2,7 +2,7 @@
 
 Date: **2026-03-19**  
 Baseline commit: **`8106d67`**  
-Execution surface: active OMX team worker pane (`worker-3`) with local verification run from repository root after clearing `OMX_TEAM_*` env vars.
+Execution surface: active OMCP team worker pane (`worker-3`) with local verification run from repository root after clearing `OMX_TEAM_*` env vars.
 
 ## Scope
 

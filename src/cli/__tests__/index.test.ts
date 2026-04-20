@@ -305,7 +305,7 @@ describe("resolveNotifyTempContract", () => {
 });
 
 describe("cleanupLaunchOrphanedMcpProcesses", () => {
-  it("reaps only detached OMX MCP processes without a live Codex ancestor", async () => {
+  it("reaps only detached OMCP MCP processes without a live Codex ancestor", async () => {
     const processes: ProcessEntry[] = [
       { pid: 700, ppid: 500, command: "codex" },
       { pid: 701, ppid: 700, command: "node /repo/bin/omx.js" },
@@ -370,12 +370,12 @@ describe("cleanupLaunchOrphanedMcpProcesses", () => {
     assert.equal(
       signals.some(({ pid }) => pid === 821),
       false,
-      "launch-safe cleanup must preserve OMX MCP processes still attached to another live Codex tree",
+      "launch-safe cleanup must preserve OMCP MCP processes still attached to another live Codex tree",
     );
     assert.equal(
       signals.some(({ pid }) => pid === 831),
       false,
-      "launch-safe cleanup must preserve OMX MCP processes still attached to another live OMX launch tree",
+      "launch-safe cleanup must preserve OMCP MCP processes still attached to another live OMCP launch tree",
     );
   });
 });
@@ -402,11 +402,11 @@ describe("reapPostLaunchOrphanedMcpProcesses", () => {
     assert.deepEqual(errors, []);
     assert.match(
       info.join("\n"),
-      /postLaunch: reaped 2 orphaned OMX MCP process/,
+      /postLaunch: reaped 2 orphaned OMCP MCP process/,
     );
     assert.match(
       warnings.join("\n"),
-      /postLaunch: failed to reap 1 orphaned OMX MCP process/,
+      /postLaunch: failed to reap 1 orphaned OMCP MCP process/,
     );
   });
 
@@ -2345,7 +2345,7 @@ describe("buildTmuxSessionName", () => {
 });
 
 describe("buildDetachedTmuxSessionName", () => {
-  it("reuses the OMX session id for the detached tmux session name", () => {
+  it("reuses the OMCP session id for the detached tmux session name", () => {
     const sessionName = buildDetachedTmuxSessionName(
       "/tmp/My Repo",
       "omx-1770992424158-abc123",

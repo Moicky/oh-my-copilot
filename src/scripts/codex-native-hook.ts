@@ -90,7 +90,7 @@ const STABLE_FINAL_RECOMMENDATION_PATTERNS = [
   /^\s*decision\s*:\s*(?:yes|no|ship|hold|release|do not release|proceed|do not proceed)\b[^\n\r]*/im,
 ] as const;
 const RELEASE_READINESS_FINALIZE_SYSTEM_MESSAGE =
-  "OMX release-readiness detected a stable final recommendation with no active worker tasks; emit one concise final decision summary and finalize.";
+  "OMCP release-readiness detected a stable final recommendation with no active worker tasks; emit one concise final decision summary and finalize.";
 const EXECUTION_HANDOFF_PATTERNS = [
   /^(?:好|好的|行|可以|那就|那现在)?[，,\s]*(?:开始|继续|直接)\s*(?:执行|优化|实现|修改|修复)(?=$|\s|[，,。.!！?？])/u,
   /(?:按照|按|基于)(?:这个|上述|当前)?\s*(?:plan|计划|方案).{0,16}(?:开始|继续|直接)?\s*(?:执行|优化|实现|修改|修复)/u,
@@ -435,7 +435,7 @@ async function buildSessionStartContext(
 
   const gitignoreResult = await ensureOmxGitignoreEntry(cwd);
   if (gitignoreResult.changed) {
-    sections.push(`Added .omx/ to ${gitignoreResult.gitignorePath} to keep local OMX state out of source control.`);
+    sections.push(`Added .omx/ to ${gitignoreResult.gitignorePath} to keep local OMCP state out of source control.`);
   }
 
   const modeSummaries: string[] = [];
@@ -456,7 +456,7 @@ async function buildSessionStartContext(
     modeSummaries.push(`- ${mode} phase: ${formatPhase(state.current_phase)}`);
   }
   if (modeSummaries.length > 0) {
-    sections.push(["[Active OMX modes]", ...modeSummaries].join("\n"));
+    sections.push(["[Active OMCP modes]", ...modeSummaries].join("\n"));
   }
 
   const projectMemory = await readJsonIfExists(omxProjectMemoryPath(cwd));
@@ -530,8 +530,8 @@ function buildAdditionalContextMessage(prompt: string, skillState?: SkillActiveS
   const match = detectPrimaryKeyword(prompt);
   if (!match) return promptPriorityMessage;
   const detectedKeywordMessage = matches.length > 1
-    ? `OMX native UserPromptSubmit detected workflow keywords ${matches.map((entry) => `"${entry.keyword}" -> ${entry.skill}`).join(", ")}.`
-    : `OMX native UserPromptSubmit detected workflow keyword "${match.keyword}" -> ${match.skill}.`;
+    ? `OMCP native UserPromptSubmit detected workflow keywords ${matches.map((entry) => `"${entry.keyword}" -> ${entry.skill}`).join(", ")}.`
+    : `OMCP native UserPromptSubmit detected workflow keyword "${match.keyword}" -> ${match.skill}.`;
   const activeSkills = Array.isArray(skillState?.active_skills)
     ? skillState.active_skills.map((entry) => entry.skill)
     : [];
@@ -555,7 +555,7 @@ function buildAdditionalContextMessage(prompt: string, skillState?: SkillActiveS
 
   if (skillState?.transition_error) {
     return [
-      `OMX native UserPromptSubmit denied workflow keyword "${match.keyword}" -> ${match.skill}.`,
+      `OMCP native UserPromptSubmit denied workflow keyword "${match.keyword}" -> ${match.skill}.`,
       skillState.transition_error,
       promptPriorityMessage,
       'Follow AGENTS.md routing and preserve workflow transition and planning-safety rules.',
@@ -575,7 +575,7 @@ function buildAdditionalContextMessage(prompt: string, skillState?: SkillActiveS
         ? `skill: ${skillState.initialized_mode} activated and initial state initialized at ${skillState.initialized_state_path}; write subsequent updates via omx_state MCP.`
         : null,
       teamDetected
-        ? "Use the durable OMX team runtime via `omx team ...` for coordinated execution; do not replace it with in-process fanout."
+        ? "Use the durable OMCP team runtime via `omx team ...` for coordinated execution; do not replace it with in-process fanout."
         : null,
       teamDetected ? "If you need runtime syntax, run `omx team --help` yourself." : null,
       'Follow AGENTS.md routing and preserve workflow transition and planning-safety rules.',
@@ -595,7 +595,7 @@ function buildAdditionalContextMessage(prompt: string, skillState?: SkillActiveS
       promptPriorityMessage,
       initializedStateMessage,
       deepInterviewPromptActivationNote,
-      "Use the durable OMX team runtime via `omx team ...` for coordinated execution; do not replace it with in-process fanout.",
+      "Use the durable OMCP team runtime via `omx team ...` for coordinated execution; do not replace it with in-process fanout.",
       "If you need runtime syntax, run `omx team --help` yourself.",
       "Follow AGENTS.md routing and preserve workflow transition and planning-safety rules.",
     ].filter(Boolean).join(" ");
@@ -701,10 +701,10 @@ async function buildTeamWorkerStopOutput(
     return {
       decision: "block",
       reason:
-        `OMX team worker ${workerContext.workerName} is still assigned non-terminal task ${taskId} (${statusValue}); continue the current assigned task or report a concrete blocker before stopping.`,
+        `OMCP team worker ${workerContext.workerName} is still assigned non-terminal task ${taskId} (${statusValue}); continue the current assigned task or report a concrete blocker before stopping.`,
       stopReason: `team_worker_${workerContext.workerName}_${taskId}_${statusValue}`,
       systemMessage:
-        `OMX team worker ${workerContext.workerName} is still assigned task ${taskId} (${statusValue}).`,
+        `OMCP team worker ${workerContext.workerName} is still assigned task ${taskId} (${statusValue}).`,
     };
   }
 
@@ -746,9 +746,9 @@ async function buildModeBasedStopOutput(
   const phase = formatPhase(state.current_phase);
   return {
     decision: "block",
-    reason: `OMX ${mode} is still active (phase: ${phase}); continue the task and gather fresh verification evidence before stopping.`,
+    reason: `OMCP ${mode} is still active (phase: ${phase}); continue the task and gather fresh verification evidence before stopping.`,
     stopReason: `${mode}_${phase}`,
-    systemMessage: `OMX ${mode} is still active (phase: ${phase}).`,
+    systemMessage: `OMCP ${mode} is still active (phase: ${phase}).`,
   };
 }
 
@@ -793,7 +793,7 @@ async function buildTeamStopOutput(cwd: string, sessionId?: string): Promise<Rec
 
 function buildTeamStopReason(teamName: string, phase: string): string {
   const teamContext = teamName ? ` (${teamName})` : "";
-  return `OMX team pipeline is still active${teamContext} at phase ${phase}; continue coordinating until the team reaches a terminal phase. If system-generated worker auto-checkpoint commits exist, rewrite them into Lore-format final commits before merge/finalization.`;
+  return `OMCP team pipeline is still active${teamContext} at phase ${phase}; continue coordinating until the team reaches a terminal phase. If system-generated worker auto-checkpoint commits exist, rewrite them into Lore-format final commits before merge/finalization.`;
 }
 
 function buildTeamStopOutputForPhase(teamName: string, phase: string): Record<string, unknown> {
@@ -801,7 +801,7 @@ function buildTeamStopOutputForPhase(teamName: string, phase: string): Record<st
     decision: "block",
     reason: buildTeamStopReason(teamName, phase),
     stopReason: `team_${phase}`,
-    systemMessage: `OMX team pipeline is still active at phase ${phase}.`,
+    systemMessage: `OMCP team pipeline is still active at phase ${phase}.`,
   };
 }
 
@@ -1022,7 +1022,7 @@ async function buildDeepInterviewQuestionStopOutput(
   if (!obligationId) return null;
 
   const systemMessage =
-    `OMX deep-interview is still active (phase: ${phase}) and requires a structured question via omx question before stopping.`;
+    `OMCP deep-interview is still active (phase: ${phase}) and requires a structured question via omx question before stopping.`;
 
   return {
     obligationId,
@@ -1267,9 +1267,9 @@ async function buildSkillStopOutput(
 
   return {
     decision: "block",
-    reason: `OMX skill ${blocker.skill} is still active (phase: ${blocker.phase}); continue until the current ${blocker.skill} workflow reaches a terminal state.`,
+    reason: `OMCP skill ${blocker.skill} is still active (phase: ${blocker.phase}); continue until the current ${blocker.skill} workflow reaches a terminal state.`,
     stopReason: `skill_${blocker.skill}_${blocker.phase}`,
-    systemMessage: `OMX skill ${blocker.skill} is still active (phase: ${blocker.phase}).`,
+    systemMessage: `OMCP skill ${blocker.skill} is still active (phase: ${blocker.phase}).`,
   };
 }
 
@@ -1397,7 +1397,7 @@ async function buildStopHookOutput(
       const completion = await readAutoresearchCompletionStatus(cwd, canonicalSessionId!.trim());
       if (!completion.complete) {
         const currentPhase = safeString(autoresearchState.current_phase ?? autoresearchState.currentPhase).trim() || 'executing';
-        const systemMessage = `OMX autoresearch is still active (phase: ${currentPhase}); continue until validator evidence is complete before stopping.`;
+        const systemMessage = `OMCP autoresearch is still active (phase: ${currentPhase}); continue until validator evidence is complete before stopping.`;
         return await maybeReturnRepeatableStopOutput(
           payload,
           stateDir,
@@ -1542,7 +1542,7 @@ async function buildStopHookOutput(
           reason: effectiveResponse,
           stopReason: "auto_nudge",
           systemMessage:
-            "OMX native Stop detected a stall/permission-style handoff and continued the turn automatically.",
+            "OMCP native Stop detected a stall/permission-style handoff and continued the turn automatically.",
         },
         canonicalSessionId,
       );
@@ -1554,7 +1554,7 @@ async function buildStopHookOutput(
   const currentPhase = safeString(ralphState?.current_phase).trim() || "executing";
   const stopReason = `ralph_${currentPhase}`;
   const systemMessage =
-    `OMX Ralph is still active (phase: ${currentPhase}); continue the task and gather fresh verification evidence before stopping.`;
+    `OMCP Ralph is still active (phase: ${currentPhase}); continue the task and gather fresh verification evidence before stopping.`;
 
   return await returnPersistentStopBlock(
     payload,
@@ -1629,7 +1629,7 @@ export async function dispatchCodexNativeHook(
             const effectiveTurnId = turnId || nowIso;
             if (decision.lane === "HEAVY") {
               triageAdditionalContext =
-                "OMX native UserPromptSubmit triage detected a multi-step goal with no workflow keyword. This is advisory prompt-routing context only; it did not activate autopilot or initialize workflow state. Prefer the existing autopilot-style workflow if AGENTS.md/runtime conditions allow it, unless newer user context narrows or opts out.";
+                "OMCP native UserPromptSubmit triage detected a multi-step goal with no workflow keyword. This is advisory prompt-routing context only; it did not activate autopilot or initialize workflow state. Prefer the existing autopilot-style workflow if AGENTS.md/runtime conditions allow it, unless newer user context narrows or opts out.";
               const newState: TriageStateFile = {
                 version: 1,
                 last_triage: {
@@ -1646,13 +1646,13 @@ export async function dispatchCodexNativeHook(
             } else if (decision.lane === "LIGHT") {
               if (decision.destination === "explore") {
                 triageAdditionalContext =
-                  "OMX native UserPromptSubmit triage detected a read-only/question-shaped request with no workflow keyword. This is advisory prompt-routing context only. Prefer the explore role surface rather than escalating to autopilot.";
+                  "OMCP native UserPromptSubmit triage detected a read-only/question-shaped request with no workflow keyword. This is advisory prompt-routing context only. Prefer the explore role surface rather than escalating to autopilot.";
               } else if (decision.destination === "executor") {
                 triageAdditionalContext =
-                  "OMX native UserPromptSubmit triage detected a narrow edit-shaped request with no workflow keyword. This is advisory prompt-routing context only. Prefer the executor role surface rather than autopilot.";
+                  "OMCP native UserPromptSubmit triage detected a narrow edit-shaped request with no workflow keyword. This is advisory prompt-routing context only. Prefer the executor role surface rather than autopilot.";
               } else if (decision.destination === "designer") {
                 triageAdditionalContext =
-                  "OMX native UserPromptSubmit triage detected a visual/style request with no workflow keyword. This is advisory prompt-routing context only. Prefer the designer role surface.";
+                  "OMCP native UserPromptSubmit triage detected a visual/style request with no workflow keyword. This is advisory prompt-routing context only. Prefer the designer role surface.";
               }
               if (triageAdditionalContext !== null) {
                 const dest = decision.destination as "explore" | "executor" | "designer";
@@ -1770,7 +1770,7 @@ export async function runCodexNativeHookCli(): Promise<void> {
   if (parseError) {
     process.stdout.write(`${JSON.stringify({
       decision: "block",
-      reason: "OMX native hook received malformed JSON input. Preserve runtime state, inspect the emitting hook payload yourself, and retry with valid JSON.",
+      reason: "OMCP native hook received malformed JSON input. Preserve runtime state, inspect the emitting hook payload yourself, and retry with valid JSON.",
       hookSpecificOutput: {
         hookEventName: "Unknown",
         additionalContext:

@@ -455,7 +455,7 @@ fn temp_output_path() -> PathBuf {
 fn compose_exec_prompt(user_prompt: &str, prompt_contract: &str) -> String {
     format!(
         concat!(
-            "You are OMX Explore, a low-cost read-only repository exploration harness.\\n",
+            "You are OMCP Explore, a low-cost read-only repository exploration harness.\\n",
             "Operate strictly in read-only mode. You may use repository-inspection shell commands only.\\n",
             "Preferred commands: rg, grep, and tightly bounded read-only bash wrappers over rg/grep/ls/find/wc/cat/head/tail.\\n",
             "Do not write, delete, rename, or modify files. Do not run git commands that alter working state.\\n",

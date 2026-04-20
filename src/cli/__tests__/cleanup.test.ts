@@ -57,11 +57,11 @@ const CURRENT_SESSION_PROCESSES: ProcessEntry[] = [
 ];
 
 describe('findCleanupCandidates', () => {
-  it('does not treat legacy team-server entrypoints as active OMX MCP processes', () => {
+  it('does not treat legacy team-server entrypoints as active OMCP MCP processes', () => {
     assert.equal(isOmxMcpProcess('node /tmp/worktree/dist/mcp/team-server.js'), false);
   });
 
-  it('selects orphaned OMX MCP processes while preserving the current session tree', () => {
+  it('selects orphaned OMCP MCP processes while preserving the current session tree', () => {
     assert.deepEqual(
       findCleanupCandidates(CURRENT_SESSION_PROCESSES, 701),
       [
@@ -93,7 +93,7 @@ describe('findCleanupCandidates', () => {
     );
   });
 
-  it('limits launch-safe cleanup to OMX MCP processes with no live Codex or OMX launch ancestor', () => {
+  it('limits launch-safe cleanup to OMCP MCP processes with no live Codex or OMCP launch ancestor', () => {
     assert.deepEqual(
       findLaunchSafeCleanupCandidates(CURRENT_SESSION_PROCESSES, 701),
       [
@@ -113,7 +113,7 @@ describe('findCleanupCandidates', () => {
     );
   });
 
-  it('keeps detached MCP candidates whose ancestor chain is live but unrelated to Codex or OMX launchers', () => {
+  it('keeps detached MCP candidates whose ancestor chain is live but unrelated to Codex or OMCP launchers', () => {
     const unrelatedAncestorProcesses: ProcessEntry[] = [
       { pid: 701, ppid: 700, command: 'node /repo/bin/omx.js' },
       { pid: 840, ppid: 841, command: 'node /tmp/unrelated/dist/mcp/state-server.js' },
@@ -236,7 +236,7 @@ describe('cleanupOmxMcpProcesses', () => {
     assert.equal(result.dryRun, true);
     assert.equal(result.candidates.length, 4);
     assert.equal(signalCount, 0);
-    assert.match(lines.join('\n'), /Dry run: would terminate 4 orphaned OMX MCP server process/);
+    assert.match(lines.join('\n'), /Dry run: would terminate 4 orphaned OMCP MCP server process/);
     assert.match(lines.join('\n'), /PID 800/);
     assert.match(lines.join('\n'), /PID 810/);
   });
@@ -274,7 +274,7 @@ describe('cleanupOmxMcpProcesses', () => {
       { pid: 810, signal: 'SIGKILL' },
     ]);
     assert.match(lines.join('\n'), /Escalating to SIGKILL for 1 process/);
-    assert.match(lines.join('\n'), /Killed 2 orphaned OMX MCP server process\(es\) \(1 required SIGKILL\)\./);
+    assert.match(lines.join('\n'), /Killed 2 orphaned OMCP MCP server process\(es\) \(1 required SIGKILL\)\./);
   });
 
   it('supports launch-safe candidate selection for automatic cleanup', async () => {
@@ -311,7 +311,7 @@ describe('cleanupOmxMcpProcesses', () => {
       { pid: 800, signal: 'SIGTERM' },
       { pid: 810, signal: 'SIGTERM' },
     ]);
-    assert.match(lines.join('\n'), /Found 2 orphaned OMX MCP server process/);
+    assert.match(lines.join('\n'), /Found 2 orphaned OMCP MCP server process/);
     assert.doesNotMatch(lines.join('\n'), /PID 821/);
     assert.doesNotMatch(lines.join('\n'), /PID 831/);
   });
@@ -351,7 +351,7 @@ describe('cleanupStaleTmpDirectories', () => {
     assert.deepEqual(removedPaths, []);
     assert.match(
       lines.join('\n'),
-      /Dry run: would remove 2 stale OMX \/tmp directories:/,
+      /Dry run: would remove 2 stale OMCP \/tmp directories:/,
     );
     assert.match(lines.join('\n'), /\/tmp\/omc-stale-b/);
     assert.match(lines.join('\n'), /\/tmp\/omx-stale-a/);
@@ -384,7 +384,7 @@ describe('cleanupStaleTmpDirectories', () => {
     assert.deepEqual(removedPaths, ['/tmp/omc-stale-b', '/tmp/omx-stale-a']);
     assert.match(lines.join('\n'), /Removed stale \/tmp directory: \/tmp\/omc-stale-b/);
     assert.match(lines.join('\n'), /Removed stale \/tmp directory: \/tmp\/omx-stale-a/);
-    assert.match(lines.join('\n'), /Removed 2 stale OMX \/tmp directories\./);
+    assert.match(lines.join('\n'), /Removed 2 stale OMCP \/tmp directories\./);
   });
 });
 

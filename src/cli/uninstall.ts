@@ -77,7 +77,7 @@ function detectOmxConfigArtifacts(config: string): {
 
   const hasTuiSection =
     /^\[tui\]/m.test(config) &&
-    config.includes("oh-my-copilot (OMX) Configuration");
+    config.includes("oh-my-copilot (OMCP) Configuration");
 
   const hasTopLevelKeys =
     /^\s*notify\s*=.*node/m.test(config) ||
@@ -137,7 +137,7 @@ async function cleanConfig(
   result.topLevelKeysRemoved = detected.hasTopLevelKeys;
   result.featureFlagsRemoved = detected.hasFeatureFlags;
 
-  // Strip OMX tables block (MCP servers, agents, tui)
+  // Strip OMCP tables block (MCP servers, agents, tui)
   let config = original;
   const { cleaned } = stripExistingOmxBlocks(config);
   config = cleaned;
@@ -148,7 +148,7 @@ async function cleanConfig(
   // Strip feature flags
   config = stripOmxFeatureFlags(config);
 
-  // Strip OMX-managed env defaults
+  // Strip OMCP-managed env defaults
   config = stripOmxEnvSettings(config);
 
   // Normalize trailing whitespace
@@ -165,7 +165,7 @@ async function cleanConfig(
       );
     }
   } else {
-    if (options.verbose) console.log("  No OMX config entries found.");
+    if (options.verbose) console.log("  No OMCP config entries found.");
   }
 
   return result;
@@ -278,7 +278,7 @@ async function removeAgentsMd(
     const content = await readFile(agentsMdPath, "utf-8");
     if (!isOmxGeneratedAgentsMd(content)) {
       if (options.verbose)
-        console.log("  AGENTS.md is not OMX-generated, skipping.");
+        console.log("  AGENTS.md is not OMCP-generated, skipping.");
       return false;
     }
   } catch {
@@ -375,7 +375,7 @@ function printSummary(summary: UninstallSummary, dryRun: boolean): void {
   console.log("\nUninstall summary:");
 
   if (summary.configCleaned) {
-    console.log(`  ${prefix} OMX configuration block from config.toml`);
+    console.log(`  ${prefix} OMCP configuration block from config.toml`);
     if (summary.mcpServersRemoved.length > 0) {
       console.log(`    MCP servers: ${summary.mcpServersRemoved.join(", ")}`);
     }
@@ -394,11 +394,11 @@ function printSummary(summary: UninstallSummary, dryRun: boolean): void {
       console.log("    Feature flags (multi_agent, child_agents_md, codex_hooks)");
     }
   } else if (!summary.configCleaned && summary.mcpServersRemoved.length === 0) {
-    console.log("  config.toml: no OMX entries found (or --keep-config used)");
+    console.log("  config.toml: no OMCP entries found (or --keep-config used)");
   }
 
   if (summary.hooksFileRemoved) {
-    console.log(`  ${prefix} OMX-managed entries in .codex/hooks.json`);
+    console.log(`  ${prefix} OMCP-managed entries in .codex/hooks.json`);
   }
 
   if (summary.promptsRemoved > 0) {

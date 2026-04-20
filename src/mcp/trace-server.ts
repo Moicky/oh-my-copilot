@@ -1,5 +1,5 @@
 /**
- * OMX Trace MCP Server
+ * OMCP Trace MCP Server
  * Provides trace timeline and summary tools for debugging agent flows.
  * Reads .omx/logs/ turn JSONL files produced by the notify hook.
  */

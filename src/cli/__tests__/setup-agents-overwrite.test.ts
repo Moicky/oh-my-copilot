@@ -187,7 +187,7 @@ describe('omx setup AGENTS refresh behavior', () => {
     }
   });
 
-  it('refreshes only the explicit OMX-owned model block inside a user-authored AGENTS.md', async () => {
+  it('refreshes only the explicit OMCP-owned model block inside a user-authored AGENTS.md', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-setup-agents-'));
     const restoreTty = setMockTty(false);
     const home = join(wd, 'home');
@@ -199,13 +199,13 @@ describe('omx setup AGENTS refresh behavior', () => {
         '',
         'Keep this custom guidance.',
         '',
-        '<!-- OMX:MODELS:START -->',
+        '<!-- OMCP:MODELS:START -->',
         '## Model Capability Table',
         '',
         '| Role | Model | Reasoning Effort | Use Case |',
         '| --- | --- | --- | --- |',
         '| Frontier (leader) | `legacy-frontier` | high | stale |',
-        '<!-- OMX:MODELS:END -->',
+        '<!-- OMCP:MODELS:END -->',
         '',
         'Footer guidance stays user-owned.',
       ].join('\n');
@@ -237,7 +237,7 @@ describe('omx setup AGENTS refresh behavior', () => {
     }
   });
 
-  it('preserves a title-only user-authored AGENTS.md by default when no OMX markers exist', async () => {
+  it('preserves a title-only user-authored AGENTS.md by default when no OMCP markers exist', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-setup-agents-'));
     const restoreTty = setMockTty(false);
     const home = join(wd, 'home');

@@ -128,7 +128,7 @@ When both explicit OpenClaw config and generic aliases are present:
 
 1. `notifications.openclaw` wins
 2. `custom_webhook_command` / `custom_cli_command` are ignored
-3. OMX emits a warning for clarity
+3. OMCP emits a warning for clarity
 
 This keeps behavior deterministic and backward compatible.
 
@@ -153,12 +153,12 @@ This keeps behavior deterministic and backward compatible.
         "session-end": {
           "enabled": true,
           "gateway": "local",
-          "instruction": "OMX task completed for {{projectPath}}"
+          "instruction": "OMCP task completed for {{projectPath}}"
         },
         "ask-user-question": {
           "enabled": true,
           "gateway": "local",
-          "instruction": "OMX needs input: {{question}}"
+          "instruction": "OMCP needs input: {{question}}"
         }
       }
     }
@@ -180,23 +180,23 @@ This keeps behavior deterministic and backward compatible.
         "Authorization": "Bearer ${HOOKS_TOKEN}"
       },
       "events": ["session-end", "ask-user-question"],
-      "instruction": "OMX event {{event}} for {{projectPath}}"
+      "instruction": "OMCP event {{event}} for {{projectPath}}"
     },
     "custom_cli_command": {
       "enabled": true,
       "command": "~/.local/bin/my-notifier --event {{event}} --text {{instruction}}",
       "events": ["session-end"],
-      "instruction": "OMX event {{event}} for {{projectPath}}"
+      "instruction": "OMCP event {{event}} for {{projectPath}}"
     }
   }
 }
 ```
 
-These aliases are normalized by OMX into internal OpenClaw gateway mappings.
+These aliases are normalized by OMCP into internal OpenClaw gateway mappings.
 
 ## Option C: Clawdbot agent-command workflow (recommended for dev)
 
-Use this when you want OMX hook events to trigger **agent turns** (not plain
+Use this when you want OMCP hook events to trigger **agent turns** (not plain
 message/webhook forwarding), e.g. for `#omc-dev`.
 
 > Shell safety: template variables (for example `{{instruction}}`) are interpolated into the
@@ -207,7 +207,7 @@ message/webhook forwarding), e.g. for `#omc-dev`.
 > For `clawdbot agent` workflows, use `120000` (2 minutes) to avoid premature timeout.
 >
 > **Production best practices:**
-> - Use `|| true` at the end of the command to prevent OMX hook failures from blocking sessions
+> - Use `|| true` at the end of the command to prevent OMCP hook failures from blocking sessions
 > - Use `.jsonl` extension with append (`>>`) for structured log aggregation
 > - Use `--reply-to 'channel:CHANNEL_ID'` format for reliable Discord delivery (preferred over aliases)
 
@@ -282,13 +282,13 @@ Use this profile when `#omc-dev` should receive OpenClaw notifications as
 Example instruction style:
 
 ```text
-OMX 훅={{event}} 프로젝트={{projectName}} 세션={{sessionId}}.
+OMCP 훅={{event}} 프로젝트={{projectName}} 세션={{sessionId}}.
 반드시 한국어로 응답하세요.
-OMX tmux 세션: {{tmuxSession}}.
+OMCP tmux 세션: {{tmuxSession}}.
 SOUL.md 및 #omc-dev 맥락을 참고해 필요한 후속 액션이 있으면 즉시 안내하세요.
 ```
 
-### 2) Track which OMX tmux session emitted the hook
+### 2) Track which OMCP tmux session emitted the hook
 
 - Include both `{{sessionId}}` and `{{tmuxSession}}` in every hook message.
 - If `{{tmuxSession}}` is present, use that as the primary follow-up target.
@@ -321,7 +321,7 @@ rg '"error"|"failed"|"timeout"' /tmp/omx-openclaw-agent.jsonl | tail -20
 
 # Manual retry with production-tested settings
 clawdbot agent --session-id omx-hooks \
-  --message "OMX hook retry 점검: session={{sessionId}} tmux={{tmuxSession}}" \
+  --message "OMCP hook retry 점검: session={{sessionId}} tmux={{tmuxSession}}" \
   --thinking minimal --deliver --reply-channel discord --reply-to 'channel:1468539002985644084' \
   --timeout 120 --json
 ```
@@ -334,7 +334,7 @@ clawdbot agent --session-id omx-hooks \
 curl -sS -X POST http://127.0.0.1:18789/hooks/wake \
   -H "Authorization: Bearer ${HOOKS_TOKEN}" \
   -H "Content-Type: application/json" \
-  -d '{"text":"OMX wake smoke test","mode":"now"}'
+  -d '{"text":"OMCP wake smoke test","mode":"now"}'
 ```
 
 Expected pass signal: JSON includes `"ok":true`.
@@ -346,7 +346,7 @@ curl -sS -o /tmp/omx-openclaw-agent-check.json -w "HTTP %{http_code}\n" \
   -X POST http://127.0.0.1:18789/hooks/agent \
   -H "Authorization: Bearer ${HOOKS_TOKEN}" \
   -H "Content-Type: application/json" \
-  -d '{"message":"OMX delivery verification","instruction":"OMX delivery verification","event":"session-end","sessionId":"manual-check"}'
+  -d '{"message":"OMCP delivery verification","instruction":"OMCP delivery verification","event":"session-end","sessionId":"manual-check"}'
 ```
 
 Expected pass signal: HTTP 2xx + accepted response body.
@@ -373,6 +373,6 @@ test "$OMX_OPENCLAW_COMMAND" = "1" && echo "OMX_OPENCLAW_COMMAND=1" || echo "mis
 - **Timeout/connection refused**: host/port/firewall issue.
 - **Command gateway disabled**: set both `OMX_OPENCLAW=1` and `OMX_OPENCLAW_COMMAND=1`.
 - **Command killed by `SIGTERM`**: increase `gateways.<name>.timeout` (recommend `120000` for clawdbot agent) or set `OMX_OPENCLAW_COMMAND_TIMEOUT_MS`.
-- **Hook failures blocking sessions**: ensure command ends with `|| true` to prevent OMX from waiting on clawdbot failures.
+- **Hook failures blocking sessions**: ensure command ends with `|| true` to prevent OMCP from waiting on clawdbot failures.
 - **Missing logs**: use `.jsonl` extension with append (`>>`) for persistent structured logging.
 - **Discord delivery failures**: use `--reply-to 'channel:CHANNEL_ID'` format instead of channel aliases.

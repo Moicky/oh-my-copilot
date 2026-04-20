@@ -1,9 +1,9 @@
-# oh-my-copilot (OMX)
+# oh-my-copilot (OMCP)
 
 <p align="center">
   <img src="https://yeachan-heo.github.io/oh-my-copilot-website/omx-character-nobg.png" alt="oh-my-copilot character" width="280">
   <br>
-  <em>Start Codex stronger, then let OMX add better prompts, workflows, and runtime help when the work grows.</em>
+  <em>Start Codex stronger, then let OMCP add better prompts, workflows, and runtime help when the work grows.</em>
 </p>
 
 [![npm version](https://img.shields.io/npm/v/oh-my-copilot)](https://www.npmjs.com/package/oh-my-copilot)
@@ -13,13 +13,13 @@
 
 **Website:** https://yeachan-heo.github.io/oh-my-copilot-website/
 **Docs:** [Getting Started](./docs/getting-started.html) · [Agents](./docs/agents.html) · [Skills](./docs/skills.html) · [Integrations](./docs/integrations.html) · [Demo](./DEMO.md) · [OpenClaw guide](./docs/openclaw-integration.md)
-**Community:** [Discord](https://discord.gg/PUwSMR9XNk) — shared OMX/community server for oh-my-copilot and related tooling.
+**Community:** [Discord](https://discord.gg/PUwSMR9XNk) — shared OMCP/community server for oh-my-copilot and related tooling.
 
-OMX is a workflow layer for [OpenAI Codex CLI](https://github.com/openai/codex).
+OMCP is a workflow layer for [OpenAI Codex CLI](https://github.com/openai/codex).
 
 <table>
 <tr>
-<td><strong>🚨 CAUTION — RECOMMENDED DEFAULT ONLY: macOS or Linux with Codex CLI.</strong><br><br><strong>OMX is primarily designed and actively tuned for that path.</strong><br><strong>Native Windows and Codex App are not the default experience, may break or behave inconsistently, and currently receive less support.</strong></td>
+<td><strong>🚨 CAUTION — RECOMMENDED DEFAULT ONLY: macOS or Linux with Codex CLI.</strong><br><br><strong>OMCP is primarily designed and actively tuned for that path.</strong><br><strong>Native Windows and Codex App are not the default experience, may break or behave inconsistently, and currently receive less support.</strong></td>
 </tr>
 </table>
 
@@ -54,7 +54,7 @@ It keeps Codex as the execution engine and makes it easier to:
 
 ## Recommended default flow
 
-If you want the default OMX experience, start here:
+If you want the default OMCP experience, start here:
 
 ```bash
 npm install -g @openai/codex oh-my-copilot
@@ -73,17 +73,17 @@ $team 3:executor "execute the approved plan in parallel"
 
 That is the main path.
 Before you treat the runtime as ready, run the quick-start smoke test below: `omx doctor` verifies the install shape, while `omx exec` proves the active Codex runtime can actually authenticate and complete a model call from the current environment.
-Start OMX strongly, clarify first when needed, approve the plan, then choose `$team` for coordinated parallel execution or `$ralph` for the persistent completion loop.
+Start OMCP strongly, clarify first when needed, approve the plan, then choose `$team` for coordinated parallel execution or `$ralph` for the persistent completion loop.
 
-## What OMX is for
+## What OMCP is for
 
-Use OMX if you already like Codex and want a better day-to-day runtime around it:
+Use OMCP if you already like Codex and want a better day-to-day runtime around it:
 - a standard workflow built around `$deep-interview`, `$ralplan`, `$team`, and `$ralph`
 - specialist roles and supporting skills when the task needs them
 - project guidance through scoped `AGENTS.md`
 - durable state under `.omx/` for plans, logs, memory, and mode tracking
 
-If you want plain Codex with no extra workflow layer, you probably do not need OMX.
+If you want plain Codex with no extra workflow layer, you probably do not need OMCP.
 
 ## Quick start
 
@@ -91,7 +91,7 @@ If you want plain Codex with no extra workflow layer, you probably do not need O
 
 - Node.js 20+
 - Codex CLI installed: `npm install -g @openai/codex`
-- Codex auth configured and visible in the same shell/profile that will run OMX
+- Codex auth configured and visible in the same shell/profile that will run OMCP
 - `tmux` on macOS/Linux if you want the recommended durable team runtime
 - `psmux` on native Windows only if you intentionally want the less-supported Windows team path
 
@@ -102,12 +102,12 @@ After install, check both boundaries:
 ```bash
 omx doctor
 codex login status
-omx exec --skip-git-repo-check -C . "Reply with exactly OMX-EXEC-OK"
+omx exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"
 ```
 
-`omx doctor` catches missing OMX files, hooks, and runtime prerequisites. The real smoke test catches auth, profile, and provider/base-URL problems that only appear when Codex performs an actual request.
+`omx doctor` catches missing OMCP files, hooks, and runtime prerequisites. The real smoke test catches auth, profile, and provider/base-URL problems that only appear when Codex performs an actual request.
 
-Launch OMX the recommended way:
+Launch OMCP the recommended way:
 
 ```bash
 omx --madmax --high
@@ -133,21 +133,21 @@ Use `$team` when the approved plan needs coordinated parallel work, or `$ralph` 
 
 ## A simple mental model
 
-OMX does **not** replace Codex.
+OMCP does **not** replace Codex.
 
 It adds a better working layer around it:
 - **Codex** does the actual agent work
-- **OMX role keywords** make useful roles reusable
-- **OMX skills** make common workflows reusable
+- **OMCP role keywords** make useful roles reusable
+- **OMCP skills** make common workflows reusable
 - **`.omx/`** stores plans, logs, memory, and runtime state
 
-Most users should think of OMX as **better task routing + better workflow + better runtime**, not as a command surface to operate manually all day.
+Most users should think of OMCP as **better task routing + better workflow + better runtime**, not as a command surface to operate manually all day.
 
 ## Start here if you are new
 
 1. Run `omx setup`
 2. Run `omx doctor`
-3. Run a real execution smoke test: `codex login status` and `omx exec --skip-git-repo-check -C . "Reply with exactly OMX-EXEC-OK"`
+3. Run a real execution smoke test: `codex login status` and `omx exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"`
 4. Launch with `omx --madmax --high`
 5. Use `$deep-interview "..."` when the request or boundaries are still unclear
 6. Use `$ralplan "..."` to approve the plan and review tradeoffs
@@ -175,7 +175,7 @@ These are useful, but they are not the main onboarding path.
 
 ### Team runtime
 
-Use the team runtime when you specifically need durable tmux/worktree coordination, not as the default way to begin using OMX.
+Use the team runtime when you specifically need durable tmux/worktree coordination, not as the default way to begin using OMCP.
 
 ```bash
 omx team 3:executor "fix the failing tests with verification"
@@ -187,15 +187,15 @@ omx team shutdown <team-name>
 ### Setup, doctor, and HUD
 
 These are operator/support surfaces:
-- `omx setup` installs prompts, skills, AGENTS scaffolding, `.codex/config.toml`, and OMX-managed native Codex hooks in `.codex/hooks.json`
-  - setup refresh preserves non-OMX hook entries in `.codex/hooks.json` and only rewrites OMX-managed wrappers
-  - `omx uninstall` removes OMX-managed wrappers from `.codex/hooks.json` but keeps the file when user hooks remain
+- `omx setup` installs prompts, skills, AGENTS scaffolding, `.codex/config.toml`, and OMCP-managed native Codex hooks in `.codex/hooks.json`
+  - setup refresh preserves non-OMCP hook entries in `.codex/hooks.json` and only rewrites OMCP-managed wrappers
+  - `omx uninstall` removes OMCP-managed wrappers from `.codex/hooks.json` but keeps the file when user hooks remain
 - `omx doctor` verifies the install when something seems wrong; it does not prove that the active Codex profile can make an authenticated model call
 - `omx hud --watch` is a monitoring/status surface, not the primary user workflow
 
 For non-team sessions, native Codex hooks are now the canonical lifecycle surface:
 - `.codex/hooks.json` = native Codex hook registrations
-- `.omx/hooks/*.mjs` = OMX plugin hooks
+- `.omx/hooks/*.mjs` = OMCP plugin hooks
 - `omx tmux-hook` / notify-hook / derived watcher = tmux + runtime fallback paths
 
 See [Codex native hook mapping](./docs/codex-native-hooks.md) for the current native / fallback matrix.
@@ -205,7 +205,7 @@ See [Codex native hook mapping](./docs/codex-native-hooks.md) for the current na
 
 A green `omx doctor` means the install and local runtime wiring look sane. If real execution still fails, check the environment Codex actually uses:
 
-- Run `codex login status` and `omx exec --skip-git-repo-check -C . "Reply with exactly OMX-EXEC-OK"` from the same shell/profile that will launch OMX.
+- Run `codex login status` and `omx exec --skip-git-repo-check -C . "Reply with exactly OMCP-EXEC-OK"` from the same shell/profile that will launch OMCP.
 - In custom HOME, profile, container, or service shells, confirm the active `~/.codex` (or `CODEX_HOME`) is the one with the expected auth and config. Do not assume your normal user `~/.codex` is visible there.
 - If you depend on a local OpenAI-compatible proxy, confirm the active `~/.codex/config.toml` includes the expected `openai_base_url`; otherwise a proxy-issued key can be sent to the default endpoint and fail with `401 Unauthorized`, `Missing bearer or basic authentication in header`, or `Incorrect API key provided`.
 - If `omx doctor --team` or resume reports a stale team such as `resume_blocker` or a missing tmux session, clean the dead runtime state before retrying:
@@ -218,7 +218,7 @@ omx doctor --team
 
 Only use the forced team shutdown for a team you have confirmed is dead or intentionally abandoned.
 
-If `Shift+Enter` still submits instead of inserting a newline inside an OMX-managed tmux session, see [Troubleshooting execution readiness](./docs/troubleshooting.md#shiftenter-submits-instead-of-inserting-a-newline-in-tmux-backed-omx-sessions). Current OMX already enables tmux extended-key forwarding around its own Codex launch paths, so a persistent failure is usually a tmux terminal-capability/discoverability problem rather than a net-new OMX feature gap.
+If `Shift+Enter` still submits instead of inserting a newline inside an OMCP-managed tmux session, see [Troubleshooting execution readiness](./docs/troubleshooting.md#shiftenter-submits-instead-of-inserting-a-newline-in-tmux-backed-omx-sessions). Current OMCP already enables tmux extended-key forwarding around its own Codex launch paths, so a persistent failure is usually a tmux terminal-capability/discoverability problem rather than a net-new OMCP feature gap.
 
 ### Explore and sparkshell
 
@@ -236,7 +236,7 @@ omx sparkshell --tmux-pane %12 --tail-lines 400
 
 ### Wiki
 
-- `omx wiki` is the CLI parity surface for the OMX wiki MCP server
+- `omx wiki` is the CLI parity surface for the OMCP wiki MCP server
 - wiki data lives locally under `.omx/wiki/`
 - the wiki is markdown-first and search-first, not vector-first
 
@@ -253,7 +253,7 @@ omx wiki refresh --json
 
 `omx team` works best on macOS/Linux with `tmux`.
 Native Windows remains a secondary path, and WSL2 is generally the better choice if you want a Windows-hosted setup.
-On native Windows, OMX accepts `psmux` as the tmux-compatible binary for the existing tmux-backed paths it already uses.
+On native Windows, OMCP accepts `psmux` as the tmux-compatible binary for the existing tmux-backed paths it already uses.
 
 | Platform | Install |
 | --- | --- |
@@ -268,7 +268,7 @@ On native Windows, OMX accepts `psmux` as the tmux-compatible binary for the exi
 
 ### Intel Mac: high `syspolicyd` / `trustd` CPU during startup
 
-On some Intel Macs, OMX startup — especially with `--madmax --high` — can spike `syspolicyd` / `trustd` CPU usage while macOS Gatekeeper validates many concurrent process launches.
+On some Intel Macs, OMCP startup — especially with `--madmax --high` — can spike `syspolicyd` / `trustd` CPU usage while macOS Gatekeeper validates many concurrent process launches.
 
 If this happens, try:
 - `xattr -dr com.apple.quarantine $(which omx)`

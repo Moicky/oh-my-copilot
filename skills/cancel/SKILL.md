@@ -1,13 +1,13 @@
 ---
 name: cancel
-description: Cancel any active OMX mode (autopilot, ralph, ultrawork, ecomode, ultraqa, swarm, ultrapilot, pipeline, team)
+description: Cancel any active OMCP mode (autopilot, ralph, ultrawork, ecomode, ultraqa, swarm, ultrapilot, pipeline, team)
 ---
 
 # Cancel Skill
 
-Intelligent cancellation that detects and cancels the active OMX mode.
+Intelligent cancellation that detects and cancels the active OMCP mode.
 
-**The cancel skill is the standard way to complete and exit any OMX mode.**
+**The cancel skill is the standard way to complete and exit any OMCP mode.**
 When the stop hook detects work is complete, it instructs the LLM to invoke
 this skill for proper state cleanup. If cancel fails or is interrupted,
 retry with `--force` flag, or wait for the 2-hour staleness timeout as
@@ -184,7 +184,7 @@ After graceful pass:
 
 **Cleanup:**
 ```
-  1. Strip AGENTS.md team worker overlay (<!-- OMX:TEAM:WORKER:START/END -->)
+  1. Strip AGENTS.md team worker overlay (<!-- OMCP:TEAM:WORKER:START/END -->)
   2. Remove team state directory: rm -rf .omx/state/team/{name}/
   3. Clear team mode state: state_clear(mode="team")
   4. Emit structured cancel report
@@ -319,7 +319,7 @@ fi
 #### No Active Modes
 
 ```bash
-echo "No active OMX modes detected."
+echo "No active OMCP modes detected."
 echo ""
 echo "Checked for:"
 echo "  - Autopilot (.omx/state/autopilot-state.json)"
@@ -356,8 +356,8 @@ Mode-specific subsections below describe what extra cleanup each handler perform
 | Pipeline | "Pipeline cancelled. Sequential agent chain stopped." |
 | Team | "Team cancelled. Teammates shut down and cleaned up." |
 | Plan Consensus | "Plan Consensus cancelled. Planning session ended." |
-| Force | "All OMX modes cleared. You are free to start fresh." |
-| None | "No active OMX modes detected." |
+| Force | "All OMCP modes cleared. You are free to start fresh." |
+| None | "No active OMCP modes detected." |
 
 ## What Gets Preserved
 
@@ -387,7 +387,7 @@ When cancelling team mode, the cancel skill should:
 
 1. **Kill all team tmux sessions**: `tmux list-sessions -F '#{session_name}' 2>/dev/null | grep '^omx-team-'` and kill each
 2. **Remove team state directories**: `rm -rf .omx/state/team/*/`
-3. **Strip AGENTS.md overlay**: Remove content between `<!-- OMX:TEAM:WORKER:START -->` and `<!-- OMX:TEAM:WORKER:END -->`
+3. **Strip AGENTS.md overlay**: Remove content between `<!-- OMCP:TEAM:WORKER:START -->` and `<!-- OMCP:TEAM:WORKER:END -->`
 
 ### Force Clear Addition
 

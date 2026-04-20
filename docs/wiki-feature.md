@@ -1,6 +1,6 @@
-# OMX Wiki
+# OMCP Wiki
 
-OMX Wiki is a compiled markdown knowledge layer for agents.
+OMCP Wiki is a compiled markdown knowledge layer for agents.
 
 ## What it is
 

@@ -22,7 +22,7 @@ delete process.env.OMX_TEAM_STATE_ROOT;
 
 async function initCommittedGitRepo(cwd: string): Promise<void> {
   execFileSync('git', ['init'], { cwd, stdio: 'pipe' });
-  execFileSync('git', ['config', 'user.name', 'OMX Test'], { cwd, stdio: 'pipe' });
+  execFileSync('git', ['config', 'user.name', 'OMCP Test'], { cwd, stdio: 'pipe' });
   execFileSync('git', ['config', 'user.email', 'omx@example.com'], { cwd, stdio: 'pipe' });
   execFileSync('git', ['add', '.'], { cwd, stdio: 'pipe' });
   execFileSync('git', ['commit', '-m', 'init'], { cwd, stdio: 'pipe' });

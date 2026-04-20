@@ -346,7 +346,7 @@ function rewriteInstalledSkillDescriptionBadge(
   filePath = "SKILL.md",
 ): string {
   const metadata = parseSkillFrontmatter(content, filePath);
-  const badgePrefix = "[OMX] ";
+  const badgePrefix = "[OMCP] ";
   const displayDescription = metadata.description.startsWith(badgePrefix)
     ? metadata.description
     : `${badgePrefix}${metadata.description}`;
@@ -732,11 +732,11 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
     );
     if (gitignoreResult === "created") {
       console.log(
-        "  Created .gitignore with OMX project ignore rules so local runtime state stays out of source control while .codex agents, skills, and prompts remain trackable.\n",
+        "  Created .gitignore with OMCP project ignore rules so local runtime state stays out of source control while .codex agents, skills, and prompts remain trackable.\n",
       );
     } else if (gitignoreResult === "updated") {
       console.log(
-        "  Updated .gitignore with OMX project ignore rules so local runtime state stays out of source control while .codex agents, skills, and prompts remain trackable.\n",
+        "  Updated .gitignore with OMCP project ignore rules so local runtime state stays out of source control while .codex agents, skills, and prompts remain trackable.\n",
       );
     }
   }
@@ -1035,7 +1035,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   if (managedConfig.omxManagesTui) {
     console.log("  StatusLine configured in config.toml via [tui] section.");
   } else {
-    console.log("  Codex CLI >= 0.107.0 manages [tui]; OMX left that section untouched.");
+    console.log("  Codex CLI >= 0.107.0 manages [tui]; OMCP left that section untouched.");
   }
   console.log();
 

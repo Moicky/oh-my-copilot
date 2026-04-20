@@ -307,9 +307,9 @@ export async function writeSessionStart(
 }
 
 /**
- * Reconcile a native/Codex SessionStart with the canonical OMX launch session.
+ * Reconcile a native/Codex SessionStart with the canonical OMCP launch session.
  * If an authoritative current session already exists for this cwd/run, preserve
- * its OMX scope id and refresh PID/native metadata. Otherwise establish a fresh
+ * its OMCP scope id and refresh PID/native metadata. Otherwise establish a fresh
  * canonical session using the native session id.
  */
 export async function reconcileNativeSessionStart(

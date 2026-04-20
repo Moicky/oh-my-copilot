@@ -1,6 +1,6 @@
-# OMX ↔ mux canonical operation space
+# OMCP ↔ mux canonical operation space
 
-This document defines the mux boundary owned by OMX core semantics.
+This document defines the mux boundary owned by OMCP core semantics.
 
 ## Canonical operations
 

@@ -76,7 +76,7 @@ describe('omx agents-init', () => {
       const srcAgents = await readFile(join(wd, 'src', 'AGENTS.md'), 'utf-8');
       const docsAgents = await readFile(join(wd, 'docs', 'AGENTS.md'), 'utf-8');
 
-      assert.match(rootAgents, /OMX:AGENTS-INIT:MANAGED/);
+      assert.match(rootAgents, /OMCP:AGENTS-INIT:MANAGED/);
       assert.match(rootAgents, /<!-- AUTONOMY DIRECTIVE — DO NOT REMOVE -->/);
       assert.match(rootAgents, /<!-- END AUTONOMY DIRECTIVE -->\n\n# oh-my-copilot - Intelligent Multi-Agent Orchestration/);
       assert.match(rootAgents, /# oh-my-copilot - Intelligent Multi-Agent Orchestration/);
@@ -142,7 +142,7 @@ describe('omx agents-init', () => {
       });
 
       const adopted = await readFile(join(wd, 'AGENTS.md'), 'utf-8');
-      assert.match(adopted, /OMX:AGENTS-INIT:MANAGED/);
+      assert.match(adopted, /OMCP:AGENTS-INIT:MANAGED/);
       const backupRoot = join(wd, '.omx', 'backups', 'agents-init');
       assert.equal(existsSync(backupRoot), true);
       const timestamps = await readdir(backupRoot);
@@ -154,7 +154,7 @@ describe('omx agents-init', () => {
     }
   });
 
-  it('protects project-root AGENTS.md during an active OMX session', async () => {
+  it('protects project-root AGENTS.md during an active OMCP session', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-agents-init-'));
     try {
       const pidStartTicks = await readCurrentLinuxStartTicks();

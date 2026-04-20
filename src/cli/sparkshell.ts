@@ -173,7 +173,7 @@ export async function resolveSparkShellBinaryPathWithHydration(
 
   throw new Error(
     `[sparkshell] native binary not found. Checked cached/native candidates under ${packageRoot}, ${repoLocal}, and ${nestedRepoLocal}. `
-      + `Reconnect to the network so OMX can fetch the release asset, or set ${OMX_SPARKSHELL_BIN_ENV} to override the path.`
+      + `Reconnect to the network so OMCP can fetch the release asset, or set ${OMX_SPARKSHELL_BIN_ENV} to override the path.`
   );
 }
 

@@ -11,7 +11,7 @@ import { basename } from "path";
 /** ANSI CSI escape sequences and two-character escapes */
 const ANSI_RE = /\x1b(?:[@-Z\\-_]|\[[0-9;]*[A-Za-z])/g;
 
-/** OMX UI chrome: spinner/progress indicator characters */
+/** OMCP UI chrome: spinner/progress indicator characters */
 const SPINNER_LINE_RE = /^[●⎿✻·◼]/;
 
 /** tmux expand hint injected by some pane-capture scripts */
@@ -20,8 +20,8 @@ const CTRL_O_RE = /ctrl\+o to expand/i;
 /** Lines composed entirely of box-drawing characters and whitespace */
 const BOX_DRAWING_RE = /^[\s─═│║┌┐└┘┬┴├┤╔╗╚╝╠╣╦╩╬╟╢╤╧╪━┃┏┓┗┛┣┫┳┻╋┠┨┯┷┿╂]+$/;
 
-/** OMX HUD status lines: [OMX#...] or [OMX] (unversioned) */
-const OMX_HUD_RE = /\[OMX[#\]]/;
+/** OMCP HUD status lines: [OMCP#...] or [OMCP] (unversioned) */
+const OMX_HUD_RE = /\[OMCP[#\]]/;
 
 /** Bypass-permissions indicator lines starting with ⏵ */
 const BYPASS_PERM_RE = /^⏵/;
@@ -49,7 +49,7 @@ const MAX_TAIL_CHARS = 1200;
  * - Removes UI chrome lines (spinner/progress characters: ●⎿✻·◼)
  * - Removes "ctrl+o to expand" hint lines
  * - Removes box-drawing character lines
- * - Removes OMX HUD status lines
+ * - Removes OMCP HUD status lines
  * - Removes bypass-permissions indicator lines
  * - Removes bare shell prompt lines
  * - Drops lines with < 15% Unicode letter/number density (for lines >= 8 chars)

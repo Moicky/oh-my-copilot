@@ -453,7 +453,7 @@ describe('notify-hook team leader nudge', () => {
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
       assert.match(tmuxLog, /send-keys/);
       assert.match(tmuxLog, /-t %99/, 'should target leader pane when present');
-      assert.match(tmuxLog, /\[OMX\] All 2 workers idle/, 'should emit all-workers-idle nudge');
+      assert.match(tmuxLog, /\[OMCP\] All 2 workers idle/, 'should emit all-workers-idle nudge');
       assert.doesNotMatch(tmuxLog, /\[OMX_INTENT:/, 'should keep orchestration intent out of injected display text');
       assert.match(tmuxLog, /\[OMX_TMUX_INJECT\]/, 'should include injection marker');
       const submitMatches = tmuxLog.match(/send-keys -t %99 C-m/g) || [];
@@ -533,7 +533,7 @@ describe('notify-hook team leader nudge', () => {
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-      assert.match(tmuxLog, /\[OMX\] All 2 workers idle\./);
+      assert.match(tmuxLog, /\[OMCP\] All 2 workers idle\./);
       assert.match(tmuxLog, /Team idle-shutdown looks complete\./);
       assert.match(tmuxLog, /Next: decide whether to reconcile\/merge results or gracefully shut down: omx team shutdown idle-shutdown\./);
       assert.doesNotMatch(tmuxLog, /keep polling/);
@@ -601,7 +601,7 @@ describe('notify-hook team leader nudge', () => {
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-      assert.match(tmuxLog, /\[OMX\] All 2 workers idle/);
+      assert.match(tmuxLog, /\[OMCP\] All 2 workers idle/);
       assert.match(tmuxLog, /Team idle-followup-reuse has idle workers ready\./);
       assert.match(tmuxLog, /Next: assign the next follow-up task to this idle team\./);
       assert.doesNotMatch(tmuxLog, /launch a new team/);
@@ -667,7 +667,7 @@ describe('notify-hook team leader nudge', () => {
       assert.equal(result.status, 0, `notify-hook failed: ${result.stderr || result.stdout}`);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-      assert.match(tmuxLog, /\[OMX\] All 2 workers idle/);
+      assert.match(tmuxLog, /\[OMCP\] All 2 workers idle/);
       assert.match(tmuxLog, /Team idle-followup-relaunch has follow-up work ready\./);
       assert.match(tmuxLog, /Next: launch a new team for the next task set\./);
       assert.doesNotMatch(tmuxLog, /idle workers ready/);
@@ -729,7 +729,7 @@ describe('notify-hook team leader nudge', () => {
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
       assert.match(tmuxLog, /send-keys/);
       assert.match(tmuxLog, /-t %97/, 'should still target the leader pane');
-      assert.match(tmuxLog, /\[OMX\] All 2 workers idle/, 'global team-state fallback should still fire idle nudge');
+      assert.match(tmuxLog, /\[OMCP\] All 2 workers idle/, 'global team-state fallback should still fire idle nudge');
     });
   });
 
@@ -756,7 +756,7 @@ describe('notify-hook team leader nudge', () => {
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
       assert.match(tmuxLog, /send-keys/);
       assert.match(tmuxLog, /-t %97/, 'should target canonical leader pane');
-      assert.match(tmuxLog, /\[OMX\] All 2 workers idle/, 'canonical fallback should still fire idle nudge');
+      assert.match(tmuxLog, /\[OMCP\] All 2 workers idle/, 'canonical fallback should still fire idle nudge');
     });
   });
 
@@ -784,7 +784,7 @@ describe('notify-hook team leader nudge', () => {
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
       assert.match(tmuxLog, /send-keys/);
       assert.match(tmuxLog, /-t %97/, 'should still target canonical leader pane');
-      assert.match(tmuxLog, /\[OMX\] All 2 workers idle/, 'inactive coarse state should still fall back canonically');
+      assert.match(tmuxLog, /\[OMCP\] All 2 workers idle/, 'inactive coarse state should still fall back canonically');
     });
   });
 
@@ -853,7 +853,7 @@ describe('notify-hook team leader nudge', () => {
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
       assert.match(tmuxLog, /-t %97/, 'should still target the valid canonical leader pane');
       assert.doesNotMatch(tmuxLog, /%666/, 'invalid canonical team names must be ignored before joins');
-      assert.match(tmuxLog, /\[OMX\] All 2 workers idle/, 'valid canonical fallback should still fire idle nudge');
+      assert.match(tmuxLog, /\[OMCP\] All 2 workers idle/, 'valid canonical fallback should still fire idle nudge');
     });
   });
 
@@ -3016,7 +3016,7 @@ exit 0
       assert.equal(second.status, 0, `notify-hook failed: ${second.stderr || second.stdout}`);
 
       const tmuxLog = await readFile(tmuxLogPath, 'utf-8');
-      const sends = tmuxLog.match(/send-keys -t %98 -l \[OMX\] All 2 workers idle/g) || [];
+      const sends = tmuxLog.match(/send-keys -t %98 -l \[OMCP\] All 2 workers idle/g) || [];
       assert.equal(sends.length, 1, 'cooldown should keep repeated all-workers-idle leader nudges bounded');
       assert.doesNotMatch(tmuxLog, /\[OMX_INTENT:/);
     });

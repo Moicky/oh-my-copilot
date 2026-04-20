@@ -37,7 +37,7 @@ const SERVER_ENTRYPOINTS: Array<{ server: McpServerName; file: string }> = [
 ];
 
 describe('mcp bootstrap auto-start guard', () => {
-  it('allows auto-start by default for every OMX MCP server', () => {
+  it('allows auto-start by default for every OMCP MCP server', () => {
     for (const server of ALL_SERVERS) {
       assert.equal(shouldAutoStartMcpServer(server, {}), true, `${server} should auto-start by default`);
     }

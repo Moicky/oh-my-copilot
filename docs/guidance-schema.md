@@ -40,8 +40,8 @@ This standard is additive and migration-safe: it does not change task-state APIs
 
 ### Marker contracts
 
-- `<!-- OMX:RUNTIME:START --> ... <!-- OMX:RUNTIME:END -->`
-- `<!-- OMX:TEAM:WORKER:START --> ... <!-- OMX:TEAM:WORKER:END -->`
+- `<!-- OMCP:RUNTIME:START --> ... <!-- OMCP:RUNTIME:END -->`
+- `<!-- OMCP:TEAM:WORKER:START --> ... <!-- OMCP:TEAM:WORKER:END -->`
 
 ### Worker task/mailbox contracts
 

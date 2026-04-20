@@ -29,7 +29,7 @@
 - `.github/workflows/{ci,pr-check,release,dev-merge-issue-close}.yml` — token rename + hard-coded crate path arrays + npm-publish target
 - `.github/ISSUE_TEMPLATE/{bug_report,feature_request,config}.{md,yml}` — token rename + Discord link removal
 - `.github/PULL_REQUEST_TEMPLATE.md` — token rename
-- All TypeScript / Rust source files containing the brand tokens `omx`, `OMX`, `oh-my-copilot`, `.omx/`, `omx-` (crate prefix), or `Moicky/oh-my-copilot`
+- All TypeScript / Rust source files containing the brand tokens `omx`, `OMCP`, `oh-my-copilot`, `.omx/`, `omx-` (crate prefix), or `Moicky/oh-my-copilot`
 
 ### Files renamed (git mv)
 - `crates/omx-explore/`           → `crates/omcp-explore/`
@@ -53,7 +53,7 @@ This sub-project does **not** add new behavior, so we don't write new functional
 1. `npm run build` succeeds.
 2. `cargo build --workspace` succeeds.
 3. `cargo metadata --format-version=1` lists exactly 5 `omcp-*` packages.
-4. `node dist/cli/omcp.js --help` runs without crashing on identity-only paths and prints **no** `OMX`/`omx`/`oh-my-copilot` strings.
+4. `node dist/cli/omcp.js --help` runs without crashing on identity-only paths and prints **no** `OMCP`/`omx`/`oh-my-copilot` strings.
 5. Final ripgrep audit returns only the explicitly-allowed brand survivors (fork-attribution line + intentional upstream link).
 
 Existing test suites that exercise Codex integration are expected to fail after this sub-project — we don't run them. We only run the Rust + TypeScript **build** and the explicit audit greps.
@@ -190,7 +190,7 @@ cat dist-workspace.toml
 
 - [ ] **Step 2: Apply edits**
 
-If the file mentions `oh-my-copilot`, `Yeachan-Heo`, `omx-`, or `OMX`, update those tokens using the rules:
+If the file mentions `oh-my-copilot`, `Yeachan-Heo`, `omx-`, or `OMCP`, update those tokens using the rules:
 - `oh-my-copilot` → `oh-my-copilot`
 - `Moicky/oh-my-copilot` → `Moicky/oh-my-copilot`
 - `omx-` (crate name prefix only) → `omcp-`
@@ -357,7 +357,7 @@ Expected: a few thousand files. The exclusion list mirrors Phase E deletion targ
 
 The `openclaw-integration.md` (English) is **not** excluded — it gets rebranded.
 
-> **Note:** `docs/openclaw-integration.md` may contain the literal string `openclaw` (a third-party tool) and references to `omx-*` crates that no longer exist. The token rename will only flip `omx-` → `omcp-` and `OMX`/`omx` brand tokens; it won't touch the third-party tool name.
+> **Note:** `docs/openclaw-integration.md` may contain the literal string `openclaw` (a third-party tool) and references to `omx-*` crates that no longer exist. The token rename will only flip `omx-` → `omcp-` and `OMCP`/`omx` brand tokens; it won't touch the third-party tool name.
 
 ### Task C2: Rule 1 — `oh-my-copilot` → `oh-my-copilot`
 
@@ -416,7 +416,7 @@ git add -u
 git commit -m "chore(rebrand): point repository URLs at Moicky/oh-my-copilot"
 ```
 
-### Task C4: Rule 3 — `OMX` → `OMCP` (uppercase brand abbreviation)
+### Task C4: Rule 3 — `OMCP` → `OMCP` (uppercase brand abbreviation)
 
 - [ ] **Step 1: Apply substitution (word-boundary aware)**
 
@@ -428,7 +428,7 @@ xargs -a /tmp/omcp-rename-files.txt -I{} sh -c '
 ' _ {}
 ```
 
-- [ ] **Step 2: Verify no stray uppercase OMX remains**
+- [ ] **Step 2: Verify no stray uppercase OMCP remains**
 
 ```bash
 rg "\\bOMX\\b" $(cat /tmp/omcp-rename-files.txt)
@@ -440,7 +440,7 @@ Expected: empty output.
 
 ```bash
 git add -u
-git commit -m "chore(rebrand): replace OMX brand abbreviation with OMCP"
+git commit -m "chore(rebrand): replace OMCP brand abbreviation with OMCP"
 ```
 
 ### Task C5: Rule 4 — lowercase `omx` (binary name, identifier) → `omcp`
@@ -606,7 +606,7 @@ Replace the file with exactly this content:
 
 ## What this is
 
-A workflow layer that aims to add prompts, skills, and runtime helpers on top of [GitHub Copilot CLI](https://github.com/github/copilot-cli). The original project (`oh-my-copilot`, OMX) wrapped OpenAI's Codex CLI; this fork (`oh-my-copilot`, OMCP) is in the process of being re-targeted at Copilot CLI.
+A workflow layer that aims to add prompts, skills, and runtime helpers on top of [GitHub Copilot CLI](https://github.com/github/copilot-cli). The original project (`oh-my-copilot`, OMCP) wrapped OpenAI's Codex CLI; this fork (`oh-my-copilot`, OMCP) is in the process of being re-targeted at Copilot CLI.
 
 ## Current state
 
@@ -780,7 +780,7 @@ Set the site `title` to `oh-my-copilot` and `description` to `Workflow layer for
 - [ ] **Step 2: Edit each HTML file's `<title>`, hero `<h1>`, and any "About" paragraph**
 
 Replace remaining literal phrases that don't survive a token rename. Example:
-- `"OMX is a workflow layer for OpenAI Codex CLI."` → `"OMCP is a workflow layer for GitHub Copilot CLI (forked from oh-my-copilot)."`
+- `"OMCP is a workflow layer for OpenAI Codex CLI."` → `"OMCP is a workflow layer for GitHub Copilot CLI (forked from oh-my-copilot)."`
 - "Built and maintained by …" — delete the line.
 
 - [ ] **Step 3: Remove dead links**
@@ -1023,7 +1023,7 @@ node dist/cli/omcp.js --help 2>&1 | tee /tmp/omcp-help.txt | head -40
 
 If the CLI errors immediately because some sub-command tries to talk to Codex during help rendering, capture the error message but **don't fix it here** — it belongs to sub-project #2. Only require that `--help` itself produces help text.
 
-- [ ] **Step 2: Confirm output contains no `omx`/`OMX`/`oh-my-copilot` strings**
+- [ ] **Step 2: Confirm output contains no `omx`/`OMCP`/`oh-my-copilot` strings**
 
 ```bash
 grep -E "\\bomx\\b|\\bOMX\\b|oh-my-copilot" /tmp/omcp-help.txt && echo "FAIL: stale brand strings in help" || echo "ok"

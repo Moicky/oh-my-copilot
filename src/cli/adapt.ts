@@ -17,14 +17,14 @@ const HELP = [
 	"Usage: omx adapt <target> <probe|status|init|envelope|doctor> [--json] [--write]",
 	"",
 	"Targets:",
-	"  openclaw  Foundation seam for OMX-owned OpenClaw adapter artifacts and reporting",
-	"  hermes    Foundation seam for OMX-owned Hermes adapter artifacts and reporting",
+	"  openclaw  Foundation seam for OMCP-owned OpenClaw adapter artifacts and reporting",
+	"  hermes    Foundation seam for OMCP-owned Hermes adapter artifacts and reporting",
 	"",
 	"Subcommands:",
 	"  probe     Report shared foundation probe metadata (target-specific runtime probing is deferred)",
-	"  status    Report OMX-owned adapter initialization status plus deferred target-runtime status",
-	"  init      Preview or write OMX-owned adapter artifacts under .omx/adapters/<target>/...",
-	"  envelope  Print the normalized OMX-owned adapter envelope for the target",
+	"  status    Report OMCP-owned adapter initialization status plus deferred target-runtime status",
+	"  init      Preview or write OMCP-owned adapter artifacts under .omx/adapters/<target>/...",
+	"  envelope  Print the normalized OMCP-owned adapter envelope for the target",
 	"  doctor    Explain blocked foundation steps and follow-on integration gaps",
 	"",
 	"Options:",
@@ -55,7 +55,7 @@ function targetHelp(target: AdaptTarget): string {
 		target === "openclaw"
 			? "  Status remains local-only and does not claim downstream OpenClaw runtime acknowledgement."
 			: target === "hermes"
-				? "  OMX remains authoritative for OMX state; Hermes internals are observed, not controlled."
+				? "  OMCP remains authoritative for OMCP state; Hermes internals are observed, not controlled."
 				: "  Target-specific runtime probing and integration logic are intentionally deferred.",
 		`  ${descriptor.followupHint}`,
 		"",

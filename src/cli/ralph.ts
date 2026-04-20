@@ -207,7 +207,7 @@ export function buildRalphAppendInstructions(
 ): string {
   return [
     '<ralph_native_subagents>',
-    'You are in OMX Ralph persistence mode.',
+    'You are in OMCP Ralph persistence mode.',
     `Primary task: ${task}`,
     'Parallelism guidance:',
     '- Prefer Codex native subagents for independent parallel subtasks.',

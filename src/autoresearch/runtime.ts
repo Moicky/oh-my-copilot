@@ -647,7 +647,7 @@ export function buildAutoresearchInstructions(
   },
 ): string {
   return [
-    '# OMX Autoresearch Supervisor Instructions',
+    '# OMCP Autoresearch Supervisor Instructions',
     '',
     `Run ID: ${context.runId}`,
     `Mission directory: ${contract.missionDir}`,

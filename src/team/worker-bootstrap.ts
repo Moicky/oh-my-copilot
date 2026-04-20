@@ -11,8 +11,8 @@ import { codexHome, listInstalledSkillDirectories } from "../utils/paths.js";
 import { sleep } from "../utils/sleep.js";
 import type { TeamReminderDirective } from "./reminder-intents.js";
 
-const TEAM_OVERLAY_START = "<!-- OMX:TEAM:WORKER:START -->";
-const TEAM_OVERLAY_END = "<!-- OMX:TEAM:WORKER:END -->";
+const TEAM_OVERLAY_START = "<!-- OMCP:TEAM:WORKER:START -->";
+const TEAM_OVERLAY_END = "<!-- OMCP:TEAM:WORKER:END -->";
 const SKILL_REFERENCE_PATTERN = /\/skills\/([^/\s`]+)\/SKILL\.md\b/g;
 const AGENTS_LOCK_PATH = [".omx", "state", "agents-md.lock"];
 const LOCK_OWNER_FILE = "owner.json";
@@ -65,7 +65,7 @@ export function generateWorkerRootAgentsContent(
 ): string {
   return `# Team Worker Runtime Instructions
 
-This file is generated for a live OMX team worker run and is disposable.
+This file is generated for a live OMCP team worker run and is disposable.
 
 ## Worker Identity
 - Team: ${options.teamName}
@@ -111,13 +111,13 @@ This file is generated for a live OMX team worker run and is disposable.
 - Follow task-specific edit scope from inbox/task JSON only.
 - If blocked on a shared file, update status with a blocked reason and report upward.
 
-<!-- OMX:TEAM:ROLE:START -->
+<!-- OMCP:TEAM:ROLE:START -->
 <team_worker_role>
 You are operating as the **${options.workerRole}** role for this team run. Apply the following role-local guidance.
 
 ${options.rolePromptContent.trim()}
 </team_worker_role>
-<!-- OMX:TEAM:ROLE:END -->
+<!-- OMCP:TEAM:ROLE:END -->
 `;
 }
 
@@ -505,13 +505,13 @@ export async function writeWorkerRoleInstructionsFile(
 ): Promise<string> {
   const base = await readFile(baseInstructionsPath, "utf-8").catch(() => "");
   const roleOverlay = `
-<!-- OMX:TEAM:ROLE:START -->
+<!-- OMCP:TEAM:ROLE:START -->
 <team_worker_role>
 You are operating as the **${workerRole}** role for this team run. Apply the following role-local guidance in addition to the team worker protocol.
 
 ${rolePromptContent.trim()}
 </team_worker_role>
-<!-- OMX:TEAM:ROLE:END -->
+<!-- OMCP:TEAM:ROLE:END -->
 `;
   const composed =
     base.trim().length > 0

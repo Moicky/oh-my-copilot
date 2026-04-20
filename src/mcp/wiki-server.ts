@@ -1,5 +1,5 @@
 /**
- * OMX Wiki MCP Server
+ * OMCP Wiki MCP Server
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';

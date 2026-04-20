@@ -924,7 +924,7 @@ export function isWsl2(): boolean {
 
 /**
  * Detect whether the process is running on native Windows (not WSL2).
- * OMX requires tmux, which is unavailable on native Windows.
+ * OMCP requires tmux, which is unavailable on native Windows.
  */
 export function isNativeWindows(): boolean {
   return process.platform === 'win32' && !isWsl2() && !isMsysOrGitBash();
@@ -1212,7 +1212,7 @@ export function restoreStandaloneHudPane(
  * Enable tmux mouse mode for a session so users can scroll pane content
  * (e.g. long agent output) with the mouse wheel instead of arrow keys.
  *
- * This helper is intentionally limited to session-scoped options so OMX
+ * This helper is intentionally limited to session-scoped options so OMCP
  * does not overwrite server-global tmux bindings/options owned by users,
  * oh-my-tmux, or other sessions. Returns true if the session mouse option
  * was set successfully, false otherwise.
@@ -1226,7 +1226,7 @@ export function enableMouseScrolling(sessionTarget: string): boolean {
   runTmux(['set-option', '-t', sessionTarget, 'set-clipboard', 'on']);
 
   // Mouse selection enters tmux copy-mode. Keep the mitigation session-scoped
-  // so OMX does not mutate users' global tmux style defaults. (issue #1448)
+  // so OMCP does not mutate users' global tmux style defaults. (issue #1448)
   mitigateCopyModeUnderlineArtifacts(sessionTarget);
 
   return true;

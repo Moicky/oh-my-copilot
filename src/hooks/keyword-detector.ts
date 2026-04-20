@@ -1,10 +1,10 @@
 /**
  * Keyword Detection Engine
  *
- * In OMC/legacy OMX flows, this logic detects workflow keywords and can inject
+ * In OMC/legacy OMCP flows, this logic detects workflow keywords and can inject
  * prompt-side routing guidance.
  *
- * In current OMX, native `UserPromptSubmit` is the canonical execution surface:
+ * In current OMCP, native `UserPromptSubmit` is the canonical execution surface:
  * this module owns the keyword registry, runtime gating, and hook-seeded
  * skill/workflow state. AGENTS.md now carries the behavioral fallback contract
  * rather than the full keyword/state table.
@@ -407,7 +407,7 @@ type IntentKeyword = 'ralph' | 'team' | 'swarm' | 'stop' | 'abort' | 'parallel' 
  * "team" / "swarm" require explicit orchestration phrasing so a generic
  * reference in prose doesn't spin up the skill.
  *
- * "stop" / "abort" require a bare imperative or explicit OMX mode reference so
+ * "stop" / "abort" require a bare imperative or explicit OMCP mode reference so
  * test-log lines like "stop retrying" or "request aborted" do not trigger cancel.
  *
  * "parallel" requires an explicit instruction to run in parallel mode so that
@@ -925,7 +925,7 @@ export async function recordSkillActivation(input: RecordSkillActivationInput): 
  * Pre-execution gate — ported from OMC src/hooks/keyword-detector/index.ts
  *
  * In OMC these functions run at prompt time in bridge.ts (mandatory enforcement).
- * In OMX they generate AGENTS.md instructions and serve as test infrastructure.
+ * In OMCP they generate AGENTS.md instructions and serve as test infrastructure.
  * See task-size-detector.ts for full advisory-nature documentation.
  */
 

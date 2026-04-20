@@ -157,7 +157,7 @@ describe("deep-interview Ouroboros contract", () => {
 		);
 		assert.match(
 			deepInterviewSkill,
-			/requires the OMX question tool rather than falling back to another questioning path/i,
+			/requires the OMCP question tool rather than falling back to another questioning path/i,
 		);
 		assert.doesNotMatch(
 			deepInterviewSkill,
@@ -182,7 +182,7 @@ describe("deep-interview Ouroboros contract", () => {
 		assert.match(deepInterviewSkill, /team verification path/i);
 	});
 
-	it("uses OMX-native output paths", () => {
+	it("uses OMCP-native output paths", () => {
 		assert.match(deepInterviewSkill, /\.omx\/interviews\//);
 		assert.match(deepInterviewSkill, /\.omx\/specs\//);
 	});

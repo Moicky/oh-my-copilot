@@ -1,7 +1,7 @@
 /**
  * Wiki Storage
  *
- * File I/O layer for the OMX wiki knowledge base.
+ * File I/O layer for the OMCP wiki knowledge base.
  */
 
 import {

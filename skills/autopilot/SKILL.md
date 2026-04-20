@@ -84,7 +84,7 @@ Most non-trivial software tasks require coordinated phases: understanding requir
    - Code-reviewer: Quality review
    - All must approve; fix and re-validate on rejection
 
-6. **Phase 5 - Cleanup**: Clear all mode state via OMX MCP tools on successful completion
+6. **Phase 5 - Cleanup**: Clear all mode state via OMCP MCP tools on successful completion
    - `state_clear({mode: "autopilot"})`
    - `state_clear({mode: "ralph"})`
    - `state_clear({mode: "ultrawork"})`

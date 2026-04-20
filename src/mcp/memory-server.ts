@@ -1,5 +1,5 @@
 /**
- * OMX Project Memory & Notepad MCP Server
+ * OMCP Project Memory & Notepad MCP Server
  * Provides persistent project memory and session notepad tools
  * Storage: .omx/project-memory.json, .omx/notepad.md
  */

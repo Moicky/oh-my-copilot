@@ -22,7 +22,7 @@ export interface CodeSimplifierConfig {
   maxFiles?: number;
 }
 
-/** Global OMX config shape (subset relevant to code-simplifier) */
+/** Global OMCP config shape (subset relevant to code-simplifier) */
 interface OmxGlobalConfig {
   codeSimplifier?: CodeSimplifierConfig;
 }
@@ -40,7 +40,7 @@ const DEFAULT_MAX_FILES = 10;
 export const TRIGGER_MARKER_FILENAME = 'code-simplifier-triggered.marker';
 
 /**
- * Read the global OMX config from ~/.omx/config.json.
+ * Read the global OMCP config from ~/.omx/config.json.
  * Returns null if the file does not exist or cannot be parsed.
  *
  * @param configDir - Optional override for the home directory. When provided,

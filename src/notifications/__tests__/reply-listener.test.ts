@@ -472,7 +472,7 @@ describe('pollDiscordOnce', () => {
         lookupByMessageIdImpl: () => createMapping('discord-bot'),
         buildSessionStatusReplyImpl: async (mapping) => {
           assert.equal(mapping.sessionId, 'session-1');
-          return 'Tracked OMX session status';
+          return 'Tracked OMCP session status';
         },
         injectReplyImpl: () => {
           injectCalled = true;
@@ -488,7 +488,7 @@ describe('pollDiscordOnce', () => {
     assert.equal(fetchCalls.length, 2);
 
     const replyBody = JSON.parse(String(fetchCalls[1].init?.body));
-    assert.equal(replyBody.content, 'Tracked OMX session status');
+    assert.equal(replyBody.content, 'Tracked OMCP session status');
     assert.deepEqual(replyBody.message_reference, { message_id: 'discord-status-1' });
     assert.deepEqual(replyBody.allowed_mentions, { parse: [] });
   });
@@ -530,7 +530,7 @@ describe('pollDiscordOnce', () => {
         }),
         buildSessionStatusReplyImpl: async (mapping) => {
           statusSessionIds.push(mapping.sessionId);
-          return `Tracked OMX session status\nSession: ${mapping.sessionId}`;
+          return `Tracked OMCP session status\nSession: ${mapping.sessionId}`;
         },
         injectReplyImpl: () => {
           throw new Error('injectReply should not run for exact-match status probes');

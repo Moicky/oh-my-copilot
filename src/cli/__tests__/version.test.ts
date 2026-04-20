@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { version } from '../version.js';
 
 describe('version', () => {
-  it('prints OMX version from this repository package.json', () => {
+  it('prints OMCP version from this repository package.json', () => {
     const pkg = JSON.parse(readFileSync(join(process.cwd(), 'package.json'), 'utf-8')) as { version: string };
     const logs: string[] = [];
     const originalLog = console.log;

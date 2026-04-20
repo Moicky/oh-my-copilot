@@ -6,7 +6,7 @@ import { join } from 'node:path';
 const HELP = [
   'Usage: omx cleanup [--dry-run]',
   '',
-  'Kill orphaned OMX MCP server processes and remove stale OMX /tmp directories left behind by previous Codex App sessions.',
+  'Kill orphaned OMCP MCP server processes and remove stale OMCP /tmp directories left behind by previous Codex App sessions.',
   '',
   'Options:',
   '  --dry-run  List matching orphaned processes and stale /tmp directories without removing them',
@@ -361,8 +361,8 @@ export async function cleanupOmxMcpProcesses(
   const candidates = selectCandidates(listProcessesImpl(), currentPid);
   if (candidates.length === 0) {
     writeLine(dryRun
-      ? 'Dry run: no orphaned OMX MCP server processes found.'
-      : 'No orphaned OMX MCP server processes found.');
+      ? 'Dry run: no orphaned OMCP MCP server processes found.'
+      : 'No orphaned OMCP MCP server processes found.');
     return {
       dryRun,
       candidates,
@@ -373,7 +373,7 @@ export async function cleanupOmxMcpProcesses(
   }
 
   if (dryRun) {
-    writeLine(`Dry run: would terminate ${candidates.length} orphaned OMX MCP server process(es):`);
+    writeLine(`Dry run: would terminate ${candidates.length} orphaned OMCP MCP server process(es):`);
     for (const candidate of candidates) writeLine(`  ${formatCandidate(candidate)}`);
     return {
       dryRun: true,
@@ -384,7 +384,7 @@ export async function cleanupOmxMcpProcesses(
     };
   }
 
-  writeLine(`Found ${candidates.length} orphaned OMX MCP server process(es). Sending SIGTERM...`);
+  writeLine(`Found ${candidates.length} orphaned OMCP MCP server process(es). Sending SIGTERM...`);
   for (const candidate of candidates) {
     try {
       sendSignal(candidate.pid, 'SIGTERM');
@@ -433,7 +433,7 @@ export async function cleanupOmxMcpProcesses(
     failedPids.push(...remainingAfterKill);
   }
 
-  writeLine(`Killed ${terminatedCount} orphaned OMX MCP server process(es)${forceKilledCount > 0 ? ` (${forceKilledCount} required SIGKILL)` : ''}.`);
+  writeLine(`Killed ${terminatedCount} orphaned OMCP MCP server process(es)${forceKilledCount > 0 ? ` (${forceKilledCount} required SIGKILL)` : ''}.`);
   if (failedPids.length > 0) {
     writeLine(`Warning: ${failedPids.length} process(es) still appear alive: ${failedPids.join(', ')}`);
   }
@@ -479,15 +479,15 @@ export async function cleanupStaleTmpDirectories(
 
   if (staleDirectories.length === 0) {
     writeLine(dryRun
-      ? 'Dry run: no stale OMX /tmp directories found.'
-      : 'No stale OMX /tmp directories found.');
+      ? 'Dry run: no stale OMCP /tmp directories found.'
+      : 'No stale OMCP /tmp directories found.');
     return 0;
   }
 
   const summaryTarget = formatPlural(
     staleDirectories.length,
-    'stale OMX /tmp directory',
-    'stale OMX /tmp directories',
+    'stale OMCP /tmp directory',
+    'stale OMCP /tmp directories',
   );
   if (dryRun) {
     writeLine(`Dry run: would remove ${summaryTarget}:`);
@@ -512,8 +512,8 @@ export async function cleanupStaleTmpDirectories(
   writeLine(
     `Removed ${formatPlural(
       removedCount,
-      'stale OMX /tmp directory',
-      'stale OMX /tmp directories',
+      'stale OMCP /tmp directory',
+      'stale OMCP /tmp directories',
     )}.`,
   );
   return removedCount;

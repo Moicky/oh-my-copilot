@@ -337,7 +337,7 @@ describe('buildExplorePromptWithWikiContext', () => {
       });
 
       const prompt = buildExplorePromptWithWikiContext('how does session-start work', wd);
-      assert.match(prompt, /\[OMX Wiki Context\]/);
+      assert.match(prompt, /\[OMCP Wiki Context\]/);
       assert.match(prompt, /Runtime Architecture/);
       assert.match(prompt, /prefer repository-backed facts/i);
       assert.match(prompt, /Wiki mismatch/);
@@ -385,7 +385,7 @@ describe('buildExplorePromptWithWikiContext', () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-explore-no-wiki-'));
     try {
       const prompt = buildExplorePromptWithWikiContext('find auth', wd);
-      assert.match(prompt, /\[OMX Wiki Status\]/);
+      assert.match(prompt, /\[OMCP Wiki Status\]/);
       assert.match(prompt, /build an initial project wiki/i);
       assert.match(prompt, /Original Explore Prompt/);
     } finally {

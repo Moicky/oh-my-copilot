@@ -344,7 +344,7 @@ describe('notify-hook auto-nudge', () => {
     });
   });
 
-  it('does not auto-nudge plain tmux Codex sessions that only inherit OMX session env', async () => {
+  it('does not auto-nudge plain tmux Codex sessions that only inherit OMCP session env', async () => {
     await withTempWorkingDir(async (cwd) => {
       const omxDir = join(cwd, '.omx');
       const stateDir = join(omxDir, 'state');
@@ -394,7 +394,7 @@ describe('notify-hook auto-nudge', () => {
     });
   });
 
-  it('does not auto-nudge plain tmux Codex sessions that are not OMX-managed', async () => {
+  it('does not auto-nudge plain tmux Codex sessions that are not OMCP-managed', async () => {
     await withTempWorkingDir(async (cwd) => {
       const omxDir = join(cwd, '.omx');
       const stateDir = join(omxDir, 'state');
@@ -467,7 +467,7 @@ describe('notify-hook auto-nudge', () => {
     });
   });
 
-  it('does not auto-nudge when tmux session naming drifts from the current OMX session id', async () => {
+  it('does not auto-nudge when tmux session naming drifts from the current OMCP session id', async () => {
     await withTempWorkingDir(async (cwd) => {
       const omxDir = join(cwd, '.omx');
       const stateDir = join(omxDir, 'state');
@@ -505,7 +505,7 @@ describe('notify-hook auto-nudge', () => {
       assert.match(
         tmuxLog,
         new RegExp(`list-panes -s -t ${escapeRegex(expectedManagedSessionName)}`),
-        'should resolve panes against the current OMX session identity, not the drifted tmux session name',
+        'should resolve panes against the current OMCP session identity, not the drifted tmux session name',
       );
       assert.doesNotMatch(tmuxLog, defaultAutoNudgePattern('%99'));
     });

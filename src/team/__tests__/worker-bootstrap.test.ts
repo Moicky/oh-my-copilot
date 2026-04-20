@@ -63,8 +63,8 @@ describe("worker bootstrap", () => {
   it("generateWorkerOverlay produces markdown with correct start/end markers", () => {
     const overlay = generateWorkerOverlay("alpha-team");
 
-    assert.match(overlay, /<!-- OMX:TEAM:WORKER:START -->/);
-    assert.match(overlay, /<!-- OMX:TEAM:WORKER:END -->/);
+    assert.match(overlay, /<!-- OMCP:TEAM:WORKER:START -->/);
+    assert.match(overlay, /<!-- OMCP:TEAM:WORKER:END -->/);
   });
 
   it("generateWorkerOverlay includes the team name", () => {
@@ -113,8 +113,8 @@ describe("worker bootstrap", () => {
       const content = await readFile(agentsMdPath, "utf8");
       assert.match(content, /# Base AGENTS/);
       assert.match(content, /Base content\./);
-      assert.match(content, /<!-- OMX:TEAM:WORKER:START -->/);
-      assert.match(content, /<!-- OMX:TEAM:WORKER:END -->/);
+      assert.match(content, /<!-- OMCP:TEAM:WORKER:START -->/);
+      assert.match(content, /<!-- OMCP:TEAM:WORKER:END -->/);
     } finally {
       await rm(cwd, { recursive: true, force: true });
     }
@@ -131,8 +131,8 @@ describe("worker bootstrap", () => {
       await applyWorkerOverlay(agentsMdPath, overlay);
 
       const content = await readFile(agentsMdPath, "utf8");
-      const starts = content.match(/<!-- OMX:TEAM:WORKER:START -->/g) ?? [];
-      const ends = content.match(/<!-- OMX:TEAM:WORKER:END -->/g) ?? [];
+      const starts = content.match(/<!-- OMCP:TEAM:WORKER:START -->/g) ?? [];
+      const ends = content.match(/<!-- OMCP:TEAM:WORKER:END -->/g) ?? [];
 
       assert.equal(starts.length, 1);
       assert.equal(ends.length, 1);
@@ -154,8 +154,8 @@ describe("worker bootstrap", () => {
       const content = await readFile(agentsMdPath, "utf8");
       assert.match(content, /# Base/);
       assert.match(content, /Keep me\./);
-      assert.doesNotMatch(content, /<!-- OMX:TEAM:WORKER:START -->/);
-      assert.doesNotMatch(content, /<!-- OMX:TEAM:WORKER:END -->/);
+      assert.doesNotMatch(content, /<!-- OMCP:TEAM:WORKER:START -->/);
+      assert.doesNotMatch(content, /<!-- OMCP:TEAM:WORKER:END -->/);
     } finally {
       await rm(cwd, { recursive: true, force: true });
     }
@@ -189,7 +189,7 @@ describe("worker bootstrap", () => {
       await applyWorkerOverlay(agentsMdPath, overlay);
 
       const content = await readFile(agentsMdPath, "utf8");
-      assert.match(content, /<!-- OMX:TEAM:WORKER:START -->/);
+      assert.match(content, /<!-- OMCP:TEAM:WORKER:START -->/);
       assert.match(content, /team "new-team"/);
     } finally {
       await rm(cwd, { recursive: true, force: true });
@@ -595,12 +595,12 @@ describe("worker bootstrap", () => {
           content.indexOf("# Project Instructions"),
       );
       assert.match(content, /Do good work/);
-      assert.match(content, /<!-- OMX:TEAM:WORKER:START -->/);
-      assert.match(content, /<!-- OMX:TEAM:WORKER:END -->/);
+      assert.match(content, /<!-- OMCP:TEAM:WORKER:START -->/);
+      assert.match(content, /<!-- OMCP:TEAM:WORKER:END -->/);
 
       // Verify project AGENTS.md was NOT modified
       const projectContent = await readFile(join(cwd, "AGENTS.md"), "utf8");
-      assert.doesNotMatch(projectContent, /<!-- OMX:TEAM:WORKER:START -->/);
+      assert.doesNotMatch(projectContent, /<!-- OMCP:TEAM:WORKER:START -->/);
     } finally {
       restoreCodexHome();
       await rm(cwd, { recursive: true, force: true });
@@ -693,7 +693,7 @@ describe("worker bootstrap", () => {
 
       const content = await readFile(outPath, "utf8");
       assert.match(content, /team "role-team"/);
-      assert.match(content, /<!-- OMX:TEAM:ROLE:START -->/);
+      assert.match(content, /<!-- OMCP:TEAM:ROLE:START -->/);
       assert.match(content, /\*\*writer\*\* role/);
       assert.match(content, /<identity>Writer role prompt<\/identity>/);
       assert.doesNotMatch(content, /exact gpt-5\.4-mini model/);
@@ -823,7 +823,7 @@ describe("worker bootstrap", () => {
       );
 
       const content = await readFile(outPath, "utf8");
-      assert.match(content, /<!-- OMX:TEAM:WORKER:START -->/);
+      assert.match(content, /<!-- OMCP:TEAM:WORKER:START -->/);
       assert.match(content, /team "no-agents-team"/);
     } finally {
       await rm(cwd, { recursive: true, force: true });

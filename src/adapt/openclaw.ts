@@ -182,12 +182,12 @@ export function buildOpenClawEnvelope(
 		target: "openclaw",
 		displayName: "OpenClaw",
 		summary:
-			"OMX-owned OpenClaw adapter metadata built from existing local config, gateway, and lifecycle seams.",
+			"OMCP-owned OpenClaw adapter metadata built from existing local config, gateway, and lifecycle seams.",
 		adapterPaths: paths,
 		planning,
 		capabilities,
 		constraints: [
-			"Status reflects local OMX/OpenClaw adapter evidence only; it does not claim downstream OpenClaw acknowledgement.",
+			"Status reflects local OMCP/OpenClaw adapter evidence only; it does not claim downstream OpenClaw acknowledgement.",
 			"Bootstrap output stays under .omx/adapters/openclaw/... and does not mutate .omx/state or upstream OpenClaw config.",
 			"Command gateways remain gated by OMX_OPENCLAW_COMMAND=1 even when OMX_OPENCLAW=1 is enabled.",
 		],
@@ -316,7 +316,7 @@ export function buildOpenClawDoctorReport(
 		issues.push({
 			code: "planning_artifacts_missing",
 			message:
-				"No canonical OMX PRD artifact is available to link into the OpenClaw adapter envelope.",
+				"No canonical OMCP PRD artifact is available to link into the OpenClaw adapter envelope.",
 		});
 	}
 
@@ -365,7 +365,7 @@ export function initOpenClawFoundation(
 					createdAt: now.toISOString(),
 					phase: "openclaw-local-observation",
 					observedState: envelope.openclaw?.observedState ?? "not-configured",
-					summary: "OMX-owned OpenClaw adapter bootstrap metadata.",
+					summary: "OMCP-owned OpenClaw adapter bootstrap metadata.",
 					lifecycleBridge: envelope.openclaw?.lifecycleBridge ?? [],
 					constraints: envelope.constraints,
 				},

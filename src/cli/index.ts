@@ -142,15 +142,15 @@ oh-my-copilot (omx) - Multi-agent orchestration for Codex CLI
 
 Usage:
   omx           Launch Codex CLI (HUD auto-attaches only when already inside tmux)
-  omx exec      Run codex exec non-interactively with OMX AGENTS/overlay injection
+  omx exec      Run codex exec non-interactively with OMCP AGENTS/overlay injection
   omx setup     Install skills, prompts, MCP servers, and scope-specific AGENTS.md
-  omx uninstall Remove OMX configuration and clean up installed artifacts
+  omx uninstall Remove OMCP configuration and clean up installed artifacts
   omx doctor    Check installation health
-  omx cleanup   Kill orphaned OMX MCP server processes and remove stale OMX /tmp directories
+  omx cleanup   Kill orphaned OMCP MCP server processes and remove stale OMCP /tmp directories
   omx doctor --team  Check team/swarm runtime health diagnostics
   omx ask       Ask local provider CLI (claude|gemini) and write artifact output
-  omx question  OMX-owned blocking question UI entrypoint for agent-invoked user questions
-  omx adapt     Scaffold OMX-owned adapter foundations for persistent external targets
+  omx question  OMCP-owned blocking question UI entrypoint for agent-invoked user questions
+  omx adapt     Scaffold OMCP-owned adapter foundations for persistent external targets
   omx resume    Resume a previous interactive Codex session
   omx explore   Default read-only exploration entrypoint (may adaptively use sparkshell backend)
   omx session   Search prior local session transcripts and history artifacts
@@ -166,14 +166,14 @@ Usage:
   omx tmux-hook Manage tmux prompt injection workaround (init|status|validate|test)
   omx hooks     Manage hook plugins (init|status|validate|test)
   omx hud       Show HUD statusline (--watch, --json, --preset=NAME)
-  omx state     Read/write/list OMX mode state via CLI parity surface
-  omx notepad   CLI parity for OMX notepad MCP tools
+  omx state     Read/write/list OMCP mode state via CLI parity surface
+  omx notepad   CLI parity for OMCP notepad MCP tools
   omx project-memory
-                CLI parity for OMX project-memory MCP tools
-  omx trace     CLI parity for OMX trace MCP tools
+                CLI parity for OMCP project-memory MCP tools
+  omx trace     CLI parity for OMCP trace MCP tools
   omx code-intel
-                CLI parity for OMX code-intel MCP tools
-  omx wiki      CLI parity for OMX wiki MCP tools
+                CLI parity for OMCP code-intel MCP tools
+  omx wiki      CLI parity for OMCP wiki MCP tools
   omx sparkshell <command> [args...]
   omx sparkshell --tmux-pane <pane-id> [--tail-lines <100-1000>]
                 Run native sparkshell sidecar for direct command execution or explicit tmux-pane summarization
@@ -965,7 +965,7 @@ export async function launchWithHud(args: string[]): Promise<void> {
         worktreeDirty = true;
         process.stderr.write(
           `[omx] Caution: worktree at ${cwd} has uncommitted changes.\n` +
-          `  The session will launch as-is. Resolve the dirty state with OMX after launch, then proceed with your task.\n`,
+          `  The session will launch as-is. Resolve the dirty state with OMCP after launch, then proceed with your task.\n`,
         );
       }
       const depBootstrap = ensureReusableNodeModules(cwd);
@@ -1065,7 +1065,7 @@ export async function execWithOverlay(args: string[]): Promise<void> {
         worktreeDirty = true;
         process.stderr.write(
           `[omx] Caution: worktree at ${cwd} has uncommitted changes.\n` +
-          `  The session will launch as-is. Resolve the dirty state with OMX after launch, then proceed with your task.\n`,
+          `  The session will launch as-is. Resolve the dirty state with OMCP after launch, then proceed with your task.\n`,
         );
       }
       const depBootstrap = ensureReusableNodeModules(cwd);
@@ -2263,12 +2263,12 @@ export async function reapPostLaunchOrphanedMcpProcesses(
     const result = await cleanup();
     if (result.terminatedCount > 0) {
       writeInfo(
-        `[omx] postLaunch: reaped ${result.terminatedCount} orphaned OMX MCP process(es).`,
+        `[omx] postLaunch: reaped ${result.terminatedCount} orphaned OMCP MCP process(es).`,
       );
     }
     if (result.failedPids.length > 0) {
       writeWarn(
-        `[omx] postLaunch: failed to reap ${result.failedPids.length} orphaned OMX MCP process(es); continuing cleanup.`,
+        `[omx] postLaunch: failed to reap ${result.failedPids.length} orphaned OMCP MCP process(es); continuing cleanup.`,
       );
     }
   } catch (err) {
@@ -2278,12 +2278,12 @@ export async function reapPostLaunchOrphanedMcpProcesses(
 
 /**
  * preLaunch: Prepare environment before Codex starts.
- * 1. Best-effort launch-safe orphan cleanup for detached OMX MCP processes
+ * 1. Best-effort launch-safe orphan cleanup for detached OMCP MCP processes
  * 2. Generate runtime overlay + write session-scoped model instructions file
  * 3. Write session.json
  *
  * Automatic broad stale-session cleanup remains disabled here. Only detached
- * OMX MCP processes without a live Codex ancestor are reaped so new launches
+ * OMCP MCP processes without a live Codex ancestor are reaped so new launches
  * do not accumulate stale processes from prior crashed/closed sessions.
  */
 async function preLaunch(
@@ -2299,12 +2299,12 @@ async function preLaunch(
     const cleanup = await cleanupLaunchOrphanedMcpProcesses();
     if (cleanup.terminatedCount > 0) {
       console.log(
-        `[omx] Reaped ${cleanup.terminatedCount} orphaned OMX MCP process(es) before launch.`,
+        `[omx] Reaped ${cleanup.terminatedCount} orphaned OMCP MCP process(es) before launch.`,
       );
     }
     if (cleanup.failedPids.length > 0) {
       console.warn(
-        `[omx] Failed to reap ${cleanup.failedPids.length} orphaned OMX MCP process(es); continuing launch.`,
+        `[omx] Failed to reap ${cleanup.failedPids.length} orphaned OMCP MCP process(es); continuing launch.`,
       );
     }
   } catch (err) {
@@ -2420,7 +2420,7 @@ function runCodex(
   const nativeWindows = isNativeWindows();
   const omxBin = resolveOmxEntryPath();
   if (!omxBin) {
-    throw new Error("Unable to resolve OMX launcher path for tmux HUD bootstrap");
+    throw new Error("Unable to resolve OMCP launcher path for tmux HUD bootstrap");
   }
   const hudCmd = nativeWindows
     ? buildWindowsPromptCommand("node", [omxBin, "hud", "--watch"])

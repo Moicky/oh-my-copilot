@@ -126,7 +126,7 @@ async function withPatchedEnv<T>(
 }
 
 describe('notify-hook Ralph session resume', () => {
-  it('resumes a matching prior Ralph into the current OMX session and rebinds the pane', async () => {
+  it('resumes a matching prior Ralph into the current OMCP session and rebinds the pane', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-resume-'));
     try {
       const stateDir = join(wd, '.omx', 'state');
@@ -266,7 +266,7 @@ describe('notify-hook Ralph session resume', () => {
     }
   });
 
-  it('adopts a same-thread Ralph across OMX session turnover even when Codex session id is absent', async () => {
+  it('adopts a same-thread Ralph across OMCP session turnover even when Codex session id is absent', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omx-notify-ralph-thread-turnover-'));
     try {
       const stateDir = join(wd, '.omx', 'state');

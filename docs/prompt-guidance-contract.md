@@ -1,6 +1,6 @@
 # GPT-5.4 Prompt Guidance Contract
 
-Status: contributor-facing contract for OMX prompt and orchestration surfaces.
+Status: contributor-facing contract for OMCP prompt and orchestration surfaces.
 
 ## Purpose
 
@@ -30,7 +30,7 @@ This document is the contributor-oriented index for those surfaces.
 
 ## Exact-model mini adaptation seam
 
-OMX also has a narrow **instruction-composition seam** for subagents/workers whose **final resolved model** is exactly `gpt-5.4-mini`.
+OMCP also has a narrow **instruction-composition seam** for subagents/workers whose **final resolved model** is exactly `gpt-5.4-mini`.
 That seam is part of prompt delivery, but it is intentionally narrower than the general GPT-5.4 behavioral contract described below.
 
 Contributor rules for that seam:
@@ -52,8 +52,8 @@ Primary implementation surfaces for this seam:
 
 ## What this contract is — and is not
 
-This contract is about **how OMX prompts should behave**.
-It is not the same thing as OMX's routing metadata.
+This contract is about **how OMCP prompts should behave**.
+It is not the same thing as OMCP's routing metadata.
 
 - **Behavioral contract:** quality-first intent-deepening defaults, automatic follow-through, localized task updates, persistent tool use, and evidence-backed completion.
 - **Adjacent but separate routing layer:** role/tier/posture metadata such as `frontier-orchestrator`, `deep-worker`, and `fast-lane` in `src/agents/native-config.ts` and `docs/shared/agent-tiers.md`.
@@ -61,7 +61,7 @@ It is not the same thing as OMX's routing metadata.
 If you are changing prompt prose, use this document first.
 If you are changing routing metadata or native config overlays, use the routing docs/tests first.
 
-## The 4 core GPT-5.4 patterns OMX should now enforce
+## The 4 core GPT-5.4 patterns OMCP should now enforce
 
 ### 1. Quality-first, intent-deepening output by default
 
@@ -100,8 +100,8 @@ Representative locations:
 Example prompt text:
 
 > - Proceed automatically on clear, low-risk, reversible next steps; ask only for irreversible, side-effectful, or materially branching actions.
-> - Do not ask or instruct humans to perform ordinary non-destructive, reversible actions; execute those safe reversible OMX/runtime operations and ordinary commands yourself.
-> - Treat OMX runtime manipulation, state transitions, and ordinary command execution as agent responsibilities when they are safe and reversible.
+> - Do not ask or instruct humans to perform ordinary non-destructive, reversible actions; execute those safe reversible OMCP/runtime operations and ordinary commands yourself.
+> - Treat OMCP runtime manipulation, state transitions, and ordinary command execution as agent responsibilities when they are safe and reversible.
 >
 > **Good:** The user says `continue` after you already identified the next safe implementation step. Continue the current branch of work instead of asking for reconfirmation.
 
@@ -128,7 +128,7 @@ Example prompt text:
 
 ### 4. Persistent tool use, dependency-aware sequencing, and evidence-backed completion
 
-Contributors should preserve the rule that prompts keep using tools when correctness depends on retrieval, diagnostics, tests, or verification. OMX should not stop at a plausible answer if proof is still missing.
+Contributors should preserve the rule that prompts keep using tools when correctness depends on retrieval, diagnostics, tests, or verification. OMCP should not stop at a plausible answer if proof is still missing.
 
 Representative locations:
 
@@ -158,7 +158,7 @@ When editing `templates/AGENTS.md`, any tracked root `AGENTS.md`, or other root 
 
 ## Reinforcement pattern: scenario examples
 
-OMX also uses **scenario-style examples** to make the contract concrete for "continue", "make a PR", and "merge if CI green" flows.
+OMCP also uses **scenario-style examples** to make the contract concrete for "continue", "make a PR", and "merge if CI green" flows.
 These examples reinforce the four core patterns above, but they are not a separate routing or reasoning system.
 
 Representative locations:
