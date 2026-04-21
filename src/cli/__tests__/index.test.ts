@@ -128,30 +128,30 @@ describe("normalizeCodexLaunchArgs", () => {
 
   it("maps --high to reasoning override", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--high"]), [
-      "-c",
-      'model_reasoning_effort="high"',
+      "--reasoning-effort",
+      "high",
     ]);
   });
 
   it("maps --xhigh to reasoning override", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--xhigh"]), [
-      "-c",
-      'model_reasoning_effort="xhigh"',
+      "--reasoning-effort",
+      "xhigh",
     ]);
   });
 
   it("uses the last reasoning shorthand when both are present", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--high", "--xhigh"]), [
-      "-c",
-      'model_reasoning_effort="xhigh"',
+      "--reasoning-effort",
+      "xhigh",
     ]);
   });
 
   it("maps --xhigh --madmax to codex-native flags only", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--xhigh", "--madmax"]), [
       "--allow-all-tools",
-      "-c",
-      'model_reasoning_effort="xhigh"',
+      "--reasoning-effort",
+      "xhigh",
     ]);
   });
 
@@ -2563,18 +2563,16 @@ describe("readTopLevelTomlString", () => {
 });
 
 describe("injectModelInstructionsBypassArgs", () => {
-  it("appends model_instructions_file override by default", () => {
+  // Copilot CLI auto-loads AGENTS.md from cwd and does not support Codex's
+  // `-c model_instructions_file=...` override. The helper is now a no-op
+  // pass-through but the export is preserved for upstream-mergeable diff.
+  it("returns args unchanged on the copilot fork", () => {
     const args = injectModelInstructionsBypassArgs(
       "/tmp/my-project",
       ["--model", "gpt-5"],
       {},
     );
-    assert.deepEqual(args, [
-      "--model",
-      "gpt-5",
-      "-c",
-      'model_instructions_file="/tmp/my-project/AGENTS.md"',
-    ]);
+    assert.deepEqual(args, ["--model", "gpt-5"]);
   });
 
   it("does not append when bypass is disabled via env", () => {
@@ -2595,29 +2593,21 @@ describe("injectModelInstructionsBypassArgs", () => {
     assert.deepEqual(args, ["-c", 'model_instructions_file="/tmp/custom.md"']);
   });
 
-  it("respects OMCP_MODEL_INSTRUCTIONS_FILE env override", () => {
+  it("ignores OMCP_MODEL_INSTRUCTIONS_FILE on the copilot fork", () => {
     const args = injectModelInstructionsBypassArgs("/tmp/my-project", [], {
       OMCP_MODEL_INSTRUCTIONS_FILE: "/tmp/alt instructions.md",
     });
-    assert.deepEqual(args, [
-      "-c",
-      'model_instructions_file="/tmp/alt instructions.md"',
-    ]);
+    assert.deepEqual(args, []);
   });
 
-  it("uses session-scoped default model_instructions_file when provided", () => {
+  it("ignores session-scoped default path on the copilot fork", () => {
     const args = injectModelInstructionsBypassArgs(
       "/tmp/my-project",
       ["--model", "gpt-5"],
       {},
       "/tmp/my-project/.omcp/state/sessions/session-1/AGENTS.md",
     );
-    assert.deepEqual(args, [
-      "--model",
-      "gpt-5",
-      "-c",
-      'model_instructions_file="/tmp/my-project/.omcp/state/sessions/session-1/AGENTS.md"',
-    ]);
+    assert.deepEqual(args, ["--model", "gpt-5"]);
   });
 });
 
