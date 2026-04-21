@@ -78,25 +78,36 @@ afterEach(() => {
 });
 
 describe("normalizeCodexLaunchArgs", () => {
-  it("maps --madmax to codex bypass flag", () => {
+  it("maps --madmax to copilot --yolo", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--madmax"]), [
-      "--allow-all-tools",
+      "--yolo",
     ]);
   });
 
   it("does not forward --madmax and preserves other args", () => {
     assert.deepEqual(
-      normalizeCodexLaunchArgs(["--model", "gpt-5", "--madmax", "--yolo"]),
+      normalizeCodexLaunchArgs(["--model", "gpt-5", "--madmax"]),
       [
         "--model",
         "gpt-5",
         "--yolo",
-        "--allow-all-tools",
       ],
     );
   });
 
-  it("avoids duplicate bypass flags when both are present", () => {
+  it("avoids duplicate bypass flags when --yolo and --madmax are both present", () => {
+    assert.deepEqual(
+      normalizeCodexLaunchArgs([
+        "--yolo",
+        "--madmax",
+      ]),
+      ["--yolo"],
+    );
+  });
+
+  it("preserves explicit --allow-all-tools verbatim alongside --madmax", () => {
+    // --allow-all-tools (narrow) is kept as the user typed it; --madmax's
+    // implied --yolo is suppressed because a bypass is already present.
     assert.deepEqual(
       normalizeCodexLaunchArgs([
         "--allow-all-tools",
@@ -106,15 +117,15 @@ describe("normalizeCodexLaunchArgs", () => {
     );
   });
 
-  it("deduplicates repeated bypass-related flags", () => {
+  it("deduplicates repeated --yolo / --madmax flags", () => {
     assert.deepEqual(
       normalizeCodexLaunchArgs([
         "--madmax",
-        "--allow-all-tools",
+        "--yolo",
         "--madmax",
-        "--allow-all-tools",
+        "--yolo",
       ]),
-      ["--allow-all-tools"],
+      ["--yolo"],
     );
   });
 
@@ -147,9 +158,9 @@ describe("normalizeCodexLaunchArgs", () => {
     ]);
   });
 
-  it("maps --xhigh --madmax to codex-native flags only", () => {
+  it("maps --xhigh --madmax to copilot-native flags only", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--xhigh", "--madmax"]), [
-      "--allow-all-tools",
+      "--yolo",
       "--reasoning-effort",
       "xhigh",
     ]);
@@ -167,13 +178,13 @@ describe("normalizeCodexLaunchArgs", () => {
 
   it("--madmax-spark adds bypass flag to leader args and is otherwise consumed", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--madmax-spark"]), [
-      "--allow-all-tools",
+      "--yolo",
     ]);
   });
 
   it("--madmax-spark deduplicates bypass when --madmax also present", () => {
     assert.deepEqual(normalizeCodexLaunchArgs(["--madmax", "--madmax-spark"]), [
-      "--allow-all-tools",
+      "--yolo",
     ]);
   });
 
@@ -2448,7 +2459,7 @@ describe("team worker launch arg inheritance helpers", () => {
         "gpt-5",
       ]),
       [
-        "--allow-all-tools",
+        "--yolo",
         "--reasoning-effort",
         "xhigh",
         "--model",
@@ -2477,7 +2488,7 @@ describe("team worker launch arg inheritance helpers", () => {
         ],
         true,
       ),
-      '--no-alt-screen --allow-all-tools --reasoning-effort xhigh --model old-b',
+      '--no-alt-screen --yolo --reasoning-effort xhigh --model old-b',
     );
   });
 
@@ -2515,7 +2526,7 @@ describe("team worker launch arg inheritance helpers", () => {
         true,
         DEFAULT_FRONTIER_MODEL,
       ),
-      `--no-alt-screen --allow-all-tools --model ${DEFAULT_FRONTIER_MODEL}`,
+      `--no-alt-screen --yolo --model ${DEFAULT_FRONTIER_MODEL}`,
     );
   });
 

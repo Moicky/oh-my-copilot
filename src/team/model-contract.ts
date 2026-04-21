@@ -8,6 +8,7 @@ import {
 
 const MADMAX_FLAG = '--madmax';
 const COPILOT_BYPASS_FLAG = '--allow-all-tools';
+const COPILOT_YOLO_FLAG = '--yolo';
 const MODEL_FLAG = '--model';
 const CONFIG_FLAG = '-c';
 const REASONING_KEY = 'model_reasoning_effort';
@@ -84,7 +85,7 @@ export function parseTeamWorkerLaunchArgs(args: string[]): ParsedTeamWorkerLaunc
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    if (arg === COPILOT_BYPASS_FLAG || arg === MADMAX_FLAG) {
+    if (arg === COPILOT_BYPASS_FLAG || arg === COPILOT_YOLO_FLAG || arg === MADMAX_FLAG) {
       wantsBypass = true;
       continue;
     }
@@ -153,7 +154,7 @@ export function collectInheritableTeamWorkerArgs(codexArgs: string[]): string[] 
   const parsed = parseTeamWorkerLaunchArgs(codexArgs);
 
   const inherited: string[] = [];
-  if (parsed.wantsBypass) inherited.push(COPILOT_BYPASS_FLAG);
+  if (parsed.wantsBypass) inherited.push(COPILOT_YOLO_FLAG);
   if (parsed.reasoningOverride) inherited.push(COPILOT_REASONING_FLAG, parsed.reasoningOverride);
   if (parsed.modelOverride) inherited.push(MODEL_FLAG, parsed.modelOverride);
   return inherited;
@@ -167,7 +168,7 @@ export function normalizeTeamWorkerLaunchArgs(
   const parsed = parseTeamWorkerLaunchArgs(args);
   const normalized = [...parsed.passthrough];
 
-  if (parsed.wantsBypass) normalized.push(COPILOT_BYPASS_FLAG);
+  if (parsed.wantsBypass) normalized.push(COPILOT_YOLO_FLAG);
 
   const selectedReasoning = parsed.reasoningOverride ?? normalizeOptionalReasoning(preferredReasoning);
   if (selectedReasoning) normalized.push(COPILOT_REASONING_FLAG, selectedReasoning);

@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'fs';
 import { isAbsolute, join, resolve } from 'path';
 import {
   COPILOT_BYPASS_FLAG,
+  COPILOT_YOLO_FLAG,
   CLAUDE_SKIP_PERMISSIONS_FLAG,
   MADMAX_FLAG,
   CONFIG_FLAG,
@@ -765,8 +766,17 @@ function readTmuxWorkerAmbientEnv(env: NodeJS.ProcessEnv = process.env): Record<
 
 function resolveWorkerLaunchArgs(extraArgs: string[] = [], cwd: string = process.cwd(), env: NodeJS.ProcessEnv = process.env): string[] {
   const merged = [...extraArgs];
-  const wantsBypass = process.argv.includes(COPILOT_BYPASS_FLAG) || process.argv.includes(MADMAX_FLAG);
-  if (wantsBypass && !merged.includes(COPILOT_BYPASS_FLAG)) {
+  const argv = process.argv;
+  const wantsYolo =
+    argv.includes(MADMAX_FLAG) || argv.includes(COPILOT_YOLO_FLAG);
+  const wantsNarrowBypass = argv.includes(COPILOT_BYPASS_FLAG);
+  if (wantsYolo && !merged.includes(COPILOT_YOLO_FLAG)) {
+    merged.push(COPILOT_YOLO_FLAG);
+  } else if (
+    wantsNarrowBypass
+    && !merged.includes(COPILOT_BYPASS_FLAG)
+    && !merged.includes(COPILOT_YOLO_FLAG)
+  ) {
     merged.push(COPILOT_BYPASS_FLAG);
   }
   // Copilot CLI auto-loads AGENTS.md from cwd; it has no `-c model_instructions_file=...`
