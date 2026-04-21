@@ -24,7 +24,7 @@ describe('team model contract', () => {
         '--model=gpt-5.3',
       ]),
       [
-        '--allow-all-tools',
+        '--yolo',
         '--reasoning-effort',
         'xhigh',
         '--model',
@@ -61,7 +61,7 @@ describe('team model contract', () => {
         inheritedArgs: ['--allow-all-tools'],
         fallbackModel: expectedLowComplexityModel(),
       }),
-      ['--no-alt-screen', '--allow-all-tools', '--model', expectedLowComplexityModel()],
+      ['--no-alt-screen', '--yolo', '--model', expectedLowComplexityModel()],
     );
   });
 

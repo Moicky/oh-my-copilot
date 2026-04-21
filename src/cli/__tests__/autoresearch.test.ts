@@ -49,15 +49,16 @@ async function initRepo(): Promise<string> {
 
 describe('normalizeAutoresearchCodexArgs', () => {
   it('adds sandbox bypass by default for autoresearch workers', () => {
-    assert.deepEqual(normalizeAutoresearchCodexArgs(['--model', 'gpt-5']), ['--model', 'gpt-5', '--allow-all-tools']);
+    assert.deepEqual(normalizeAutoresearchCodexArgs(['--model', 'gpt-5']), ['--model', 'gpt-5', '--yolo']);
   });
 
   it('deduplicates explicit bypass flags', () => {
     assert.deepEqual(normalizeAutoresearchCodexArgs(['--allow-all-tools']), ['--allow-all-tools']);
+    assert.deepEqual(normalizeAutoresearchCodexArgs(['--yolo']), ['--yolo']);
   });
 
-  it('normalizes --madmax to the canonical bypass flag', () => {
-    assert.deepEqual(normalizeAutoresearchCodexArgs(['--madmax']), ['--allow-all-tools']);
+  it('normalizes --madmax to copilot --yolo (full sandbox bypass)', () => {
+    assert.deepEqual(normalizeAutoresearchCodexArgs(['--madmax']), ['--yolo']);
   });
 });
 

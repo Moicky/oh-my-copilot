@@ -36,6 +36,7 @@ import { adaptCommand } from "./adapt.js";
 import {
   MADMAX_FLAG,
   COPILOT_BYPASS_FLAG,
+  COPILOT_YOLO_FLAG,
   HIGH_REASONING_FLAG,
   XHIGH_REASONING_FLAG,
   SPARK_FLAG,
@@ -190,7 +191,7 @@ Options:
   --xhigh       Launch Copilot with xhigh reasoning effort
                 (shorthand for: -c model_reasoning_effort="xhigh")
   --madmax      DANGEROUS: bypass Copilot approvals and sandbox
-                (alias for --allow-all-tools)
+                (expands to --yolo on copilot CLI)
   --spark       Use the Copilot spark model (~1.3x faster) for team workers only
                 Workers get the configured low-complexity team model; leader model unchanged
                 Workers get the configured low-complexity team model; leader model unchanged
@@ -1151,8 +1152,18 @@ export function normalizeCodexLaunchArgs(args: string[]): string[] {
       continue;
     }
 
-    if (arg === COPILOT_BYPASS_FLAG) {
+    if (arg === COPILOT_YOLO_FLAG) {
       wantsBypass = true;
+      if (!hasBypass) {
+        normalized.push(arg);
+        hasBypass = true;
+      }
+      continue;
+    }
+
+    if (arg === COPILOT_BYPASS_FLAG) {
+      // User explicitly asked for the narrower --allow-all-tools bypass; honor it
+      // verbatim rather than upgrading to --yolo.
       if (!hasBypass) {
         normalized.push(arg);
         hasBypass = true;
@@ -1185,7 +1196,10 @@ export function normalizeCodexLaunchArgs(args: string[]): string[] {
   }
 
   if (wantsBypass && !hasBypass) {
-    normalized.push(COPILOT_BYPASS_FLAG);
+    // --madmax expands to copilot's full-bypass --yolo (allow-all-tools +
+    // allow-all-paths + allow-all-urls) rather than the narrower
+    // --allow-all-tools.
+    normalized.push(COPILOT_YOLO_FLAG);
   }
 
   if (reasoningMode) {
