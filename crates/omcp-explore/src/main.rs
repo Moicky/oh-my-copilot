@@ -1,7 +1,7 @@
 use std::env;
 use std::ffi::OsString;
 use std::fs::{
-    canonicalize, create_dir_all, read_to_string, remove_dir_all, remove_file, write, File,
+    canonicalize, create_dir_all, read_to_string, remove_dir_all, write, File,
 };
 use std::io::{self, BufRead, BufReader};
 use std::path::{Path, PathBuf};
@@ -204,35 +204,47 @@ fn usage() -> &'static str {
 fn invoke_codex(args: &Args, model: &str, prompt_contract: &str) -> io::Result<AttemptResult> {
     let codex_launch = resolve_codex_launch();
     let allowlist = prepare_allowlist_environment().map_err(io::Error::other)?;
-    let output_path = temp_output_path();
     let final_prompt = compose_exec_prompt(&args.prompt, prompt_contract);
     let mut command = Command::new(&codex_launch.program);
     command.args(&codex_launch.leading_args);
+    // Copilot CLI flag mapping (was: codex exec -C cwd -m model -s read-only \
+    //   -c model_reasoning_effort=low -c shell_environment_policy.inherit=all \
+    //   --skip-git-repo-check -o file <prompt>):
+    //   -p / --prompt           : non-interactive prompt mode
+    //   --model                 : pick the model
+    //   --reasoning-effort low  : low reasoning budget for the cheap explore pass
+    //   --allow-all-tools       : required for non-interactive (no human in loop)
+    //   --no-ask-user --silent  : autonomous, response-only stdout
+    //   --no-color              : strip ANSI so callers can parse markdown
+    //   --add-dir <support>     : grant read access to ~/.omcp + ~/.copilot
+    //   current_dir(args.cwd)   : Copilot lacks `-C`; chdir before spawn instead
+    // Read-only enforcement is delivered by the allowlist PATH wrappers below
+    // and by the prompt contract; Copilot CLI has no per-session sandbox flag.
     command
-        .arg("exec")
-        .arg("-C")
-        .arg(&args.cwd)
-        .args(codex_support_dir_args())
-        .arg("-m")
-        .arg(model)
-        .arg("-s")
-        .arg("read-only")
-        .arg("-c")
-        .arg("model_reasoning_effort=\"low\"")
-        .arg("-c")
-        .arg("shell_environment_policy.inherit=all")
-        .arg("--skip-git-repo-check")
-        .arg("-o")
-        .arg(&output_path)
+        .arg("-p")
         .arg(&final_prompt)
+        .arg("--model")
+        .arg(model)
+        .arg("--reasoning-effort")
+        .arg("low")
+        .arg("--allow-all-tools")
+        .arg("--no-ask-user")
+        .arg("--silent")
+        .arg("--no-color")
+        .args(codex_support_dir_args())
+        .current_dir(&args.cwd)
         .env(HARNESS_ROOT_ENV, &args.cwd)
         .env("PATH", &allowlist.bin_dir)
         .env("SHELL", &allowlist.shell_path);
     sanitize_explore_subprocess_env(&mut command);
     let output = command.output()?;
 
-    let markdown = read_to_string(&output_path).ok();
-    let _ = remove_file(&output_path);
+    let stdout_text = String::from_utf8_lossy(&output.stdout).into_owned();
+    let markdown = if stdout_text.trim().is_empty() {
+        None
+    } else {
+        Some(stdout_text)
+    };
     Ok(AttemptResult {
         status_code: output.status.code().unwrap_or(1),
         stderr: String::from_utf8_lossy(&output.stderr).into_owned(),
@@ -442,14 +454,6 @@ fn discover_codex_support_dirs() -> Vec<PathBuf> {
         }
     }
     dirs
-}
-
-fn temp_output_path() -> PathBuf {
-    let nanos = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_nanos();
-    env::temp_dir().join(format!("omcp-explore-{}-{}.md", std::process::id(), nanos))
 }
 
 fn compose_exec_prompt(user_prompt: &str, prompt_contract: &str) -> String {

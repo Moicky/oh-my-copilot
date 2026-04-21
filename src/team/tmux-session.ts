@@ -769,9 +769,10 @@ function resolveWorkerLaunchArgs(extraArgs: string[] = [], cwd: string = process
   if (wantsBypass && !merged.includes(COPILOT_BYPASS_FLAG)) {
     merged.push(COPILOT_BYPASS_FLAG);
   }
-  if (shouldBypassDefaultSystemPrompt(env) && !hasModelInstructionsOverride(merged)) {
-    merged.push(CONFIG_FLAG, buildModelInstructionsOverride(cwd, env));
-  }
+  // Copilot CLI auto-loads AGENTS.md from cwd; it has no `-c model_instructions_file=...`
+  // equivalent to Codex's per-session override, so the bypass injection is a no-op here.
+  void cwd;
+  void env;
   return merged;
 }
 

@@ -36,7 +36,7 @@ function runOmcp(
 }
 
 describe('omcp exec', () => {
-  it('runs copilot -p with session-scoped instructions that preserve AGENTS and overlay content', async () => {
+  it('runs copilot -p with non-interactive flags injected for scripting', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-exec-cli-'));
     try {
       const home = join(wd, 'home');
@@ -80,11 +80,9 @@ describe('omcp exec', () => {
       });
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);
-      assert.match(result.stdout, /fake-codex:exec --model gpt-5 say hi /);
-      assert.match(result.stdout, /instructions-path:.*\/\.omcp\/state\/sessions\/omcp-.*\/AGENTS\.md/);
-      assert.match(result.stdout, /# User Instructions/);
-      assert.match(result.stdout, /# Project Instructions/);
-      assert.match(result.stdout, /<!-- OMCP:RUNTIME:START -->/);
+      assert.match(result.stdout, /fake-codex:-p say hi --model gpt-5/);
+      assert.match(result.stdout, /--allow-all-tools/);
+      assert.match(result.stdout, /--no-ask-user/);
 
       const sessionRoot = join(wd, '.omcp', 'state', 'sessions');
       const sessionEntries = await readdir(sessionRoot);
@@ -97,7 +95,7 @@ describe('omcp exec', () => {
     }
   });
 
-  it('passes exec --help through to copilot -p', async () => {
+  it('passes --help through to copilot', async () => {
     const wd = await mkdtemp(join(tmpdir(), 'omcp-exec-help-'));
     try {
       const home = join(wd, 'home');
@@ -122,7 +120,7 @@ describe('omcp exec', () => {
       });
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);
-      assert.match(result.stdout, /fake-codex:exec --help\b/);
+      assert.match(result.stdout, /fake-codex:--help/);
       assert.doesNotMatch(result.stdout, /oh-my-copilot \(omcp\) - Multi-agent orchestration for Copilot CLI/i);
     } finally {
       await rm(wd, { recursive: true, force: true });

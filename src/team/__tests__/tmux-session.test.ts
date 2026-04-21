@@ -1197,7 +1197,7 @@ describe('buildWorkerStartupCommand', () => {
     }
   });
 
-  it('injects model_instructions_file override by default', () => {
+  it('does not inject -c model_instructions_file override (copilot has no equivalent flag)', () => {
     const prevShell = process.env.SHELL;
     process.env.SHELL = '/bin/bash';
     const prevBypass = process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
@@ -1206,9 +1206,7 @@ describe('buildWorkerStartupCommand', () => {
     delete process.env.OMCP_MODEL_INSTRUCTIONS_FILE;
     try {
       const cmd = buildWorkerStartupCommand('alpha', 1, [], '/tmp/project');
-      assert.match(cmd, /'-c'/);
-      assert.match(cmd, /model_instructions_file=/);
-      assert.match(cmd, /AGENTS\.md/);
+      assert.doesNotMatch(cmd, /model_instructions_file=/);
     } finally {
       if (typeof prevShell === 'string') process.env.SHELL = prevShell;
       else delete process.env.SHELL;
@@ -1220,7 +1218,7 @@ describe('buildWorkerStartupCommand', () => {
   });
 
 
-  it('uses per-worker OMCP_MODEL_INSTRUCTIONS_FILE from extraEnv when building process launch spec', () => {
+  it('passes through reasoning and instructions args without re-injecting copilot-incompatible flags', () => {
     const prevBypass = process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
     const prevInstr = process.env.OMCP_MODEL_INSTRUCTIONS_FILE;
     delete process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
@@ -1229,14 +1227,15 @@ describe('buildWorkerStartupCommand', () => {
       const spec = buildWorkerProcessLaunchSpec(
         'alpha',
         1,
-        ['-c', 'model_reasoning_effort="low"'],
+        ['--reasoning-effort', 'low'],
         '/tmp/project',
         { OMCP_MODEL_INSTRUCTIONS_FILE: '/tmp/project/.omcp/state/team/alpha/workers/worker-1/AGENTS.md' },
         'copilot',
       );
       const joined = spec.args.join(' ');
-      assert.match(joined, /model_reasoning_effort="low"/);
-      assert.match(joined, /model_instructions_file="\/tmp\/project\/.omcp\/state\/team\/alpha\/workers\/worker-1\/AGENTS\.md"/);
+      assert.match(joined, /--reasoning-effort low/);
+      // model_instructions_file is a Codex-only concept; copilot should not see it.
+      assert.doesNotMatch(joined, /model_instructions_file=/);
     } finally {
       if (typeof prevBypass === 'string') process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT = prevBypass;
       else delete process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
@@ -1261,7 +1260,7 @@ describe('buildWorkerStartupCommand', () => {
     }
   });
 
-  it('does not inject model_instructions_file when already provided in launch args', () => {
+  it('preserves caller-supplied model_instructions_file flag verbatim (caller is responsible for its compatibility)', () => {
     const prevShell = process.env.SHELL;
     process.env.SHELL = '/bin/bash';
     const prevBypass = process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
@@ -1284,7 +1283,7 @@ describe('buildWorkerStartupCommand', () => {
     }
   });
 
-  it('translates model_instructions_file path for MSYS2/Git Bash environments', () => {
+  it('does not auto-inject model_instructions_file from env on the copilot fork (MSYS2/Git Bash path translation is moot)', () => {
     const prevShell = process.env.SHELL;
     const prevBypass = process.env.OMCP_BYPASS_DEFAULT_SYSTEM_PROMPT;
     const prevInstructions = process.env.OMCP_MODEL_INSTRUCTIONS_FILE;
@@ -1297,7 +1296,7 @@ describe('buildWorkerStartupCommand', () => {
     Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
     try {
       const cmd = buildWorkerStartupCommand('alpha', 1, [], 'C:\\repo');
-      assert.match(cmd, /model_instructions_file=\"\/c\/repo\/AGENTS\.md\"/);
+      assert.doesNotMatch(cmd, /model_instructions_file=/);
     } finally {
       if (origPlatform) Object.defineProperty(process, 'platform', origPlatform);
       if (typeof prevShell === 'string') process.env.SHELL = prevShell;

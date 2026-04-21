@@ -1118,7 +1118,7 @@ export async function execWithOverlay(args: string[]): Promise<void> {
       : null;
     const codexArgs = injectModelInstructionsBypassArgs(
       cwd,
-      ["exec", ...normalizedArgs],
+      translateExecArgsToCopilot(normalizedArgs),
       process.env,
       sessionModelInstructionsPath(cwd, sessionId),
     );
@@ -1189,10 +1189,111 @@ export function normalizeCodexLaunchArgs(args: string[]): string[] {
   }
 
   if (reasoningMode) {
-    normalized.push(CONFIG_FLAG, `${REASONING_KEY}="${reasoningMode}"`);
+    // Copilot CLI uses `--reasoning-effort <level>` (Codex used `-c model_reasoning_effort="..."`).
+    normalized.push("--reasoning-effort", reasoningMode);
   }
 
   return normalized;
+}
+
+/**
+ * Translate `omcp exec [flags] <prompt>` args into the `copilot` CLI's
+ * non-interactive flag set. Codex CLI used the `exec` subcommand with the
+ * prompt as a positional arg; Copilot CLI uses top-level `copilot -p <prompt>
+ * --allow-all-tools --no-ask-user --silent --no-color`.
+ *
+ * This is intentionally conservative: any leading `-`-prefixed args are
+ * preserved in-place so callers can still pass `--model`, `--reasoning-effort`,
+ * `--allow-all-tools`, etc. The first non-flag argument is treated as the
+ * prompt and moved behind `-p`. If no positional prompt is present (e.g. the
+ * caller only passed flags), we still emit the required non-interactive
+ * permissions flags and let copilot complain about the missing prompt.
+ */
+export function translateExecArgsToCopilot(args: string[]): string[] {
+  // Flags that take a value as the next arg; when we see them, we must keep
+  // that value with the flag rather than letting it be misclassified as the
+  // positional prompt.
+  const VALUE_FLAGS = new Set([
+    "-p",
+    "--prompt",
+    "-i",
+    "--interactive",
+    "--model",
+    "--reasoning-effort",
+    "--effort",
+    "--add-dir",
+    "--config-dir",
+    "--plugin-dir",
+    "--agent",
+    "--mode",
+    "--output-format",
+    "--resume",
+  ]);
+
+  const out: string[] = [];
+  let promptArg: string | undefined;
+  let sawPromptFlag = false;
+  let i = 0;
+  while (i < args.length) {
+    const arg = args[i];
+    if (arg === "--") {
+      for (let j = i + 1; j < args.length; j++) {
+        if (promptArg === undefined) {
+          promptArg = args[j];
+        } else {
+          out.push(args[j]);
+        }
+      }
+      break;
+    }
+    if (arg === "-p" || arg === "--prompt") {
+      sawPromptFlag = true;
+      out.push(arg);
+      if (i + 1 < args.length) {
+        out.push(args[i + 1]);
+        i += 2;
+        continue;
+      }
+      i += 1;
+      continue;
+    }
+    if (arg.startsWith("-")) {
+      // `--flag=value` form always stays as-is.
+      if (arg.includes("=")) {
+        out.push(arg);
+        i += 1;
+        continue;
+      }
+      out.push(arg);
+      if (VALUE_FLAGS.has(arg) && i + 1 < args.length) {
+        out.push(args[i + 1]);
+        i += 2;
+        continue;
+      }
+      i += 1;
+      continue;
+    }
+    if (promptArg === undefined) {
+      promptArg = arg;
+      i += 1;
+      continue;
+    }
+    out.push(arg);
+    i += 1;
+  }
+
+  if (promptArg !== undefined && !sawPromptFlag) {
+    out.unshift("-p", promptArg);
+  }
+
+  const ensureFlag = (flag: string) => {
+    if (!out.includes(flag)) out.push(flag);
+  };
+  ensureFlag("--allow-all-tools");
+  ensureFlag("--no-ask-user");
+  ensureFlag("--silent");
+  ensureFlag("--no-color");
+  return out;
 }
 
 /**
@@ -1333,13 +1434,15 @@ export function injectModelInstructionsBypassArgs(
   env: NodeJS.ProcessEnv = process.env,
   defaultFilePath?: string,
 ): string[] {
-  if (!shouldBypassDefaultSystemPrompt(env)) return [...args];
-  if (hasModelInstructionsOverride(args)) return [...args];
-  return [
-    ...args,
-    CONFIG_FLAG,
-    buildModelInstructionsOverride(cwd, env, defaultFilePath),
-  ];
+  // Copilot CLI has no equivalent of Codex CLI's `-c model_instructions_file=...`
+  // It auto-loads AGENTS.md from cwd (and supports --no-custom-instructions to
+  // opt out). So this injection is a no-op on the Copilot fork; we keep the
+  // function signature for upstream-mergeable diff and for callers that still
+  // pass the cwd/defaultFilePath for logging purposes.
+  void cwd;
+  void env;
+  void defaultFilePath;
+  return [...args];
 }
 
 export function collectInheritableTeamWorkerArgs(
