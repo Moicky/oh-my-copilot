@@ -44,7 +44,7 @@ import {
   type CopilotMcpServerEntry,
   type UnifiedMcpRegistryLoadResult,
 } from "../config/mcp-registry.js";
-import { generateAgentToml } from "../agents/native-config.js";
+import { generateAgentMarkdown } from "../agents/native-config.js";
 import { AGENT_DEFINITIONS } from "../agents/definitions.js";
 import { getPackageRoot } from "../utils/package.js";
 import { readSessionState, isSessionStale } from "../hooks/session.js";
@@ -1080,7 +1080,7 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   console.log("  3. Browse skills with /skills; AGENTS keyword routing can also activate them implicitly");
   console.log("  4. The AGENTS.md orchestration brain is loaded automatically");
   console.log(
-    "  5. Native agent defaults configured in config.toml [agents] and TOML files written to .copilot/agents/",
+    "  5. Native agent markdown files written to .copilot/agents/*.md (Copilot CLI reads these directly)",
   );
   console.log(
     '  6. "omcp explore" and "omcp sparkshell" can hydrate native release binaries on first use; source installs still allow repo-local fallbacks and OMCP_EXPLORE_BIN / OMCP_SPARKSHELL_BIN overrides',
@@ -1386,7 +1386,7 @@ async function refreshNativeAgentConfigs(
     if (agentStatusByName && !isInstallableStatus(status)) {
       if (options.verbose) {
         const label = status ?? "unlisted";
-        console.log(`  skipped native agent ${name}.toml (status: ${label})`);
+        console.log(`  skipped native agent ${name}.md (status: ${label})`);
       }
       summary.skipped += 1;
       continue;
@@ -1398,18 +1398,34 @@ async function refreshNativeAgentConfigs(
     }
 
     const promptContent = await readFile(promptPath, "utf-8");
-    const toml = generateAgentToml(agent, promptContent, {
+    const md = generateAgentMarkdown(agent, promptContent, {
       copilotHomeOverride: join(agentsDir, ".."),
     });
-    const dst = join(agentsDir, `${name}.toml`);
+    const dst = join(agentsDir, `${name}.md`);
     await syncManagedContent(
-      toml,
+      md,
       dst,
       summary,
       backupContext,
       options,
-      `native agent ${name}.toml`,
+      `native agent ${name}.md`,
     );
+    // Remove any legacy .toml agent config left over from the Codex era so
+    // copilot doesn't show stale entries alongside the new .md agents.
+    const legacyTomlPath = join(agentsDir, `${name}.toml`);
+    if (existsSync(legacyTomlPath)) {
+      await ensureBackup(legacyTomlPath, true, backupContext, options);
+      if (!options.dryRun) {
+        await rm(legacyTomlPath, { force: true });
+      }
+      summary.removed += 1;
+      if (options.verbose) {
+        const prefix = options.dryRun
+          ? "would remove legacy .toml native agent"
+          : "removed legacy .toml native agent";
+        console.log(`  ${prefix} ${name}.toml`);
+      }
+    }
   }
 
   summary.removed += await cleanupObsoleteNativeAgents(
@@ -1421,8 +1437,8 @@ async function refreshNativeAgentConfigs(
   if (options.force && manifest && existsSync(agentsDir)) {
     const installedFiles = await readdir(agentsDir);
     for (const file of installedFiles) {
-      if (!file.endsWith(".toml")) continue;
-      const agentName = file.slice(0, -5);
+      if (!file.endsWith(".md") && !file.endsWith(".toml")) continue;
+      const agentName = file.replace(/\.(md|toml)$/, "");
       const agentStatus = agentStatusByName?.get(agentName);
       if (isInstallableStatus(agentStatus)) continue;
       if (

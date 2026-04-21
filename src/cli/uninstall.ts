@@ -276,17 +276,19 @@ async function removeAgentConfigs(
   const agentNames = Object.keys(AGENT_DEFINITIONS);
 
   for (const name of agentNames) {
-    const configFile = join(agentsDir, `${name}.toml`);
-    if (!existsSync(configFile)) continue;
+    for (const ext of ["md", "toml"] as const) {
+      const configFile = join(agentsDir, `${name}.${ext}`);
+      if (!existsSync(configFile)) continue;
 
-    if (!options.dryRun) {
-      await rm(configFile, { force: true });
+      if (!options.dryRun) {
+        await rm(configFile, { force: true });
+      }
+      if (options.verbose)
+        console.log(
+          `  ${options.dryRun ? "Would remove" : "Removed"} agent config: ${name}.${ext}`,
+        );
+      removed++;
     }
-    if (options.verbose)
-      console.log(
-        `  ${options.dryRun ? "Would remove" : "Removed"} agent config: ${name}.toml`,
-      );
-    removed++;
   }
 
   // If the agents dir is now empty, remove it too

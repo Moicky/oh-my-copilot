@@ -1,6 +1,14 @@
 /**
  * Native agent config generators for Copilot CLI.
- * Writes standalone TOML files under ~/.copilot/agents/ or ./.copilot/agents/.
+ *
+ * Copilot CLI loads custom agents from markdown files with YAML frontmatter
+ * under ~/.copilot/agents/*.md (or ./.copilot/agents/*.md for project scope).
+ * The frontmatter holds `name`, `description`, and `model`; the body is the
+ * agent's system prompt.
+ *
+ * NOTE: This module previously emitted Codex-compatible .toml files with
+ * fields like `developer_instructions` and `model_reasoning_effort`. Copilot
+ * ignores that schema entirely — see fix/copilot-agents-md migration.
  */
 
 import { existsSync, readFileSync } from "fs";
@@ -100,8 +108,17 @@ const EXACT_MINI_MODEL_OVERLAY = [
 export interface GeneratedNativeAgentConfig {
   name: string;
   description: string;
-  developerInstructions?: string;
+  /**
+   * Body of the agent markdown file — used verbatim as the system prompt.
+   * Previously this was `developer_instructions` when OMCP targeted Codex.
+   */
+  systemPrompt?: string;
   model?: string;
+  /**
+   * Retained for internal metadata; Copilot agent frontmatter does not
+   * currently expose a per-agent reasoning effort knob, so this is appended to
+   * the body as metadata rather than written as a frontmatter key.
+   */
   reasoningEffort?: "low" | "medium" | "high" | "xhigh";
 }
 
@@ -248,66 +265,67 @@ export function stripFrontmatter(content: string): string {
 }
 
 /**
- * Escape content for TOML triple-quoted strings.
- * TOML """ strings only need to escape sequences of 3+ consecutive quotes.
+ * Escape a YAML 1.2 scalar safely — prefers a single-quoted string which only
+ * needs single-quote doubling. Returns the fully quoted value.
  */
-function escapeTomlMultiline(s: string): string {
-  return s.replace(/"{3,}/g, (match) => match.split("").join("\\"));
-}
-
-function escapeTomlBasicString(s: string): string {
-  return s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-}
-
-export function generateStandaloneAgentToml(
-  config: GeneratedNativeAgentConfig,
-): string {
-  const lines = [
-    `# oh-my-copilot agent: ${config.name}`,
-    `name = "${escapeTomlBasicString(config.name)}"`,
-    `description = "${escapeTomlBasicString(config.description)}"`,
-  ];
-
-  if (config.model) {
-    lines.push(`model = "${escapeTomlBasicString(config.model)}"`);
-  }
-  if (config.reasoningEffort) {
-    lines.push(`model_reasoning_effort = "${config.reasoningEffort}"`);
-  }
-  if (
-    typeof config.developerInstructions === "string" &&
-    config.developerInstructions.trim().length > 0
-  ) {
-    const escapedInstructions = escapeTomlMultiline(
-      config.developerInstructions,
-    );
-    lines.push('developer_instructions = """', escapedInstructions, '"""');
-  }
-
-  lines.push("");
-  return lines.join("\n");
+function quoteYamlScalar(s: string): string {
+  return `'${s.replace(/'/g, "''")}'`;
 }
 
 /**
- * Generate TOML content for a prompt-backed OMCP role agent.
+ * Render a description field. Short single-line values use a single-quoted
+ * scalar. Multi-line content uses a YAML literal block (`|`) so the markdown
+ * inside is preserved without escaping.
  */
-export function generateAgentToml(
+function renderYamlDescription(description: string): string {
+  const normalized = description.replace(/\r\n/g, "\n");
+  if (!normalized.includes("\n")) {
+    return `description: ${quoteYamlScalar(normalized)}`;
+  }
+  const indented = normalized
+    .split("\n")
+    .map((line) => (line.length > 0 ? `  ${line}` : ""))
+    .join("\n");
+  return `description: |\n${indented}`;
+}
+
+export function generateStandaloneAgentMarkdown(
+  config: GeneratedNativeAgentConfig,
+): string {
+  const frontmatter: string[] = [
+    "---",
+    `name: ${quoteYamlScalar(config.name)}`,
+    renderYamlDescription(config.description),
+  ];
+  if (config.model) {
+    frontmatter.push(`model: ${quoteYamlScalar(config.model)}`);
+  }
+  frontmatter.push("---", "");
+
+  const body = (config.systemPrompt ?? "").trim();
+  return `${frontmatter.join("\n")}${body}\n`;
+}
+
+/**
+ * Generate markdown content for a prompt-backed OMCP role agent.
+ */
+export function generateAgentMarkdown(
   agent: AgentDefinition,
   promptContent: string,
   options: AgentModelResolutionOptions = {},
 ): string {
   const resolvedModel = resolveAgentModel(agent, options);
-  return generateStandaloneAgentToml({
+  return generateStandaloneAgentMarkdown({
     name: agent.name,
     description: agent.description,
-    developerInstructions: composeRoleInstructions(promptContent, agent, resolvedModel),
+    systemPrompt: composeRoleInstructions(promptContent, agent, resolvedModel),
     model: resolvedModel,
     reasoningEffort: agent.reasoningEffort,
   });
 }
 
 /**
- * Install prompt-backed native agent config .toml files to ~/.copilot/agents/
+ * Install prompt-backed native agent config .md files to ~/.copilot/agents/.
  * Returns the number of agent files written.
  */
 export async function installNativeAgentConfigs(
@@ -340,19 +358,19 @@ export async function installNativeAgentConfigs(
       continue;
     }
 
-    const dst = join(agentsDir, `${name}.toml`);
+    const dst = join(agentsDir, `${name}.md`);
     if (!force && existsSync(dst)) {
       if (verbose) console.log(`  skip ${name} (already exists)`);
       continue;
     }
 
     const promptContent = await readFile(promptPath, "utf-8");
-    const toml = generateAgentToml(agent, promptContent, { copilotHomeOverride });
+    const md = generateAgentMarkdown(agent, promptContent, { copilotHomeOverride });
 
     if (!dryRun) {
-      await writeFile(dst, toml);
+      await writeFile(dst, md);
     }
-    if (verbose) console.log(`  ${name}.toml`);
+    if (verbose) console.log(`  ${name}.md`);
     count += 1;
   }
 

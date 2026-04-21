@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { afterEach, beforeEach, describe, it } from "node:test";
 import type { AgentDefinition } from "../definitions.js";
 import {
-  generateAgentToml,
+  generateAgentMarkdown,
   installNativeAgentConfigs,
 } from "../native-config.js";
 
@@ -25,7 +25,7 @@ afterEach(() => {
 });
 
 describe("agents/native-config", () => {
-  it("generates TOML with stripped frontmatter and escaped triple quotes", () => {
+  it("generates markdown with YAML frontmatter and stripped body frontmatter", () => {
     const agent: AgentDefinition = {
       name: "executor",
       description: "Code implementation",
@@ -37,23 +37,21 @@ describe("agents/native-config", () => {
       category: "build",
     };
 
-    const prompt = `---\ntitle: demo\n---\n\nInstruction line\n\"\"\"danger\"\"\"`;
-    const toml = generateAgentToml(agent, prompt);
+    const prompt = `---\ntitle: demo\n---\n\nInstruction line\n\"\"\"safe\"\"\"`;
+    const md = generateAgentMarkdown(agent, prompt);
 
-    assert.match(toml, /# oh-my-copilot agent: executor/);
-    assert.match(toml, /model = "gpt-5\.4"/);
-    assert.match(toml, /model_reasoning_effort = "medium"/);
-    assert.ok(!toml.includes("title: demo"));
-    assert.ok(toml.includes("Instruction line"));
-    assert.ok(toml.includes("You are operating in the deep-worker posture."));
-    assert.ok(toml.includes("- posture: deep-worker"));
-
-    const tripleQuoteBlocks = toml.match(/"""/g) || [];
-    assert.equal(
-      tripleQuoteBlocks.length,
-      2,
-      "only TOML delimiters should remain as raw triple quotes",
-    );
+    assert.match(md, /^---\n/);
+    assert.match(md, /\nname: 'executor'\n/);
+    assert.match(md, /\nmodel: 'gpt-5\.4'\n/);
+    assert.match(md, /\ndescription: 'Code implementation'\n/);
+    // frontmatter should close before body
+    assert.match(md, /\n---\nInstruction line/);
+    assert.ok(!md.includes("title: demo"));
+    assert.ok(md.includes("Instruction line"));
+    assert.ok(md.includes("You are operating in the deep-worker posture."));
+    assert.ok(md.includes("- posture: deep-worker"));
+    // triple quotes from body must be preserved verbatim
+    assert.ok(md.includes('"""safe"""'));
   });
 
   it("applies exact-model mini guidance only for resolved gpt-5.4-mini standard roles", () => {
@@ -69,21 +67,21 @@ describe("agents/native-config", () => {
     };
 
     const prompt = "Instruction line";
-    const exactMiniToml = generateAgentToml(agent, prompt, {
+    const exactMiniMd = generateAgentMarkdown(agent, prompt, {
       env: { OMCP_DEFAULT_STANDARD_MODEL: "gpt-5.4-mini" } as NodeJS.ProcessEnv,
     });
-    const frontierToml = generateAgentToml(agent, prompt, {
+    const frontierMd = generateAgentMarkdown(agent, prompt, {
       env: { OMCP_DEFAULT_STANDARD_MODEL: "gpt-5.4" } as NodeJS.ProcessEnv,
     });
-    const tunedToml = generateAgentToml(agent, prompt, {
+    const tunedMd = generateAgentMarkdown(agent, prompt, {
       env: { OMCP_DEFAULT_STANDARD_MODEL: "gpt-5.4-mini-tuned" } as NodeJS.ProcessEnv,
     });
 
-    assert.match(exactMiniToml, /exact gpt-5\.4-mini model/);
-    assert.match(exactMiniToml, /strict execution order: inspect -> plan -> act -> verify/);
-    assert.match(exactMiniToml, /resolved_model: gpt-5\.4-mini/);
-    assert.doesNotMatch(frontierToml, /exact gpt-5\.4-mini model/);
-    assert.doesNotMatch(tunedToml, /exact gpt-5\.4-mini model/);
+    assert.match(exactMiniMd, /exact gpt-5\.4-mini model/);
+    assert.match(exactMiniMd, /strict execution order: inspect -> plan -> act -> verify/);
+    assert.match(exactMiniMd, /resolved_model: gpt-5\.4-mini/);
+    assert.doesNotMatch(frontierMd, /exact gpt-5\.4-mini model/);
+    assert.doesNotMatch(tunedMd, /exact gpt-5\.4-mini model/);
   });
 
   it("installs only agents with prompt files and skips existing files without force", async () => {
@@ -100,15 +98,16 @@ describe("agents/native-config", () => {
         agentsDir: outDir,
       });
       assert.equal(created, 2);
-      assert.equal(existsSync(join(outDir, "executor.toml")), true);
-      assert.equal(existsSync(join(outDir, "planner.toml")), true);
+      assert.equal(existsSync(join(outDir, "executor.md")), true);
+      assert.equal(existsSync(join(outDir, "planner.md")), true);
 
-      const executorToml = await readFile(
-        join(outDir, "executor.toml"),
+      const executorMd = await readFile(
+        join(outDir, "executor.md"),
         "utf8",
       );
-      assert.match(executorToml, /model = "gpt-5\.4"/);
-      assert.match(executorToml, /model_reasoning_effort = "high"/);
+      assert.match(executorMd, /^---\n/);
+      assert.match(executorMd, /\nmodel: 'gpt-5\.4'\n/);
+      assert.match(executorMd, /- resolved_model: gpt-5\.4/);
 
       const skipped = await installNativeAgentConfigs(root, {
         agentsDir: outDir,
@@ -135,9 +134,9 @@ describe("agents/native-config", () => {
       await writeFile(join(promptsDir, "debugger.md"), "debugger prompt");
 
       await installNativeAgentConfigs(root, { agentsDir: outDir });
-      const debuggerToml = await readFile(join(outDir, "debugger.toml"), "utf8");
-      assert.match(debuggerToml, /model = "gpt-5\.4-mini"/);
-      assert.doesNotMatch(debuggerToml, /model = "gpt-5\.2"/);
+      const debuggerMd = await readFile(join(outDir, "debugger.md"), "utf8");
+      assert.match(debuggerMd, /\nmodel: 'gpt-5\.4-mini'\n/);
+      assert.doesNotMatch(debuggerMd, /\nmodel: 'gpt-5\.2'\n/);
     } finally {
       if (typeof previousCodexHome === "string") process.env.COPILOT_HOME = previousCodexHome;
       else delete process.env.COPILOT_HOME;
@@ -162,8 +161,8 @@ describe("agents/native-config", () => {
       await writeFile(join(promptsDir, "executor.md"), "executor prompt");
 
       await installNativeAgentConfigs(root, { agentsDir: outDir });
-      const executorToml = await readFile(join(outDir, "executor.toml"), "utf8");
-      assert.match(executorToml, /model = "gpt-5\.2"/);
+      const executorMd = await readFile(join(outDir, "executor.md"), "utf8");
+      assert.match(executorMd, /\nmodel: 'gpt-5\.2'\n/);
     } finally {
       if (typeof previousCodexHome === "string") process.env.COPILOT_HOME = previousCodexHome;
       else delete process.env.COPILOT_HOME;
