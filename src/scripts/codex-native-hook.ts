@@ -1705,6 +1705,25 @@ export async function dispatchCodexNativeHook(
     await dispatchHookEvent(event, { cwd });
   }
 
+  // Fire session-idle lifecycle notification on Stop events so Discord / Slack /
+  // Telegram / custom callbacks receive per-turn alerts under Copilot CLI.
+  // (Codex previously fed this via the legacy `notify = [...]` hook which
+  // Copilot does not consume; the Stop hook is its closest equivalent.)
+  if (hookEventName === "Stop" && !process.env.OMCP_TEAM_WORKER) {
+    try {
+      const notifySessionId = canonicalSessionId || nativeSessionId || eventSessionId || null;
+      if (notifySessionId) {
+        const { notifyLifecycle } = await import("../notifications/index.js");
+        await notifyLifecycle("session-idle", {
+          sessionId: notifySessionId,
+          projectPath: cwd,
+        });
+      }
+    } catch {
+      // Non-fatal: notification module may not be configured.
+    }
+  }
+
   let outputJson: Record<string, unknown> | null = null;
   if (hookEventName === "SessionStart" || hookEventName === "UserPromptSubmit") {
     const additionalContext = hookEventName === "SessionStart"
