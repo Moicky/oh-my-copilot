@@ -92,7 +92,7 @@ describe("codex hooks helpers", () => {
       }),
     );
 
-    assert.deepEqual(missing, ["PreToolUse", "PostToolUse", "UserPromptSubmit", "Stop"]);
+    assert.deepEqual(missing, ["PreToolUse", "PostToolUse", "UserPromptSubmit", "Stop", "ErrorOccurred"]);
   });
 
   it("returns null for invalid hooks.json content", () => {

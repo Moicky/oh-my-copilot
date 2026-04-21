@@ -6,6 +6,10 @@ export const MANAGED_HOOK_EVENTS = [
   "PostToolUse",
   "UserPromptSubmit",
   "Stop",
+  // ErrorOccurred is the documented Copilot CLI event that fires when an error
+  // occurs during a session. We subscribe so OMCP can surface failures via
+  // notifications (Discord/Slack/Telegram) and the hook extensibility pipeline.
+  "ErrorOccurred",
 ] as const;
 
 type ManagedHookEventName = (typeof MANAGED_HOOK_EVENTS)[number];
@@ -87,6 +91,11 @@ export function buildManagedCodexHooksConfig(
       Stop: [
         buildCommandHook(command, {
           timeout: 30,
+        }),
+      ],
+      ErrorOccurred: [
+        buildCommandHook(command, {
+          timeout: 15,
         }),
       ],
     },
