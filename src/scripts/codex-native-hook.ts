@@ -1761,11 +1761,54 @@ interface NativeHookCliReadResult {
   parseError: Error | null;
 }
 
+// Maximum wait for stdin EOF before treating the payload as empty. Copilot CLI
+// does not always close stdin on Stop hook invocations (Codex did), so an
+// unbounded `for await (const chunk of stdin)` blocks until Copilot's 30s hook
+// timeout — defeating the Stop hook entirely. With this guard we still consume
+// any payload Copilot sends but never block past the deadline.
+const STDIN_READ_TIMEOUT_MS = Number(
+  process.env.OMCP_HOOK_STDIN_TIMEOUT_MS ?? 1500,
+);
+
 async function readStdinJson(): Promise<NativeHookCliReadResult> {
   const chunks: Buffer[] = [];
-  for await (const chunk of process.stdin) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
+
+  if (process.stdin.isTTY) {
+    return { payload: {}, parseError: null };
   }
+
+  await new Promise<void>((resolve) => {
+    let settled = false;
+    const finalize = () => {
+      if (settled) return;
+      settled = true;
+      try {
+        process.stdin.removeListener("data", onData);
+        process.stdin.removeListener("end", onEnd);
+        process.stdin.removeListener("error", onEnd);
+        // Detach stdin from the event loop so an open-but-idle pipe (e.g.
+        // Copilot's Stop hook on some platforms) cannot keep the process alive
+        // past the deadline.
+        process.stdin.pause();
+        if (typeof (process.stdin as { unref?: () => void }).unref === "function") {
+          (process.stdin as { unref: () => void }).unref();
+        }
+      } catch {
+        // best effort
+      }
+      resolve();
+    };
+    const onData = (chunk: Buffer | string) => {
+      chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(String(chunk)));
+    };
+    const onEnd = () => finalize();
+    const timer = setTimeout(finalize, STDIN_READ_TIMEOUT_MS);
+    if (typeof timer.unref === "function") timer.unref();
+    process.stdin.on("data", onData);
+    process.stdin.once("end", onEnd);
+    process.stdin.once("error", onEnd);
+  });
+
   const raw = Buffer.concat(chunks).toString("utf-8").trim();
   if (!raw) {
     return { payload: {}, parseError: null };
@@ -1806,12 +1849,21 @@ export async function runCodexNativeHookCli(): Promise<void> {
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-  runCodexNativeHookCli().catch((error) => {
-    process.stderr.write(
-      `[omcp] codex-native-hook failed: ${
-        error instanceof Error ? error.message : String(error)
-      }\n`,
-    );
-    process.exitCode = 1;
-  });
+  runCodexNativeHookCli()
+    .catch((error) => {
+      process.stderr.write(
+        `[omcp] codex-native-hook failed: ${
+          error instanceof Error ? error.message : String(error)
+        }\n`,
+      );
+      process.exitCode = 1;
+    })
+    .finally(() => {
+      // Force-exit so a still-open stdin pipe (e.g. Copilot Stop hook on some
+      // platforms) cannot keep the event loop alive past the 30s hook timeout.
+      // All meaningful work is awaited above; pending I/O at this point is
+      // either fire-and-forget telemetry or background timers.
+      const code = typeof process.exitCode === "number" ? process.exitCode : 0;
+      process.exit(code);
+    });
 }
