@@ -11,6 +11,7 @@ const COPILOT_BYPASS_FLAG = '--allow-all-tools';
 const MODEL_FLAG = '--model';
 const CONFIG_FLAG = '-c';
 const REASONING_KEY = 'model_reasoning_effort';
+const COPILOT_REASONING_FLAG = '--reasoning-effort';
 
 const LOW_COMPLEXITY_AGENT_TYPES = new Set([
   'explore',
@@ -25,7 +26,7 @@ export type TeamReasoningEffort = 'low' | 'medium' | 'high' | 'xhigh';
 export interface ParsedTeamWorkerLaunchArgs {
   passthrough: string[];
   wantsBypass: boolean;
-  reasoningOverride: string | null;
+  reasoningOverride: TeamReasoningEffort | null;
   modelOverride: string | null;
 }
 
@@ -39,6 +40,13 @@ export interface ResolveTeamWorkerLaunchArgsOptions {
 
 function isReasoningOverride(value: string): boolean {
   return new RegExp(`^${REASONING_KEY}\\s*=`).test(value.trim());
+}
+
+function extractReasoningLevelFromCodexPair(value: string): TeamReasoningEffort | undefined {
+  // Accept `model_reasoning_effort="medium"` or `model_reasoning_effort=medium`.
+  const match = value.trim().match(/^model_reasoning_effort\s*=\s*"?([A-Za-z]+)"?\s*$/);
+  if (!match) return undefined;
+  return normalizeOptionalReasoning(match[1]);
 }
 
 function isValidModelValue(value: string): boolean {
@@ -71,7 +79,7 @@ export function splitWorkerLaunchArgs(raw: string | undefined): string[] {
 export function parseTeamWorkerLaunchArgs(args: string[]): ParsedTeamWorkerLaunchArgs {
   const passthrough: string[] = [];
   let wantsBypass = false;
-  let reasoningOverride: string | null = null;
+  let reasoningOverride: TeamReasoningEffort | null = null;
   let modelOverride: string | null = null;
 
   for (let i = 0; i < args.length; i++) {
@@ -100,10 +108,31 @@ export function parseTeamWorkerLaunchArgs(args: string[]): ParsedTeamWorkerLaunc
       continue;
     }
 
+    // Copilot-native reasoning flag: --reasoning-effort <level> or --effort <level>.
+    if (arg === COPILOT_REASONING_FLAG || arg === '--effort') {
+      const maybeValue = args[i + 1];
+      const level = typeof maybeValue === 'string' ? normalizeOptionalReasoning(maybeValue) : undefined;
+      if (level) {
+        reasoningOverride = level;
+        i += 1;
+      }
+      continue;
+    }
+    if (arg.startsWith(`${COPILOT_REASONING_FLAG}=`) || arg.startsWith('--effort=')) {
+      const inline = arg.slice(arg.indexOf('=') + 1);
+      const level = normalizeOptionalReasoning(inline);
+      if (level) reasoningOverride = level;
+      continue;
+    }
+
+    // Legacy Codex form: `-c model_reasoning_effort="<level>"`. Accept for
+    // backwards compatibility with any persisted team state, but emit the
+    // Copilot form on serialization.
     if (arg === CONFIG_FLAG) {
       const maybeValue = args[i + 1];
       if (typeof maybeValue === 'string' && isReasoningOverride(maybeValue)) {
-        reasoningOverride = maybeValue;
+        const level = extractReasoningLevelFromCodexPair(maybeValue);
+        if (level) reasoningOverride = level;
         i += 1;
         continue;
       }
@@ -125,7 +154,7 @@ export function collectInheritableTeamWorkerArgs(codexArgs: string[]): string[] 
 
   const inherited: string[] = [];
   if (parsed.wantsBypass) inherited.push(COPILOT_BYPASS_FLAG);
-  if (parsed.reasoningOverride) inherited.push(CONFIG_FLAG, parsed.reasoningOverride);
+  if (parsed.reasoningOverride) inherited.push(COPILOT_REASONING_FLAG, parsed.reasoningOverride);
   if (parsed.modelOverride) inherited.push(MODEL_FLAG, parsed.modelOverride);
   return inherited;
 }
@@ -140,11 +169,8 @@ export function normalizeTeamWorkerLaunchArgs(
 
   if (parsed.wantsBypass) normalized.push(COPILOT_BYPASS_FLAG);
 
-  const selectedReasoning = parsed.reasoningOverride
-    ?? (normalizeOptionalReasoning(preferredReasoning)
-      ? `${REASONING_KEY}="${normalizeOptionalReasoning(preferredReasoning)}"`
-      : null);
-  if (selectedReasoning) normalized.push(CONFIG_FLAG, selectedReasoning);
+  const selectedReasoning = parsed.reasoningOverride ?? normalizeOptionalReasoning(preferredReasoning);
+  if (selectedReasoning) normalized.push(COPILOT_REASONING_FLAG, selectedReasoning);
 
   const selectedModel = normalizeOptionalModel(preferredModel) ?? normalizeOptionalModel(parsed.modelOverride);
   if (selectedModel) normalized.push(MODEL_FLAG, selectedModel);

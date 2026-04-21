@@ -301,6 +301,12 @@ export function paneLooksReady(captured: any): boolean {
   const hasCodexWelcomePrompt = lines.some((line) => /\bhow can i help(?: you)?\b/i.test(line));
   if (hasCodexWelcomePrompt) return true;
 
+  // Copilot CLI welcome screen: shows the GitHub Copilot banner with a
+  // "Describe a task to get started." caption once the TUI is ready for input.
+  const hasCopilotWelcome = lines.some((line) => /\bGitHub Copilot\b/i.test(line))
+    && lines.some((line) => /\bDescribe a task\b/i.test(line));
+  if (hasCopilotWelcome) return true;
+
   return lines.some((line) => /^\s*(?:[›>❯]\s*)?[A-Z][A-Z0-9]+-\d+\s+only(?:\s*(?:…|\.{3}))?\s*$/iu.test(line));
 }
 
@@ -309,10 +315,22 @@ export function paneShowsCodexViewport(captured: any): boolean {
   if (lines.length === 0) return false;
   if (paneIsBootstrapping(lines)) return false;
 
+  // Codex showed an "OpenAI Codex" banner with model:/directory: rows.
   const hasCodexBanner = lines.some((line) => /\bOpenAI Codex\b/i.test(line));
-  if (!hasCodexBanner) return false;
+  if (hasCodexBanner) {
+    return lines.some((line) => /(?:^|\s)(?:model|directory):/i.test(line));
+  }
 
-  return lines.some((line) => /(?:^|\s)(?:model|directory):/i.test(line));
+  // Copilot CLI shows a "GitHub Copilot vX.Y.Z" banner with a "Describe a
+  // task to get started." subtitle. Once that splash has rendered, the pane
+  // is a live copilot viewport even if the input row hasn't drawn yet.
+  const hasCopilotBanner = lines.some((line) => /\bGitHub Copilot\b/i.test(line));
+  if (!hasCopilotBanner) return false;
+  return lines.some((line) =>
+    /\bDescribe a task\b/i.test(line)
+    || /\bCopilot uses AI\b/i.test(line)
+    || /\bcopilot[- ]instructions\.md\b/i.test(line)
+  );
 }
 
 export function paneHasActiveTask(captured: any): boolean {

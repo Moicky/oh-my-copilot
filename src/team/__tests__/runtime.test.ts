@@ -439,8 +439,8 @@ describe('runtime', () => {
         'high',
         'copilot',
       );
-      assert.deepEqual(lowArgs, ['--no-alt-screen', '-c', 'model_reasoning_effort="low"', '--model', 'gpt-5.4']);
-      assert.deepEqual(highArgs, ['--no-alt-screen', '-c', 'model_reasoning_effort="high"', '--model', 'gpt-5.4']);
+      assert.deepEqual(lowArgs, ['--no-alt-screen', '--reasoning-effort', 'low', '--model', 'gpt-5.4']);
+      assert.deepEqual(highArgs, ['--no-alt-screen', '--reasoning-effort', 'high', '--model', 'gpt-5.4']);
     } finally {
       console.log = originalLog;
     }
@@ -459,7 +459,7 @@ describe('runtime', () => {
       );
       assert.deepEqual(
         args,
-        ['--no-alt-screen', '-c', 'model_reasoning_effort="high"', '--model', expectedLowComplexityModel()],
+        ['--no-alt-screen', '--reasoning-effort', 'high', '--model', expectedLowComplexityModel()],
       );
     } finally {
       console.log = originalLog;
@@ -481,7 +481,7 @@ describe('runtime', () => {
       );
       assert.deepEqual(
         args,
-        ['--no-alt-screen', '-c', 'model_reasoning_effort="high"', '--model', expectedLowComplexityModel()],
+        ['--no-alt-screen', '--reasoning-effort', 'high', '--model', expectedLowComplexityModel()],
       );
     } finally {
       console.log = originalLog;
@@ -528,7 +528,7 @@ describe('runtime', () => {
         },
         'executor',
       );
-      assert.deepEqual(args, ['-c', 'model_reasoning_effort="high"', '--model', 'claude-3-7-sonnet']);
+      assert.deepEqual(args, ['--reasoning-effort', 'high', '--model', 'claude-3-7-sonnet']);
     } finally {
       console.log = originalLog;
     }
@@ -561,9 +561,9 @@ describe('runtime', () => {
         'low',
         'gemini',
       );
-      assert.deepEqual(codexArgs, ['--no-alt-screen', '-c', 'model_reasoning_effort="high"', '--model', 'gpt-5.4']);
-      assert.deepEqual(claudeArgs, ['--no-alt-screen', '-c', 'model_reasoning_effort="low"', '--model', 'claude-3-7-sonnet']);
-      assert.deepEqual(geminiArgs, ['-c', 'model_reasoning_effort="low"', '--model', 'gemini-2.0-pro']);
+      assert.deepEqual(codexArgs, ['--no-alt-screen', '--reasoning-effort', 'high', '--model', 'gpt-5.4']);
+      assert.deepEqual(claudeArgs, ['--no-alt-screen', '--reasoning-effort', 'low', '--model', 'claude-3-7-sonnet']);
+      assert.deepEqual(geminiArgs, ['--reasoning-effort', 'low', '--model', 'gemini-2.0-pro']);
     } finally {
       console.log = originalLog;
     }
@@ -2014,11 +2014,9 @@ process.on('SIGTERM', () => process.exit(0));
       assert.ok(worker2Args, 'worker-2 argv capture file should be written');
       const worker1Joined = worker1Args!.join(' ');
       const worker2Joined = worker2Args!.join(' ');
-      assert.match(worker1Joined, /model_reasoning_effort="medium"/);
-      assert.match(worker1Joined, /model_instructions_file=.*worker-1\/AGENTS\.md/);
+      assert.match(worker1Joined, /--reasoning-effort medium/);
       assert.match(worker1Joined, /--model gpt-5\.4/);
-      assert.match(worker2Joined, /model_reasoning_effort="high"/);
-      assert.match(worker2Joined, /model_instructions_file=.*worker-2\/AGENTS\.md/);
+      assert.match(worker2Joined, /--reasoning-effort high/);
       assert.match(worker2Joined, /--model gpt-5\.4-mini/);
 
       await shutdownTeam(runtime.teamName, cwd, { force: true });

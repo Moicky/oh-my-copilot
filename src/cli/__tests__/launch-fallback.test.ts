@@ -74,7 +74,7 @@ describe('omcp launch fallback when tmux is unavailable', () => {
 
       assert.equal(result.status, 0, result.error || result.stderr || result.stdout);
       assert.match(result.stdout, /fake-codex:.*--allow-all-tools/);
-      assert.match(result.stdout, /fake-codex:.*model_reasoning_effort="xhigh"/);
+      assert.match(result.stdout, /fake-codex:.*--reasoning-effort xhigh/);
       assert.doesNotMatch(result.stderr, /spawnSync tmux ENOENT/);
     } finally {
       await rm(wd, { recursive: true, force: true });

@@ -1249,10 +1249,25 @@ function paneHasTrustPrompt(captured: string): boolean {
     .split('\n')
     .map((line) => line.replace(/\r/g, '').trim())
     .filter((line) => line.length > 0);
-  const tail = lines.slice(-12);
-  const hasQuestion = tail.some((line) => /Do you trust the contents of this directory\?/i.test(line));
-  const hasActiveChoices = tail.some((line) => /Yes,\s*continue|No,\s*quit|Press enter to continue/i.test(line));
-  return hasQuestion && hasActiveChoices;
+  const tail = lines.slice(-30);
+  // Codex-style trust prompt.
+  const hasCodexQuestion = tail.some((line) => /Do you trust the contents of this directory\?/i.test(line));
+  const hasCodexChoices = tail.some((line) => /Yes,\s*continue|No,\s*quit|Press enter to continue/i.test(line));
+  if (hasCodexQuestion && hasCodexChoices) return true;
+
+  // Copilot CLI "Confirm folder trust" prompt:
+  //   Confirm folder trust
+  //   Do you trust the files in this folder?
+  //   ❯ 1. Yes
+  //     2. Yes, and remember this folder for future sessions
+  //     3. No (Esc)
+  const hasCopilotQuestion = tail.some((line) =>
+    /Confirm folder trust/i.test(line)
+    || /Do you trust the files in this folder\?/i.test(line)
+  );
+  const hasCopilotChoices = tail.some((line) => /^\s*[❯>]?\s*1\.\s*Yes\b/i.test(line))
+    && tail.some((line) => /\bNo\b\s*\(Esc\)/i.test(line));
+  return hasCopilotQuestion && hasCopilotChoices;
 }
 
 function paneHasClaudeBypassPermissionsPrompt(captured: string): boolean {
