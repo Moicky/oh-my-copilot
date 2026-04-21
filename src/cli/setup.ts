@@ -39,6 +39,9 @@ import {
   getUnifiedMcpRegistryCandidates,
   loadUnifiedMcpRegistry,
   planClaudeCodeMcpSettingsSync,
+  planCopilotMcpServersSync,
+  sharedRegistryServerToCopilotEntry,
+  type CopilotMcpServerEntry,
   type UnifiedMcpRegistryLoadResult,
 } from "../config/mcp-registry.js";
 import { generateAgentToml } from "../agents/native-config.js";
@@ -863,6 +866,14 @@ export async function setup(options: SetupOptions = {}): Promise<void> {
   }
   if (resolvedScope.scope === "user") {
     await syncClaudeCodeMcpSettings(
+      sharedMcpRegistry,
+      summary.config,
+      backupContext,
+      { dryRun, verbose },
+    );
+    await syncCopilotMcpServers(
+      pkgRoot,
+      scopeDirs.copilotHomeDir,
       sharedMcpRegistry,
       summary.config,
       backupContext,
@@ -1741,6 +1752,103 @@ async function syncClaudeCodeMcpSettings(
     backupContext,
     options,
     `Claude Code MCP settings ${settingsPath} (+${syncPlan.added.join(", ")})`,
+  );
+}
+
+/**
+ * Build the list of OMCP-managed MCP servers to register in copilot's
+ * ~/.copilot/mcp-config.json. These mirror the `[mcp_servers.omcp_*]` tables
+ * in Codex's config.toml (see src/config/generator.ts) but use the JSON
+ * schema copilot CLI expects.
+ */
+function getOmcpManagedCopilotServers(pkgRoot: string): CopilotMcpServerEntry[] {
+  const mcp = (file: string) => join(pkgRoot, "dist", "mcp", file);
+  return [
+    {
+      name: "omcp_state",
+      command: "node",
+      args: [mcp("state-server.js")],
+      timeoutMs: 5000,
+    },
+    {
+      name: "omcp_memory",
+      command: "node",
+      args: [mcp("memory-server.js")],
+      timeoutMs: 5000,
+    },
+    {
+      name: "omcp_code_intel",
+      command: "node",
+      args: [mcp("code-intel-server.js")],
+      timeoutMs: 10000,
+    },
+    {
+      name: "omcp_trace",
+      command: "node",
+      args: [mcp("trace-server.js")],
+      timeoutMs: 5000,
+    },
+    {
+      name: "omcp_wiki",
+      command: "node",
+      args: [mcp("wiki-server.js")],
+      timeoutMs: 5000,
+    },
+  ];
+}
+
+/**
+ * Write the OMCP-managed MCP servers (omcp_state, omcp_memory, ...) plus any
+ * shared-registry servers into ~/.copilot/mcp-config.json, which is the file
+ * copilot CLI actually reads. Entries we own are tracked under the
+ * x-omcp-managed-servers marker so uninstall can remove only our entries.
+ */
+async function syncCopilotMcpServers(
+  pkgRoot: string,
+  copilotHomeDir: string,
+  sharedMcpRegistry: UnifiedMcpRegistryLoadResult,
+  summary: SetupCategorySummary,
+  backupContext: SetupBackupContext,
+  options: Pick<SetupOptions, "dryRun" | "verbose">,
+): Promise<void> {
+  const mcpConfigPath = join(copilotHomeDir, "mcp-config.json");
+  const desired: CopilotMcpServerEntry[] = [
+    ...getOmcpManagedCopilotServers(pkgRoot),
+    ...sharedMcpRegistry.servers.map(sharedRegistryServerToCopilotEntry),
+  ];
+
+  const existing = existsSync(mcpConfigPath)
+    ? await readFile(mcpConfigPath, "utf-8")
+    : "";
+  const plan = planCopilotMcpServersSync(existing, desired);
+
+  for (const warning of plan.warnings) {
+    console.log(`  warning: ${warning}`);
+  }
+
+  if (!plan.content) {
+    summary.unchanged += 1;
+    if (options.verbose) {
+      console.log(
+        `  copilot mcp-config.json already up to date (${mcpConfigPath})`,
+      );
+    }
+    return;
+  }
+
+  const parts: string[] = [];
+  if (plan.added.length > 0) parts.push(`+${plan.added.join(", ")}`);
+  if (plan.updated.length > 0) parts.push(`~${plan.updated.join(", ")}`);
+  if (plan.removed.length > 0) parts.push(`-${plan.removed.join(", ")}`);
+  const summarySuffix = parts.length > 0 ? ` (${parts.join(" ")})` : "";
+
+  await syncManagedContent(
+    plan.content,
+    mcpConfigPath,
+    summary,
+    backupContext,
+    options,
+    `copilot MCP config ${mcpConfigPath}${summarySuffix}`,
   );
 }
 
