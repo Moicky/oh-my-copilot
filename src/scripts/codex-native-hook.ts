@@ -62,7 +62,8 @@ type CodexHookEventName =
   | "PreToolUse"
   | "PostToolUse"
   | "UserPromptSubmit"
-  | "Stop";
+  | "Stop"
+  | "ErrorOccurred";
 
 type CodexHookPayload = Record<string, unknown>;
 
@@ -162,6 +163,7 @@ function readHookEventName(payload: CodexHookPayload): CodexHookEventName | null
     || raw === "PostToolUse"
     || raw === "UserPromptSubmit"
     || raw === "Stop"
+    || raw === "ErrorOccurred"
   ) {
     return raw;
   }
@@ -182,6 +184,8 @@ export function mapCodexHookEventToOmcpEvent(
       return "keyword-detector";
     case "Stop":
       return "stop";
+    case "ErrorOccurred":
+      return "error-occurred";
     default:
       return null;
   }
@@ -1723,6 +1727,12 @@ export async function dispatchCodexNativeHook(
       // Non-fatal: notification module may not be configured.
     }
   }
+
+  // ErrorOccurred is dispatched through the standard dispatchHookEvent flow
+  // above (mapped to "error-occurred"), reaching custom hook scripts so users
+  // can react to Copilot CLI errors. We intentionally do NOT route this to
+  // notifyLifecycle because the lifecycle channel is reserved for high-signal
+  // session boundary events; adding noisy per-error pings would degrade UX.
 
   let outputJson: Record<string, unknown> | null = null;
   if (hookEventName === "SessionStart" || hookEventName === "UserPromptSubmit") {

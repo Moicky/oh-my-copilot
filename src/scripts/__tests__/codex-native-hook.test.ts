@@ -105,6 +105,7 @@ describe("codex native hook config", () => {
       "PostToolUse",
       "UserPromptSubmit",
       "Stop",
+      "ErrorOccurred",
     ]);
 
     const sessionStart = config.hooks.SessionStart[0] as {
