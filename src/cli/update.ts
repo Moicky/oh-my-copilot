@@ -20,7 +20,7 @@ interface LatestPackageInfo {
   version?: string;
 }
 
-const PACKAGE_NAME = 'oh-my-copilot';
+const PACKAGE_NAME = '@moicky/oh-my-copilot';
 const CHECK_INTERVAL_MS = 12 * 60 * 60 * 1000; // 12h
 
 function parseSemver(version: string): [number, number, number] | null {

@@ -21,6 +21,7 @@ import { detectLegacySkillRootOverlap } from "../utils/paths.js";
 import { resolveScopeDirectories, type SetupScope } from "./setup.js";
 import { readPersistedSetupScope } from "./index.js";
 import { isOmcpGeneratedAgentsMd } from "../utils/agents-md.js";
+import { planCopilotMcpServersRemoval } from "../config/mcp-registry.js";
 
 export interface UninstallOptions {
   dryRun?: boolean;
@@ -169,6 +170,42 @@ async function cleanConfig(
   }
 
   return result;
+}
+
+/**
+ * Remove OMCP-managed entries from ~/.copilot/mcp-config.json. User-managed
+ * entries (any entry not listed under the x-omcp-managed-servers marker) are
+ * preserved. Removes the marker itself on success.
+ */
+async function cleanCopilotMcpConfig(
+  mcpConfigPath: string,
+  options: Pick<UninstallOptions, "dryRun" | "verbose">,
+): Promise<void> {
+  if (!existsSync(mcpConfigPath)) {
+    if (options.verbose) {
+      console.log(`  ${mcpConfigPath} not found, skipping.`);
+    }
+    return;
+  }
+  const original = await readFile(mcpConfigPath, "utf-8");
+  const plan = planCopilotMcpServersRemoval(original);
+  for (const warning of plan.warnings) {
+    console.log(`  warning: ${warning}`);
+  }
+  if (!plan.content || plan.removed.length === 0) {
+    if (options.verbose) {
+      console.log(`  No OMCP-managed entries in ${mcpConfigPath}.`);
+    }
+    return;
+  }
+  if (!options.dryRun) {
+    await writeFile(mcpConfigPath, plan.content);
+  }
+  console.log(
+    `  ${options.dryRun ? "Would remove" : "Removed"} OMCP MCP server${
+      plan.removed.length === 1 ? "" : "s"
+    } from ${mcpConfigPath}: ${plan.removed.join(", ")}`,
+  );
 }
 
 async function removeInstalledPrompts(
@@ -488,6 +525,12 @@ export async function uninstall(options: UninstallOptions = {}): Promise<void> {
       verbose,
     });
     Object.assign(summary, configResult);
+    if (scope === "user") {
+      await cleanCopilotMcpConfig(
+        join(scopeDirs.copilotHomeDir, "mcp-config.json"),
+        { dryRun, verbose },
+      );
+    }
   }
   console.log();
 
