@@ -25,8 +25,8 @@ describe('team model contract', () => {
       ]),
       [
         '--allow-all-tools',
-        '-c',
-        'model_reasoning_effort="xhigh"',
+        '--reasoning-effort',
+        'xhigh',
         '--model',
         'gpt-5.3',
       ],
@@ -135,7 +135,7 @@ describe('resolveTeamWorkerLaunchArgs - teammate reasoning allocation', () => {
     });
     assert.deepEqual(
       result,
-      ['-c', 'model_reasoning_effort="low"', '--model', expectedLowComplexityModel()],
+      ['--reasoning-effort', 'low', '--model', expectedLowComplexityModel()],
     );
   });
 
@@ -144,7 +144,8 @@ describe('resolveTeamWorkerLaunchArgs - teammate reasoning allocation', () => {
       fallbackModel: expectedLowComplexityModel(),
     });
     const joined = result.join(' ');
-    assert.ok(!joined.includes('model_reasoning_effort'), `Expected no auto-injected thinking level in: ${joined}`);
+    assert.ok(!joined.includes('reasoning-effort'), `Expected no auto-injected thinking level in: ${joined}`);
+    assert.ok(!joined.includes('model_reasoning_effort'), `Expected no legacy codex reasoning key in: ${joined}`);
   });
 
   it('preserves explicit reasoning override over teammate preference', () => {
@@ -154,11 +155,12 @@ describe('resolveTeamWorkerLaunchArgs - teammate reasoning allocation', () => {
       preferredReasoning: 'low',
     });
     const joined = result.join(' ');
-    // Should contain the explicit high level
-    assert.ok(joined.includes('model_reasoning_effort="high"'), `Expected explicit high level in: ${joined}`);
-    // Should appear exactly once
-    const matches = joined.match(/model_reasoning_effort/g) ?? [];
-    assert.equal(matches.length, 1, 'reasoning override should appear exactly once');
+    // Must emit the copilot-native form with the explicit high level.
+    assert.ok(/--reasoning-effort\s+high/.test(joined), `Expected explicit high level in: ${joined}`);
+    // Should appear exactly once and never leak the legacy codex -c form.
+    const copilotMatches = joined.match(/--reasoning-effort/g) ?? [];
+    assert.equal(copilotMatches.length, 1, 'reasoning override should appear exactly once');
+    assert.ok(!joined.includes('model_reasoning_effort'), 'legacy codex config key must not appear');
   });
 
   it('does not inject thinking when model is explicit but reasoning is omitted', () => {
@@ -166,6 +168,7 @@ describe('resolveTeamWorkerLaunchArgs - teammate reasoning allocation', () => {
       existingRaw: '--model claude-opus-4',
     });
     const joined = result.join(' ');
-    assert.ok(!joined.includes('model_reasoning_effort'), `Expected no reasoning in: ${joined}`);
+    assert.ok(!joined.includes('reasoning-effort'), `Expected no reasoning in: ${joined}`);
+    assert.ok(!joined.includes('model_reasoning_effort'), `Expected no legacy reasoning in: ${joined}`);
   });
 });

@@ -2449,8 +2449,8 @@ describe("team worker launch arg inheritance helpers", () => {
       ]),
       [
         "--allow-all-tools",
-        "-c",
-        'model_reasoning_effort="xhigh"',
+        "--reasoning-effort",
+        "xhigh",
         "--model",
         "gpt-5",
       ],
@@ -2477,7 +2477,7 @@ describe("team worker launch arg inheritance helpers", () => {
         ],
         true,
       ),
-      '--no-alt-screen --allow-all-tools -c model_reasoning_effort="xhigh" --model old-b',
+      '--no-alt-screen --allow-all-tools --reasoning-effort xhigh --model old-b',
     );
   });
 

@@ -1873,8 +1873,7 @@ export function resolveWorkerLaunchArgsFromEnv(
   // Extract resolved model and thinking level from result args for startup log
   const resolvedParsed = parseTeamWorkerLaunchArgs(resolved);
   const resolvedModel = resolvedParsed.modelOverride ?? fallbackModel ?? 'default';
-  const reasoningMatch = resolvedParsed.reasoningOverride?.match(/model_reasoning_effort\s*=\s*"?(\w+)"?/);
-  const thinkingLevel = reasoningMatch?.[1] ?? 'none';
+  const thinkingLevel = resolvedParsed.reasoningOverride ?? 'none';
   const source = hasExplicitReasoning
     ? 'explicit'
     : (preferredReasoning ? 'role-default' : 'none/default-none');
