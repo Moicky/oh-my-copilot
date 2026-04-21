@@ -190,7 +190,7 @@ describe("omcp setup scope behavior", () => {
       assert.equal(existsSync(localConfig), true);
       assert.equal(existsSync(localHooks), true);
       assert.equal(existsSync(localAgents), true);
-      assert.equal(existsSync(join(localAgents, "executor.toml")), true);
+      assert.equal(existsSync(join(localAgents, "executor.md")), true);
       assert.equal(
         existsSync(join(localSkills, "omcp-setup", "SKILL.md")),
         true,

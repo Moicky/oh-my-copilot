@@ -37,24 +37,24 @@ describe('omcp setup prompt/native-agent overwrite behavior', () => {
       assert.equal(installedPrompts.has('sisyphus-lite.md'), false);
       assert.equal(installedPrompts.has('code-simplifier.md'), true);
 
-      assert.equal(installedNativeAgents.has('executor.toml'), true);
-      assert.equal(installedNativeAgents.has('team-executor.toml'), true);
-      assert.equal(installedNativeAgents.has('code-reviewer.toml'), true);
-      assert.equal(installedNativeAgents.has('code-review.toml'), false);
-      assert.equal(installedNativeAgents.has('plan.toml'), false);
-      assert.equal(installedNativeAgents.has('style-reviewer.toml'), false);
-      assert.equal(installedNativeAgents.has('quality-reviewer.toml'), false);
-      assert.equal(installedNativeAgents.has('api-reviewer.toml'), false);
-      assert.equal(installedNativeAgents.has('performance-reviewer.toml'), false);
-      assert.equal(installedNativeAgents.has('product-manager.toml'), false);
-      assert.equal(installedNativeAgents.has('ux-researcher.toml'), false);
-      assert.equal(installedNativeAgents.has('information-architect.toml'), false);
-      assert.equal(installedNativeAgents.has('product-analyst.toml'), false);
-      assert.equal(installedNativeAgents.has('code-simplifier.toml'), true);
+      assert.equal(installedNativeAgents.has('executor.md'), true);
+      assert.equal(installedNativeAgents.has('team-executor.md'), true);
+      assert.equal(installedNativeAgents.has('code-reviewer.md'), true);
+      assert.equal(installedNativeAgents.has('code-review.md'), false);
+      assert.equal(installedNativeAgents.has('plan.md'), false);
+      assert.equal(installedNativeAgents.has('style-reviewer.md'), false);
+      assert.equal(installedNativeAgents.has('quality-reviewer.md'), false);
+      assert.equal(installedNativeAgents.has('api-reviewer.md'), false);
+      assert.equal(installedNativeAgents.has('performance-reviewer.md'), false);
+      assert.equal(installedNativeAgents.has('product-manager.md'), false);
+      assert.equal(installedNativeAgents.has('ux-researcher.md'), false);
+      assert.equal(installedNativeAgents.has('information-architect.md'), false);
+      assert.equal(installedNativeAgents.has('product-analyst.md'), false);
+      assert.equal(installedNativeAgents.has('code-simplifier.md'), true);
 
-      const codeReviewerToml = await readFile(join(wd, '.copilot', 'agents', 'code-reviewer.toml'), 'utf-8');
-      assert.match(codeReviewerToml, /^name = "code-reviewer"$/m);
-      assert.match(codeReviewerToml, /developer_instructions\s*=/);
+      const codeReviewerMd = await readFile(join(wd, '.copilot', 'agents', 'code-reviewer.md'), 'utf-8');
+      assert.match(codeReviewerMd, /^name: 'code-reviewer'$/m);
+      assert.match(codeReviewerMd, /^model:/m);
     } finally {
       process.chdir(previousCwd);
       await rm(wd, { recursive: true, force: true });
@@ -97,7 +97,7 @@ describe('omcp setup prompt/native-agent overwrite behavior', () => {
 
       await setup({ scope: 'project' });
 
-      const staleAgents = ['style-reviewer.toml', 'quality-reviewer.toml'];
+      const staleAgents = ['style-reviewer.md', 'quality-reviewer.md'];
       for (const staleAgent of staleAgents) {
         const stalePath = join(wd, '.copilot', 'agents', staleAgent);
         await writeFile(stalePath, '# stale native agent\n');
@@ -109,7 +109,7 @@ describe('omcp setup prompt/native-agent overwrite behavior', () => {
       for (const staleAgent of staleAgents) {
         assert.equal(existsSync(join(wd, '.copilot', 'agents', staleAgent)), false);
       }
-      assert.equal(existsSync(join(wd, '.copilot', 'agents', 'executor.toml')), true);
+      assert.equal(existsSync(join(wd, '.copilot', 'agents', 'executor.md')), true);
     } finally {
       process.chdir(previousCwd);
       await rm(wd, { recursive: true, force: true });
@@ -140,7 +140,7 @@ describe('omcp setup prompt/native-agent overwrite behavior', () => {
       await setup({ scope: 'project' });
 
       assert.equal(existsSync(stalePath), false);
-      assert.equal(existsSync(join(wd, '.copilot', 'agents', 'executor.toml')), true);
+      assert.equal(existsSync(join(wd, '.copilot', 'agents', 'executor.md')), true);
     } finally {
       process.chdir(previousCwd);
       await rm(wd, { recursive: true, force: true });
